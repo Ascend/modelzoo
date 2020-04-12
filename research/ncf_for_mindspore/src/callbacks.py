@@ -1,0 +1,58 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+from mindspore.train.callback import Callback
+
+
+class LossCallBack(Callback):
+    """
+    Monitor the loss in training.
+    """
+ 
+    def __init__(self, loss_file_path="./loss.log"):
+        super(LossCallBack, self).__init__()
+        self.loss_file_path = loss_file_path
+ 
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        loss = cb_params.net_outputs.asnumpy()
+        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+ 
+        loss_file = open(self.loss_file_path, "a+")
+        loss_file.write("epoch: %s step: %s, loss is %s\n" % (cb_params.cur_epoch_num, cur_step_in_epoch, loss))
+        loss_file.close()
+        print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num, cur_step_in_epoch, loss))
+
+
+class EvalCallBack(Callback):
+    """
+    Monitor the loss in evaluate.
+    """
+ 
+    def __init__(self, model, eval_dataset, metric, eval_file_path="./eval.log"):
+        super(EvalCallBack, self).__init__()
+        self.model = model
+        self.eval_dataset = eval_dataset
+        self.Metric = metric
+        self.Metric.clear()
+        self.eval_file_path = eval_file_path
+ 
+    def epoch_end(self, run_context):
+        self.Metric.clear()
+        out = self.model.eval(self.eval_dataset)
+
+        eval_file = open(self.eval_file_path, "a+")
+        eval_file.write("EvalCallBack: HR = {}, NDCG = {}\n".format(out['ncf'][0], out['ncf'][1]))
+        eval_file.close()
+        print("EvalCallBack: HR = {}, NDCG = {}".format(out['ncf'][0], out['ncf'][1]))

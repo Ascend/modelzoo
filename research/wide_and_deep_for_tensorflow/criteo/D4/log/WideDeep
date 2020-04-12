@@ -1,0 +1,885 @@
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 0.8
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.587187	0.562444	0.988615
+ctr	0	0.634521	0.554621	0.974864
+ctr	0	0.648472	0.549399	0.965685
+ctr	0	0.655826	0.545717	0.959213
+ctr	0	0.660857	0.54305	0.954527
+ctr	0	0.664844	0.540819	0.950604
+ctr	0	0.667968	0.5389	0.947232
+ctr	0	0.670614	0.537201	0.944245
+ctr	0	0.67287	0.535825	0.941827
+ctr	0	0.67514	0.534659	0.939777
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.790122	0.459311	0.807337
+ctr	0	0.789836	0.459711	0.808041
+ctr	0	0.787435	0.461937	0.811953
+ctr	0	0.785117	0.463967	0.815521
+ctr	0	0.78327	0.46574	0.818637
+ctr	0	0.781842	0.466927	0.820723
+ctr	0	0.780624	0.468093	0.822774
+ctr	0	0.779503	0.468953	0.824286
+ctr	0	0.778765	0.469558	0.825348
+ctr	0	0.778192	0.470056	0.826224
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.795899	0.454508	0.798895
+ctr	0	0.797032	0.45327	0.796718
+ctr	0	0.797846	0.452612	0.795562
+ctr	0	0.797766	0.452683	0.795688
+ctr	0	0.797809	0.452584	0.795513
+ctr	0	0.797884	0.452534	0.795424
+ctr	0	0.798083	0.452384	0.795161
+ctr	0	0.798192	0.452349	0.7951
+ctr	0	0.798128	0.452377	0.795148
+ctr	0	0.797962	0.452503	0.795371
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 0.8
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.792816	0.457148	0.803535
+ctr	0	0.794813	0.455348	0.800372
+ctr	0	0.795271	0.455003	0.799765
+ctr	0	0.7955	0.454782	0.799376
+ctr	0	0.795733	0.454592	0.799043
+ctr	0	0.795894	0.454458	0.798807
+ctr	0	0.796062	0.454425	0.79875
+ctr	0	0.796153	0.454208	0.798368
+ctr	0	0.796158	0.454218	0.798385
+ctr	0	0.796264	0.454121	0.798215
+ctr	0	0.796502	0.453966	0.797942
+ctr	0	0.79648	0.453978	0.797963
+ctr	0	0.796461	0.45398	0.797966
+ctr	0	0.796489	0.453942	0.7979
+ctr	0	0.796535	0.453983	0.797973
+ctr	0	0.796383	0.454056	0.7981
+ctr	0	0.796553	0.453941	0.797898
+ctr	0	0.796758	0.453719	0.797507
+ctr	0	0.796529	0.453938	0.797893
+ctr	0	0.796303	0.454141	0.798251
+ctr	0	0.796641	0.453814	0.797675
+ctr	0	0.796701	0.453735	0.797537
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.792725	0.457719	0.804896
+ctr	0	0.79506	0.454981	0.800081
+ctr	0	0.795183	0.454788	0.799742
+ctr	0	0.795557	0.454496	0.799228
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.790827	0.471434	0.828656
+ctr	0	0.794021	0.456047	0.801609
+ctr	0	0.794456	0.455633	0.800881
+ctr	0	0.794772	0.455365	0.80041
+ctr	0	0.794938	0.455273	0.800249
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.792034	0.457735	0.804576
+ctr	0	0.794085	0.456037	0.801592
+ctr	0	0.794686	0.455464	0.800585
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.792159	0.457604	0.804346
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.792425	0.457765	0.804629
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.676424	0.533306	0.937411
+ctr	0	0.690775	0.525284	0.92331
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.67755	0.533228	0.937273
+ctr	0	0.691538	0.525177	0.923121
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.677317	0.533503	0.937757
+ctr	0	0.691709	0.525269	0.923283
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.677853	0.533229	0.937275
+ctr	0	0.691356	0.525066	0.922927
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.677521	0.533122	0.937086
+ctr	0	0.691602	0.525126	0.923032
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.718498	0.511281	0.898697
+ctr	0	0.7313	0.502536	0.883324
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.726011	0.519709	0.9135
+ctr	0	0.731755	0.50254	0.883321
+ctr	0	0.735683	0.498885	0.876897
+ctr	0	0.738711	0.497271	0.87406
+ctr	0	0.741255	0.496016	0.871854
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.72399	0.507383	0.891833
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.720436	0.510258	0.896887
+ctr	0	0.731712	0.502322	0.882939
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.725618	0.506975	0.891117
+ctr	0	0.729604	0.502524	0.883294
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.721164	0.50903	0.894729
+ctr	0	0.732039	0.503334	0.884717
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.726353	0.504911	0.887489
+ctr	0	0.732841	0.500959	0.880543
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.71877	0.509645	0.89581
+ctr	0	0.731302	0.501941	0.882268
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.72407	0.506654	0.890552
+ctr	0	0.732683	0.501105	0.880799
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.725239	0.512981	0.901673
+ctr	0	0.732842	0.502057	0.882472
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.717234	0.515289	0.905731
+ctr	0	0.658904	0.594073	1.04421
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.726417	0.505109	0.887837
+ctr	0	0.73866	0.497102	0.873762
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.722047	0.508237	0.893335
+ctr	0	0.732425	0.501795	0.882013
+ctr	0	0.737978	0.498189	0.875674
+ctr	0	0.741381	0.495933	0.871708
+ctr	0	0.744313	0.493934	0.868194
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.721902	0.507813	0.89259
+ctr	0	0.732031	0.501454	0.881412
+ctr	0	0.737956	0.497913	0.875189
+ctr	0	0.741709	0.495439	0.870841
+ctr	0	0.744406	0.49361	0.867624
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.721365	0.508498	0.893794
+ctr	0	0.732532	0.501345	0.88122
+ctr	0	0.738473	0.497733	0.874872
+ctr	0	0.742625	0.494993	0.870055
+ctr	0	0.745466	0.493047	0.866635
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.721169	0.508507	0.893809
+ctr	0	0.731793	0.501978	0.882334
+ctr	0	0.737397	0.498387	0.876021
+ctr	0	0.741299	0.495955	0.871747
+ctr	0	0.743824	0.494097	0.868481
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 0.8
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.639472	0.557886	0.980603
+ctr	0	0.652613	0.552021	0.970294
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 0.8
+l2(lambda): 8e-05
+merge_multi_hot: False
+
+ctr	0	0.63691	0.559237	0.982978
+ctr	0	0.651314	0.552418	0.970993
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 0.8
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.625306	0.556429	0.978043
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.620043	0.556309	0.977831
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.721023	0.508635	0.894035
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.71909	0.509439	0.895447
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.720153	0.509055	0.894772
+ctr	0	0.731664	0.502018	0.882404
+ctr	0	0.737371	0.498393	0.876033
+ctr	0	0.74144	0.495754	0.871393
+ctr	0	0.74407	0.494021	0.868348
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.721595	0.507892	0.892728
+ctr	0	0.73351	0.500537	0.879801
+ctr	0	0.739313	0.497003	0.873589
+ctr	0	0.742927	0.494572	0.869316
+ctr	0	0.745563	0.492783	0.866172
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.721396	0.508276	0.893404
+ctr	0	0.732718	0.501222	0.881005
+ctr	0	0.738312	0.497751	0.874904
+ctr	0	0.741893	0.495439	0.87084
+ctr	0	0.744538	0.493609	0.867623
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.719759	0.508686	0.894124
+ctr	0	0.730618	0.502014	0.882397
+ctr	0	0.736441	0.498455	0.876141
+ctr	0	0.740463	0.495917	0.871681
+ctr	0	0.743204	0.4941	0.868486
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-06
+merge_multi_hot: False
+
+ctr	0	0.720367	0.509041	0.894749
+ctr	0	0.732123	0.501489	0.881474
+ctr	0	0.737524	0.498001	0.875342
+ctr	0	0.741266	0.495627	0.871171
+ctr	0	0.743903	0.493896	0.868128
+input dim: 200000
+num inputs: 39
+embed size(each): 80
+embedding layer: 3120
+layers: [3120, 1024, 512, 256, 128, 1]
+activate: relu
+keep_prob: 1
+l2(lambda): 1e-07
+merge_multi_hot: False
+
+ctr	0	0.730884	0.510321	0.896998
+ctr	0	0.741664	0.497332	0.874167
+ctr	0	0.746377	0.493447	0.867338
+ctr	0	0.7495	0.491349	0.863651
+ctr	0	0.75167	0.489543	0.860476
+ctr	0	0.75334	0.488586	0.858794
+ctr	0	0.754907	0.487279	0.856497
+ctr	0	0.756118	0.486604	0.85531
+ctr	0	0.757159	0.485865	0.854011
+ctr	0	0.757919	0.485578	0.853508
+ctr	0	0.758602	0.485372	0.853145
+ctr	0	0.759201	0.486606	0.855314
+ctr	0	0.759586	0.483949	0.850644
+ctr	0	0.759943	0.484174	0.851039
+ctr	0	0.759956	0.485875	0.854029
+ctr	0	0.760134	0.483734	0.850266
+ctr	0	0.760242	0.483312	0.849523
+ctr	0	0.760086	0.484688	0.851942
+ctr	0	0.760028	0.485006	0.852502
+ctr	0	0.759861	0.491897	0.864614

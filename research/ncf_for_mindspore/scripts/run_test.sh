@@ -1,0 +1,1 @@
+python ./test.py --data_path './dataset' --dataset 'ml-1m'  --train_epochs 14 --eval_batch_size 160000 --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path './checkpoint/NCF-14_19418.ckpt' 

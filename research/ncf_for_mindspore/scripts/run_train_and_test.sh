@@ -1,0 +1,1 @@
+python ./train_and_test.py --data_path './dataset' --dataset 'ml-1m'  --train_epochs 14 --batch_size 256 --eval_batch_size 160000 --output_path './output/' --eval_file_name 'eval.log' --loss_file_name 'loss.log' 
