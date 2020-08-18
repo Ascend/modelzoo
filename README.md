@@ -35,10 +35,10 @@
 			- [YOLOv3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Official/YOLOv3_for_TensorFlow)
 			- [YoloV3_For_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Official/YoloV3_For_MindSpore)
 
-    - [Research](#Research)
-        - [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Research/DeeplabV3_for_MindSpore)
-        - [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Research/SSD-Resnet34_for_TensorFlow)
-    - [tutorial](#tutorial)
+		- [Research](#Research)
+			- [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Research/DeeplabV3_for_MindSpore)
+			- [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Research/SSD-Resnet34_for_TensorFlow)
+		- [tutorial](#tutorial)
 
 # Disclaimers
 
