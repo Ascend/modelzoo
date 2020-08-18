@@ -1,0 +1,6 @@
+mindspore
+lmdb
+numpy
+PIL
+tqdm
+six

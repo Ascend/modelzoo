@@ -1,0 +1,79 @@
+#!/bin/bash
+
+while getopts ":e:u:" opt
+do
+    case $opt in
+        e)
+        ENV_VERSION=$OPTARG
+        ;;
+        u)
+        UNSET_PROXY_FLAG=$OPTARG
+        ;;
+        ?)
+        echo "环境 版本(不填为Ascend910版本) -e ['cuda9'， 'cuda10'， 'ascend310'] , 是否设置代理(默认为true) -u ['true', 'false']"
+        exit 1;;
+    esac
+done
+
+root_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
+
+# Unset proxy
+if [ "$UNSET_PROXY_FLAG" != "false" ]; then
+  unset http_proxy
+  unset https_proxy
+fi
+
+if [ -z "${GE_FLAG}" ]; then
+  GE_FLAG='false'
+fi
+
+# Common
+export sault_schedule_root=/home/jenkins/sault_schedule
+export PYTHONPATH=${root_dir}/solution_test:${PYTHONPATH}
+export WORKSPACEX=/home/jenkins/workspace/release_pkg/ms_daily
+if [ -d /usr/local/gcc/gcc73 ]; then
+    export LD_LIBRARY_PATH=/usr/local/gcc/gcc73/gcc7/lib64/:$LD_LIBRARY_PATH
+    export PATH=/usr/local/gcc/gcc73/gcc7/bin:/usr/local/gcc/gcc73/gcc7/lib:$PATH
+fi
+
+# GPU(cuda, ompi and nccl)
+if [ "${ENV_VERSION}" = "cuda9" ]; then
+    export CUDA_HOME=/usr/local/cuda-9.2
+    export CUDNN_PATH=${CUDA_HOME}
+    export PATH=${CUDA_HOME}/bin:$PATH
+    export LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${CUDA_HOME}/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+    export CUDA_VISIBLE_DEVICES=0
+elif [ "${ENV_VERSION}" = "cuda10" ]; then
+    export CUDA_HOME=/usr/local/cuda-10.1
+    export CUDNN_PATH=${CUDA_HOME}
+    export PATH=${CUDA_HOME}/bin:$PATH
+    export LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${CUDA_HOME}/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}
+    export CUDA_VISIBLE_DEVICES=0
+elif [ "${ENV_VERSION}" = "ascend310" ]; then
+    # Ascend
+    export SLOG_PRINT_TO_STDOUT=1
+    export DEVICE_ID=0
+    export ASCEND_HOME=/usr/local/Ascend
+    # Ascend atc and opp
+    export PATH=$ASCEND_HOME/atc/ccec_compiler/bin:$ASCEND_HOME/atc/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib/:$ASCEND_HOME/atc/lib64:$ASCEND_HOME/acllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
+    export PYTHONPATH=$PYTHONPATH:$ASCEND_HOME/atc/python/site-packages/te.egg:$ASCEND_HOME/atc/python/site-packages/topi.egg:$ASCEND_HOME/atc/python/site-packages/auto_tune.egg
+    export NPU_HOST_LIB=/usr/local/Ascend/acllib/lib64/stub
+    export ASCEND_OPP_PATH=/usr/local/Ascend/opp
+else
+    # Ascend
+    export SLOG_PRINT_TO_STDOUT=1
+    export DEVICE_ID=0
+    # Ascend TBE
+    export LOCAL_HIAI=/usr/local/Ascend
+    export PATH=${LOCAL_HIAI}/fwkacllib/ccec_compiler/bin:${PATH}
+    export TBE_IMPL_PATH=${LOCAL_HIAI}/opp/op_impl/built-in/ai_core/tbe
+    export PYTHONPATH=${TBE_IMPL_PATH}:${PYTHONPATH}
+    export LD_LIBRARY_PATH=${LOCAL_HIAI}/driver/lib64/common:${LOCAL_HIAI}/fwkacllib/lib64:${LOCAL_HIAI}/add-ons:${LD_LIBRARY_PATH}
+fi
+
+
+
+

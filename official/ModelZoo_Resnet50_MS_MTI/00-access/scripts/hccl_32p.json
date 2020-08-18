@@ -1,0 +1,61 @@
+{
+    "board_id": "0x002f",
+    "chip_info": "910",
+    "deploy_mode": "lab",
+    "group_count": "1",
+    "group_list": [
+      {
+         "device_num": "32",
+         "server_num": "4",
+         "group_name": "",
+         "instance_count": "32",
+         "instance_list": [
+           { "devices": [ { "device_id": "0", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "0",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "1", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "1",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "2", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "2",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "3", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "3",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "4", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "4",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "5", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "5",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "6", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "6",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "7", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "7",  "server_id": "xxx.xxx.xxx.xxx1" },
+           { "devices": [ { "device_id": "0", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "8",  "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "1", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "9",  "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "2", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "10", "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "3", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "11", "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "4", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "12", "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "5", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "13", "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "6", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "14", "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "7", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "15", "server_id": "xxx.xxx.xxx.xxx2" },
+           { "devices": [ { "device_id": "0", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "16", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "1", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "17", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "2", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "18", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "3", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "19", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "4", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "20", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "5", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "21", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "6", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "22", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "7", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "23", "server_id": "xxx.xxx.xxx.xxx3" },
+           { "devices": [ { "device_id": "0", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "24", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "1", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "25", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "2", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "26", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "3", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "27", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "4", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "28", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "5", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "29", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "6", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "30", "server_id": "xxx.xxx.xxx.xxx4" },
+           { "devices": [ { "device_id": "7", "device_ip": "xxx.xxx.xxx.xxx" } ], "rank_id": "31", "server_id": "xxx.xxx.xxx.xxx4" }
+         ]
+      }
+    ],
+    "para_plane_nic_location": "device",
+    "para_plane_nic_name": [
+        "eth0",
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7"
+    ],
+    "para_plane_nic_num": "8",
+    "status": "completed"
+  }

@@ -1,0 +1,12 @@
+
+# dirs
+.idea/
+__pycache__/
+
+# fils
+*.pyc
+*.log
+*.out
+
+data/darknet_weights/*.ckpt*
+

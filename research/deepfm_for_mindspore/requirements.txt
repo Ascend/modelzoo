@@ -1,5 +1,0 @@
-h5py==2.10.0
-mindspore==0.1.0
-pandas==1.0.1
-numpy==1.17.0
-scikit_learn==0.22.2.post1

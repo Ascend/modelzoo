@@ -1,0 +1,2 @@
+model_checkpoint_path: "darknet53.ckpt"
+all_model_checkpoint_paths: "darknet53.ckpt"
