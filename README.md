@@ -1,14 +1,14 @@
 # Welcome to the Model Zoo for Ascend
 
-# Table of Contents
+## Table of Contents
 
-- [Models](#modelzoo)
+- Models
 
-	- [Benchmark](#Benchmark)
+	- Benchmark
 		- [Bert-base_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Benchmark/Bert-base_for_TensorFlow)
 		- [Nezha-large_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Benchmark/Nezha-large_for_TensorFlow)
-		
-	- [Official](#Official)
+
+	- Official
 		- [AlexNet_For_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Official/AlexNet_For_MindSpore)
 		- [AlexNet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Official/AlexNet_for_TensorFlow)
 		- [Bert-base_For_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Official/Bert-base_For_MindSpore)
@@ -36,22 +36,18 @@
 		- [YOLOv3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Official/YOLOv3_for_TensorFlow)
 		- [YoloV3_For_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Official/YoloV3_For_MindSpore)
 
-	- [Research](#Research)
+	- Research
 		- [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/Research/DeeplabV3_for_MindSpore)
 		- [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/Research/SSD-Resnet34_for_TensorFlow)
-		
-	- [tutorial](#tutorial)
 
-# Disclaimers
+	- [tutorial](tutorial/README.md)
+
+## Disclaimers
 
 Ascend ModelZoo only provides scripts that downloads and preprocesses public datasets. We do not own these datasets and are not responsible for their quality or maintenance. Please make sure you have permission to use the dataset under the dataset’s license.
 
-To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on Mindspore, or wish to update it in any way. Please contact us through a Github/Gitee issue. Your understanding and contribution to this community is greatly appreciated.
+To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on MindSpore, or wish to update it in any way. Please contact us through a [GitHub](https://github.com/mindspore-ai/mindspore/issues)/[Gitee](https://gitee.com/mindspore/mindspore/issues) issue. Your understanding and contribution to this community is greatly appreciated.
 
-Ascend ModelZoo is MIT licensed. Please see the LICENSE file.
+## License
 
-
-
-# License
-
-[MIT License](https://gitee.com/ascend/modelzoo/blob/master/LICENSE)
+[Apache License 2.0](LICENSE)
