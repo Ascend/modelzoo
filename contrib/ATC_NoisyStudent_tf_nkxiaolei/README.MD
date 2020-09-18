@@ -1,4 +1,4 @@
-1. 转换模型，NoisyStudent的pb模型，下载地址来自于Google的modelzoo
+1、转换模型，NoisyStudent的pb模型，下载地址来自于Google的modelzoo
 
 2、下载验证数据集：
 http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_val.tar
@@ -7,4 +7,5 @@ http://www.image-net.org/challenges/LSVRC/2012/nnoupb/ILSVRC2012_img_val.tar
 
 4、使用msame工具进行推理
 
-5、根据输出的bin文件计算精度。
+5、使用bintotxt.py,解析输出的bin文件，根据输出的bin文件计算精度。
+python3.7.5 output/ fp32
