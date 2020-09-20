@@ -8,13 +8,9 @@
 ./msame --model model/albert.om --output output/ --loop 100
 
 Inference average time: 12.738640 ms
-
 Inference average time without first time: 12.736172 ms
-
 [INFO] unload model success, model Id is 1
-
 [INFO] Execute sample success.
-
 
 1Batch，长度128，平均推理性能12.736ms
 
