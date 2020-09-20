@@ -12,6 +12,6 @@ Inference average time without first time: 4.241717 ms
 [INFO] unload model success, model Id is 1
 [INFO] Execute sample success.
 
-1Batch，shape:1*299*229*3，不带AIPP，平均推理性能4.24ms
+1Batch，shape:1x299x229x3，不带AIPP，平均推理性能4.24ms
 
 5、精度测试：暂未开始
