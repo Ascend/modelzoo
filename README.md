@@ -5,6 +5,7 @@
 - Models
 	- Benchmark
 		- [Bert-base_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Bert-base_for_TensorFlow)
+		- [Mask_R_CNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Mask_R_CNN_for_MindSpore)
 		- [Nezha-large_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Nezha-large_for_TensorFlow)
 
 	- Official
@@ -12,34 +13,51 @@
 		- [AlexNet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/AlexNet_for_TensorFlow)
 		- [Bert-base_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Bert-base_for_MindSpore)
 		- [CNN&CTC_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/CNN&CTC_for_MindSpore)
+		- [DeepFM_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DeepFM_for_MindSpore)
 		- [DeeplabV3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DeeplabV3_for_TensorFlow)
 		- [DenseNet121_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DenseNet121_for_MindSpore)
 		- [DenseNet121_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DenseNet121_for_TensorFlow)
+		- [EfficientNet_B0_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/EfficientNet_B0_for_TensorFlow)
 		- [FasterRCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/FasterRCNN_for_MindSpore)
 		- [GoogLeNet_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/GoogLeNet_for_MindSpore)
 		- [GoogleNet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/GoogleNet_for_TensorFlow)
+		- [InceptionV4_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/InceptionV4_for_TensorFlow)
 		- [LeNet_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/LeNet_for_MindSpore)
 		- [MobileNetV2_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/MobileNetV2_for_MindSpore)
 		- [MobileNetV2_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/MobileNetV2_for_TensorFlow)
+		- [NCF for MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/NCF_for_MindSpore)
+		- [NEZHA_Large_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/NEZHA_Large_for_MindSpore)
 		- [PSENet_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/PSENet_for_MindSpore)
-		- [ResNet101_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResNet101_for_TensorFlow)
 		- [ResNet50_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResNet50_for_MindSpore)
 		- [ResNet50_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResNet50_for_TensorFlow)
+		- [Resnet101_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Resnet101_for_MindSpore)
+		- [ResNet101_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResNet101_for_TensorFlow)
+		- [ResnetVariant_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResnetVariant_for_TensorFlow)
 		- [ResNext50_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResNext50_for_MindSpore)
 		- [ResNext50_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/ResNext50_for_TensorFlow)
-		- [Resnet101_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Resnet101_for_MindSpore)
 		- [SSD_MobileNetV2_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/SSD_MobileNetV2_for_MindSpore)
 		- [TinyBERT_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/TinyBERT_for_MindSpore)
+		- [Transformer_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Transformer_for_MindSpore)
+		- [Transformer_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Transformer_for_TensorFlow)
+		- [UNet_Medical_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/UNet_Medical_for_MindSpore)
 		- [VGG16_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/VGG16_for_MindSpore)
 		- [VGG16_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/VGG16_for_TensorFlow)
+		- [Wide_Deep_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Wide_Deep_for_MindSpore)
 		- [YOLOv3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/YOLOv3_for_TensorFlow)
 		- [YoloV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/YoloV3_for_MindSpore)
 
 	- Research
+		- [DeepFM_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DeepFM_for_TensorFlow)
 		- [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DeeplabV3_for_MindSpore)
+		- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DSCNN_for_MindSpore)
+		- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceAttribute_for_MindSpore)
+		- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceDetection_for_MindSpore)
+		- [FaceQualityAssessment_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceQualityAssessment_for_MindSpore)
+		- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceRecognitionForTracking_for_MindSpore)
+		- [Music_Genre_Classification_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/Music_Genre_Classification_for_MindSpore)
 		- [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/SSD-Resnet34_for_TensorFlow)
-
-	- [tutorial](built-in/tutorial/README.md)
+		- [UNet_Industrial_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/UNet_Industrial_for_TensorFlow)
+		- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/Wide&Deep_for_TensorFlow)
 
 ## Disclaimers
 
