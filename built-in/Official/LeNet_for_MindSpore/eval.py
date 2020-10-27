@@ -19,40 +19,36 @@ python eval.py --data_path /YourDataPath --ckpt_path Your.ckpt
 """
 
 import os
+import ast
 import argparse
-from dataset import create_dataset
-from config import mnist_cfg as cfg
 import mindspore.nn as nn
-from lenet import LeNet5
-
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train import Model
 from mindspore.nn.metrics import Accuracy
-
+from src.dataset import create_dataset
+from src.config import mnist_cfg as cfg
+from src.lenet import LeNet5
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='MindSpore MNIST Example')
+    parser = argparse.ArgumentParser(description='MindSpore Lenet Example')
     parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU', 'CPU'],
                         help='device where the code will be implemented (default: Ascend)')
-    parser.add_argument('--data_path', type=str, default="./MNIST_Data",
+    parser.add_argument('--data_path', type=str, default="./Data",
                         help='path where the dataset is saved')
     parser.add_argument('--ckpt_path', type=str, default="", help='if mode is test, must provide\
                         path where the trained ckpt file')
-    parser.add_argument('--dataset_sink_mode', type=bool, default=False, help='dataset_sink_mode is False or True')
+    parser.add_argument('--dataset_sink_mode', type=ast.literal_eval,
+                        default=False, help='dataset_sink_mode is False or True')
 
     args = parser.parse_args()
 
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
 
     network = LeNet5(cfg.num_classes)
-    net_loss = nn.SoftmaxCrossEntropyWithLogits(is_grad=False, sparse=True, reduction="mean")
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     repeat_size = cfg.epoch_size
     net_opt = nn.Momentum(network.trainable_params(), cfg.lr, cfg.momentum)
-    config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
-                                 keep_checkpoint_max=cfg.keep_checkpoint_max)
-    ckpoint_cb = ModelCheckpoint(prefix="checkpoint_lenet", config=config_ck)
     model = Model(network, net_loss, net_opt, metrics={"Accuracy": Accuracy()})
 
     print("============== Starting Testing ==============")
@@ -61,5 +57,8 @@ if __name__ == "__main__":
     ds_eval = create_dataset(os.path.join(args.data_path, "test"),
                              cfg.batch_size,
                              1)
+    if ds_eval.get_dataset_size() == 0:
+        raise ValueError("Please check dataset size > 0 and batch_size <= dataset size")
+
     acc = model.eval(ds_eval, dataset_sink_mode=args.dataset_sink_mode)
-    print("============== Accuracy:{} ==============".format(acc))
+    print("============== {} ==============".format(acc))

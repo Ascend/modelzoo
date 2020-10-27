@@ -1,176 +1,150 @@
-import os
-from mindspore import context
-devid = int(os.getenv('DEVICE_ID'))
-context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
-                    device_target="Ascend", save_graphs=False, device_id=devid)
-
-import time
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""
+#################train vgg16 example on cifar10########################
+"""
 import argparse
 import datetime
+import os
 
 import mindspore.nn as nn
 from mindspore import Tensor
-from mindspore import ParallelMode
-from mindspore.nn.optim import Momentum
+from mindspore import context
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import ModelCheckpoint, RunContext
-from mindspore.train.callback import _InternalCallbackParam, CheckpointConfig, Callback
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.nn.optim.momentum import Momentum
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train.model import Model
-from mindspore.train.callback import Callback
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
+from mindspore.context import ParallelMode
+from mindspore.train.serialization import load_param_into_net, load_checkpoint
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.common import set_seed
+from src.dataset import vgg_create_dataset
+from src.dataset import classification_dataset
 
-from vgg16.datasets import classification_dataset_c
-from vgg16.losses.crossentropy import CrossEntropy
-from vgg16.lr_scheduler.warmup_step_lr import warmup_step_lr
-from vgg16.lr_scheduler.warmup_cosine_annealing_lr import warmup_cosine_annealing_lr
-from vgg16.utils.logging import get_logger
-from vgg16.optimizers import get_param_groups
-from vgg16.network.vgg import get_network
-from vgg16.utils.mixed_precision import mixed_precision_warpper
-
-class BuildTrainNetwork(nn.Cell):
-    def __init__(self, network, criterion):
-        super(BuildTrainNetwork, self).__init__()
-        self.network = network
-        self.criterion = criterion
- 
-    def construct(self, input_data, label):
-        output = self.network(input_data)
-        loss = self.criterion(output, label)
-        return loss
-
-class ProgressMonitor(Callback):
-    def __init__(self, args):
-        super(ProgressMonitor, self).__init__()
-        self.me_epoch_start_time = 0
-        self.me_epoch_start_step_num = 0
-        self.args = args
-        self.ckpt_history = []
-
-    def begin(self, run_context):
-        self.args.logger.info('start network train...')
-
-    def epoch_begin(self, run_context):
-        pass
-
-    def epoch_end(self, run_context, *me_args):
-        cb_params = run_context.original_args()
-        me_step = cb_params.cur_step_num - 1
-
-        real_epoch = me_step // self.args.steps_per_epoch
-        time_used = time.time() - self.me_epoch_start_time
-        fps_mean = self.args.per_batch_size * (me_step-self.me_epoch_start_step_num) * self.args.group_size / time_used
-        self.args.logger.info('epoch[{}], maiter[{}], loss:{}, mean_fps:{:.2f} imgs/sec'.format(real_epoch, me_step, cb_params.net_outputs, fps_mean))
-
-        if self.args.rank_save_ckpt_flag:
-            try:
-                import moxing as mox
-                import glob
-                ckpts = glob.glob(os.path.join(self.args.outputs_dir, '*.ckpt'))
-                for ckpt in ckpts:
-                    ckpt_fn = os.path.basename(ckpt)
-                    if not ckpt_fn.startswith('{}-'.format(self.args.rank)):
-                        continue
-                    if ckpt in self.ckpt_history:
-                        continue
-                    self.ckpt_history.append(ckpt)
-                    self.args.logger.info('epoch[{}], iter[{}], loss:{}, ckpt:{}, ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
-            except:
-                self.args.logger.info('local passed')
-
-        self.me_epoch_start_step_num = me_step
-        self.me_epoch_start_time = time.time()
-
-    def step_begin(self, run_context):
-        # self.args.logger.info('start step...')
-        pass
-
-    def step_end(self, run_context, *me_args):
-        pass
-
-    def end(self, run_context):
-        self.args.logger.info('end network train...')
+from src.crossentropy import CrossEntropy
+from src.warmup_step_lr import warmup_step_lr
+from src.warmup_cosine_annealing_lr import warmup_cosine_annealing_lr
+from src.warmup_step_lr import lr_steps
+from src.utils.logging import get_logger
+from src.utils.util import get_param_groups
+from src.vgg import vgg16
 
 
-def parse_args(cloud_args={}):
+set_seed(1)
+
+
+def parse_args(cloud_args=None):
+    """parameters"""
     parser = argparse.ArgumentParser('mindspore classification training')
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+                        help='device where the code will be implemented. (Default: Ascend)')
+    parser.add_argument('--device_id', type=int, default=1, help='device id of GPU or Ascend. (Default: None)')
 
     # dataset related
-    parser.add_argument('--data_dir', type=str, default='', help='train data dir')
-    parser.add_argument('--num_classes', type=int, default=1000, help='num of classes in dataset')
-    parser.add_argument('--image_size', type=str, default='224,224', help='image size of the dataset')
-    parser.add_argument('--per_batch_size', default=32, type=int, help='batch size for per gpu')
+    parser.add_argument('--dataset', type=str, choices=["cifar10", "imagenet2012"], default="cifar10")
+    parser.add_argument('--data_path', type=str, default='', help='train data dir')
 
     # network related
-    parser.add_argument('--backbone', default='vgg16', type=str, help='backbone')
-    parser.add_argument('--pretrained', default='', type=str, help='model_path, local pretrained model to load')
-
-    # optimizer and lr related
-    parser.add_argument('--lr_scheduler', default='cosine_annealing', type=str,
-                        help='lr-scheduler, option type: exponential, cosine_annealing')
-    parser.add_argument('--lr', default=0.01, type=float, help='learning rate of the training')
-    parser.add_argument('--lr_epochs', type=str, default='30,60,90,120', help='epoch of lr changing')
-    parser.add_argument('--lr_gamma', type=float, default=0.1, help='decrease lr by a factor of exponential lr_scheduler')
+    parser.add_argument('--pre_trained', default='', type=str, help='model_path, local pretrained model to load')
+    parser.add_argument('--lr_gamma', type=float, default=0.1,
+                        help='decrease lr by a factor of exponential lr_scheduler')
     parser.add_argument('--eta_min', type=float, default=0., help='eta_min in cosine_annealing scheduler')
     parser.add_argument('--T_max', type=int, default=150, help='T-max in cosine_annealing scheduler')
-    parser.add_argument('--max_epoch', type=int, default=150, help='max epoch num to train the model')
-    parser.add_argument('--warmup_epochs', default=0, type=float, help='warmup epoch')
-    parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight decay')
-    parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
 
-    # loss related
-    parser.add_argument('--is_dynamic_loss_scale', type=int, default=0, help='dynamic loss scale')
-    parser.add_argument('--loss_scale', type=int, default=1024, help='static loss scale')
-    parser.add_argument('--label_smooth', type=int, default=1, help='whether to use label smooth in CE')
-    parser.add_argument('--label_smooth_factor', type=float, default=0.1, help='smooth strength of original one-hot')
-
-    # logging related
+    # logging and checkpoint related
     parser.add_argument('--log_interval', type=int, default=100, help='logging interval')
     parser.add_argument('--ckpt_path', type=str, default='outputs/', help='checkpoint save location')
-    parser.add_argument('--ckpt_interval', type=int, default=2000, help='ckpt_interval')
+    parser.add_argument('--ckpt_interval', type=int, default=5, help='ckpt_interval')
     parser.add_argument('--is_save_on_master', type=int, default=1, help='save ckpt on master or all rank')
 
     # distributed related
-    parser.add_argument('--is_distributed', type=int, default=1, help='if multi device')
+    parser.add_argument('--is_distributed', type=int, default=0, help='if multi device')
     parser.add_argument('--rank', type=int, default=0, help='local rank of distributed')
     parser.add_argument('--group_size', type=int, default=1, help='world size of distributed')
+    args_opt = parser.parse_args()
+    args_opt = merge_args(args_opt, cloud_args)
 
-    args, _ = parser.parse_known_args()
-    args = merge_args(args, cloud_args)
+    if args_opt.dataset == "cifar10":
+        from src.config import cifar_cfg as cfg
+    else:
+        from src.config import imagenet_cfg as cfg
 
-    args.lr_epochs = list(map(int, args.lr_epochs.split(',')))
-    args.image_size = list(map(int, args.image_size.split(',')))
+    args_opt.label_smooth = cfg.label_smooth
+    args_opt.label_smooth_factor = cfg.label_smooth_factor
+    args_opt.lr_scheduler = cfg.lr_scheduler
+    args_opt.loss_scale = cfg.loss_scale
+    args_opt.max_epoch = cfg.max_epoch
+    args_opt.warmup_epochs = cfg.warmup_epochs
+    args_opt.lr = cfg.lr
+    args_opt.lr_init = cfg.lr_init
+    args_opt.lr_max = cfg.lr_max
+    args_opt.momentum = cfg.momentum
+    args_opt.weight_decay = cfg.weight_decay
+    args_opt.per_batch_size = cfg.batch_size
+    args_opt.num_classes = cfg.num_classes
+    args_opt.buffer_size = cfg.buffer_size
+    args_opt.ckpt_save_max = cfg.keep_checkpoint_max
+    args_opt.pad_mode = cfg.pad_mode
+    args_opt.padding = cfg.padding
+    args_opt.has_bias = cfg.has_bias
+    args_opt.batch_norm = cfg.batch_norm
+    args_opt.initialize_mode = cfg.initialize_mode
+    args_opt.has_dropout = cfg.has_dropout
 
-    return args
+    args_opt.lr_epochs = list(map(int, cfg.lr_epochs.split(',')))
+    args_opt.image_size = list(map(int, cfg.image_size.split(',')))
+
+    return args_opt
 
 
-def merge_args(args, cloud_args):
-    args_dict = vars(args)
+def merge_args(args_opt, cloud_args):
+    """dictionary"""
+    args_dict = vars(args_opt)
     if isinstance(cloud_args, dict):
-        for key in cloud_args.keys():
-            val = cloud_args[key]
-            if key in args_dict and val:
-                arg_type = type(args_dict[key])
-                if arg_type is not type(None):
+        for key_arg in cloud_args.keys():
+            val = cloud_args[key_arg]
+            if key_arg in args_dict and val:
+                arg_type = type(args_dict[key_arg])
+                if arg_type is not None:
                     val = arg_type(val)
-                args_dict[key] = val
-    return args
-	
+                args_dict[key_arg] = val
+    return args_opt
 
-def train(cloud_args={}):
-    args = parse_args(cloud_args)
 
-    # init distributed
+if __name__ == '__main__':
+    args = parse_args()
+
+    device_num = int(os.environ.get("DEVICE_NUM", 1))
     if args.is_distributed:
-        init()
+        if args.device_target == "Ascend":
+            init()
+            context.set_context(device_id=args.device_id)
+        elif args.device_target == "GPU":
+            init()
+
         args.rank = get_rank()
         args.group_size = get_group_size()
+        device_num = args.group_size
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+    else:
+        context.set_context(device_id=args.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
 
-    if args.is_dynamic_loss_scale == 1:
-        args.loss_scale = 1  # for dynamic loss scale can not set loss scale in momentum opt
-    
-    # select for master rank save ckpt or all rank save, compatiable for model parallel
+    # select for master rank save ckpt or all rank save, compatible for model parallel
     args.rank_save_ckpt_flag = 0
     if args.is_save_on_master:
         if args.rank == 0:
@@ -179,42 +153,29 @@ def train(cloud_args={}):
         args.rank_save_ckpt_flag = 1
 
     # logger
-    args.outputs_dir = os.path.join(args.ckpt_path, 
-        datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
+    args.outputs_dir = os.path.join(args.ckpt_path,
+                                    datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
     args.logger = get_logger(args.outputs_dir, args.rank)
 
-    # dataloader
-    de_dataset = classification_dataset_c(args.data_dir, args.image_size, 
-                                  args.per_batch_size, args.max_epoch,
-                                  args.rank, args.group_size)
-    de_dataset.map_model = 4  # !!!important
-    args.steps_per_epoch = de_dataset.get_dataset_size()
+    if args.dataset == "cifar10":
+        dataset = vgg_create_dataset(args.data_path, args.image_size, args.per_batch_size, args.rank, args.group_size)
+    else:
+        dataset = classification_dataset(args.data_path, args.image_size, args.per_batch_size,
+                                         args.rank, args.group_size)
 
+    batch_num = dataset.get_dataset_size()
+    args.steps_per_epoch = dataset.get_dataset_size()
     args.logger.save_args(args)
 
     # network
     args.logger.important_info('start create network')
-    # get network and init
-    network = get_network(args.backbone, args.num_classes)
-    # loss
-    if not args.label_smooth:
-        args.label_smooth_factor = 0.0
-    criterion = CrossEntropy(smooth_factor=args.label_smooth_factor,
-                             num_classes=args.num_classes)
 
-    # load pretrain model
-    if os.path.isfile(args.pretrained):
-        param_dict = load_checkpoint(args.pretrained)
-        param_dict_new = {}
-        for key, values in param_dict.items():
-            if key.startswith('moments.'):
-                continue
-            elif key.startswith('network.'):
-                param_dict_new[key[8:]] = values
-            else:
-                param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
-        args.logger.info('load model {} success'.format(args.pretrained))
+    # get network and init
+    network = vgg16(args.num_classes, args)
+
+    # pre_trained
+    if args.pre_trained:
+        load_param_into_net(network, load_checkpoint(args.pre_trained))
 
     # lr scheduler
     if args.lr_scheduler == 'exponential':
@@ -232,48 +193,42 @@ def train(cloud_args={}):
                                         args.max_epoch,
                                         args.T_max,
                                         args.eta_min)
+    elif args.lr_scheduler == 'step':
+        lr = lr_steps(0, lr_init=args.lr_init, lr_max=args.lr_max, warmup_epochs=args.warmup_epochs,
+                      total_epochs=args.max_epoch, steps_per_epoch=batch_num)
     else:
         raise NotImplementedError(args.lr_scheduler)
 
     # optimizer
     opt = Momentum(params=get_param_groups(network),
-                   learning_rate=Tensor(lr), 
-                   momentum=args.momentum, 
-                   weight_decay=args.weight_decay, 
+                   learning_rate=Tensor(lr),
+                   momentum=args.momentum,
+                   weight_decay=args.weight_decay,
                    loss_scale=args.loss_scale)
 
-    # mixed precision training 
-    criterion.add_flags_recursive(fp32=True)
+    if args.dataset == "cifar10":
+        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc'},
+                      amp_level="O2", keep_batchnorm_fp32=False, loss_scale_manager=None)
+    else:
+        if not args.label_smooth:
+            args.label_smooth_factor = 0.0
+        loss = CrossEntropy(smooth_factor=args.label_smooth_factor, num_classes=args.num_classes)
 
-    # package training process, adjust lr + forward + backward + optimizer
-    train_net = BuildTrainNetwork(network, criterion)
-    if args.is_distributed:
-        parallel_mode = ParallelMode.DATA_PARALLEL
-    else:
-        parallel_mode = ParallelMode.STAND_ALONE
-    if args.is_dynamic_loss_scale == 1:
-        loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
-    else:
         loss_scale_manager = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
-		
-    # Model api changed since TR5_branch 2020/03/09
-    context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=args.group_size, parameter_broadcast=True, mirror_mean=True)
-    model = Model(train_net, optimizer=opt, metrics=None, loss_scale_manager=loss_scale_manager)
+        model = Model(network, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale_manager, amp_level="O2")
 
-    # checkpoint save
-    progress_cb = ProgressMonitor(args)
-    callbacks = [progress_cb, ]
+    # define callbacks
+    time_cb = TimeMonitor(data_size=batch_num)
+    loss_cb = LossMonitor(per_print_times=batch_num)
+    callbacks = [time_cb, loss_cb]
     if args.rank_save_ckpt_flag:
-        ckpt_max_num = args.max_epoch * args.steps_per_epoch // args.ckpt_interval
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=args.ckpt_interval,
-                                        keep_checkpoint_max=ckpt_max_num)
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=args.ckpt_interval * args.steps_per_epoch,
+                                       keep_checkpoint_max=args.ckpt_save_max)
+        save_ckpt_path = os.path.join(args.outputs_dir, 'ckpt_' + str(args.rank) + '/')
         ckpt_cb = ModelCheckpoint(config=ckpt_config,
-                                    directory=args.outputs_dir,
-                                    prefix='{}'.format(args.rank))
+                                  directory=save_ckpt_path,
+                                  prefix='{}'.format(args.rank))
         callbacks.append(ckpt_cb)
 
-    model.train(args.max_epoch, de_dataset, callbacks=callbacks)
-
-
-if __name__ == "__main__":
-    train()
+    model.train(args.max_epoch, dataset, callbacks=callbacks)

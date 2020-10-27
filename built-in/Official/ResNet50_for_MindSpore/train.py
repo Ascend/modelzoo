@@ -1,285 +1,191 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""train resnet."""
 import os
-from mindspore import context
-devid = int(os.getenv('DEVICE_ID'))
-context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
-                    device_target="Davinci", save_graphs=True, device_id=devid)
-loglevel = 'error'
-os.system('su root -c "adc --host 127.0.0.1:22118 --log \\"SetLogLevel(0)[{}]\\""'.format(loglevel))
-os.system('su root -c "adc --host 127.0.0.1:22118 --log \\"SetLogLevel(0)[{}]\\" --device 4"'.format(loglevel))
-
-import time
 import argparse
-import datetime
-
-import mindspore.nn as nn
+import ast
+from mindspore import context
 from mindspore import Tensor
-from mindspore import ParallelMode
-from mindspore.nn.optim import Momentum
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import ModelCheckpoint, RunContext
-from mindspore.train.callback import _InternalCallbackParam, CheckpointConfig, Callback
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.nn.optim.momentum import Momentum
 from mindspore.train.model import Model
-from mindspore.train.callback import Callback
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
+from mindspore.context import ParallelMode
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.common import set_seed
+import mindspore.nn as nn
+import mindspore.common.initializer as weight_init
+from src.lr_generator import get_lr, warmup_cosine_annealing_lr
+from src.CrossEntropySmooth import CrossEntropySmooth
 
-from resnet50.datasets import classification_dataset
-from resnet50.losses.crossentropy import CrossEntropy
-from resnet50.lr_scheduler.warmup_step_lr import warmup_step_lr
-from resnet50.lr_scheduler.warmup_cosine_annealing_lr import warmup_cosine_annealing_lr
-from resnet50.utils.logging import get_logger
-from resnet50.utils.cloud_copy_cache import copy_mox_ckpt_log_to_s3
-from resnet50.optimizers import get_param_groups
-from resnet50.network.image_classification import get_network
+parser = argparse.ArgumentParser(description='Image classification')
+parser.add_argument('--net', type=str, default=None, help='Resnet Model, either resnet50 or resnet101')
+parser.add_argument('--dataset', type=str, default=None, help='Dataset, either cifar10 or imagenet2012')
+parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
+parser.add_argument('--device_num', type=int, default=1, help='Device num.')
 
+parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
+parser.add_argument('--device_target', type=str, default='Ascend', help='Device target')
+parser.add_argument('--pre_trained', type=str, default=None, help='Pretrained checkpoint path')
+parser.add_argument('--parameter_server', type=ast.literal_eval, default=False, help='Run parameter server train')
+args_opt = parser.parse_args()
 
+set_seed(1)
 
-class BuildTrainNetwork(nn.Cell):
-    def __init__(self, network, criterion):
-        super(BuildTrainNetwork, self).__init__()
-        self.network = network
-        self.criterion = criterion
- 
-    def construct(self, input_data, label):
-        output = self.network(input_data)
-        loss = self.criterion(output, label)
-        return loss
-
-class ProgressMonitor(Callback):
-    def __init__(self, args):
-        super(ProgressMonitor, self).__init__()
-        self.me_epoch_start_time = 0
-        self.me_epoch_start_step_num = 0
-        self.args = args
-        self.ckpt_history = []
-
-    def begin(self, run_context):
-        self.args.logger.info('start network train...')
-
-    def epoch_begin(self, run_context):
-        pass
-
-    def epoch_end(self, run_context, *me_args):
-        cb_params = run_context.original_args()
-        me_step = cb_params.cur_step_num - 1
-
-        real_epoch = me_step // self.args.steps_per_epoch
-        time_used = time.time() - self.me_epoch_start_time
-        fps_mean = self.args.per_batch_size * (me_step-self.me_epoch_start_step_num) * self.args.group_size / time_used
-        self.args.logger.info('epoch[{}], iter[{}], loss:{}, mean_fps:{:.2f} imgs/sec'.format(real_epoch, me_step, cb_params.net_outputs, fps_mean))
-
-        if self.args.rank_save_ckpt_flag:
-            try:
-                import moxing as mox
-                import glob
-                ckpts = glob.glob(os.path.join(self.args.outputs_dir, '*.ckpt'))
-                for ckpt in ckpts:
-                    ckpt_fn = os.path.basename(ckpt)
-                    if not ckpt_fn.startswith('{}-'.format(self.args.rank)):
-                        continue
-                    if ckpt in self.ckpt_history:
-                        continue
-                    self.ckpt_history.append(ckpt)
-                    self.args.logger.info('epoch[{}], iter[{}], loss:{}, ckpt:{}, ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
-                    copy_mox_ckpt_log_to_s3(self.args, ckpt)
-            except:
-                self.args.logger.info('local passed')
-
-        self.me_epoch_start_step_num = me_step
-        self.me_epoch_start_time = time.time()
-
-    def step_begin(self, run_context):
-        pass
-
-    def step_end(self, run_context, *me_args):
-        pass
-
-    def end(self, run_context):
-        self.args.logger.info('end network train...')
-
-
-def parse_args(cloud_args={}):
-    parser = argparse.ArgumentParser('mindspore classification training')
-
-    # dataset related
-    parser.add_argument('--data_dir', type=str, default='', help='train data dir')
-    parser.add_argument('--num_classes', type=int, default=1000, help='num of classes in dataset')
-    parser.add_argument('--image_size', type=str, default='224,224', help='image size of the dataset')
-    parser.add_argument('--per_batch_size', default=256, type=int, help='batch size for per gpu')
-
-    # network related
-    parser.add_argument('--backbone', default='resnet50', type=str, help='backbone')
-    parser.add_argument('--pretrained', default='', type=str, help='model_path, local pretrained model to load')
-
-    # optimizer and lr related
-    parser.add_argument('--lr_scheduler', default='exponential', type=str,
-                        help='lr-scheduler, option type: exponential, cosine_annealing')
-    parser.add_argument('--lr', default=0.1, type=float, help='learning rate of the training')
-    parser.add_argument('--lr_epochs', type=str, default='30,60,90,120', help='epoch of lr changing')
-    parser.add_argument('--lr_gamma', type=float, default=0.1, help='decrease lr by a factor of exponential lr_scheduler')
-    parser.add_argument('--eta_min', type=float, default=0., help='eta_min in cosine_annealing scheduler')
-    parser.add_argument('--T_max', type=int, default=150, help='T-max in cosine_annealing scheduler')
-    parser.add_argument('--max_epoch', type=int, default=150, help='max epoch num to train the model')
-    parser.add_argument('--warmup_epochs', default=0, type=float, help='warmup epoch')
-    parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight decay')
-    parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
-
-    # loss related
-    parser.add_argument('--is_dynamic_loss_scale', type=int, default=0, help='dynamic loss scale')
-    parser.add_argument('--loss_scale', type=int, default=1024, help='static loss scale')
-    parser.add_argument('--label_smooth', type=int, default=0, help='whether to use label smooth in CE')
-    parser.add_argument('--label_smooth_factor', type=float, default=0.1, help='smooth strength of original one-hot')
-
-    # logging related
-    parser.add_argument('--log_interval', type=int, default=100, help='logging interval')
-    parser.add_argument('--ckpt_path', type=str, default='outputs/', help='checkpoint save location')
-    parser.add_argument('--ckpt_interval', type=int, default=2000, help='ckpt_interval')
-    parser.add_argument('--is_save_on_master', type=int, default=1, help='save ckpt on master or all rank')
-
-    # distributed related
-    parser.add_argument('--is_distributed', type=int, default=1, help='if multi device')
-    parser.add_argument('--rank', type=int, default=0, help='local rank of distributed')
-    parser.add_argument('--group_size', type=int, default=1, help='world size of distributed')
-
-    # roma obs
-    parser.add_argument('--train_url', type=str, default="", help='train url')
-
-    args, _ = parser.parse_known_args()
-    args = merge_args(args, cloud_args)
-
-    args.lr_epochs = list(map(int, args.lr_epochs.split(',')))
-    args.image_size = list(map(int, args.image_size.split(',')))
-
-    return args
-
-def merge_args(args, cloud_args):
-    args_dict = vars(args)
-    if isinstance(cloud_args, dict):
-        for key in cloud_args.keys():
-            val = cloud_args[key]
-            if key in args_dict and val:
-                arg_type = type(args_dict[key])
-                if arg_type is not type(None):
-                    val = arg_type(val)
-                args_dict[key] = val
-    return args
-	
-def train(cloud_args={}):
-    args = parse_args(cloud_args)
-
-    # init distributed
-    if args.is_distributed:
-        init()
-        args.rank = get_rank()
-        args.group_size = get_group_size()
-
-    if args.is_dynamic_loss_scale == 1:
-        args.loss_scale = 1  # for dynamic loss scale can not set loss scale in momentum opt
-    
-    # select for master rank save ckpt or all rank save, compatiable for model parallel
-    args.rank_save_ckpt_flag = 0
-    if args.is_save_on_master:
-        if args.rank == 0:
-            args.rank_save_ckpt_flag = 1
+if args_opt.net == "resnet50":
+    from src.resnet import resnet50 as resnet
+    if args_opt.dataset == "cifar10":
+        from src.config import config1 as config
+        from src.dataset import create_dataset1 as create_dataset
     else:
-        args.rank_save_ckpt_flag = 1
+        from src.config import config2 as config
+        from src.dataset import create_dataset2 as create_dataset
+elif args_opt.net == "resnet101":
+    from src.resnet import resnet101 as resnet
+    from src.config import config3 as config
+    from src.dataset import create_dataset3 as create_dataset
+else:
+    from src.resnet import se_resnet50 as resnet
+    from src.config import config4 as config
+    from src.dataset import create_dataset4 as create_dataset
 
-    # logger
-    args.outputs_dir = os.path.join(args.ckpt_path, 
-        datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-    args.logger = get_logger(args.outputs_dir, args.rank)
 
-    # dataloader
-    de_dataset = classification_dataset(args.data_dir, args.image_size, 
-                                  args.per_batch_size, args.max_epoch,
-                                  args.rank, args.group_size)
-    de_dataset.map_model = 4  # !!!important
-    args.steps_per_epoch = de_dataset.get_dataset_size()
+if __name__ == '__main__':
+    target = args_opt.device_target
+    ckpt_save_dir = config.save_checkpoint_path
 
-    args.logger.save_args(args)
-
-    # network
-    args.logger.important_info('start create network')
-    # get network and init
-    network = get_network(args.backbone, args.num_classes)
-    # loss
-    if not args.label_smooth:
-        args.label_smooth_factor = 0.0
-    criterion = CrossEntropy(smooth_factor=args.label_smooth_factor,
-                             num_classes=args.num_classes)
-
-    # load pretrain model
-    if os.path.isfile(args.pretrained):
-        param_dict = load_checkpoint(args.pretrained)
-        param_dict_new = {}
-        for key, values in param_dict.items():
-            if key.startswith('moments.'):
-                continue
-            elif key.startswith('network.'):
-                param_dict_new[key[8:]] = values
+    # init context
+    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+    if args_opt.parameter_server:
+        context.set_ps_context(enable_ps=True)
+    if args_opt.run_distribute:
+        if target == "Ascend":
+            device_id = int(os.getenv('DEVICE_ID'))
+            context.set_context(device_id=device_id, enable_auto_mixed_precision=True)
+            context.set_auto_parallel_context(device_num=args_opt.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            if args_opt.net == "resnet50" or args_opt.net == "se-resnet50":
+                context.set_auto_parallel_context(all_reduce_fusion_config=[85, 160])
             else:
-                param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
-        args.logger.info('load model {} success'.format(args.pretrained))
+                context.set_auto_parallel_context(all_reduce_fusion_config=[180, 313])
+            init()
+        # GPU target
+        else:
+            init()
+            context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            if args_opt.net == "resnet50":
+                context.set_auto_parallel_context(all_reduce_fusion_config=[85, 160])
+        ckpt_save_dir = config.save_checkpoint_path + "ckpt_" + str(get_rank()) + "/"
 
-    # lr scheduler
-    if args.lr_scheduler == 'exponential':
-        lr = warmup_step_lr(args.lr,
-                            args.lr_epochs,
-                            args.steps_per_epoch,
-                            args.warmup_epochs,
-                            args.max_epoch,
-                            gamma=args.lr_gamma,
-                            )
-    elif args.lr_scheduler == 'cosine_annealing':
-        lr = warmup_cosine_annealing_lr(args.lr,
-                                        args.steps_per_epoch,
-                                        args.warmup_epochs,
-                                        args.max_epoch,
-                                        args.T_max,
-                                        args.eta_min)
+    # create dataset
+    dataset = create_dataset(dataset_path=args_opt.dataset_path, do_train=True, repeat_num=1,
+                             batch_size=config.batch_size, target=target)
+    step_size = dataset.get_dataset_size()
+
+    # define net
+    net = resnet(class_num=config.class_num)
+    if args_opt.parameter_server:
+        net.set_param_ps()
+
+    # init weight
+    if args_opt.pre_trained:
+        param_dict = load_checkpoint(args_opt.pre_trained)
+        load_param_into_net(net, param_dict)
     else:
-        raise NotImplementedError(args.lr_scheduler)
+        for _, cell in net.cells_and_names():
+            if isinstance(cell, nn.Conv2d):
+                cell.weight.set_data(weight_init.initializer(weight_init.XavierUniform(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
+            if isinstance(cell, nn.Dense):
+                cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
 
-    # optimizer
-    opt = Momentum(params=get_param_groups(network),
-                   learning_rate=Tensor(lr), 
-                   momentum=args.momentum, 
-                   weight_decay=args.weight_decay, 
-                   loss_scale=args.loss_scale)
-
-
-    criterion.add_flags_recursive(fp32=True)
-
-    # package training process, adjust lr + forward + backward + optimizer
-    train_net = BuildTrainNetwork(network, criterion)
-    if args.is_distributed:
-        parallel_mode = ParallelMode.DATA_PARALLEL
+    # init lr
+    if args_opt.net == "resnet50" or args_opt.net == "se-resnet50":
+        lr = get_lr(lr_init=config.lr_init, lr_end=config.lr_end, lr_max=config.lr_max,
+                    warmup_epochs=config.warmup_epochs, total_epochs=config.epoch_size, steps_per_epoch=step_size,
+                    lr_decay_mode=config.lr_decay_mode)
     else:
-        parallel_mode = ParallelMode.STAND_ALONE
-    if args.is_dynamic_loss_scale == 1:
-        loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
+        lr = warmup_cosine_annealing_lr(config.lr, step_size, config.warmup_epochs, config.epoch_size,
+                                        config.pretrain_epoch_size * step_size)
+    lr = Tensor(lr)
+
+    # define opt
+    decayed_params = []
+    no_decayed_params = []
+    for param in net.trainable_params():
+        if 'beta' not in param.name and 'gamma' not in param.name and 'bias' not in param.name:
+            decayed_params.append(param)
+        else:
+            no_decayed_params.append(param)
+
+    group_params = [{'params': decayed_params, 'weight_decay': config.weight_decay},
+                    {'params': no_decayed_params},
+                    {'order_params': net.trainable_params()}]
+    opt = Momentum(group_params, lr, config.momentum, loss_scale=config.loss_scale)
+    # define loss, model
+    if target == "Ascend":
+        if args_opt.dataset == "imagenet2012":
+            if not config.use_label_smooth:
+                config.label_smooth_factor = 0.0
+            loss = CrossEntropySmooth(sparse=True, reduction="mean",
+                                      smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
+        else:
+            loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+        loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+        model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
+                      amp_level="O2", keep_batchnorm_fp32=False)
     else:
-        loss_scale_manager = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
-		
-    # Model api changed since TR5_branch 2020/03/09
-    context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=args.group_size, parameter_broadcast=True, mirror_mean=True)
-    model = Model(train_net, optimizer=opt, metrics=None, loss_scale_manager=loss_scale_manager)
+        # GPU target
+        if args_opt.dataset == "imagenet2012":
+            if not config.use_label_smooth:
+                config.label_smooth_factor = 0.0
+            loss = CrossEntropySmooth(sparse=True, reduction="mean",
+                                      smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
+        else:
+            loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
 
-    # checkpoint save
-    progress_cb = ProgressMonitor(args)
-    callbacks = [progress_cb, ]
-    if args.rank_save_ckpt_flag:
-        ckpt_max_num = args.max_epoch * args.steps_per_epoch // args.ckpt_interval
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=args.ckpt_interval,
-                                        keep_checkpoint_max=ckpt_max_num)
-        ckpt_cb = ModelCheckpoint(config=ckpt_config,
-                                    directory=args.outputs_dir,
-                                    prefix='{}'.format(args.rank))
-        callbacks.append(ckpt_cb)
+        if (args_opt.net == "resnet101" or args_opt.net == "resnet50") and not args_opt.parameter_server:
+            opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config.momentum, config.weight_decay,
+                           config.loss_scale)
+            loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+            # Mixed precision
+            model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
+                          amp_level="O2", keep_batchnorm_fp32=False)
+        else:
+            ## fp32 training
+            opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config.momentum, config.weight_decay)
+            model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
 
-    model.train(args.max_epoch, de_dataset, callbacks=callbacks)
+    # define callbacks
+    time_cb = TimeMonitor(data_size=step_size)
+    loss_cb = LossMonitor()
+    cb = [time_cb, loss_cb]
+    if config.save_checkpoint:
+        config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * step_size,
+                                     keep_checkpoint_max=config.keep_checkpoint_max)
+        ckpt_cb = ModelCheckpoint(prefix="resnet", directory=ckpt_save_dir, config=config_ck)
+        cb += [ckpt_cb]
 
-
-if __name__ == "__main__":
-    train()
+    # train model
+    if args_opt.net == "se-resnet50":
+        config.epoch_size = config.train_epoch_size
+    model.train(config.epoch_size - config.pretrain_epoch_size, dataset, callbacks=cb,
+                sink_size=dataset.get_dataset_size(), dataset_sink_mode=(not args_opt.parameter_server))

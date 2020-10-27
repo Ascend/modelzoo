@@ -1,168 +1,248 @@
-# ResNext50 for MindSpore
+# Contents
 
-This repository provides a script and recipe to train the ResNext50 model to achieve state-of-the-art accuracy.
+- [ResNeXt50 Description](#resnext50-description)
+- [Model Architecture](#model-architecture)
+- [Dataset](#dataset)
+- [Features](#features)
+    - [Mixed Precision](#mixed-precision)
+- [Environment Requirements](#environment-requirements)
+- [Quick Start](#quick-start)    
+- [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
+    - [Script Parameters](#script-parameters)
+    - [Training Process](#training-process)
+    - [Evaluation Process](#evaluation-process)
+- [Model Description](#model-description)
+    - [Performance](#performance)  
+        - [Training Performance](#evaluation-performance)
+        - [Inference Performance](#evaluation-performance)
+- [Description of Random Situation](#description-of-random-situation)
+- [ModelZoo Homepage](#modelzoo-homepage)
 
-## Table Of Contents
+# [ResNeXt50 Description](#contents)
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Data augmentation](#data-augmentation)
-* [Setup](#setup)
-  * [Requirements](#requirements)
-* [Quick start guide](#quick-start-guide)
-* [Advanced](#advanced)
-  * [Command line arguments](#command-line-arguments)
-  * [Training process](#training-process)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
+ResNeXt is a simple, highly modularized network architecture for image classification. It designs results in a homogeneous, multi-branch architecture that has only a few hyper-parameters to set in ResNeXt. This strategy exposes a new dimension, which we call “cardinality” (the size of the set of transformations), as an essential factor in addition to the dimensions of depth and width.
+
+[Paper](https://arxiv.org/abs/1611.05431):  Xie S, Girshick R, Dollár, Piotr, et al. Aggregated Residual Transformations for Deep Neural Networks. 2016.
+
+# [Model architecture](#contents)
+
+The overall network architecture of ResNeXt is show below:
+
+[Link](https://arxiv.org/abs/1611.05431)
 
 
-## Model overview
+# [Dataset](#contents)
 
-ResNext50 model from
-    `"Aggregated Residual Transformations for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`
+Dataset used: [imagenet](http://www.image-net.org/)
 
-We provide resnext50_32x4d version.
-	
-### Model architecture
+- Dataset size: ~125G, 1.2W colorful images in 1000 classes
+  - Train: 120G, 1.2W images
+  - Test: 5G, 50000 images
+- Data format: RGB images.
+  - Note: Data will be processed in src/dataset.py 
 
 
-### Default configuration
+# [Features](#contents)
 
-The following sections introduce the default configurations and hyperparameters for ResNext50 model.
+## [Mixed Precision](#contents)
 
-#### Optimizer
-
-This model uses Momentum optimizer from mindspore with the following hyperparameters:
-
-- Momentum : 0.9
-- Learning rate (LR) : 0.4
-- LR schedule: cosine_annealing
-- Batch size : 128
-- Weight decay :  0.0001. We do not apply weight decay on all bias and Batch Norm trainable parameters (beta/gamma)
-- Label smoothing = 0.1
-- We train for:
-  - 150 epochs
-
-#### Data augmentation
-
-This model uses the following data augmentation:
-
-- For training:
-  - RandomResizeCrop, scale=(0.08, 1.0), ratio=(0.75, 1.333)
-  - RandomHorizontalFlip, prob=0.5
-  - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
-- For inference:
-  - Resize to (256, 256)
-  - CenterCrop to (224, 224)
-  - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
-
-## Setup
-The following section lists the requirements to start training the ResNext50 model.
-### Requirements
-
-mindspore
-
-## Quick Start Guide
-
-### 1. Clone the respository
-
-```shell
-git clone xxx
-cd modelzoo_resnext50
-```
-
-### 2. Download and preprocess the dataset
-
-1. download dataset
-2. Extract the training data
-3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
-
-### 3. Train
-
-```shell
-# $PROJECT_ROOT is the project path
-# $SINGLE_NODE_WORLD_SIZE is the number of devices
-# $VISIBLE_DEVICES is the running device
-# $ENV_SH is your own 1node environment shell script
-# $SERVER_ID is your device ip
-# $RUNNING_SCRIPT is the running script for distributing
-# $SCRIPT_ARGS is the running script args
-# remenber to add $PROJECT_ROOT to PYTHON_PATH in the $ENV_SH
-python $PROJECT_ROOT/launch.py --nproc_per_node=$SINGLE_NODE_WORLD_SIZE --visible_devices=$VISIBLE_DEVICES --env_sh=$ENV_SH --server_id=$SERVER_ID $RUNNING_SCRIPT $SCRIPT_ARGS
-```
-
-for example:
-
-```shell
-mkdir run_test
-cd run_test
-python /path/to/launch.py --nproc_per_node=8 --visible_devices=0,1,2,3,4,5,6,7 --env_sh=/path/to/env_sh.sh --server_id=xx.xxx.xxx.xxx /path/to/train.py --per_batch_size=128 --data_dir=/path/to/dataset/train/ --is_distributed=1 --lr_scheduler=cosine_annealing --per_batch_size=128 --lr=0.4 --T_max=150 --max_epoch=150 --label_smooth=1
-```
-
-### 4. Test
-
-```shell
-mkdir run_test
-cd run_test
-python /path/to/launch.py --nproc_per_node=8 --visible_devices=0,1,2,3,4,5,6,7 --mode=test --server_id=xx.xxx.xxx.xxx --env_sh=/path/to/env_sh.sh /path/to/test.py --data_dir=/path/to/dataset/val --per_batch_size=32 --pretrained=/path/to/ckpt
-```
-## Advanced
-### Commmand-line options
-
-```
-  --data_dir              train data dir
-  --num_classes           num of classes in dataset（default:1000)
-  --image_size            image size of the dataset
-  --per_batch_size        mini-batch size (default: 256) per gpu
-  --backbone              model architecture: resnext50
-  --pretrained            path of pretrained model
-  --lr_scheduler          type of LR schedule: exponential, cosine_annealing
-  --lr                    initial learning rate
-  --lr_epochs             epoch milestone of lr changing
-  --lr_gamma              decrease lr by a factor of exponential lr_scheduler
-  --eta_min               eta_min in cosine_annealing scheduler
-  --T_max                 T_max in cosine_annealing scheduler
-  --max_epoch             max epoch num to train the model
-  --warmup_epochs         warmup epoch(when batchsize is large)
-  --weight_decay          weight decay (default: 1e-4)
-  --momentum              momentum(default: 0.9)
-  --label_smooth          whether to use label smooth in CE
-  --label_smooth_factor   smooth strength of original one-hot
-  --log_interval          logging interval(dafault:100)
-  --ckpt_path             path to save checkpoint
-  --ckpt_interval         the interval to save checkpoint
-  --is_save_on_master     save checkpoint on master or all rank
-  --is_distributed        if multi device(default: 1)
-  --rank                  local rank of distributed(default: 0)
-  --group_size            world size of distributed(default: 1)
-```
-
-### Training process
-
-All the results of the training will be stored in the directory specified with `--ckpt_path` argument.
-Script will store:
- - checkpoints.
- - log.
+The [mixed precision](https://www.mindspore.cn/tutorial/training/en/master/advanced_use/enable_mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
  
-## Performance
+For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
-### Result
+# [Environment Requirements](#contents)
 
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
+- Hardware（Ascend/GPU）
+  - Prepare hardware environment with Ascend or GPU processor. If you want to try Ascend  , please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources. 
+- Framework
+  - [MindSpore](https://www.mindspore.cn/install/en)
+- For more information, please check the resources below：
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
 
-#### Training accuracy results
+# [Script description](#contents)
 
-| **epochs** |   Top1/Top5   |
-| :--------: | :-----------: |
-|     150     |  78.23%(TOP1)/93.92%(TOP5) |
+## [Script and sample code](#contents)
 
-#### Training performance results
+```python
+.
+└─resnext50      
+  ├─README.md
+  ├─scripts      
+    ├─run_standalone_train.sh         # launch standalone training for ascend(1p)
+    ├─run_distribute_train.sh         # launch distributed training for ascend(8p)
+    ├─run_standalone_train_for_gpu.sh # launch standalone training for gpu(1p)
+    ├─run_distribute_train_for_gpu.sh # launch distributed training for gpu(8p)
+    └─run_eval.sh                     # launch evaluating
+  ├─src
+    ├─backbone
+      ├─_init_.py                     # initalize
+      ├─resnet.py                     # resnext50 backbone
+    ├─utils
+      ├─_init_.py                     # initalize
+      ├─cunstom_op.py                 # network operation
+      ├─logging.py                    # print log
+      ├─optimizers_init_.py           # get parameters
+      ├─sampler.py                    # distributed sampler
+      ├─var_init_.py                  # calculate gain value
+    ├─_init_.py                       # initalize
+    ├─config.py                       # parameter configuration
+    ├─crossentropy.py                 # CrossEntropy loss function
+    ├─dataset.py                      # data preprocessing
+    ├─head.py                         # commom head
+    ├─image_classification.py         # get resnet
+    ├─linear_warmup.py                # linear warmup learning rate
+    ├─warmup_cosine_annealing.py      # learning rate each step
+    ├─warmup_step_lr.py               # warmup step learning rate
+  ├─eval.py                           # eval net
+  ├──train.py                         # train net
+  ├──mindspore_hub_conf.py            #  mindspore hub interface
+  
+```
 
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |   7400image/sec   |
-|    1     |   970image/sec   |
+## [Script Parameters](#contents)
+
+Parameters for both training and evaluating can be set in config.py.
+
+```       
+"image_height": '224,224'                 # image size
+"num_classes": 1000,                      # dataset class number
+"per_batch_size": 128,                    # batch size of input tensor
+"lr": 0.05,                               # base learning rate
+"lr_scheduler": 'cosine_annealing',       # learning rate mode
+"lr_epochs": '30,60,90,120',              # epoch of lr changing
+"lr_gamma": 0.1,                          # decrease lr by a factor of exponential lr_scheduler
+"eta_min": 0,                             # eta_min in cosine_annealing scheduler
+"T_max": 150,                             # T-max in cosine_annealing scheduler
+"max_epoch": 150,                         # max epoch num to train the model
+"backbone": 'resnext50',                  # backbone metwork
+"warmup_epochs" : 1,                      # warmup epoch
+"weight_decay": 0.0001,                   # weight decay
+"momentum": 0.9,                          # momentum
+"is_dynamic_loss_scale": 0,               # dynamic loss scale
+"loss_scale": 1024,                       # loss scale
+"label_smooth": 1,                        # label_smooth
+"label_smooth_factor": 0.1,               # label_smooth_factor
+"ckpt_interval": 2000,                    # ckpt_interval
+"ckpt_path": 'outputs/',                  # checkpoint save location
+"is_save_on_master": 1,
+"rank": 0,                                # local rank of distributed
+"group_size": 1                           # world size of distributed
+```
+
+## [Training Process](#contents)
+
+#### Usage
+
+You can start training by python script:
+
+```
+python train.py --data_dir ~/imagenet/train/ --platform Ascend --is_distributed 0
+```
+
+or shell stript:
+
+```
+Ascend: 
+    # distribute training example(8p)
+    sh run_distribute_train.sh RANK_TABLE_FILE DATA_PATH
+    # standalone training
+    sh run_standalone_train.sh DEVICE_ID DATA_PATH
+GPU:
+    # distribute training example(8p)
+    sh run_distribute_train_for_gpu.sh DATA_PATH
+    # standalone training
+    sh run_standalone_train_for_gpu.sh DEVICE_ID DATA_PATH
+```
+
+#### Launch
+
+```bash
+# distributed training example(8p) for Ascend
+sh scripts/run_distribute_train.sh RANK_TABLE_FILE /dataset/train
+# standalone training example for Ascend
+sh scripts/run_standalone_train.sh 0 /dataset/train
+
+# distributed training example(8p) for GPU
+sh scripts/run_distribute_train_for_gpu.sh /dataset/train
+# standalone training example for GPU
+sh scripts/run_standalone_train_for_gpu.sh 0 /dataset/train
+```
+
+You can find checkpoint file together with result in log.
+
+## [Evaluation Process](#contents)
+
+### Usage
+
+You can start training by python script:
+
+```
+python eval.py --data_dir ~/imagenet/val/ --platform Ascend --pretrained resnext.ckpt
+```
+
+or shell stript:
+
+```
+# Evaluation
+sh run_eval.sh DEVICE_ID DATA_PATH PRETRAINED_CKPT_PATH PLATFORM
+```
+PLATFORM is Ascend or GPU, default is Ascend.
+
+#### Launch
+
+```bash
+# Evaluation with checkpoint
+sh scripts/run_eval.sh 0 /opt/npu/datasets/classification/val /resnext50_100.ckpt Ascend
+```
+
+#### Result
+
+Evaluation result will be stored in the scripts path. Under this, you can find result like the followings in log.
+ 
+```
+acc=78.16%(TOP1)
+acc=93.88%(TOP5)
+```
+
+# [Model description](#contents)
+
+## [Performance](#contents)
+
+### Training Performance
+
+| Parameters                 | ResNeXt50                                                |                           |
+| -------------------------- | ---------------------------------------------------------- | ------------------------- |
+| Resource                   | Ascend 910, cpu:2.60GHz 192cores, memory:755G               | NV SMX2 V100-32G          |
+| uploaded Date              | 06/30/2020                                                 | 07/23/2020                |
+| MindSpore Version          | 0.5.0                                                      | 0.6.0                     |
+| Dataset                    | ImageNet                                                   | ImageNet                  |
+| Training Parameters        | src/config.py                                              | src/config.py             |
+| Optimizer                  | Momentum                                                   | Momentum                  |
+| Loss Function              | SoftmaxCrossEntropy                                        | SoftmaxCrossEntropy       |
+| Loss                       | 1.76592                                                    | 1.8965                    |
+| Accuracy                   | 78%(TOP1)                                                  | 77.8%(TOP1)               |
+| Total time                 | 7.8 h 8ps                                                  | 21.5 h 8ps                |
+| Checkpoint for Fine tuning | 192 M(.ckpt file)                                          | 192 M(.ckpt file)         |
+
+#### Inference Performance
+
+| Parameters                 |                               |                           |                      |
+| -------------------------- | ----------------------------- | ------------------------- | -------------------- |
+| Resource                   | Ascend 910                    | NV SMX2 V100-32G          | Ascend 310           |
+| uploaded Date              | 06/30/2020                    | 07/23/2020                | 07/23/2020           |
+| MindSpore Version          | 0.5.0                         | 0.6.0                     | 0.6.0                | 
+| Dataset                    | ImageNet, 1.2W                | ImageNet, 1.2W            | ImageNet, 1.2W       |
+| batch_size                 | 1                             | 1                         | 1                    |
+| outputs                    | probability                   | probability               | probability          |
+| Accuracy                   | acc=78.16%(TOP1)              | acc=78.05%(TOP1)          |                      |
+
+
+# [Description of Random Situation](#contents)
+
+In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
+
+# [ModelZoo Homepage](#contents)
+ 
+Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo). 

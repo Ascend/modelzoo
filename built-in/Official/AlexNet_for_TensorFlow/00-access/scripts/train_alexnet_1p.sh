@@ -36,11 +36,11 @@ env > ${EXEC_DIR}/${RESULTS}/env_${device_id}.log
 
 #start exec
 python3.7 ${EXEC_DIR}/train.py --rank_size=1 \
-	--iterations_per_loop=1251 \
+	--iterations_per_loop=100 \
 	--batch_size=256 \
-	--data_dir=/opt/npu/slimImagenet \
+	--data_dir=/data/slimImagenet \
 	--mode=train \
-	--checkpoint_dir=/opt/npu/m00536736/alexnet_0618/scripts/results/0/model_8p/ \
+	--checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/ \
 	--lr=0.015 \
 	--log_dir=./model_1p > ./train_${device_id}.log 2>&1 
 

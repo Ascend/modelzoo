@@ -1,20 +1,36 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+"""
+A function that returns a dataset for classification.
+"""
+
 import os
-import numpy as np
-import math
 from PIL import Image, ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = True
-import warnings
 from mindspore import dtype as mstype
-
 import mindspore.dataset as de
-import mindspore.dataset.transforms.vision.py_transforms as F
-import mindspore.dataset.transforms.vision.c_transforms as vision_C
+import mindspore.dataset.vision.c_transforms as vision_C
 import mindspore.dataset.transforms.c_transforms as normal_C
-
 from src.datasets.sampler import DistributedSampler
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-class TxtDataset(object):
+class TxtDataset():
+    """
+    read dataset from txt
+    """
     def __init__(self, root, txt_name):
         super(TxtDataset, self).__init__()
         self.imgs = []
@@ -34,24 +50,24 @@ class TxtDataset(object):
         return len(self.imgs)
 
 
-def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank, group_size, 
-                     mode='train', 
-                     input_mode='folder',
-                     root='',
-                     num_parallel_workers=None,
-                     shuffle=None,
-                     sampler=None,
-                     class_indexing=None,
-                     drop_remainder=True,
-                     transform=None,
-                     target_transform=None):
+def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank, group_size,
+                           mode='train',
+                           input_mode='folder',
+                           root='',
+                           num_parallel_workers=None,
+                           shuffle=None,
+                           sampler=None,
+                           class_indexing=None,
+                           drop_remainder=True,
+                           transform=None,
+                           target_transform=None):
     """
-    A function that returns a dataset for classification. The mode of input dataset could be "folder" or "txt". 
+    A function that returns a dataset for classification. The mode of input dataset could be "folder" or "txt".
     If it is "folder", all images within one folder have the same label. If it is "txt", all paths of images
     are written into a textfile.
 
     Args:
-        data_dir (str): Path to the root directory that contains the dataset for "input_mode="folder"". 
+        data_dir (str): Path to the root directory that contains the dataset for "input_mode="folder"".
             Or path of the textfile that contains every image's path of the dataset.
         image_size (str): Size of the input images.
         per_batch_size (int): the batch size of evey step during training.
@@ -93,7 +109,7 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
     if transform is None:
         if mode == 'train':
             transform_img = [
-				vision_C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+                vision_C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
                 vision_C.RandomHorizontalFlip(prob=0.5),
                 vision_C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
                 vision_C.Normalize(mean=mean, std=std),
@@ -118,15 +134,14 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
         transform_label = target_transform
 
     if input_mode == 'folder':
-        de_dataset = de.ImageFolderDatasetV2(data_dir, num_parallel_workers=num_parallel_workers,
-                                             shuffle=shuffle, sampler=sampler, class_indexing=class_indexing,
-                                             num_shards=group_size, shard_id=rank)
+        de_dataset = de.ImageFolderDataset(data_dir, num_parallel_workers=num_parallel_workers,
+                                           shuffle=shuffle, sampler=sampler, class_indexing=class_indexing,
+                                           num_shards=group_size, shard_id=rank)
     else:
         dataset = TxtDataset(root, data_dir)
         sampler = DistributedSampler(dataset, rank, group_size, shuffle=shuffle)
         de_dataset = de.GeneratorDataset(dataset, ["image", "label"], sampler=sampler)
-        de_dataset.set_dataset_size(len(sampler))
-    
+
     de_dataset = de_dataset.map(input_columns="image", num_parallel_workers=8, operations=transform_img)
     de_dataset = de_dataset.map(input_columns="label", num_parallel_workers=8, operations=transform_label)
 
@@ -134,6 +149,6 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
     de_dataset = de_dataset.project(columns=columns_to_project)
 
     de_dataset = de_dataset.batch(per_batch_size, drop_remainder=drop_remainder)
-    de_dataset = de_dataset.repeat(max_epoch)   
-    
+    de_dataset = de_dataset.repeat(1)
+
     return de_dataset

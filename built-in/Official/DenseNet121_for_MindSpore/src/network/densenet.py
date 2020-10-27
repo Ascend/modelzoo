@@ -1,26 +1,44 @@
-import os
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+"""
+model architecture of densenet
+"""
+
 import math
 from collections import OrderedDict
 
 import mindspore.nn as nn
 from mindspore.ops import operations as P
-from mindspore.communication.management import get_rank
 from mindspore.common import initializer as init
-
-from src.utils.cloud_copy_cache import copy_pretrained_model_to_cache
 from src.utils.var_init import default_recurisive_init, KaimingNormal
 
 __all__ = ["DenseNet121"]
 
 class GlobalAvgPooling(nn.Cell):
+    """
+    GlobalAvgPooling function.
+    """
     def __init__(self):
         super(GlobalAvgPooling, self).__init__()
         self.mean = P.ReduceMean(True)
         self.shape = P.Shape()
         self.reshape = P.Reshape()
-    
+
     def construct(self, x):
-        x = self.mean(x, (2, 3)) 
+        x = self.mean(x, (2, 3))
         b, c, _, _ = self.shape(x)
         x = self.reshape(x, (b, c))
         return x
@@ -52,6 +70,9 @@ def conv1x1(in_channels, out_channels, stride=1, padding=0, has_bias=False):
 
 
 class _DenseLayer(nn.Cell):
+    """
+    the dense layer, include 2 conv layer
+    """
     def __init__(self, num_input_features, growth_rate, bn_size, drop_rate):
         super(_DenseLayer, self).__init__()
         self.norm1 = nn.BatchNorm2d(num_input_features)
@@ -63,7 +84,7 @@ class _DenseLayer(nn.Cell):
         self.conv2 = conv3x3(bn_size*growth_rate, growth_rate)
 
         # nn.Dropout in MindSpore use keep_prob, diff from Pytorch
-        self.keep_prob = 1 - drop_rate
+        self.keep_prob = 1.0 - drop_rate
         self.dropout = nn.Dropout(keep_prob=self.keep_prob)
 
     def construct(self, features):
@@ -74,6 +95,9 @@ class _DenseLayer(nn.Cell):
         return new_features
 
 class _DenseBlock(nn.Cell):
+    """
+    the dense block
+    """
     def __init__(self, num_layers, num_input_features, bn_size, growth_rate, drop_rate):
         super(_DenseBlock, self).__init__()
         self.cell_list = nn.CellList()
@@ -85,24 +109,27 @@ class _DenseBlock(nn.Cell):
                 drop_rate=drop_rate
             )
             self.cell_list.append(layer)
-            
+
         self.concate = P.Concat(axis=1)
 
     def construct(self, init_features):
         features = init_features
         for layer in self.cell_list:
             new_features = layer(features)
-            features = self.concate((features,new_features))
+            features = self.concate((features, new_features))
         return features
 
 class _Transition(nn.Cell):
+    """
+    the transiton layer
+    """
     def __init__(self, num_input_features, num_output_features):
         super(_Transition, self).__init__()
         self.features = nn.SequentialCell(OrderedDict([
             ('norm', nn.BatchNorm2d(num_input_features)),
             ('relu', nn.ReLU()),
             ('conv', conv1x1(num_input_features, num_output_features)),
-            ('pool', nn.AvgPool2d(kernel_size=2, stride=2))
+            ('pool', nn.MaxPool2d(kernel_size=2, stride=2))
         ]))
 
     def construct(self, x):
@@ -110,11 +137,14 @@ class _Transition(nn.Cell):
         return x
 
 class Densenet(nn.Cell):
+    """
+    the densenet architecture
+    """
     __constants__ = ['features']
 
     def __init__(self, growth_rate, block_config, num_init_features, bn_size=4, drop_rate=0):
         super(Densenet, self).__init__()
-        
+
         layers = OrderedDict()
         layers['conv0'] = conv7x7(3, num_init_features, stride=2, padding=3)
         layers['norm0'] = nn.BatchNorm2d(num_init_features)
@@ -163,7 +193,7 @@ def _densenet161(**kwargs):
 
 
 def _densenet169(**kwargs):
-    return Densenet(growth_rate=32, block_config=(6, 12 , 32, 32), num_init_features=64, **kwargs)
+    return Densenet(growth_rate=32, block_config=(6, 12, 32, 32), num_init_features=64, **kwargs)
 
 
 def _densenet201(**kwargs):
@@ -172,24 +202,33 @@ def _densenet201(**kwargs):
 
 
 class DenseNet121(nn.Cell):
-    def __init__(self, num_classes):
+    """
+    the densenet121 architectur
+    """
+    def __init__(self, num_classes, include_top=True):
         super(DenseNet121, self).__init__()
         self.backbone = _densenet121()
         out_channels = self.backbone.get_out_channels()
-        self.head = CommonHead(num_classes, out_channels)
+        self.include_top = include_top
+        if self.include_top:
+            self.head = CommonHead(num_classes, out_channels)
 
         default_recurisive_init(self)
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Conv2d):
-                cell.weight.default_input = init.initializer(KaimingNormal(a=math.sqrt(5), mode='fan_out', nonlinearity='relu'),
-                                                            cell.weight.default_input.shape(), cell.weight.default_input.dtype()).to_tensor()
+                cell.weight.set_data(init.initializer(KaimingNormal(a=math.sqrt(5), mode='fan_out',
+                                                                    nonlinearity='relu'),
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
             elif isinstance(cell, nn.BatchNorm2d):
-                cell.gamma.default_input = init.initializer('ones', cell.gamma.default_input.shape()).to_tensor()
-                cell.beta.default_input = init.initializer('zeros', cell.beta.default_input.shape()).to_tensor()
+                cell.gamma.set_data(init.initializer('ones', cell.gamma.shape))
+                cell.beta.set_data(init.initializer('zeros', cell.beta.shape))
             elif isinstance(cell, nn.Dense):
-                cell.bias.default_input = init.initializer('zeros', cell.bias.default_input.shape()).to_tensor()
+                cell.bias.set_data(init.initializer('zeros', cell.bias.shape))
 
     def construct(self, x):
         x = self.backbone(x)
+        if not self.include_top:
+            return x
         x = self.head(x)
         return x

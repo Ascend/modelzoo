@@ -77,7 +77,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.random_choice_with_mask_neg = P.RandomChoiceWithMask(self.num_expected_neg)
         self.reshape = P.Reshape()
         self.equal = P.Equal()
-        self.bounding_box_encode = P.BoundingBoxEncode(means=(0.0, 0.0, 0.0, 0.0), stds=(10.0, 10.0, 5.0, 5.0))
+        self.bounding_box_encode = P.BoundingBoxEncode(means=(0.0, 0.0, 0.0, 0.0), stds=(0.1, 0.1, 0.2, 0.2))
         self.concat_axis1 = P.Concat(axis=1)
         self.logicalnot = P.LogicalNot()
         self.tile = P.Tile()
@@ -114,7 +114,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
         bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, mstype.int32), \
                              (self.num_bboxes, 1)), (1, 4)), mstype.bool_), \
                              bboxes, self.check_anchor_two)
-        # 1 dim = gt, 2 dim = bbox
+
         overlaps = self.iou(bboxes, gt_bboxes_i)
 
         max_overlaps_w_gt_index, max_overlaps_w_gt = self.max_gt(overlaps)

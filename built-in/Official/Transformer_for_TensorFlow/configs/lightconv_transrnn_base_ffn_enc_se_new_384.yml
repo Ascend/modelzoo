@@ -1,0 +1,46 @@
+# share embedding
+# add relu in ffn
+# softmax attention
+# no qkv bias
+model_name: seq2seq_model
+model_params:
+  initializer: use_separate_init
+  embedding.dim: 384
+  src.embedding.initializer: normal
+  src.embedding.multiply_mode: sqrt_depth
+  embedding.share: true
+  weight_tying: true
+  encoder.class: lightconv_encoder
+  encoder.params:
+    num_units: 384
+    num_layers: 9
+    ffn.num_units: 1536
+    dropout_rate: 0.1
+    kernel_sizes: 3,7,15,31,31,31,31,31,31
+  decoder.class: transrnn_decoder
+  decoder.params:
+    attention.class: sum_attention
+    attention.params:
+      num_units: 384
+      norm: false
+      num_heads: 6
+      dropout_rate: 0.1
+      use_bias: false
+    num_units: 384
+    num_layers: 3
+    dropout_rate: 0.1
+    pass_state: false
+    ffn_wrapper: true
+    ffn_units: 1536
+    ffn_act: "relu"
+    ln_wrapper: true
+    attention_layer: true
+    residual: true
+    residual.start_layer: 0
+  optimizer.name: LazyAdam
+  word_level_loss: true
+  learning_rate.constant: 2.0
+  max_grad_norm: null
+  label_smoothing_factor: 0.1
+  learning_rate.warmup_steps: 16000
+  learning_rate.schedule: "constant*rsqrt_hidden_size*linear_warmup*rsqrt_decay"

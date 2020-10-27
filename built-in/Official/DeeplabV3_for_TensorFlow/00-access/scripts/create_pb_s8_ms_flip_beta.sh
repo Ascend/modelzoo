@@ -1,7 +1,6 @@
 #!/bin/sh
 
 CURRENT_DIR=$(cd "$(dirname "$0")"; pwd)
-source ${CURRENT_DIR}/env.sh
 
 # user env
 export JOB_ID=9999001

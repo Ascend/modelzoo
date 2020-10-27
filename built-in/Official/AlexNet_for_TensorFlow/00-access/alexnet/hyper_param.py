@@ -32,7 +32,7 @@ class HyperParams:
         self.config.nsteps_per_epoch = nsteps_per_epoch
         if self.config.max_epochs:
             nstep = nsteps_per_epoch * self.config.max_epochs   #------calculate nsteps in a different way------
-        if self.config.max_train_steps:
+        if self.config.max_train_steps is not None:
             nstep = self.config.max_train_steps
         self.config.nstep = nstep
         
@@ -49,8 +49,9 @@ class HyperParams:
 
     def get_learning_rate(self): 
         global_step = tf.train.get_global_step()
-    
-        learning_rate = tf.gather(tf.convert_to_tensor(self.cos_lr), global_step)
+
+        cur_step = tf.minimum(tf.cast(self.config.nstep,tf.int64), global_step) 
+        learning_rate = tf.gather(tf.convert_to_tensor(self.cos_lr), cur_step)
 
         learning_rate = tf.identity(learning_rate, 'learning_rate')
 

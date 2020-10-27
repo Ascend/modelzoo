@@ -1,0 +1,51 @@
+prune:
+    cfg_file: /examples/compression/prune_ea/prune.yml
+    args:
+        general:
+            worker:
+                devices_per_job: -1
+        nas:
+            search_algorithm:
+                length: 464
+                num_generation: 1
+                random_models: 20
+            trainer:
+                init_model_file: /data2/model_zoo/models/resnet-20/single-gpuB/bestmodel.pth
+                epochs: 1
+        dataset:
+            train_portion: 0.1
+
+quant:
+    cfg_file: /examples/compression/quant_ea/quant_ea.yml
+    args:
+        general:
+            worker:
+                devices_per_job: -1
+        nas1:
+            search_algorithm:
+                num_generation: 2
+                num_individual: 4
+                random_models: 3
+            trainer:
+                epochs: 1
+
+resnet:
+    cfg_file: /examples/fully_train/trainer/resnet.yml
+    args:
+        general:
+            worker:
+                devices_per_job: -1
+        fully_train:
+            trainer:
+                epochs: 1
+
+asha:
+    cfg_file: /examples/hpo/asha/asha.yml
+    args:
+        general:
+            worker:
+                devices_per_job: -1
+        hpo1:
+            hpo:
+                total_epochs: 1
+                config_count: 10

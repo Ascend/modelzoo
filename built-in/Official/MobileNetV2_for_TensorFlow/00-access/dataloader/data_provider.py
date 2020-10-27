@@ -231,9 +231,10 @@ def get_data_united(dataset, batch_size, num_classes, labels_offset, is_training
     ds = ds.batch(batch_size, drop_remainder=True)
 
     ds = ds.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
-    ds = threadpool.override_threadpool(ds,threadpool.PrivateThreadPool(128, display_name='input_pipeline_thread_pool'))
 
-    iterator = ds
+    iterator = ds.make_initializable_iterator()
+
+    ds = threadpool.override_threadpool(ds,threadpool.PrivateThreadPool(128, display_name='input_pipeline_thread_pool'))
 
     return iterator, ds
 

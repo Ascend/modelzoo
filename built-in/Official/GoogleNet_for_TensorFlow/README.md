@@ -92,6 +92,18 @@ cd modelzoo_GoogleNet_TF
     - **edit** *scripts/run_8p.sh* and *scripts/train_8p.sh* (see example below)
     - ./run_8p.sh 
 
+Configure the env:
+- **edit** *scripts/run_1p.sh* and *scripts/run_8p.sh*
+    - add your own configuration info in *scripts/run_1p.sh* and *scripts/run_8p.sh*. The default configuration info could be considered as an example.
+```shell
+    #!/bin/bash
+    install_path=/usr/local/Ascend
+    export TBE_IMPL_PATH=${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbeexport 
+    LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib/:${install_path}/nnae/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons
+    export PYTHONPATH=$PYTHONPATH:${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbe:${install_path}/tfplugin/latest/tfplugin/python/site-packages/:${install_path}/nnae/latest/fwkacllib/python/site-packages/hccl:${install_path}/nnae/latest/fwkacllib/python/site-packages/te:${install_path}/nnae/latest/fwkacllib/python/site-packages/topi
+    export PATH=${install_path}/nnae/latest/fwkacllib/ccec_compiler/bin:${PATH}
+```
+
 Examples:
 - Case for single NPU
     - Modify the ID of NPU in *device_group* in *scripts/run_1p.sh*, default ID is *0*.

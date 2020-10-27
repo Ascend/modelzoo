@@ -7,12 +7,12 @@ mkdir -p result/8p
 #fi
 
 # set env
-export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:/usr/local/Ascend/fwkacllib/lib64/:/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:/usr/local/Ascend/add-ons/
-export PYTHONPATH=$PYTHONPATH:/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe
-export PATH=$PATH:/usr/local/Ascend/fwkacllib/ccec_compiler/bin
-export ASCEND_OPP_PATH=/usr/local/Ascend/opp
-export DDK_VERSION_FLAG=1.60.T17.B830
-export HCCL_CONNECT_TIMEOUT=600
+#################### configure the env ####################
+#
+#
+#
+#
+###########################################################
 
 currentDir=$(cd "$(dirname "$0")"; pwd)
 
@@ -22,6 +22,7 @@ export RANK_TABLE_FILE=${currentDir}/8p.json
 export RANK_SIZE=8
 export RANK_ID=ascend8p
 export SLOG_PRINT_TO_STDOUT=0
+export HCCL_CONNECT_TIMEOUT=600
 
 device_group="0 1 2 3 4 5 6 7"
 

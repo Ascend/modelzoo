@@ -390,7 +390,7 @@ def mobilenet(inputs,
       # logits = tf.squeeze(logits, [1, 2])
 
       # use slim.fully_connected instead
-      net = tf.squeeze(net)
+      net = tf.squeeze(net, [1, 2])
       net = slim.dropout(net, keep_prob=0.8, scope='Dropout', is_training=is_training)
       logits = slim.fully_connected(
         net,

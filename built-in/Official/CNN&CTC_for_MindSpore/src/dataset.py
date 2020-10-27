@@ -1,32 +1,35 @@
-import lmdb
-import math
-import numpy as np
-import six
-import pickle
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""cnn_ctc dataset"""
+
 import sys
+import pickle
+import math
+import six
+import numpy as np
 from PIL import Image
+import lmdb
+
+from mindspore.communication.management import get_rank, get_group_size
 
 from .util import CTCLabelConverter
 from .config import Config_CNNCTC
 
-from mindspore.communication.management import init, get_rank, get_group_size
-
 config = Config_CNNCTC()
-CHARACTER = config.CHARACTER
 
-TRAIN_DATASET_PATH = config.TRAIN_DATASET_PATH
-TRAIN_DATASET_INDEX_PATH = config.TRAIN_DATASET_INDEX_PATH
-TRAIN_BATCH_SIZE = config.TRAIN_BATCH_SIZE
-
-TEST_DATASET_PATH = config.TEST_DATASET_PATH
-TEST_BATCH_SIZE = config.TEST_BATCH_SIZE
-
-FINAL_FEATURE_WIDTH = config.FINAL_FEATURE_WIDTH
-IMG_H = config.IMG_H
-IMG_W = config.IMG_W
-
-
-class NormalizePAD(object):
+class NormalizePAD():
 
     def __init__(self, max_size, PAD_type='right'):
         self.max_size = max_size
@@ -42,7 +45,7 @@ class NormalizePAD(object):
         img = np.subtract(img, 0.5)
         img = np.true_divide(img, 0.5)
 
-        c, h, w = img.shape
+        _, _, w = img.shape
         Pad_img = np.zeros(shape=self.max_size, dtype=np.float32)
         Pad_img[:, :, :w] = img  # right pad
         if self.max_size[2] != w:  # add border Pad
@@ -51,7 +54,7 @@ class NormalizePAD(object):
         return Pad_img
 
 
-class AlignCollate(object):
+class AlignCollate():
 
     def __init__(self, imgH=32, imgW=100):
         self.imgH = imgH
@@ -96,7 +99,7 @@ def get_img_from_lmdb(env, index):
         except IOError:
             print(f'Corrupted image for {index}')
             # make dummy image and dummy label for corrupted image.
-            img = Image.new('RGB', (IMG_W, IMG_H))
+            img = Image.new('RGB', (config.IMG_W, config.IMG_H))
             label = '[dummy_label]'
 
     label = label.lower()
@@ -104,104 +107,96 @@ def get_img_from_lmdb(env, index):
     return img, label
 
 
-def ST_MJ_Generator_batch_fixed_length():
-    align_collector = AlignCollate()
+class ST_MJ_Generator_batch_fixed_length:
+    def __init__(self):
+        self.align_collector = AlignCollate()
+        self.converter = CTCLabelConverter(config.CHARACTER)
+        self.env = lmdb.open(config.TRAIN_DATASET_PATH, max_readers=32, readonly=True, lock=False, readahead=False,
+                             meminit=False)
+        if not self.env:
+            print('cannot create lmdb from %s' % (config.TRAIN_DATASET_PATH))
+            raise ValueError(config.TRAIN_DATASET_PATH)
 
-    converter = CTCLabelConverter(CHARACTER)
+        with open(config.TRAIN_DATASET_INDEX_PATH, 'rb') as f:
+            self.st_mj_filtered_index_list = pickle.load(f)
 
-    env = lmdb.open(TRAIN_DATASET_PATH, max_readers=32, readonly=True, lock=False, readahead=False, meminit=False)
-    if not env:
-        print('cannot create lmdb from %s' % (TRAIN_DATASET_PATH))
-        sys.exit(0)
+        print(f'num of samples in ST_MJ dataset: {len(self.st_mj_filtered_index_list)}')
+        self.dataset_size = len(self.st_mj_filtered_index_list) // config.TRAIN_BATCH_SIZE
+        self.batch_size = config.TRAIN_BATCH_SIZE
 
-    with open(TRAIN_DATASET_INDEX_PATH, 'rb') as f:
-        st_mj_filtered_index_list = pickle.load(f)
+    def __len__(self):
+        return self.dataset_size
 
-    print(f'num of samples in ST_MJ dataset: {len(st_mj_filtered_index_list)}')
+    def __getitem__(self, item):
+        img_ret = []
+        text_ret = []
 
-    cnt = 0
+        for i in range(item * self.batch_size, (item + 1) * self.batch_size):
+            index = self.st_mj_filtered_index_list[i]
+            img, label = get_img_from_lmdb(self.env, index)
 
-    img_ret = []
-    text_ret = []
+            img_ret.append(img)
+            text_ret.append(label)
 
-    for index in st_mj_filtered_index_list:
+        img_ret = self.align_collector(img_ret)
+        text_ret, length = self.converter.encode(text_ret)
 
-        img, label = get_img_from_lmdb(env, index)
+        label_indices = []
+        for i, _ in enumerate(length):
+            for j in range(length[i]):
+                label_indices.append((i, j))
+        label_indices = np.array(label_indices, np.int64)
+        sequence_length = np.array([config.FINAL_FEATURE_WIDTH] * config.TRAIN_BATCH_SIZE, dtype=np.int32)
+        text_ret = text_ret.astype(np.int32)
 
-        img_ret.append(img)
-        text_ret.append(label)
+        return img_ret, label_indices, text_ret, sequence_length
 
-        if len(img_ret) == TRAIN_BATCH_SIZE:
-            img_ret = align_collector(img_ret)
-            text_ret, length = converter.encode(text_ret)
+class ST_MJ_Generator_batch_fixed_length_para:
+    def __init__(self):
+        self.align_collector = AlignCollate()
+        self.converter = CTCLabelConverter(config.CHARACTER)
+        self.env = lmdb.open(config.TRAIN_DATASET_PATH, max_readers=32, readonly=True, lock=False, readahead=False,
+                             meminit=False)
+        if not self.env:
+            print('cannot create lmdb from %s' % (config.TRAIN_DATASET_PATH))
+            raise ValueError(config.TRAIN_DATASET_PATH)
 
-            label_indices = []
-            for i in range(len(length)):
-                for j in range(length[i]):
-                    label_indices.append((i, j))
-            label_indices = np.array(label_indices, np.int64)
-            sequence_length = np.array([FINAL_FEATURE_WIDTH] * TRAIN_BATCH_SIZE, dtype=np.int32)
-            text_ret = text_ret.astype(np.int32)
+        with open(config.TRAIN_DATASET_INDEX_PATH, 'rb') as f:
+            self.st_mj_filtered_index_list = pickle.load(f)
 
-            yield img_ret, label_indices, text_ret, sequence_length
-            
-            cnt += 1
-            img_ret = []
-            text_ret = []
+        print(f'num of samples in ST_MJ dataset: {len(self.st_mj_filtered_index_list)}')
+        self.rank_id = get_rank()
+        self.rank_size = get_group_size()
+        self.dataset_size = len(self.st_mj_filtered_index_list) // config.TRAIN_BATCH_SIZE // self.rank_size
+        self.batch_size = config.TRAIN_BATCH_SIZE
 
+    def __len__(self):
+        return self.dataset_size
 
-def ST_MJ_Generator_batch_fixed_length_para():
-    align_collector = AlignCollate()
+    def __getitem__(self, item):
+        img_ret = []
+        text_ret = []
 
-    converter = CTCLabelConverter(CHARACTER)
+        rank_item = (item * self.rank_size) + self.rank_id
+        for i in range(rank_item * self.batch_size, (rank_item + 1) * self.batch_size):
+            index = self.st_mj_filtered_index_list[i]
+            img, label = get_img_from_lmdb(self.env, index)
 
-    env = lmdb.open(TRAIN_DATASET_PATH, max_readers=32, readonly=True, lock=False, readahead=False, meminit=False)
-    if not env:
-        print('cannot create lmdb from %s' % (TRAIN_DATASET_PATH))
-        sys.exit(0)
+            img_ret.append(img)
+            text_ret.append(label)
 
-    with open(TRAIN_DATASET_INDEX_PATH, 'rb') as f:
-        st_mj_filtered_index_list = pickle.load(f)
+        img_ret = self.align_collector(img_ret)
+        text_ret, length = self.converter.encode(text_ret)
 
-    print(f'num of samples in ST_MJ dataset: {len(st_mj_filtered_index_list)}')
+        label_indices = []
+        for i, _ in enumerate(length):
+            for j in range(length[i]):
+                label_indices.append((i, j))
+        label_indices = np.array(label_indices, np.int64)
+        sequence_length = np.array([config.FINAL_FEATURE_WIDTH] * config.TRAIN_BATCH_SIZE, dtype=np.int32)
+        text_ret = text_ret.astype(np.int32)
 
-    cnt = 0
-
-    index_ret = []
-    img_ret = []
-    text_ret = []
-    rank_id = get_rank()
-    rank_size = get_group_size()
-
-    for index in st_mj_filtered_index_list:
-
-        index_ret.append(index)
-
-        if len(index_ret) == TRAIN_BATCH_SIZE:
-            if cnt % rank_size == rank_id:
-
-                for index_ in index_ret:
-                    img, label = get_img_from_lmdb(env, index_)
-
-                    img_ret.append(img)
-                    text_ret.append(label)
-
-                img_ret = align_collector(img_ret)
-                text_ret, length = converter.encode(text_ret)
-
-                label_indices = []
-                for i in range(len(length)):
-                    for j in range(length[i]):
-                        label_indices.append((i, j))
-                label_indices = np.array(label_indices, np.int64)
-                sequence_length = np.array([FINAL_FEATURE_WIDTH] * TRAIN_BATCH_SIZE, dtype=np.int32)
-                text_ret = text_ret.astype(np.int32)
-                yield img_ret, label_indices, text_ret, sequence_length
-
-            cnt += 1
-            index_ret = []
-            img_ret = []
-            text_ret = []
+        return img_ret, label_indices, text_ret, sequence_length
 
 
 def IIIT_Generator_batch():
@@ -209,11 +204,11 @@ def IIIT_Generator_batch():
 
     align_collector = AlignCollate()
 
-    converter = CTCLabelConverter(CHARACTER)
+    converter = CTCLabelConverter(config.CHARACTER)
 
-    env = lmdb.open(TEST_DATASET_PATH, max_readers=32, readonly=True, lock=False, readahead=False, meminit=False)
+    env = lmdb.open(config.TEST_DATASET_PATH, max_readers=32, readonly=True, lock=False, readahead=False, meminit=False)
     if not env:
-        print('cannot create lmdb from %s' % (TEST_DATASET_PATH))
+        print('cannot create lmdb from %s' % (config.TEST_DATASET_PATH))
         sys.exit(0)
 
     with env.begin(write=False) as txn:
@@ -232,7 +227,7 @@ def IIIT_Generator_batch():
 
             illegal_sample = False
             for char_item in label.lower():
-                if char_item not in CHARACTER:
+                if char_item not in config.CHARACTER:
                     illegal_sample = True
                     break
             if illegal_sample:
@@ -252,16 +247,16 @@ def IIIT_Generator_batch():
         img_ret.append(img)
         text_ret.append(label)
 
-        if len(img_ret) == TEST_BATCH_SIZE:
+        if len(img_ret) == config.TEST_BATCH_SIZE:
             img_ret = align_collector(img_ret)
             text_ret, length = converter.encode(text_ret)
 
             label_indices = []
-            for i in range(len(length)):
+            for i, _ in enumerate(length):
                 for j in range(length[i]):
                     label_indices.append((i, j))
             label_indices = np.array(label_indices, np.int64)
-            sequence_length = np.array([26] * TEST_BATCH_SIZE, dtype=np.int32)
+            sequence_length = np.array([26] * config.TEST_BATCH_SIZE, dtype=np.int32)
             text_ret = text_ret.astype(np.int32)
 
             yield img_ret, label_indices, text_ret, sequence_length, length

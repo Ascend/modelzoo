@@ -1,279 +1,137 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""Train mobilenetV2 on ImageNet."""
+
 import os
-from mindspore import context
-devid = int(os.getenv('DEVICE_ID'))
-context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
-                    device_target="Davinci", save_graphs=True, device_id=devid)
-
 import time
-import argparse
-import datetime
+import random
+import numpy as np
 
-import mindspore.nn as nn
 from mindspore import Tensor
-from mindspore.nn.optim import Momentum
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore import ParallelMode
-from mindspore.train.callback import ModelCheckpoint, RunContext
-from mindspore.train.callback import _InternalCallbackParam, CheckpointConfig, Callback
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.nn import WithLossCell, TrainOneStepCell
+from mindspore.nn.optim.momentum import Momentum
+from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
+from mindspore.common import dtype as mstype
+from mindspore.communication.management import get_rank
 from mindspore.train.model import Model
-from mindspore.train.callback import Callback
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.train.serialization import save_checkpoint
+from mindspore.common import set_seed
 
-from mobilenet_v2.datasets import classification_dataset
-from mobilenet_v2.losses.crossentropy import CrossEntropy
-from mobilenet_v2.lr_scheduler.warmup_step_lr import warmup_step_lr
-from mobilenet_v2.lr_scheduler.warmup_cosine_annealing_lr import warmup_cosine_annealing_lr
-from mobilenet_v2.utils.logging import get_logger
-from mobilenet_v2.optimizers import get_param_groups
-from mobilenet_v2.network.mobilenet import get_network
+from src.dataset import create_dataset, extract_features
+from src.lr_generator import get_lr
+from src.config import set_config
 
+from src.args import train_parse_args
+from src.utils import context_device_init, switch_precision, config_ckpoint
+from src.models import CrossEntropyWithLabelSmooth, define_net, load_ckpt
 
-class BuildTrainNetwork(nn.Cell):
-    def __init__(self, network, criterion):
-        super(BuildTrainNetwork, self).__init__()
-        self.network = network
-        self.criterion = criterion
- 
-    def construct(self, input_data, label):
-        output = self.network(input_data)
-        loss = self.criterion(output, label)
-        return loss
+set_seed(1)
 
-class ProgressMonitor(Callback):
-    def __init__(self, args):
-        super(ProgressMonitor, self).__init__()
-        self.me_epoch_start_time = 0
-        self.me_epoch_start_step_num = 0
-        self.args = args
-        self.ckpt_history = []
+if __name__ == '__main__':
+    args_opt = train_parse_args()
+    args_opt.dataset_path = os.path.abspath(args_opt.dataset_path)
+    config = set_config(args_opt)
+    start = time.time()
 
-    def begin(self, run_context):
-        self.args.logger.info('start network train...')
+    print(f"train args: {args_opt}\ncfg: {config}")
 
-    def epoch_begin(self, run_context):
-        pass
+    #set context and device init
+    context_device_init(config)
 
-    def epoch_end(self, run_context, *me_args):
-        cb_params = run_context.original_args()
-        me_step = cb_params.cur_step_num - 1
+    # define network
+    backbone_net, head_net, net = define_net(config, args_opt.is_training)
 
-        real_epoch = me_step // self.args.steps_per_epoch
-        time_used = time.time() - self.me_epoch_start_time
-        fps_mean = self.args.per_batch_size * (me_step-self.me_epoch_start_step_num) * self.args.group_size / time_used
-        self.args.logger.info('epoch[{}], maiter[{}], loss:{}, mean_fps:{:.2f} imgs/sec'.format(real_epoch, me_step, cb_params.net_outputs, fps_mean))
+    if args_opt.pretrain_ckpt != "" and args_opt.freeze_layer == "backbone":
+        load_ckpt(backbone_net, args_opt.pretrain_ckpt, trainable=False)
+        step_size = extract_features(backbone_net, args_opt.dataset_path, config)
 
-        if self.args.rank_save_ckpt_flag:
-            try:
-                import moxing as mox
-                import glob
-                ckpts = glob.glob(os.path.join(self.args.outputs_dir, '*.ckpt'))
-                for ckpt in ckpts:
-                    ckpt_fn = os.path.basename(ckpt)
-                    if not ckpt_fn.startswith('{}-'.format(self.args.rank)):
-                        continue
-                    if ckpt in self.ckpt_history:
-                        continue
-                    self.ckpt_history.append(ckpt)
-                    self.args.logger.info('epoch[{}], iter[{}], loss:{}, ckpt:{}, ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
-            except:
-                self.args.logger.info('local passed')
-
-        self.me_epoch_start_step_num = me_step
-        self.me_epoch_start_time = time.time()
-
-    def step_begin(self, run_context):
-        # self.args.logger.info('start step...')
-        pass
-
-    def step_end(self, run_context, *me_args):
-        pass
-
-    def end(self, run_context):
-        self.args.logger.info('end network train...')
-
-
-def parse_args(cloud_args={}):
-    parser = argparse.ArgumentParser('mindspore classification training')
-
-    # dataset related
-    parser.add_argument('--data_dir', type=str, default='', help='train data dir')
-    parser.add_argument('--num_classes', type=int, default=1000, help='num of classes in dataset')
-    parser.add_argument('--image_size', type=str, default='224,224', help='image size of the dataset')
-    parser.add_argument('--per_batch_size', default=64, type=int, help='batch size for per gpu')
-
-    # network related
-    parser.add_argument('--backbone', default='mobilenet_v2', type=str, help='backbone')
-    parser.add_argument('--pretrained', default='', type=str, help='model_path, local pretrained model to load')
-
-    # optimizer and lr related
-    parser.add_argument('--lr_scheduler', default='exponential', type=str,
-                        help='lr-scheduler, option type: exponential, cosine_annealing')
-    parser.add_argument('--lr', default=0.1, type=float, help='learning rate of the training')
-    parser.add_argument('--lr_epochs', type=str, default='30,60,90,120,150,180,210,240,270', help='epoch of lr changing')
-    parser.add_argument('--lr_gamma', type=float, default=0.1, help='decrease lr by a factor of exponential lr_scheduler')
-    parser.add_argument('--eta_min', type=float, default=0., help='eta_min in cosine_annealing scheduler')
-    parser.add_argument('--T_max', type=int, default=300, help='T-max in cosine_annealing scheduler')
-    parser.add_argument('--max_epoch', type=int, default=300, help='max epoch num to train the model')
-    parser.add_argument('--warmup_epochs', default=0, type=float, help='warmup epoch')
-    parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight decay')
-    parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
-
-    # loss related
-    parser.add_argument('--is_dynamic_loss_scale', type=int, default=0, help='dynamic loss scale')
-    parser.add_argument('--loss_scale', type=int, default=1024, help='static loss scale')
-    parser.add_argument('--label_smooth', type=int, default=0, help='whether to use label smooth in CE')
-    parser.add_argument('--label_smooth_factor', type=float, default=0.1, help='smooth strength of original one-hot')
-
-    # logging related
-    parser.add_argument('--log_interval', type=int, default=100, help='logging interval')
-    parser.add_argument('--ckpt_path', type=str, default='outputs/', help='checkpoint save location')
-    parser.add_argument('--ckpt_interval', type=int, default=2000, help='ckpt_interval')
-    parser.add_argument('--is_save_on_master', type=int, default=1, help='save ckpt on master or all rank')
-
-    # distributed related
-    parser.add_argument('--is_distributed', type=int, default=1, help='if multi device')
-    parser.add_argument('--rank', type=int, default=0, help='local rank of distributed')
-    parser.add_argument('--group_size', type=int, default=1, help='world size of distributed')
-
-    args, _ = parser.parse_known_args()
-    args = merge_args(args, cloud_args)
-
-    args.lr_epochs = list(map(int, args.lr_epochs.split(',')))
-    args.image_size = list(map(int, args.image_size.split(',')))
-
-    return args
-
-
-def merge_args(args, cloud_args):
-    args_dict = vars(args)
-    if isinstance(cloud_args, dict):
-        for key in cloud_args.keys():
-            val = cloud_args[key]
-            if key in args_dict and val:
-                arg_type = type(args_dict[key])
-                if arg_type is not type(None):
-                    val = arg_type(val)
-                args_dict[key] = val
-    return args
-	
-
-def train(cloud_args={}):
-    args = parse_args(cloud_args)
-
-    # init distributed
-    if args.is_distributed:
-        init()
-        args.rank = get_rank()
-        args.group_size = get_group_size()
-
-    if args.is_dynamic_loss_scale == 1:
-        args.loss_scale = 1  # for dynamic loss scale can not set loss scale in momentum opt
-    
-    # select for master rank save ckpt or all rank save, compatiable for model parallel
-    args.rank_save_ckpt_flag = 0
-    if args.is_save_on_master:
-        if args.rank == 0:
-            args.rank_save_ckpt_flag = 1
     else:
-        args.rank_save_ckpt_flag = 1
+        if args_opt.platform == "CPU":
+            raise ValueError("CPU only support fine tune the head net, doesn't support fine tune the all net")
 
-    # logger
-    args.outputs_dir = os.path.join(args.ckpt_path, 
-        datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-    args.logger = get_logger(args.outputs_dir, args.rank)
+        if args_opt.pretrain_ckpt:
+            load_ckpt(backbone_net, args_opt.pretrain_ckpt)
 
-    # dataloader
-    de_dataset = classification_dataset(args.data_dir, args.image_size, 
-                                args.per_batch_size, args.max_epoch,
-                                args.rank, args.group_size)
+        dataset = create_dataset(dataset_path=args_opt.dataset_path, do_train=True, config=config)
+        step_size = dataset.get_dataset_size()
 
-    args.steps_per_epoch = de_dataset.get_dataset_size()
+    if step_size == 0:
+        raise ValueError("The step_size of dataset is zero. Check if the images' count of train dataset is more \
+            than batch_size in config.py")
 
-    args.logger.save_args(args)
+    # Currently, only Ascend support switch precision.
+    switch_precision(net, mstype.float16, config)
 
-    # network
-    args.logger.important_info('start create network')
-    # get network and init
-    network = get_network(args.backbone, args.num_classes)
-    # loss
-    if not args.label_smooth:
-        args.label_smooth_factor = 0.0
-    criterion = CrossEntropy(smooth_factor=args.label_smooth_factor,
-                             num_classes=args.num_classes)
-
-    # load pretrain model
-    if os.path.isfile(args.pretrained):
-        param_dict = load_checkpoint(args.pretrained)
-        param_dict_new = {}
-        for key, values in param_dict.items():
-            if key.startswith('moments.'):
-                continue
-            elif key.startswith('network.'):
-                param_dict_new[key[8:]] = values
-            else:
-                param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
-        args.logger.info('load model {} success'.format(args.pretrained))
-
-    # lr scheduler
-    if args.lr_scheduler == 'exponential':
-        lr = warmup_step_lr(args.lr,
-                            args.lr_epochs,
-                            args.steps_per_epoch,
-                            args.warmup_epochs,
-                            args.max_epoch,
-                            gamma=args.lr_gamma,
-                            )
-    elif args.lr_scheduler == 'cosine_annealing':
-        lr = warmup_cosine_annealing_lr(args.lr,
-                                        args.steps_per_epoch,
-                                        args.warmup_epochs,
-                                        args.max_epoch,
-                                        args.T_max,
-                                        args.eta_min)
+    # define loss
+    if config.label_smooth > 0:
+        loss = CrossEntropyWithLabelSmooth(
+            smooth_factor=config.label_smooth, num_classes=config.num_classes)
     else:
-        raise NotImplementedError(args.lr_scheduler)
+        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 
-    # optimizer
-    opt = Momentum(params=get_param_groups(network),
-                   learning_rate=Tensor(lr), 
-                   momentum=args.momentum, 
-                   weight_decay=args.weight_decay, 
-                   loss_scale=args.loss_scale)
+    epoch_size = config.epoch_size
 
-    # # mixed precision training 
-    criterion.add_flags_recursive(fp32=True)
+    # get learning rate
+    lr = Tensor(get_lr(global_step=0,
+                       lr_init=config.lr_init,
+                       lr_end=config.lr_end,
+                       lr_max=config.lr_max,
+                       warmup_epochs=config.warmup_epochs,
+                       total_epochs=epoch_size,
+                       steps_per_epoch=step_size))
 
-    # package training process, adjust lr + forward + backward + optimizer
-    train_net = BuildTrainNetwork(network, criterion)
-    if args.is_distributed:
-        parallel_mode = ParallelMode.DATA_PARALLEL
+    if args_opt.pretrain_ckpt == "" or args_opt.freeze_layer == "none":
+        loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+        opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config.momentum, \
+            config.weight_decay, config.loss_scale)
+        model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale)
+
+        cb = config_ckpoint(config, lr, step_size)
+        print("============== Starting Training ==============")
+        model.train(epoch_size, dataset, callbacks=cb)
+        print("============== End Training ==============")
+
     else:
-        parallel_mode = ParallelMode.STAND_ALONE
-    if args.is_dynamic_loss_scale == 1:
-        loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
-    else:
-        loss_scale_manager = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
-		
-    # Model api changed since TR5_branch 2020/03/09
-    context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=args.group_size, parameter_broadcast=True, mirror_mean=True)
-    model = Model(train_net, optimizer=opt, metrics=None, loss_scale_manager=loss_scale_manager)
+        opt = Momentum(filter(lambda x: x.requires_grad, head_net.get_parameters()), lr, config.momentum, config.weight_decay)
 
-    # checkpoint save
-    progress_cb = ProgressMonitor(args)
-    callbacks = [progress_cb, ]
-    if args.rank_save_ckpt_flag:
-        ckpt_max_num = args.max_epoch * args.steps_per_epoch // args.ckpt_interval
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=args.ckpt_interval,
-                                        keep_checkpoint_max=ckpt_max_num)
-        ckpt_cb = ModelCheckpoint(config=ckpt_config,
-                                    directory=args.outputs_dir,
-                                    prefix='{}'.format(args.rank))
-        callbacks.append(ckpt_cb)
+        network = WithLossCell(head_net, loss)
+        network = TrainOneStepCell(network, opt)
+        network.set_train()
 
-    model.train(args.max_epoch, de_dataset, callbacks=callbacks)
+        features_path = args_opt.dataset_path + '_features'
+        idx_list = list(range(step_size))
+        rank = 0
+        if config.run_distribute:
+            rank = get_rank()
+        save_ckpt_path = os.path.join(config.save_checkpoint_path, 'ckpt_' + str(rank) + '/')
+        if not os.path.isdir(save_ckpt_path):
+            os.mkdir(save_ckpt_path)
 
-
-if __name__ == "__main__":
-    train()
+        for epoch in range(epoch_size):
+            random.shuffle(idx_list)
+            epoch_start = time.time()
+            losses = []
+            for j in idx_list:
+                feature = Tensor(np.load(os.path.join(features_path, f"feature_{j}.npy")))
+                label = Tensor(np.load(os.path.join(features_path, f"label_{j}.npy")))
+                losses.append(network(feature, label).asnumpy())
+            epoch_mseconds = (time.time()-epoch_start) * 1000
+            per_step_mseconds = epoch_mseconds / step_size
+            print("epoch[{}/{}], iter[{}] cost: {:5.3f}, per step time: {:5.3f}, avg loss: {:5.3f}"\
+            .format(epoch + 1, epoch_size, step_size, epoch_mseconds, per_step_mseconds, np.mean(np.array(losses))))
+            if (epoch + 1) % config.save_checkpoint_epochs == 0:
+                save_checkpoint(net, os.path.join(save_ckpt_path, f"mobilenetv2_{epoch+1}.ckpt"))
+        print("total cost {:5.4f} s".format(time.time() - start))

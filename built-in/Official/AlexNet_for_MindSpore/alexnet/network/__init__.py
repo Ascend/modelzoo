@@ -1,1 +1,0 @@
-from .alexnet import get_network

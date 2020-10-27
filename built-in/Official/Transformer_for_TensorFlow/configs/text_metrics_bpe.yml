@@ -1,0 +1,5 @@
+metrics:
+  - class: perplexity
+  - class: bleu
+    params:
+      postproc_fn: "bpe"

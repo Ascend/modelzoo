@@ -1,5 +1,4 @@
 mindspore
 numpy
-python-gflags
 Pillow
 python-opencv

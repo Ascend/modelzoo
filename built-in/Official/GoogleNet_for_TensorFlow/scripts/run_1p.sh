@@ -7,15 +7,12 @@ mkdir -p result/1p
 #fi
 
 # set env
-export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:/usr/local/Ascend/fwkacllib/lib64/:/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:/usr/local/Ascend/add-ons/
-export PYTHONPATH=$PYTHONPATH:/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe
-export PATH=$PATH:/usr/local/Ascend/fwkacllib/ccec_compiler/bin
-export ASCEND_OPP_PATH=/usr/local/Ascend/opp
-export DDK_VERSION_FLAG=1.60.T17.B830
-export HCCL_CONNECT_TIMEOUT=600
-export NEW_GE_FE_ID=1
-export GE_AICPU_FLAG=1
-export SOC_VERSION=Ascend910
+#################### configure the env ####################
+#
+#
+#
+#
+###########################################################
 # user env
 export JOB_ID=9999001
 export RANK_SIZE=1

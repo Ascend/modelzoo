@@ -42,7 +42,7 @@ This model uses Momentum optimizer from Tensorflow with the following hyperparam
 - Momentum : 0.9
 - Learning rate (LR) : 0.06
 - LR schedule: cosine_annealing
-- Batch size : 128 
+- Batch size : 128*8 for 8 NPUs, 256 for single NPU 
 - Weight decay :  0.0001. 
 - Label smoothing = 0.1
 - We train for:
@@ -74,12 +74,12 @@ NPU environmemnt
 
 ```shell
 git clone xxx
-cd  Model_zoo_Alexnet_HARD
+cd  ModelZoo_AlexNet_TF_HARD
 ```
 
 ### 2. Download and preprocess the dataset
 
-1. down load the imagenet dataset
+1. download the ImageNet dataset
 2. Extract the training data
 3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
 
@@ -93,14 +93,17 @@ cd  Model_zoo_Alexnet_HARD
 
 
 for example:
+
+**make sure** that `--data_dir` in the following examples should be your own tfrecord dataset path 
 - case for single NPU
     - In scripts/train_alexnet_1p.sh , python scripts part should look like as follows. For more detailed command lines arguments, please refer to [Command line arguments](#command-line-arguments)
 ```shell
 python3.7 ${EXEC_DIR}/train.py --rank_size=1 \
 	--iterations_per_loop=100 \
 	--batch_size=256 \
-	--data_dir=/path/to/dataset \
+	--data_dir=/data/slimImagenet \
 	--mode=train \
+	--checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/ \
 	--lr=0.015 \
 	--log_dir=./model_1p > ./train_${device_id}.log 2>&1 
 ```
@@ -111,17 +114,20 @@ bash scripts/run_npu_1p.sh
 - case for 8 NPUs
     - In `scripts/train_alexnet_8p.sh` , python scripts part should look like as follows.
 ```shell 
-python3.7 ${EXEC_DIR}/train.py --rank_size=8 \
-	--iterations_per_loop=100 \
-	--batch_size=128 \
-	--data_dir=/path/to/dataset \
-	--mode=train \
-	--lr=0.06 \
-	--log_dir=./model_8p > ./train_${device_id}.log 2>&1 
+taskset -c ${start_id}-${end_id} python3.7 ${EXEC_DIR}/train.py --rank_size=8 \
+                      --epochs_between_evals=1 \
+                      --mode=train \
+        	          --max_epochs=150 \
+                      --iterations_per_loop=100 \
+                      --batch_size=128 \
+                      --data_dir=/data/slimImagenet \
+                      --lr=0.06 \
+                      --checkpoint_dir=./model_8p \
+                      --log_dir=./model_8p > ./train_${device_id}.log 2>&1
 ```
 run the program  
 ```
-bash scripts/run_npu_1p.sh
+bash scripts/run_npu_8p.sh
 ```
 
 ### 4. Test
@@ -141,7 +147,7 @@ bash scripts/run_npu_1p.sh
   --batch_size                      mini-batch size (default: 128) per npu
   --pretrained                      path of pretrained model
   --lr                              initial learning rate
-  --max_epochs                      max epoch num to train the model
+  --max_epochs                      max number of epoch to train the model
   --warmup_epochs                   warmup epoch(when batchsize is large)
   --weight_decay                    weight decay (default: 1e-4)
   --momentum                        momentum(default: 0.9)
@@ -186,7 +192,6 @@ Our result were obtained by running the applicable training script. To achieve t
 | **NPUs** | train performance |
 | :------: | :---------------: |
 |    8     |   25000+  img/s   |
-
 
 
 

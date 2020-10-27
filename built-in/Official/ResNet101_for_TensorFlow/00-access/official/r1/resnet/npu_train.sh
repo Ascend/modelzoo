@@ -7,17 +7,8 @@ rm -rf /var/log/npu/slog/device-*/*.log
 MAIN_PATH=$(dirname $(readlink -f $0))
 
 # set env
-export PYTHONPATH=/usr/local/Ascend/ops/op_impl/built-in/ai_core/tbe/:$MAIN_PATH/../../../
-export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:/usr/local/Ascend/fwkacllib/lib64/:/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:/usr/local/Ascend/add-ons/:/usr/lib/x86_64-linux-gnu
-PATH=$PATH:$HOME/bin
-export PATH=$PATH:/usr/local/Ascend/fwkacllib/ccec_compiler/bin:$PATH
-export ASCEND_OPP_PATH=/usr/local/Ascend/opp
-export DDK_VERSION_FLAG=1.60.T49.0.B201
-export NEW_GE_FE_ID=1
-export GE_AICPU_FLAG=1
-export SOC_VERSION=Ascend910
-
-ulimit -c unlimited
+# set env
+export PYTHONPATH=$PYTHONPTH:$MAIN_PATH/../../../
 
 RANK_SIZE=$1
 RANK_TABLE_FILE=./configs/${RANK_SIZE}p.json

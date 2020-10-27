@@ -26,22 +26,20 @@ class LogSessionRunHook(tf.train.SessionRunHook):
   def before_run(self, run_context):
     self.t0 = time.time()
     return tf.train.SessionRunArgs(
-      fetches=[tf.train.get_global_step(), 'loss:0', 'total_loss:0', 'learning_rate:0',
-               'train_accuracy:0'])
+      fetches=[tf.train.get_global_step(), 'loss:0', 'total_loss:0', 'learning_rate:0'])
 
   def after_run(self, run_context, run_values):
     batch_time = time.time() - self.t0
     self.iter_times.append(batch_time)
     self.elapsed_secs += batch_time
     self.count += 1
-    global_step, loss, total_loss, lr, train_accuracy = run_values.results
+    global_step, loss, total_loss, lr = run_values.results
     if global_step == 1 or global_step % self.display_every == 0:
       dt = self.elapsed_secs / self.count
       img_per_sec = self.global_batch_size * self.iterations_per_loop / dt
       epoch = global_step * self.global_batch_size / self.num_records
       self.logger.info(f'step:{global_step}  epoch:{epoch} ips:{img_per_sec} '
-                       f'loss:{loss}  total_loss:{total_loss}  lr:{lr}, '
-                       f'train_accuracy:{train_accuracy }')
+                       f'loss:{loss}  total_loss:{total_loss}  lr:{lr}, ')
       self.elapsed_secs = 0.
       self.count = 0
 

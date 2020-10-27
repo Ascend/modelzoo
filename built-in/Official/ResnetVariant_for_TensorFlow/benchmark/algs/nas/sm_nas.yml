@@ -1,0 +1,188 @@
+general:
+    # task:
+    #     backup_base_path: s3://automl-hn1/bochao/outputs/tmp_out-0229/
+    worker:
+        devices_per_job: 8
+
+pipeline: [smnass, smnasm, fullytrain]
+
+smnass:
+    pipe_step:
+        type: NasPipeStep
+
+    search_algorithm:
+        type: SMNasS
+        max_sample: 2
+        min_sample: 1
+        pareto:
+            object_count: 2
+            max_object_ids: [0]
+        train_setting:
+            batch_size: 2
+            epoch: 1
+            optimizer:
+                type: 'SGD'
+                lr: 0.02
+                nesterov: True
+                paramwise_options:
+                    norm_decay_mult: 0
+            lr_scheduler:
+                policy: 'step'
+                min_lr: 0.0001
+                warmup_ratio: 0.33
+                step: [8, 11]
+        sample_setting:
+            random_samples: 1
+            max_samples: 2
+            flops_constraint: [ 0.5, 1]
+            EA_setting:
+                num_mutate: 3
+        search_space:
+            dataset:
+                img_scale: [{train: !!python/tuple [512, 512], test: !!python/tuple [512,512], val: !!python/tuple [512,512] },
+                            {train: !!python/tuple [800, 600], test: !!python/tuple [800, 600], val: !!python/tuple [800, 600] },
+                            {train: !!python/tuple [1000,600], test: !!python/tuple [1000,600], val: !!python/tuple [1000,600] }]
+            detector:
+                FasterRCNN: {}
+                # FasterRCNN_wo_FPN: {}
+                # GAFasterRCNN: {}
+                # CascadeRCNN:
+                #     num_stages: [2, 3]
+                # CascadeRCNN_wo_FPN:
+                #     num_stages: [2, 3]
+                # GACascadeRCNN: {}
+                # RetinaNet: {}
+            backbone:
+                ResNet:
+                    depth: [18,34, 50]
+            neck:
+                FPN:
+                    out_channels: [64, 128, 256]
+        data_setting:
+            data_root: '/cache/datasets/COCO2017/'
+            num_classes: 81
+            batch_size: 1
+            num_workers: 1
+            shuffle: False
+            distributed: True
+            multiscale_mode: 'range'   # using multiscale
+            img_norm_cfg: {mean: [123.675, 116.28, 103.53], std: [58.395, 57.12, 57.375], to_rgb: True}
+            size_divisor: 32
+            flip_ratio: 0.5
+            with_mask: False
+            with_crowd: False
+            with_label: True
+            proposal_file: !!null
+            num_max_proposals: 1000
+            with_semantic_seg: False
+            seg_prefix: False
+            seg_scale_factor: 1
+            extra_aug: False
+            resize_keep_ratio: True
+            skip_img_without_anno: True
+            test_mode: False
+            imgs_per_gpu: 1
+
+    search_space:
+        type: SearchSpace
+
+    # Unused setting, just for initialization
+    trainer:
+        type: SMNasTrainer
+        step_name: 'smnas_s'
+        epochs: 1
+
+
+smnasm:
+    pipe_step:
+        type: NasPipeStep
+
+    search_algorithm:
+        type: SMNasM
+        random_ratio: 0.2
+        num_mutate: 10
+        max_sample: 10
+        min_sample: 2
+        sample_base: True
+        pareto:
+            object_count: 2
+            max_object_ids: [0]
+        train_setting:
+            batch_size: 2
+            epoch: 1
+            optimizer:
+                type: 'SGD'
+                lr: 0.02
+                nesterov: True
+                paramwise_options:
+                    norm_decay_mult: 0
+            lr_scheduler:
+                policy: 'step'
+                min_lr: 0.0001
+                warmup_ratio: 0.33
+                step: [8, 11]
+            train_from_scratch: True
+        sample_setting:
+            random_samples: 1
+            max_samples: 2
+            flops_constraint: [ 0.5, 1]
+            EA_setting:
+                num_mutate: 3
+        search_space:
+            backbone:
+                ResNet: {}
+                ResNeXt: {}
+                ResNet_Variant:
+                    arch:
+                        num_reduction: 3
+                        num_stage: 4
+                        num_block: [5, 15]
+                    base_channel: [32, 48, 64]
+                ResNeXt_Variant:
+                    arch:
+                        num_reduction: 3
+                        num_stage: 4
+                        num_block: [5, 15]
+                    base_channel: [32, 48, 56, 64]
+        data_setting:
+            data_root: '/cache/datasets/COCO2017/'
+            num_classes: 81
+            batch_size: 1
+            num_workers: 1
+            shuffle: False
+            distributed: True
+            multiscale_mode: 'range'   # using multiscale
+            img_norm_cfg: {mean: [123.675, 116.28, 103.53], std: [58.395, 57.12, 57.375], to_rgb: True}
+            size_divisor: 32
+            flip_ratio: 0.5
+            with_mask: False
+            with_crowd: False
+            with_label: True
+            proposal_file: !!null
+            num_max_proposals: 1000
+            with_semantic_seg: False
+            seg_prefix: False
+            seg_scale_factor: 1
+            extra_aug: False
+            resize_keep_ratio: True
+            skip_img_without_anno: True
+            test_mode: False
+            imgs_per_gpu: 1
+
+    search_space:
+        type: SearchSpace
+
+    trainer:
+        type: SMNasTrainer
+        step_name: 'smnas_m'
+        epochs: 1
+
+fullytrain:
+    pipe_step:
+        type: FullyTrainPipeStep
+
+    trainer:
+        type: SMNasTrainer
+        step_name: 'fullytrain'
+        epochs: 12
+        model_desc: 'smnas_m_best_config.py'

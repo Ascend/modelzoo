@@ -1,19 +1,34 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+
 import time
-import mindspore.nn as nn
-from mindspore.ops import functional as F
-from mindspore.ops import composite as C
-from mindspore.ops import operations as P
-from mindspore import Parameter, ParameterTuple
-from mindspore.common.tensor import Tensor
-from mindspore.train.callback import Callback
-from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_mirror_mean
-from mindspore.train.parallel_utils import ParallelMode
-from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+
 import numpy as np
+
+import mindspore.nn as nn
+from mindspore import ParameterTuple
+from mindspore.common.tensor import Tensor
+from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+from mindspore.ops import composite as C
+from mindspore.ops import functional as F
+from mindspore.train.callback import Callback
 
 __all__ = ['LossCallBack', 'WithLossCell', 'TrainOneStepCell']
 
-class AverageMeter(object):
+class AverageMeter():
     """Computes and stores the average and current value"""
     def __init__(self):
         self.reset()
@@ -114,11 +129,9 @@ class TrainOneStepCell(nn.Cell):
     def __init__(self, network, optimizer, sens=1.0, reduce_flag=False, mean=True, degree=None):
         super(TrainOneStepCell, self).__init__(auto_prefix=False)
         self.network = network
-        self.backbone = network._backbone
         self.weights = ParameterTuple(network.trainable_params())
         self.optimizer = optimizer
-        self.grad = C.GradOperation('grad',
-                                    get_by_list=True,
+        self.grad = C.GradOperation(get_by_list=True,
                                     sens_param=True)
         self.sens = Tensor((np.ones(1, dtype=np.float32)) * sens)
         self.reducer_flag = reduce_flag

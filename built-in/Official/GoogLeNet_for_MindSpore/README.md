@@ -1,223 +1,516 @@
-# GoogLeNet for MindSpore
+# Contents
 
-GoogLeNet won the 1st place in Image Large Scale Visual Recognition Challenge (ILSVRC) 2014. 
-GoogLeNet along with its Inception module evolves in the next few years, 
-resulting in spotted architectures such as InceptionV1, InceptionV2, 
-Inception V3 and so on. 
-This repository provides a script and recipe to GoogLeNet model and 
-achieve state-of-the-art performance.
+- [GoogleNet Description](#googlenet-description)
+- [Model Architecture](#model-architecture)
+- [Dataset](#dataset)
+- [Features](#features)
+    - [Mixed Precision](#mixed-precision)
+- [Environment Requirements](#environment-requirements)
+- [Quick Start](#quick-start)    
+- [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
+    - [Script Parameters](#script-parameters)
+    - [Training Process](#training-process)
+        - [Training](#training)
+        - [Distributed Training](#distributed-training)  
+    - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
+- [Model Description](#model-description)
+    - [Performance](#performance)  
+        - [Evaluation Performance](#evaluation-performance)
+        - [Inference Performance](#evaluation-performance)
+    - [How to use](#how-to-use)
+        - [Inference](#inference) 
+        - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
+       - [Transfer Learning](#transfer-learning)
+- [Description of Random Situation](#description-of-random-situation)
+- [ModelZoo Homepage](#modelzoo-homepage)
 
-## Table Of Contents
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Setup](#setup)
-  * [Requirements](#requirements)
-* [Quick start guide](#quick-start-guide)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy](#training-accuracy)
-    * [Training performance](#training-performance)
-    * [One-hour performance](#one-hour-performance)
+# [GoogleNet Description](#contents)
+
+GoogleNet, a 22 layers deep network, was proposed in 2014 and won the first place in the ImageNet Large-Scale Visual Recognition Challenge 2014 (ILSVRC14).  GoogleNet, also called Inception v1, has significant improvement over ZFNet (The winner in 2013) and AlexNet (The winner in 2012), and has relatively lower error rate compared to VGGNet.  Typically deeper deep learning network means larger number of parameters, which makes it more prone to overfitting. Furthermore, the increased network size leads to increased use of computational resources. To tackle these issues, GoogleNet adopts 1*1 convolution middle of the network to reduce dimension, and thus further reduce the computation. Global average pooling is used at the end of the network, instead of using fully connected layers.  Another technique, called inception module, is to have different sizes of convolutions for the same input and stacking all the outputs. 
+
+[Paper](https://arxiv.org/abs/1409.4842):  Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed, Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, Andrew Rabinovich. "Going deeper with convolutions." *Proceedings of the IEEE conference on computer vision and pattern recognition*. 2015.
 
 
-    
+# [Model Architecture](#contents)
 
-## Model overview
+Specifically, the GoogleNet contains numerous inception modules, which are connected together to go deeper.  In general, an inception module with dimensionality reduction consists of **1×1 conv**, **3×3 conv**, **5×5 conv**, and **3×3 max pooling**, which are done altogether for the previous input, and stack together again at output.
 
-Refer to [this paper][1] for network details.
 
-`Szegedy, Christian, et al. "Going deeper with convolutions." Proceedings of the IEEE conference on computer vision and pattern recognition. 2015.`
 
-[1]: https://arxiv.org/abs/1409.4842
+# [Dataset](#contents)
 
-## Default Configuration
+Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>) 
 
-- network architecture
+- Dataset size：175M，60,000 32*32 colorful images in 10 classes
+  - Train：146M，50,000 images  
+  - Test：29M，10,000 images 
+- Data format：binary files
+  - Note：Data will be processed in src/dataset.py
 
-  Based on Inception module, add BatchNorm layer after each Conv layer
+Dataset used can refer to paper.
 
-- Preprocessing
+- Dataset size: 125G, 1250k colorful images in 1000 classes
+	- Train: 120G, 1200k images
+	- Test: 5G, 50k images
+- Data format: RGB images.
+	- Note: Data will be processed in src/dataset.py 
 
-  Input size as 224 * 224, RandomCrop, RandomHorizontalFlip, RandomColorAdjust, Normalization
+# [Features](#contents)
+
+## Mixed Precision
+
+The [mixed precision](https://www.mindspore.cn/tutorial/training/en/master/advanced_use/enable_mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware. 
+For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
+
+
+
+# [Environment Requirements](#contents)
+
+- Hardware（Ascend/GPU）
+  - Prepare hardware environment with Ascend or GPU processor. If you want to try Ascend  , please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources. 
+- Framework
+  - [MindSpore](https://www.mindspore.cn/install/en)
+- For more information, please check the resources below：
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+
+
+
+# [Quick Start](#contents)
+
+After installing MindSpore via the official website, you can start training and evaluation as follows: 
+
+- runing on Ascend
+
+  ```python
+  # run training example
+  python train.py > train.log 2>&1 & 
   
-- Hyper Parameters
+  # run distributed training example
+  sh scripts/run_train.sh rank_table.json
+  
+  # run evaluation example
+  python eval.py > eval.log 2>&1 & 
+  OR
+  sh run_eval.sh
+  ```
 
-  Momentum(0.9), exponential `learning rate` scheduler, initial `lr=0.1`, decrease lr by 70% every 70 epochs,
-  `MaxEpoch=300`, `BatchSize=256`, `WeightDecay=0.0001`
+  For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-  refer to
+  Please follow the instructions in the link below:
 
-## Setup
+  https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.
 
-The following section lists the requirements to start training the googlenet model.
+- running on GPU
 
+  For running on GPU, please change `device_target` from `Ascend` to `GPU` in configuration file src/config.py
 
-### Requirements
-
-Before training, please make sure you already have
-
-- Ascend hardware environment
-- mindspore
-
-Apply for resources by sending [table][2]  to ascend@huawei.com.
-
-[2]: https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx
-
-Learn more about MindSpore with
-
-- [MindSpore tutorial][3]
-- [MindSpore API reference][4]
-
-[3]: https://www.mindspore.cn/tutorial/zh-CN/master/index.html
-[4]: https://www.mindspore.cn/api/zh-CN/master/index.html
-
-
-## Quick Start Guide
-
-### 1. Clone the respository
-
-```
-git clone xxx
-cd googlenet
-```
-
-### 2. Download and preprocess the dataset
-
-1. download training and validation dataset, such as ImageNet2012, CIFAR10 and so on.
-2. extract the dataset to `train/` and `val/` respectively.
-   All images within one folder have the same label.
+  ```python
+  # run training example
+  export CUDA_VISIBLE_DEVICES=0
+  python train.py > train.log 2>&1 & 
+  
+  # run distributed training example
+  sh scripts/run_train_gpu.sh 8 0,1,2,3,4,5,6,7
+  
+  # run evaluation example
+  python eval.py --checkpoint_path=[CHECKPOINT_PATH] > eval.log 2>&1 &  
+  OR
+  sh run_eval_gpu.sh [CHECKPOINT_PATH]
+  ```
 
 
+We use CIFAR-10 dataset by default. Your can also pass `$dataset_type` to the scripts so that select different datasets. For more details, please refer the specify script.
 
-### 3. Train
 
-Below we offer training scripts for 8 devices and single device, respectively.
-Once launched, 
+# [Script Description](#contents)
 
-- checkpoint will be saved every `ckpt_interval` steps in `ckpt_path`
-
-- loss &accuracy will be recorded every `log_interval` steps, training log is also saved in `ckpt_path`
-
-Example for training with 8 devices
+## [Script and Sample Code](#contents)
 
 ```
-python /path/to/launch.py \
---nproc_per_node=8 \
---visible_devices=0,1,2,3,4,5,6,7 \
---env_sh=/path/to/env_sh.sh \
---server_id=xx.xxx.xxx.xxx \
-/path/to/train.py \
---per_batch_size=256 \
---data_dir=/path/to/dataset/train \
---is_distributed=1 \
---lr_scheduler=exponential \
---lr_epochs=70,140,210,280 \
---lr_gamma=0.3 \
---per_batch_size=256 \
---lr=0.1 \
---max_epoch=300 \
---label_smooth=1 \
---num_classes=xx
+├── model_zoo
+    ├── README.md                          // descriptions about all the models
+    ├── googlenet        
+        ├── README.md                    // descriptions about googlenet
+        ├── scripts 
+        │   ├──run_train.sh             // shell script for distributed on Ascend
+        │   ├──run_train_gpu.sh         // shell script for distributed on GPU
+        │   ├──run_eval.sh              // shell script for evaluation on Ascend
+        │   ├──run_eval_gpu.sh          // shell script for evaluation on GPU
+        ├── src 
+        │   ├──dataset.py             // creating dataset
+        │   ├──googlenet.py          // googlenet architecture
+        │   ├──config.py            // parameter configuration 
+        ├── train.py               // training script 
+        ├── eval.py               //  evaluation script 
+        ├── export.py            // export checkpoint files into air/onnx 
 ```
 
-Example for training with single device
+## [Script Parameters](#contents)
 
-```
-python /path/to/launch.py \
---nproc_per_node=1 \
---visible_devices=0 \
---env_sh=/path/to/env_sh.sh \
---server_id=xx.xxx.xxx.xxx \
-/path/to/train.py \
---per_batch_size=256 \
---data_dir=/path/to/dataset/train \
---is_distributed=0 \
---lr_scheduler=exponential \
---lr_epochs=70,140,210,280 \
---lr_gamma=0.3 \
---per_batch_size=256 \
---lr=0.1 \
---max_epoch=300 \
---label_smooth=1 \
---num_classes=xx
-```
+Parameters for both training and evaluation can be set in config.py
 
+- config for GoogleNet, CIFAR-10 dataset
 
-### 4. Test
+  ```python
+  'pre_trained': 'False'    # whether training based on the pre-trained model
+  'nump_classes': 10        # the number of classes in the dataset
+  'lr_init': 0.1            # initial learning rate
+  'batch_size': 128         # training batch size
+  'epoch_size': 125         # total training epochs
+  'momentum': 0.9           # momentum
+  'weight_decay': 5e-4      # weight decay value
+  'image_height': 224       # image height used as input to the model
+  'image_width': 224        # image width used as input to the model
+  'data_path': './cifar10'  # absolute full path to the train and evaluation datasets
+  'device_target': 'Ascend' # device running the program
+  'device_id': 4            # device ID used to train or evaluate the dataset. Ignore it when you use run_train.sh for distributed training
+  'keep_checkpoint_max': 10 # only keep the last keep_checkpoint_max checkpoint
+  'checkpoint_path': './train_googlenet_cifar10-125_390.ckpt'  # the absolute full path to save the checkpoint file
+  'onnx_filename': 'googlenet.onnx' # file name of the onnx model used in export.py
+  'geir_filename': 'googlenet.geir' # file name of the geir model used in export.py
+  ```
 
-Example for inference with 8 devices, refer to `log_path` for performance results.
+For more configuration details, please refer the script `config.py`.
 
-```
-python /path/to/launch.py \
---nproc_per_node=8 \
---visible_devices=0,1,2,3,4,5,6,7 \
---env_sh=/path/to/env_sh.sh \
---server_id=xx.xxx.xxx.xxx \
-/path/to/test.py \
---per_batch_size=128 \
---data_dir=/path/to/dataset/val \
---is_distributed=1 \
---pretrained=/path/to/ckpt \
---num_classes=xx \
---backbone=googlenet
---log_path=/path/to/log_dir
-``` 
+## [Training Process](#contents)
 
-Example for inference with single device
+### Training 
 
-```
-python /path/to/launch.py \
---nproc_per_node=1 \
---visible_devices=0 \
---env_sh=/path/to/env_sh.sh \
---server_id=xx.xxx.xxx.xxx \
-/path/to/test.py \
---per_batch_size=128 \
---data_dir=/path/to/dataset/val \
---is_distributed=0 \
---pretrained=/path/to/ckpt \
---num_classes=xx \
---backbone=googlenet
---log_path=/path/to/log_dir
-``` 
+- running on Ascend
 
-## Performance
+  ```
+  python train.py > train.log 2>&1 & 
+  ```
+  
+  The python command above will run in the background, you can view the results through the file `train.log`.
+  
+  After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows:
+  
+  ```
+  # grep "loss is " train.log
+  epoch: 1 step: 390, loss is 1.4842823
+  epcoh: 2 step: 390, loss is 1.0897788
+  ...
+  ```
+  
+  The model checkpoint will be saved in the current directory. 
 
-### Result
+- running on GPU
 
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
+  ```
+  export CUDA_VISIBLE_DEVICES=0
+  python train.py > train.log 2>&1 & 
+  ```
 
-#### Training accuracy
-
-| **epochs** |   Top1_acc   |    Top5_acc |
-| :--------: | :-----------: | :------ |
-|     300     | 71.86%       | 90.70%  |
-
-#### Training performance
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |   1600 img/s   |
-|    8     |   13000 img/s   |
-
-#### One-hour performance
-
-After training one hour (refer to training parameters in ./scripts/train_8p.sh), confirm
+  The python command above will run in the background, you can view the results through the file `train.log`.
+  
+  After training, you'll get some checkpoint files under the folder `./ckpt_0/` by default.
 
 
-| **items** | train performance |
-| :------: | :---------------: |
-|  epoch   |      >= 36         |
-|  loss    |      <= 2.0        |
-|  top1_acc|      >= 58.0%      |
-|  top5_acc|      >= 82.0%      |
+### Distributed Training
+
+- running on Ascend
+
+  ```
+  sh scripts/run_train.sh rank_table.json
+  ```
+  
+  The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log`. The loss value will be achieved as follows:
+  
+  ```
+  # grep "result: " train_parallel*/log
+  train_parallel0/log:epoch: 1 step: 48, loss is 1.4302931
+  train_parallel0/log:epcoh: 2 step: 48, loss is 1.4023874
+  ...
+  train_parallel1/log:epoch: 1 step: 48, loss is 1.3458025
+  train_parallel1/log:epcoh: 2 step: 48, loss is 1.3729336
+  ...
+  ...
+  ```
+
+- running on GPU
+
+  ```
+  sh scripts/run_train_gpu.sh 8 0,1,2,3,4,5,6,7
+  ```
+  
+  The above shell script will run distribute training in the background. You can view the results through the file `train/train.log`.
 
 
+## [Evaluation Process](#contents)
+
+### Evaluation
+
+- evaluation on CIFAR-10 dataset when running on Ascend
+
+  Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/googlenet/train_googlenet_cifar10-125_390.ckpt".
+  
+  ```
+  python eval.py > eval.log 2>&1 &  
+  OR
+  sh scripts/run_eval.sh
+  ```
+  
+  The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
+  
+  ```
+  # grep "accuracy: " eval.log
+  accuracy: {'acc': 0.934}
+  ```
+  
+  Note that for evaluation after distributed training, please set the checkpoint_path to be the last saved checkpoint file such as "username/googlenet/train_parallel0/train_googlenet_cifar10-125_48.ckpt". The accuracy of the test dataset will be as follows:
+  
+  ```
+  # grep "accuracy: " dist.eval.log
+  accuracy: {'acc': 0.9217}
+  ```
+
+- evaluation on CIFAR-10 dataset when running on GPU
+
+  Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/googlenet/train/ckpt_0/train_googlenet_cifar10-125_390.ckpt".
+  
+  ```
+  python eval.py --checkpoint_path=[CHECKPOINT_PATH] > eval.log 2>&1 &  
+  ```
+  
+  The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
+  
+  ```
+  # grep "accuracy: " eval.log
+  accuracy: {'acc': 0.930}
+  ```
+
+  OR,
+
+  ```
+  sh scripts/run_eval_gpu.sh [CHECKPOINT_PATH]
+  ```
+  
+  The above python command will run in the background. You can view the results through the file "eval/eval.log". The accuracy of the test dataset will be as follows:
+  
+  ```
+  # grep "accuracy: " eval/eval.log
+  accuracy: {'acc': 0.930}
+  ```
+
+ 
 
 
+# [Model Description](#contents)
+## [Performance](#contents)
+
+### Evaluation Performance 
+
+#### GoogleNet on CIFAR-10
+| Parameters                 | Ascend                                                      | GPU                    |
+| -------------------------- | ----------------------------------------------------------- | ---------------------- |
+| Model Version              | Inception V1                                                | Inception V1           |
+| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G             | NV SMX2 V100-32G       |
+| uploaded Date              | 08/31/2020 (month/day/year)                                 | 08/20/2020 (month/day/year) |
+| MindSpore Version          | 0.7.0-alpha                                                 | 0.6.0-alpha            |
+| Dataset                    | CIFAR-10                                                    | CIFAR-10               |
+| Training Parameters        | epoch=125, steps=390, batch_size = 128, lr=0.1              | epoch=125, steps=390, batch_size=128, lr=0.1    |
+| Optimizer                  | Momentum                                                    | Momentum               |
+| Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy  |
+| outputs                    | probability                                                 | probobility            |
+| Loss                       | 0.0016                                                      | 0.0016                 |
+| Speed                      | 1pc: 79 ms/step;  8pcs: 82 ms/step                          | 1pc: 150 ms/step;  8pcs: 164 ms/step      |
+| Total time                 | 1pc: 63.85 mins;  8pcs: 11.28 mins                          | 1pc: 126.87 mins;  8pcs: 21.65 mins      | 
+| Parameters (M)             | 13.0                                                        | 13.0                   |
+| Checkpoint for Fine tuning | 43.07M (.ckpt file)                                         | 43.07M (.ckpt file)    |
+| Model for inference        | 21.50M (.onnx file),  21.60M(.air file)                     |      | 
+| Scripts                    | [googlenet script](https://gitee.com/mindspore/mindspore/tree/r0.7/model_zoo/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/mindspore/tree/r0.6/model_zoo/official/cv/googlenet) |
+
+#### GoogleNet on 1200k images
+| Parameters                 | Ascend                                                      |
+| -------------------------- | ----------------------------------------------------------- |
+| Model Version              | Inception V1                                                |
+| Resource                   | Ascend 910, CPU 2.60GHz, 56cores, Memory 314G               |
+| uploaded Date              | 09/20/2020 (month/day/year)                                 |
+| MindSpore Version          | 0.7.0-alpha                                                 |
+| Dataset                    | 1200k images                                                |
+| Training Parameters        | epoch=300, steps=5000, batch_size=256, lr=0.1               |
+| Optimizer                  | Momentum                                                    |
+| Loss Function              | Softmax Cross Entropy                                       |
+| outputs                    | probability                                                 |
+| Loss                       | 2.0                                                         |
+| Speed                      | 1pc: 152 ms/step;  8pcs: 171 ms/step                        |
+| Total time                 | 8pcs: 8.8 hours                                             |
+| Parameters (M)             | 13.0                                                        |
+| Checkpoint for Fine tuning | 52M (.ckpt file)                                            |
+| Scripts                    | [googlenet script](https://gitee.com/mindspore/mindspore/tree/r0.7/model_zoo/official/cv/googlenet) | 
 
 
+### Inference Performance
+
+#### GoogleNet on CIFAR-10
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | Inception V1                | Inception V1                |
+| Resource            | Ascend 910                  | GPU                         |
+| Uploaded Date       | 08/31/2020 (month/day/year) | 08/20/2020 (month/day/year) |
+| MindSpore Version   | 0.7.0-alpha                 | 0.6.0-alpha                 |
+| Dataset             | CIFAR-10, 10,000 images     | CIFAR-10, 10,000 images     |
+| batch_size          | 128                         | 128                         |
+| outputs             | probability                 | probability                 |
+| Accuracy            | 1pc: 93.4%;  8pcs: 92.17%   | 1pc: 93%, 8pcs: 92.89%      |
+| Model for inference | 21.50M (.onnx file)         |  |
+
+#### GoogleNet on 1200k images
+| Parameters          | Ascend                      |
+| ------------------- | --------------------------- |
+| Model Version       | Inception V1                |
+| Resource            | Ascend 910                  |
+| Uploaded Date       | 09/20/2020 (month/day/year) |
+| MindSpore Version   | 0.7.0-alpha                 |
+| Dataset             | 1200k images                |
+| batch_size          | 256                         |
+| outputs             | probability                 |
+| Accuracy            | 8pcs: 71.81%                |
+
+## [How to use](#contents)
+### Inference
+
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorial/training/en/master/advanced_use/migrate_3rd_scripts.html). Following the steps below, this is a simple example:
+
+- Running on Ascend
+
+  ```
+  # Set context
+  context.set_context(mode=context.GRAPH_HOME, device_target=cfg.device_target)
+  context.set_context(device_id=cfg.device_id)
+  
+  # Load unseen dataset for inference
+  dataset = dataset.create_dataset(cfg.data_path, 1, False)
+  
+  # Define model 
+  net = GoogleNet(num_classes=cfg.num_classes)
+  opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), 0.01,
+                 cfg.momentum, weight_decay=cfg.weight_decay)
+  loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean', 
+                                          is_grad=False)
+  model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
+  
+  # Load pre-trained model
+  param_dict = load_checkpoint(cfg.checkpoint_path)
+  load_param_into_net(net, param_dict)
+  net.set_train(False)
+  
+  # Make predictions on the unseen dataset
+  acc = model.eval(dataset)
+  print("accuracy: ", acc)
+  ```
+
+- Running on GPU:
+
+  ```
+  # Set context
+  context.set_context(mode=context.GRAPH_HOME, device_target="GPU")
+  
+  # Load unseen dataset for inference
+  dataset = dataset.create_dataset(cfg.data_path, 1, False)
+  
+  # Define model 
+  net = GoogleNet(num_classes=cfg.num_classes)
+  opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), 0.01,
+                 cfg.momentum, weight_decay=cfg.weight_decay)
+  loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean', 
+                                          is_grad=False)
+  model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
+  
+  # Load pre-trained model
+  param_dict = load_checkpoint(args_opt.checkpoint_path)
+  load_param_into_net(net, param_dict)
+  net.set_train(False)
+  
+  # Make predictions on the unseen dataset
+  acc = model.eval(dataset)
+  print("accuracy: ", acc)
+
+  ```
+
+### Continue Training on the Pretrained Model 
+
+- running on Ascend
+
+  ```
+  # Load dataset
+  dataset = create_dataset(cfg.data_path, 1)
+  batch_num = dataset.get_dataset_size()
+  
+  # Define model
+  net = GoogleNet(num_classes=cfg.num_classes)
+  # Continue training if set pre_trained to be True
+  if cfg.pre_trained:
+      param_dict = load_checkpoint(cfg.checkpoint_path)
+      load_param_into_net(net, param_dict)
+  lr = lr_steps(0, lr_max=cfg.lr_init, total_epochs=cfg.epoch_size,    
+                steps_per_epoch=batch_num)
+  opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), 
+                 Tensor(lr), cfg.momentum, weight_decay=cfg.weight_decay)
+  loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean', is_grad=False)
+  model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'},
+                amp_level="O2", keep_batchnorm_fp32=False, loss_scale_manager=None)
+  
+  # Set callbacks 
+  config_ck = CheckpointConfig(save_checkpoint_steps=batch_num * 5, 
+                               keep_checkpoint_max=cfg.keep_checkpoint_max)
+  time_cb = TimeMonitor(data_size=batch_num)
+  ckpoint_cb = ModelCheckpoint(prefix="train_googlenet_cifar10", directory="./", 
+                               config=config_ck)
+  loss_cb = LossMonitor()
+  
+  # Start training
+  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+  print("train success")
+  ```
+
+- running on GPU
+
+  ```
+  # Load dataset
+  dataset = create_dataset(cfg.data_path, 1)
+  batch_num = dataset.get_dataset_size()
+  
+  # Define model
+  net = GoogleNet(num_classes=cfg.num_classes)
+  # Continue training if set pre_trained to be True
+  if cfg.pre_trained:
+      param_dict = load_checkpoint(cfg.checkpoint_path)
+      load_param_into_net(net, param_dict)
+  lr = lr_steps(0, lr_max=cfg.lr_init, total_epochs=cfg.epoch_size,    
+                steps_per_epoch=batch_num)
+  opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), 
+                 Tensor(lr), cfg.momentum, weight_decay=cfg.weight_decay)
+  loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean', is_grad=False)
+  model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'},
+                amp_level="O2", keep_batchnorm_fp32=False, loss_scale_manager=None)
+  
+  # Set callbacks 
+  config_ck = CheckpointConfig(save_checkpoint_steps=batch_num * 5, 
+                               keep_checkpoint_max=cfg.keep_checkpoint_max)
+  time_cb = TimeMonitor(data_size=batch_num)
+  ckpoint_cb = ModelCheckpoint(prefix="train_googlenet_cifar10", directory="./ckpt_" + str(get_rank()) + "/", 
+                               config=config_ck)
+  loss_cb = LossMonitor()
+  
+  # Start training
+  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+  print("train success")
+  ```
+
+### Transfer Learning
+To be added.
 
 
+# [Description of Random Situation](#contents)
+
+In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py. 
+
+
+# [ModelZoo Homepage](#contents)  
+ Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  

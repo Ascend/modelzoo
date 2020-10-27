@@ -1,0 +1,47 @@
+model_name: seq2seq_model
+model_params:
+  init_scale: 0.08
+  initializer: uniform
+  embedding.dim: 1024
+  embedding.initializer: null
+  embedding.multiply_mode: rsqrt_depth
+  encoder.class: dtmt_encoder
+  encoder.params:
+    rnn.cell_type.bottom: lgru
+    rnn.cell_type: tgru
+    num_units: 1024
+    dropout_rate.emb: 0.5
+    dropout_rate.rnn_out: 0.5
+    num_layers: 5
+    position.enable: True
+  decoder.class: dtmt_decoder
+  decoder.params:
+    attention.class: sum_attention
+    attention.params:
+      num_units: 1024
+      norm: False
+      num_heads: 16
+      dropout_rate: 0
+    rnn.cell_type.bottom: lgru
+    rnn.cell_type: tgru
+    num_units: 1024
+    dropout_rate.emb: 0.5
+    dropout_rate.rnn_out: 0.5
+    dropout_rate.pred: 0.3
+    num_layers: 5
+    pass_state: False
+    attention_layer: True
+    position.enable: True
+  optimizer.name: LazyAdam
+  optimizer.params:
+    beta1: 0.9
+    beta2: 0.999
+    epsilon: 1e-06
+  word_level_loss: true
+  learning_rate.constant: 0.001
+  max_grad_norm: 5.0
+  label_smoothing_factor: 0.1
+  learning_rate.warmup_steps: 500
+  learning_rate.start_decay_step: 8000
+  learning_rate.stop_decay_at: 64000
+  learning_rate.schedule: "constant*rnmt_warmup_decay"

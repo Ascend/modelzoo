@@ -1,158 +1,215 @@
-# AlexNet for MindSpore
+# Contents
 
-This repository provides a script and recipe to train the AlexNet model to achieve state-of-the-art accuracy.
-
-## Table Of Contents
-
-- Model overview
-
-  - Model architecture
-
-  - Default configuration
-
-    - Optimizer
-- Data augmentation
-  
-- Setup
-
-  - Requirements
-
-- Quick Start Guide
-
-- Performance
-
-  - Results
-
-    
-
-## Model overview
-
-AlexNet is a convolutional neural network architecture. Its layers consists of Convolutional layers, Max Pooling layers, Activation layers, Fully connected layers.
-
-AlexNet model from
-    `"One weird trick for parallelizing convolutional neural networks" <https://arxiv.org/abs/1404.5997>`_ paper.
-
-### Model architecture
-
-AlexNet consists of one 11x11 convolution kernel, one 5x5 convolution kernel and three 3x3 convolution kernels, which is fairly easy to understand.
-
-### Default configuration
-
-The following sections introduce the default configurations and hyperparameters for AlexNet model.
-
-#### Optimizer
-
-This model uses Momentum optimizer from mindspore with the following hyperparameters:
-
-- Momentum : 0.9
-- Learning rate (LR) : 0.13
-- LR schedule: cosine_annealing
-- Batch size : 256
-- Weight decay :  0.0001
-- Label smoothing = 0.1
-- warmup epochs : 5
-- We train for:
-  - 150 epochs for a standard training process using ImageNet
-
-#### Data augmentation
-
-This model uses the following data augmentation:
-
-- For training:
-  - RandomResizeCrop, scale=(0.08, 1.0), ratio=(0.75, 1.333)
-  - RandomHorizontalFlip, prob=0.5
-  - RandomColorAdjust, brightness=0.4, contrast=0.4, saturation=0.4
-  - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
-- For inference:
-  - Resize to (256, 256)
-  - CenterCrop to (224, 224)
-  - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
-
-## Setup
-
-### Requirements
-
-Ensure you have the following components:
-  - [MindSpore](https://www.mindspore.cn/)
-  - Hardware environment with the Ascend AI processor
+- [AlexNet Description](#alexnet-description)
+- [Model Architecture](#model-architecture)
+- [Dataset](#dataset)
+- [Environment Requirements](#environment-requirements)
+- [Quick Start](#quick-start)
+- [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
+    - [Script Parameters](#script-parameters)
+    - [Training Process](#training-process)
+        - [Training](#training)
+    - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
+- [Model Description](#model-description)
+    - [Performance](#performance)
+        - [Evaluation Performance](#evaluation-performance)
+- [ModelZoo Homepage](#modelzoo-homepage)
 
 
-  For more information about how to get started with MindSpore, see the
-  following sections:
-  - [MindSpore's Tutorial](https://www.mindspore.cn/tutorial/zh-CN/master/index.html)
-  - [MindSpore's Api](https://www.mindspore.cn/api/zh-CN/master/index.html)
+# [AlexNet Description](#contents)
 
-## Quick Start Guide
+AlexNet was proposed in 2012, one of the most influential neural networks. It got big success in ImageNet Dataset recognition than other models.
 
-### 1. Clone the respository
+[Paper](http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf): Krizhevsky A, Sutskever I, Hinton G E. ImageNet Classification with Deep ConvolutionalNeural Networks. *Advances In Neural Information Processing Systems*. 2012.
 
-```shell
-git clone xxx
-cd modelzoo_alexnet
-```
+# [Model Architecture](#contents)
 
-### 2. Download and preprocess the dataset
+AlexNet composition consists of 5 convolutional layers and 3 fully connected layers. Multiple convolutional kernels can extract interesting features in images and get more accurate classification.
 
-1. down load the classification dataset
-2. Extract the training data
-3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
+# [Dataset](#contents)
 
-### 3. Train
+Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 
-```shell
-# $PROJECT_ROOT is the project path
-# $SINGLE_NODE_WORLD_SIZE is the number of devices
-# $VISIBLE_DEVICES is the running device
-# $ENV_SH is your own 1node environment shell script
-# $SERVER_ID is your device ip
-# $RUNNING_SCRIPT is the running script for distributing
-# $SCRIPT_ARGS is the running script args
-# $SCRIPT_ARGS is the running script args
-# remenber to add $PROJECT_ROOT to PYTHON_PATH in the $ENV_SH
-python $PROJECT_ROOT/.../launch.py --nproc_per_node=$SINGLE_NODE_WORLD_SIZE --visible_devices=$VISIBLE_DEVICES --env_sh=$ENV_SH --server_id=$SERVER_ID $RUNNING_SCRIPT $SCRIPT_ARGS
-```
-
-for example:
+- Dataset size：175M，60,000 32*32 colorful images in 10 classes
+  - Train：146M，50,000 images
+  - Test：29.3M，10,000 images
+- Data format：binary files
+  - Note：Data will be processed in dataset.py
+- Download the dataset, the directory structure is as follows:
 
 ```
-python /path/to/launch.py --nproc_per_node=8 --visible_devices=0,1,2,3,4,5,6,7 --env_sh=/path/to/env_sh.sh --server_id=xx.xxx.xxx.xxx /path/to/train.py --per_batch_size=256 --data_dir=/path/to/dataset/train/ --is_distributed=1 --lr_scheduler=cosine_annealing --weight_decay=0.0001 --lr=0.13 --T_max=150 --max_epoch=150 --warmup_epochs=5 --label_smooth=1 --backbone=alexnet
+├─cifar-10-batches-bin
+│
+└─cifar-10-verify-bin
 ```
 
-### 4. Test
-The test command is as follows.(note: for testing, the current version needs to manually modify nn.Dropout(keep_prob=0.65) to nn.Dropout(keep_prob =1.0) in alexnet.py)
+# [Environment Requirements](#contents)
+
+- Hardware（Ascend/GPU）
+  - Prepare hardware environment with Ascend or GPU processor.
+- Framework
+  - [MindSpore](https://www.mindspore.cn/install/en)
+- For more information, please check the resources below：
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+
+# [Quick Start](#contents)
+
+After installing MindSpore via the official website, you can start training and evaluation as follows:
+
+```python
+# enter script dir, train AlexNet
+sh run_standalone_train_ascend.sh [DATA_PATH] [CKPT_SAVE_PATH]
+# enter script dir, evaluate AlexNet
+sh run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_NAME]
 ```
-python /path/to/launch.py --nproc_per_node=8 --visible_devices=0,1,2,3,4,5,6,7 --mode=test --server_id=xx.xxx.xxx.xxx --env_sh=/path/to/env_sh.sh /path/to/test.py --data_dir=/path/to/dataset/val --per_batch_size=32 --pretrained=/path/to/ckpt
+
+# [Script Description](#contents)
+
+## [Script and Sample Code](#contents)
+
+```
+├── cv
+    ├── alexnet
+        ├── README.md                    // descriptions about alexnet
+        ├── requirements.txt             // package needed
+        ├── scripts
+        │   ├──run_standalone_train_gpu.sh             // train in gpu
+        │   ├──run_standalone_train_ascend.sh          // train in ascend
+        │   ├──run_standalone_eval_gpu.sh             //  evaluate in gpu
+        │   ├──run_standalone_eval_ascend.sh          //  evaluate in ascend
+        ├── src
+        │   ├──dataset.py             // creating dataset
+        │   ├──alexnet.py              // alexnet architecture
+        │   ├──config.py            // parameter configuration
+        ├── train.py               // training script
+        ├── eval.py               //  evaluation script
 ```
 
-## Performance
+## [Script Parameters](#contents)
 
-### Result
+```python
+Major parameters in train.py and config.py as follows:
 
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
+--data_path: The absolute full path to the train and evaluation datasets.
+--epoch_size: Total training epochs.
+--batch_size: Training batch size.
+--image_height: Image height used as input to the model.
+--image_width: Image width used as input the model.
+--device_target: Device where the code will be implemented. Optional values are "Ascend", "GPU".
+--checkpoint_path: The absolute full path to the checkpoint file saved after training.
+--data_path: Path where the dataset is saved
+```
 
-#### Training accuracy results
+## [Training Process](#contents)
 
-| **epochs** |   Top1/Top5   |
-| :--------: | :-----------: |
-|    150     | 60.49%/82.56% |
+### Training
 
-#### Training performance results
+- running on Ascend
 
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |     8500 img/s    |
+  ```
+  python train.py --data_path cifar-10-batches-bin --ckpt_path ckpt > log.txt 2>&1 &
+  # or enter script dir, and run the script
+  sh run_standalone_train_ascend.sh cifar-10-batches-bin ckpt
+  ```
 
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |    20000 img/s    |
+  After training, the loss value will be achieved as follows:
+
+  ```
+  # grep "loss is " train.log
+  epoch: 1 step: 1, loss is 2.2791853
+  ...
+  epoch: 1 step: 1536, loss is 1.9366643
+  epoch: 1 step: 1537, loss is 1.6983616
+  epoch: 1 step: 1538, loss is 1.0221305
+  ...
+  ```
+
+  The model checkpoint will be saved in the current directory.
+
+- running on GPU
+
+  ```
+  python train.py --device_target "GPU" --data_path cifar-10-batches-bin --ckpt_path ckpt > log.txt 2>&1 &
+  # or enter script dir, and run the script
+  sh run_standalone_train_for_gpu.sh cifar-10-batches-bin ckpt
+  ```
+
+  After training, the loss value will be achieved as follows:
+
+  ```
+  # grep "loss is " train.log
+  epoch: 1 step: 1, loss is 2.3125906
+  ...
+  epoch: 30 step: 1560, loss is 0.6687547
+  epoch: 30 step: 1561, loss is 0.20055409
+  epoch: 30 step: 1561, loss is 0.103845775
+  ```
 
 
+## [Evaluation Process](#contents)
 
+### Evaluation
 
+Before running the command below, please check the checkpoint path used for evaluation.
 
+- running on Ascend
 
+  ```
+  python eval.py --data_path cifar-10-verify-bin --ckpt_path ckpt/checkpoint_alexnet-1_1562.ckpt > log.txt 2>&1 &
+  or enter script dir, and run the script
+  sh run_standalone_eval_ascend.sh cifar-10-verify-bin ckpt/checkpoint_alexnet-1_1562.ckpt
+  ```
 
+  You can view the results through the file "log.txt". The accuracy of the test dataset will be as follows:
 
+  ```
+  # grep "Accuracy: " log.txt
+  'Accuracy': 0.8832
+  ```
 
+- running on GPU
 
+  ```
+  python eval.py --device_target "GPU" --data_path cifar-10-verify-bin --ckpt_path ckpt/checkpoint_alexnet-30_1562.ckpt > log.txt 2>&1 &
+  or enter script dir, and run the script
+  sh run_standalone_eval_for_gpu.sh cifar-10-verify-bin ckpt/checkpoint_alexnet-30_1562.ckpt
+  ```
 
+  You can view the results through the file "log.txt". The accuracy of the test dataset will be as follows:
+
+  ```
+  # grep "Accuracy: " log.txt
+  'Accuracy': 0.88512
+  ```
+
+# [Model Description](#contents)
+
+## [Performance](#contents)
+
+### Evaluation Performance
+
+| Parameters                 | Ascend                                                      | GPU                                              |
+| -------------------------- | ------------------------------------------------------------| -------------------------------------------------|
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G              | NV SMX2 V100-32G                                 |
+| uploaded Date              | 06/09/2020 (month/day/year)                                 | 17/09/2020 (month/day/year)                      |
+| MindSpore Version          | 0.5.0-beta                                                  | 0.7.0-beta                                       |
+| Dataset                    | CIFAR-10                                                    | CIFAR-10                                         |
+| Training Parameters        | epoch=30, steps=1562, batch_size = 32, lr=0.002             | epoch=30, steps=1562, batch_size = 32, lr=0.002  |
+| Optimizer                  | Momentum                                                    | Momentum                                         |
+| Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy                            |
+| outputs                    | probability                                                 | probability                                      |
+| Loss                       | 0.0016                                                      | 0.01                                             |
+| Speed                      | 21 ms/step                                                  | 16.8 ms/step                                     |
+| Total time                 | 17 mins                                                     | 14 mins                                          |
+| Checkpoint for Fine tuning | 445M (.ckpt file)                                           | 445M (.ckpt file)                                |
+| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet |
+
+# [Description of Random Situation](#contents)
+
+In dataset.py, we set the seed inside ```create_dataset``` function.
+
+# [ModelZoo Homepage](#contents)
+ Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).

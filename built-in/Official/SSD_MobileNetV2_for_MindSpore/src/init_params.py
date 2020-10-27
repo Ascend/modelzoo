@@ -15,18 +15,16 @@
 """Parameters utils"""
 
 from mindspore.common.initializer import initializer, TruncatedNormal
-import numpy as np
 
 def init_net_param(network, initialize_mode='TruncatedNormal'):
     """Init the parameters in net."""
     params = network.trainable_params()
     for p in params:
         if 'beta' not in p.name and 'gamma' not in p.name and 'bias' not in p.name:
-            np.random.seed(seed=1)
             if initialize_mode == 'TruncatedNormal':
-                p.set_parameter_data(initializer(TruncatedNormal(), p.data.shape, p.data.dtype))
+                p.set_data(initializer(TruncatedNormal(), p.data.shape, p.data.dtype))
             else:
-                p.set_parameter_data(initialize_mode, p.data.shape, p.data.dtype)
+                p.set_data(initialize_mode, p.data.shape, p.data.dtype)
 
 
 def load_backbone_params(network, param_dict):
@@ -39,4 +37,10 @@ def load_backbone_params(network, param_dict):
         if 'features_2' in param_name:
             param_name = '.'.join(['features', str(int(name_split[1]) + 14)] + name_split[2:])
         if param_name in param_dict:
-            param.set_parameter_data(param_dict[param_name].data)
+            param.set_data(param_dict[param_name].data)
+
+def filter_checkpoint_parameter(param_dict):
+    """remove useless parameters"""
+    for key in list(param_dict.keys()):
+        if 'multi_loc_layers' in key or 'multi_cls_layers' in key:
+            del param_dict[key]

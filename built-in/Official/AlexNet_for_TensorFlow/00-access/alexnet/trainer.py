@@ -45,7 +45,7 @@ class Trainer(object):
     def train(self):
         print ('training steps: %d' % self.config.nstep)
         self.classifier.train( input_fn=lambda:self.data.get_train_input_fn(),
-                               max_steps = self.config.max_train_steps,
+                               max_steps = self.config.nstep,
                                hooks = self.training_hook
                               )
 
@@ -62,7 +62,8 @@ class Trainer(object):
                 eval_result = self.classifier.evaluate(
                     input_fn=lambda: self.data.get_eval_input_fn(),
                     checkpoint_path=c['path'])
-                c['epoch'] = math.ceil(c['step']/ (self.config.num_training_samples/ (self.config.global_batch_size)))
+                #c['epoch'] = math.ceil(c['step']/ (self.config.num_training_samples/ (self.config.global_batch_size)))
+                c['epoch'] = math.floor(c['step']/ (self.config.num_training_samples/ (self.config.global_batch_size)))
                 c['top1'] = eval_result['val-top1acc']
                 c['top5'] = eval_result['val-top5acc']
                 c['loss'] = eval_result['loss']

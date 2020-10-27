@@ -1,6 +1,22 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+"""util file"""
+
 import numpy as np
 
-class AverageMeter(object):
+class AverageMeter():
     """Computes and stores the average and current value"""
 
     def __init__(self):
@@ -19,7 +35,7 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-class CTCLabelConverter(object):
+class CTCLabelConverter():
     """ Convert between text-label and text-index """
 
     def __init__(self, character):
@@ -28,14 +44,10 @@ class CTCLabelConverter(object):
 
         self.dict = {}
         for i, char in enumerate(dict_character):
-            # NOTE: in TF, last token is reserved for 'blank' token required by CTCLoss
             self.dict[char] = i
-            # self.dict[char] = i + 1
 
         self.character = dict_character + ['[blank]']  # dummy '[blank]' token for CTCLoss (index 0)
         self.dict['[blank]'] = len(dict_character)
-        # self.character = ['[blank]'] + dict_character  # dummy '[blank]' token for CTCLoss (index 0)
-        # self.dict['[blank]'] = 0
 
     def encode(self, text):
         """convert text-label into text-index.

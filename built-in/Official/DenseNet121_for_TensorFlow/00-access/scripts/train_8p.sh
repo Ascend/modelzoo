@@ -26,7 +26,7 @@ cd ${currentDir}/result/8p/${device_id}
 python3.7 ${dname}/train.py --rank_size=8 \
     --mode=train_and_evaluate \
     --max_epochs=150 \
-    --iterations_per_loop=5004 \
+    --iterations_per_loop=1000 \
     --epochs_between_evals=5 \
     --data_dir=/opt/npu/slimImagenet \
     --lr=0.1 \

@@ -22,7 +22,7 @@ import numpy as np
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.ssd import SSD300, ssd_mobilenet_v2
-from src.dataset import create_ssd_dataset, data_to_mindrecord_byte_image
+from src.dataset import create_ssd_dataset, data_to_mindrecord_byte_image, voc_data_to_mindrecord
 from src.config import config
 from src.coco_eval import metrics
 
@@ -44,7 +44,7 @@ def ssd_eval(dataset_path, ckpt_path):
     print("\n========================================\n")
     print("total images num: ", total)
     print("Processing, please wait a moment.")
-    for data in ds.create_dict_iterator():
+    for data in ds.create_dict_iterator(output_numpy=True, num_epochs=1):
         img_id = data['img_id']
         img_np = data['image']
         image_shape = data['image_shape']
@@ -71,13 +71,17 @@ if __name__ == '__main__':
     parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
     parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
     parser.add_argument("--checkpoint_path", type=str, required=True, help="Checkpoint file path.")
+    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend", "GPU"),
+                        help="run platform, only support Ascend and GPU.")
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args_opt.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=args_opt.device_id)
 
     prefix = "ssd_eval.mindrecord"
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
+    if args_opt.dataset == "voc":
+        config.coco_root = config.voc_root
     if not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
@@ -88,6 +92,13 @@ if __name__ == '__main__':
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("coco_root not exits.")
+        elif args_opt.dataset == "voc":
+            if os.path.isdir(config.voc_dir) and os.path.isdir(config.voc_root):
+                print("Create Mindrecord.")
+                voc_data_to_mindrecord(mindrecord_dir, False, prefix)
+                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+            else:
+                print("voc_root or voc_dir not exits.")
         else:
             if os.path.isdir(config.image_dir) and os.path.exists(config.anno_path):
                 print("Create Mindrecord.")

@@ -1,0 +1,97 @@
+general:
+    task:
+        local_base_path: /home/liuzhicheng/cache/local/
+        backup_base_path: ~
+    model_zoo:
+        model_zoo_path: /home/liuzhicehng/cache/model_zoo/
+        local_path: ~
+
+avazu:
+    train:
+        data_path: ~
+
+Cifar10:
+    train:
+        data_path: /data2/datasets/cifar10/
+    val:
+        data_path: /data2/datasets/cifar10/
+    test:
+        data_path: /data2/datasets/cifar10/
+
+Cifar100:
+    train:
+        data_path: ~
+    val:
+        data_path: ~
+    test:
+        data_path: ~
+
+Cityscapes:
+    train:
+        root_path: /data2/datasets/cityscapes_dataset/
+    test:
+        root_path: /data2/datasets/cityscapes_dataset/
+
+Coco:
+    train:
+        data_root: /home/liuzhicheng/lzc/dataset/COCO2017/
+        train_ann_file: /home/liuzhicheng/lzc/dataset/COCO2017/annotations/instances_train2017.json
+        val_ann_file: /home/liuzhicheng/lzc/dataset/COCO2017/annotations/instances_val2017.json
+        test_ann_file: /home/liuzhicheng/lzc/dataset/COCO2017/annotations/instances_val2017.json
+        train_img_prefix: /home/liuzhicheng/lzc/dataset/COCO2017/train2017/
+        val_img_prefix: /home/liuzhicheng/lzc/dataset/COCO2017/val2017/
+        test_img_prefix: /home/liuzhicheng/lzc/dataset/COCO2017/val2017/
+
+DIV2K:
+    train:
+        root_HR: /home/liuzhicheng/lzc/dataset/div2k_train/hr
+        root_LR: /home/liuzhicheng/lzc/dataset/div2k_train/lr
+    test:
+        root_HR: /home/liuzhicheng/lzc/dataset/div2k_valid/hr
+        root_LR: /home/liuzhicheng/lzc/dataset/div2k_valid/lr
+
+Set5:
+    test:
+        root_HR: /home/liuzhicheng/lzc/dataset/Set5/hr
+        root_LR: /home/liuzhicheng/lzc/dataset/Set5/lr
+
+Set14:
+    test:
+        root_HR: /home/liuzhicheng/lzc/dataset/Set14/hr
+        root_LR: /home/liuzhicheng/lzc/dataset/Set14/lr
+
+BSDS100:
+    test:
+        root_HR: /home/liuzhicheng/lzc/dataset/BSDS100/hr
+        root_LR: /home/liuzhicheng/lzc/dataset/BSDS100/lr
+
+FashionMnist:
+        train:
+            data_path: /data2/datasets/fashion_mnist_data/
+        val:
+            data_path: /data2/datasets/fashion_mnist_data/
+        test:
+            data_path: /data2/datasets/fashion_mnist_data/
+
+Imagenet:
+    train:
+        data_path: /data2/datasets/imagenet/
+    val:
+        data_path: /data2/datasets/imagenet/
+    test:
+        data_path: /data2/datasets/imagenet/
+
+Mdc2dDetDataset:
+    train:
+        train_ann_file: /data2/datasets/pieline/Mdc2dDetDataset/Vehicle_person/pieline_train_vp.txt
+        valid_ann_file: /data2/datasets/pieline/Mdc2dDetDataset/Vehicle_person/pieline_test_vp.txt
+        gt_coco_file: /data2/datasets/pieline/Mdc2dDetDataset/Vehicle_person/coco_style_file.json
+        img_prefix: /data2/datasets/pieline/Mdc2dDetDataset/Vehicle_person/
+
+Mnist:
+    train:
+        data_path: /data2/datasets/mnist_data/
+    val:
+        data_path: /data2/datasets/mnist_data/
+    test:
+        data_path: /data2/datasets/mnist_data/

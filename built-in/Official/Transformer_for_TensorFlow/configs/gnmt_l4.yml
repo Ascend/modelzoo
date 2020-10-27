@@ -1,0 +1,32 @@
+model_name: seq2seq_model
+model_params:
+  init_scale: 0.1
+  initializer: uniform
+  embedding.dim: 1024
+  embedding.initializer: null
+  embedding.multiply_mode: null
+  encoder.class: gnmt_encoder
+  encoder.params:
+    rnn.cell_type: lstm
+    num_units: 1024
+    dropout_rate: 0.2
+    num_layers: 4
+  decoder.class: gnmt_decoder
+  decoder.params:
+    attention.class: sum_attention
+    attention.params:
+      num_units: 1024
+      norm: True
+    rnn.cell_type: lstm
+    num_units: 1024
+    dropout_rate: 0.2
+    num_layers: 4
+    pass_state: True
+    use_new_attention: True
+  optimizer.name: LazyAdam
+  word_level_loss: true
+  learning_rate.constant: 2.0
+  max_grad_norm: 5.0
+  label_smoothing_factor: 0.1
+  learning_rate.warmup_steps: 16000
+  learning_rate.schedule: "constant*rsqrt_hidden_size*linear_warmup*rsqrt_decay"

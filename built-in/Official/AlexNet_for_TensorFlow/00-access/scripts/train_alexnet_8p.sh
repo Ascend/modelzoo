@@ -8,12 +8,6 @@ EXEC_DIR=$(pwd)
 RESULTS=results/8p
 
 
-#mkdir exec path
-#mkdir -p ${EXEC_DIR}/${RESULTS}/${device_id}
-#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*
-#cd ${EXEC_DIR}/${RESULTS}/${device_id}
-
-
 device_id=$1
 if  [ x"${device_id}" = x ] ;
 then
@@ -43,18 +37,23 @@ env > ${EXEC_DIR}/results/env_${device_id}.log
 
 
 #start exec
-start_id=$((device_id*24))
-end_id=$((device_id*24+23))
+num_cpus=$(getconf _NPROCESSORS_ONLN)
+num_cpus_per_device=$((num_cpus/8))
+
+start_id=$((num_cpus_per_device*device_id))
+end_id=$((num_cpus_per_device*device_id+num_cpus_per_device-1))
+
 
 taskset -c ${start_id}-${end_id} python3.7 ${EXEC_DIR}/train.py --rank_size=8 \
                       --epochs_between_evals=1 \
                       --mode=train \
-        	      --iterations_per_loop=100 \
-        	      --batch_size=128 \
-        	      --data_dir=/opt/npu/slimImagenet \
-        	      --lr=0.06 \
+        	            --max_epochs=150 \
+                      --iterations_per_loop=100 \
+        	            --batch_size=128 \
+        	            --data_dir=/data/slimImagenet \
+        	            --lr=0.06 \
                       --checkpoint_dir=./model_8p \
-        	      --log_dir=./model_8p > ./train_${device_id}.log 2>&1
+        	            --log_dir=./model_8p > ./train_${device_id}.log 2>&1
 
 if [ $? -eq 0 ] ;
 then

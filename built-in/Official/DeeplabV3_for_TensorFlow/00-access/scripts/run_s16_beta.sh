@@ -1,16 +1,10 @@
 
-rm -rf *.log
-rm -rf /var/log/npu/slog/host-0/*
-
-
 CURRENT_DIR=$(cd "$(dirname "$0")"; pwd)
-source ${CURRENT_DIR}/env.sh
 
 # user env
 export JOB_ID=9999001
 export RANK_TABLE_FILE=${CURRENT_DIR}/8p.json
 export RANK_SIZE=8
-#export RANK_INDEX=0
 export RANK_ID=npu8p
 
 export SLOG_PRINT_TO_STDOUT=0

@@ -3,11 +3,6 @@
 mkdir -p result/8p
 
 # set env
-export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:/usr/local/Ascend/fwkacllib/lib64/:/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:/usr/local/Ascend/add-ons/
-export PYTHONPATH=$PYTHONPATH:/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe
-export PATH=$PATH:/usr/local/Ascend/fwkacllib/ccec_compiler/bin
-export ASCEND_OPP_PATH=/usr/local/Ascend/opp
-export DDK_VERSION_FLAG=1.60.T17.B830
 export HCCL_CONNECT_TIMEOUT=600
 
 currentDir=$(cd "$(dirname "$0")"; pwd)
@@ -22,10 +17,15 @@ export SLOG_PRINT_TO_STDOUT=0
 
 device_group="0 1 2 3 4 5 6 7"
 
+num_cpus=$(getconf _NPROCESSORS_ONLN)
+num_cpus_per_device=$((num_cpus/8))
+
 for device_phy_id in ${device_group}
 do
     echo "[`date +%Y%m%d-%H:%M:%S`] [INFO] start: train.sh ${device_phy_id} & " >> ${currentDir}/result/8p/main.log
-    taskset -c $((device_phy_id*24))-$(((device_phy_id+1)*24-1)) ${currentDir}/train_8p.sh ${device_phy_id}  &
+    start_id=$((num_cpus_per_device*device_phy_id))
+    end_id=$((num_cpus_per_device*device_phy_id+num_cpus_per_device-1))
+    taskset -c ${start_id}-${end_id} ${currentDir}/train_8p.sh ${device_phy_id}  &
 done
 
 wait

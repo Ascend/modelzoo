@@ -20,7 +20,7 @@ import numpy as np
 from mindspore import Tensor
 from mindspore.common import dtype as mstype
 from mindspore.train.callback import Callback
-from mindspore.train.serialization import _exec_save_checkpoint
+from mindspore.train.serialization import save_checkpoint
 from mindspore.ops import operations as P
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule, PolynomialDecayLR, WarmUpLR
 from .assessment_method import Accuracy
@@ -53,9 +53,9 @@ class ModelSaveCkpt(Callback):
                                                                                    self.save_ckpt_step))
                 if os.path.exists(path):
                     os.remove(path)
-            _exec_save_checkpoint(self.network, os.path.join(self.output_dir,
-                                                             "tiny_bert_{}_{}.ckpt".format(int(saved_ckpt_num),
-                                                                                           self.save_ckpt_step)))
+            save_checkpoint(self.network, os.path.join(self.output_dir,
+                                                       "tiny_bert_{}_{}.ckpt".format(int(saved_ckpt_num),
+                                                                                     self.save_ckpt_step)))
 
 class LossCallBack(Callback):
     """
@@ -93,10 +93,10 @@ class EvalCallBack(Callback):
         if cb_params.cur_step_num % 100 == 0:
             callback = Accuracy()
             columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
-            for data in self.dataset.create_dict_iterator():
+            for data in self.dataset.create_dict_iterator(num_epochs=1):
                 input_data = []
                 for i in columns_list:
-                    input_data.append(Tensor(data[i]))
+                    input_data.append(data[i])
                 input_ids, input_mask, token_type_id, label_ids = input_data
                 self.network.set_train(False)
                 logits = self.network(input_ids, token_type_id, input_mask)
@@ -110,7 +110,10 @@ class EvalCallBack(Callback):
             if acc > self.global_acc:
                 self.global_acc = acc
                 print("The best acc is {}".format(acc))
-                _exec_save_checkpoint(self.network, "eval_model.ckpt")
+                eval_model_ckpt_file = "eval_model.ckpt"
+                if os.path.exists(eval_model_ckpt_file):
+                    os.remove(eval_model_ckpt_file)
+                save_checkpoint(self.network, eval_model_ckpt_file)
 
 class BertLearningRate(LearningRateSchedule):
     """

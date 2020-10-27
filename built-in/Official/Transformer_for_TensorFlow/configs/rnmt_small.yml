@@ -1,0 +1,42 @@
+model_name: seq2seq_model
+model_params:
+  embedding.dim: 128
+  encoder.class: rnmt_encoder
+  encoder.params:
+    rnn.cell_type: lstm
+    layer_norm: true
+    num_units: 128
+    dropout_rate: 0.2
+    num_layers: 3
+    proj.activation: null
+    proj.use_bias: false
+  decoder.class: gnmt_decoder
+  decoder.params:
+    attention.class: sum_attention
+    attention.params:
+      num_units: 128
+      norm: False
+      num_heads: 2
+      dropout_rate: 0.2
+    rnn.cell_type: lstm
+    num_units: 128
+    dropout_rate: 0.2
+    num_layers: 4
+    use_new_attention: true
+    softmax.add_attention: true
+    input.dropout: true
+    pass_state: false
+  optimizer.name: adam
+  optimizer.params:
+    beta1: 0.9
+    beta2: 0.999
+    epsilon: 1e-6
+  learning_rate.constant: 0.0001
+  learning_rate.start_decay_step: 1200000
+  learning_rate.stop_decay_at: 3600000
+  learning_rate.min_value: 0.00005
+  learning_rate.warmup_steps: 500
+  learning_rate.schedule: "constant*rsqrt_hidden_size*linear_warmup*rsqrt_decay"
+  word_level_loss: False
+  label_smoothing_factor: 0.1
+  max_grad_norm: 5.0

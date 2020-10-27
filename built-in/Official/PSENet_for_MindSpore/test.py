@@ -1,15 +1,30 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+
 import os
 import math
 import operator
 from functools import reduce
+import argparse
+import time
 import numpy as np
 import cv2
 from mindspore import Tensor, context
 import mindspore.common.dtype as mstype
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from tqdm import tqdm
-import argparse
-import time
 
 from src.config import config
 from src.dataset import test_dataset_creator
@@ -17,13 +32,13 @@ from src.ETSNET.etsnet import ETSNet
 from src.ETSNET.pse import pse
 
 parser = argparse.ArgumentParser(description='Hyperparams')
-parser.add_argument('ckpt', type=str, default=0, help='trained model path.')
+parser.add_argument("--ckpt", type=str, default=0, help='trained model path.')
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False,
                     save_graphs_path=".")
 
-class AverageMeter(object):
+class AverageMeter():
     """Computes and stores the average and current value"""
     def __init__(self):
         self.reset()
@@ -51,7 +66,7 @@ def write_result_as_txt(img_name, bboxes, path):
         os.makedirs(path)
     filename = os.path.join(path, 'res_{}.txt'.format(os.path.splitext(img_name)[0]))
     lines = []
-    for box_idx, bbox in enumerate(bboxes):
+    for _, bbox in enumerate(bboxes):
         bbox = bbox.reshape(-1, 2)
         bbox = np.array(list(sort_to_clockwise(bbox)))[[3, 0, 1, 2]].copy().reshape(-1)
         values = [int(v) for v in bbox]
@@ -70,7 +85,7 @@ def test():
 
     config.INFERENCE = True
     net = ETSNet(config)
-    net._phase = 'train'
+    print(args.ckpt)
     param_dict = load_checkpoint(args.ckpt)
     load_param_into_net(net, param_dict)
     print('parameters loaded!')
@@ -80,7 +95,7 @@ def test():
     post_process_time = AverageMeter()
 
     end_pts = time.time()
-    iters = tqdm(ds.create_tuple_iterator())
+    iters = ds.create_tuple_iterator(output_numpy=True)
     count = 0
     for data in iters:
         count += 1
@@ -131,10 +146,6 @@ def test():
             model_run_time.reset()
             post_process_time.reset()
 
-        iters.set_description('get_data: {}ms, model_run: {}ms, post_process: {}ms'
-                             .format(get_data_time.avg * 1000,
-                                     model_run_time.avg * 1000,
-                                     post_process_time.avg * 1000))
         end_pts = time.time()
 
         # save res

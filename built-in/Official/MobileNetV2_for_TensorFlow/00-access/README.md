@@ -78,7 +78,7 @@ Tensorflow 1.15.0
 
 ```shell
 git clone xxx
-cd ModelZoo_MobileNetv2_TF
+cd ModelZoo_MobileNetv2_TF_HARD
 ```
 
 ### 2. Download and preprocess the dataset
@@ -87,7 +87,11 @@ cd ModelZoo_MobileNetv2_TF
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
-### 3. Train
+### 3. Set environment
+
+Set environment variable like *LD_LIBRARY_PATH*, *PYTHONPATH* and *PATH* to match your system before training and testing.
+
+### 4. Train
 - train on a single NPU
     - **edit** *train_1p.sh* (see example below)
     - bash run_1p.sh
@@ -142,7 +146,7 @@ Examples:
         bash run_8p.sh
         ```
 
-### 4. Test
+### 5. Test
 - We evaluate results by using following commands:
      ```shell 
     python3.7 eval_image_classifier_mobilenet.py --dataset_dir=/opt/npu/slimImagenet \
@@ -158,8 +162,8 @@ We list those important parameters to train this network here. For more details 
 
 ```
   --dataset_dir                     directory of dataset (default: /opt/npu/models/slimImagenet)
-  --max_epoch                       number of epochs to train the model (default: 200) 
-  --max_train_steps                 max number of training steps (default: 500)
+  --max_epoch                       number of epochs to train the model (default: None) 
+  --max_train_steps                 max number of training steps (default: None)
   --iterations_per_loop             number of steps to run in devices each iteration (default: None)
   --model_name                      name of the model to train (default: mobilenet_v2_140)
   --moving_average_decay            the decay to use for the moving average (default: None)

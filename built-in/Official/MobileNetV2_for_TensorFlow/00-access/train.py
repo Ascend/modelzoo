@@ -35,8 +35,8 @@ def parse_args():
 
     # cosine learning rate. [DECOUPLED WEIGHT DECAY REGULARIZATION]
     tf.app.flags.DEFINE_string('checkpoint_path', '', '')
-    tf.app.flags.DEFINE_integer('max_epoch', '200', 'max epochs to train')
-    tf.app.flags.DEFINE_integer('max_train_steps', '500', 'max steps to train')
+    tf.app.flags.DEFINE_integer('max_epoch', None, 'max epochs to train')
+    tf.app.flags.DEFINE_integer('max_train_steps', None, 'max steps to train')
     tf.app.flags.DEFINE_float('eta_min', '0.0', 'eta_min in cosine_annealing scheduler')
     tf.app.flags.DEFINE_integer('T_max', '200', 'T-max in cosine_annealing scheduler')
     tf.app.flags.DEFINE_integer('ckp_freq', '5000', 'Frequency (in steps) to save checkpoint')
@@ -256,7 +256,13 @@ def main(_):
 
     num_samples = 1281167
 
-    if int(os.getenv('RANK_SIZE')) == 1:
+    if FLAGS.max_train_steps is None and FLAGS.max_epoch is None:
+        raise ValueError("Must set max_train_steps or max_epoch.")
+
+    if FLAGS.max_train_steps is not None and FLAGS.max_epoch is not None:
+        raise ValueError("Can't set both max_train_steps and max_epoch.")
+
+    if FLAGS.max_train_steps:
         FLAGS.max_number_of_steps = FLAGS.max_train_steps
     else:
         FLAGS.max_number_of_steps = num_samples // (FLAGS.batch_size * int(os.getenv('RANK_SIZE'))) * FLAGS.max_epoch

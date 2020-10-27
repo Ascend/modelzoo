@@ -17,31 +17,27 @@
 import os
 import argparse
 import time
-import random
 import numpy as np
 from pycocotools.coco import COCO
-from mindspore import context, Tensor
+from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-import mindspore.dataset.engine as de
+from mindspore.common import set_seed
 
 from src.FasterRcnn.faster_rcnn_r50 import Faster_Rcnn_Resnet50
 from src.config import config
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
-from src.util import bbox2result_1image, create_mindrecord, eval_trial
+from src.util import coco_eval, bbox2result_1image, results2json
 
-random.seed(1)
-np.random.seed(1)
-de.config.set_seed(1)
+set_seed(1)
 
 parser = argparse.ArgumentParser(description="FasterRcnn evaluation")
 parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
 parser.add_argument("--ann_file", type=str, default="val.json", help="Ann file, default is val.json.")
 parser.add_argument("--checkpoint_path", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
-parser.add_argument("--rank_id", type=int, default=0, help="Rank id, default is 0.")
 args_opt = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=True, device_id=args_opt.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args_opt.device_id)
 
 def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
     """FasterRcnn evaluation."""
@@ -55,12 +51,13 @@ def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
     eval_iter = 0
     total = ds.get_dataset_size()
     outputs = []
+    dataset_coco = COCO(ann_file)
 
     print("\n========================================\n")
     print("total images num: ", total)
     print("Processing, please wait a moment.")
     max_num = 128
-    for data in ds.create_dict_iterator():
+    for data in ds.create_dict_iterator(num_epochs=1):
         eval_iter = eval_iter + 1
 
         img_data = data['image']
@@ -71,7 +68,7 @@ def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
 
         start = time.time()
         # run net
-        output = net(Tensor(img_data), Tensor(img_metas), Tensor(gt_bboxes), Tensor(gt_labels), Tensor(gt_num))
+        output = net(img_data, img_metas, gt_bboxes, gt_labels, gt_num)
         end = time.time()
         print("Iter {} cost time {}".format(eval_iter, end - start))
 
@@ -99,20 +96,35 @@ def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
             outputs.append(outputs_tmp)
 
     eval_types = ["bbox"]
+    result_files = results2json(dataset_coco, outputs, "./results.pkl")
 
-    eval_trial(outputs, ann_file, eval_types, args_opt)
+    coco_eval(result_files, eval_types, dataset_coco, single_result=True)
 
 
 if __name__ == '__main__':
-    import time
     prefix = "FasterRcnn_eval.mindrecord"
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix)
-    if args_opt.rank_id == 0 and not os.path.exists(mindrecord_file):
-        create_mindrecord(mindrecord_dir, prefix, args_opt, config, phase="val")
+    print("CHECKING MINDRECORD FILES ...")
 
-    while not os.path.exists(mindrecord_file + ".db"):
-        time.sleep(5)
+    if not os.path.exists(mindrecord_file):
+        if not os.path.isdir(mindrecord_dir):
+            os.makedirs(mindrecord_dir)
+        if args_opt.dataset == "coco":
+            if os.path.isdir(config.coco_root):
+                print("Create Mindrecord. It may take some time.")
+                data_to_mindrecord_byte_image("coco", False, prefix, file_num=1)
+                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+            else:
+                print("coco_root not exits.")
+        else:
+            if os.path.isdir(config.IMAGE_DIR) and os.path.exists(config.ANNO_PATH):
+                print("Create Mindrecord. It may take some time.")
+                data_to_mindrecord_byte_image("other", False, prefix, file_num=1)
+                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+            else:
+                print("IMAGE_DIR or ANNO_PATH not exits.")
 
+    print("CHECKING MINDRECORD FILES DONE!")
     print("Start Eval!")
     FasterRcnn_eval(mindrecord_file, args_opt.checkpoint_path, args_opt.ann_file)

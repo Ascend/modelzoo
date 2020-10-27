@@ -1,2 +1,0 @@
-../img/infer/pi.jpg
-../img/infer/pi2.jpg

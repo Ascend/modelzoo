@@ -1,0 +1,140 @@
+general:
+    task:
+        local_base_path: /myfile-datastore-G/cache/local/
+        backup_base_path: s3://bucket-mdcs/vega/back_up/
+    model_zoo:
+        model_zoo_path: /myfile-datastore-G/cache/model_zoo/
+        local_path: ~
+    model_store:
+        store_path: /myfile-datastore-G/cache/output/
+Trainer:
+    output_model_path: s3://bucket-mdcs/vega/model_output/
+
+avazu:
+    train:
+        data_path: /myfile-datastore-G/Avazu/
+
+Cifar10:
+    train:
+        data_path: s3://bucket-mdcs/Dataset/cifar10_data/
+    val:
+        data_path:  s3://bucket-mdcs/Dataset/cifar10_data/
+    test:
+        data_path:  s3://bucket-mdcs/Dataset/cifar10_data/
+
+Cifar100:
+    train:
+        data_path:  s3://bucket-mdcs/Dataset/cifar100_data/
+    val:
+        data_path: s3://bucket-mdcs/Dataset/cifar100_data/
+    test:
+        data_path: s3://bucket-mdcs/Dataset/cifar100_data/
+
+Cityscapes:
+    train:
+        root_path: /myfile-datastore-G/cityscapes_dataset/
+    test:
+        root_path: /myfile-datastore-G/cityscapes_dataset/
+
+Coco:
+    train:
+        data_root: /myfile-datastore-G/COCO2017/
+        train_ann_file: /myfile-datastore-G/COCO2017/annotations/instances_train2017.json
+        val_ann_file: /myfile-datastore-G/COCO2017/annotations/instances_val2017.json
+        test_ann_file: /myfile-datastore-G/COCO2017/annotations/instances_val2017.json
+        train_img_prefix: /myfile-datastore-G/COCO2017/train2017/
+        val_img_prefix: /myfile-datastore-G/COCO2017/val2017/
+        test_img_prefix: /myfile-datastore-G/COCO2017/val2017/
+
+DIV2K:
+    train:
+        root_HR: /myfile-datastore-G/DIV2K/div2k_train/hr
+        root_LR: /myfile-datastore-G/DIV2K/div2k_train/lr
+    test:
+        root_HR: /myfile-datastore-G/DIV2K/div2k_valid/hr
+        root_LR: /myfile-datastore-G/DIV2K/div2k_valid/lr
+
+Set5:
+    test:
+        root_HR: /myfile-datastore-G/DIV2K/Set5/hr
+        root_LR: /myfile-datastore-G/DIV2K/Set5/lr
+
+Set14:
+    test:
+        root_HR: /myfile-datastore-G/DIV2K/Set14/hr
+        root_LR: /myfile-datastore-G/DIV2K/Set14/lr
+
+BSDS100:
+    test:
+        root_HR: /myfile-datastore-G/DIV2K/BSDS100/hr
+        root_LR: /myfile-datastore-G/DIV2K/BSDS100/lr
+
+UBRAN100:
+    test:
+        root_HR: /myfile-datastore-G/DIV2K/Urban100/hr
+        root_LR: /myfile-datastore-G/DIV2K/Urban100/lr
+
+FashionMnist:
+        train:
+            data_path: /myfile-datastore-G/fashion_mnist_data/
+        val:
+            data_path: /myfile-datastore-G/fashion_mnist_data/
+        test:
+            data_path: /myfile-datastore-G/fashion_mnist_data/
+
+Imagenet:
+    train:
+        data_path: /myfile-datastore-G/Imagenet/
+    val:
+        data_path: /myfile-datastore-G/Imagenet/
+    test:
+        data_path: /myfile-datastore-G/Imagenet/
+
+Mdc2dDetDataset:
+    train:
+        train_ann_file: /myfile-datastore-G/Mdc2dDetDataset/Vehicle_person/pieline_train_vp.txt
+        valid_ann_file: /myfile-datastore-G/Mdc2dDetDataset/Vehicle_person/pieline_test_vp.txt
+        gt_coco_file: /myfile-datastore-G/Mdc2dDetDataset/Vehicle_person/coco_style_file.json
+        img_prefix: /myfile-datastore-G/Mdc2dDetDataset/Vehicle_person/
+
+Mnist:
+    train:
+        data_path: s3://bucket-mdcs/Dataset/mnist_data/
+    val:
+        data_path: s3://bucket-mdcs/Dataset/mnist_data/
+    test:
+        data_path: s3://bucket-mdcs/Dataset/mnist_data/
+
+CocoDataset:
+    train:
+        data_root: /myfile-datastore-G/COCO2017
+        train_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_train2017.json'
+        val_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_val2017.json'
+        test_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_val2017.json'
+        train_img_prefix: '/myfile-datastore-G/COCO2017train2017/'
+        val_img_prefix: '/myfile-datastore-G/COCO2017val2017/'
+        test_img_prefix: '/myfile-datastore-G/COCO2017val2017/'
+    val:
+        data_root: /myfile-datastore-G/COCO2017
+        train_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_train2017.json'
+        val_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_val2017.json'
+        test_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_val2017.json'
+        train_img_prefix: '/myfile-datastore-G/COCO2017train2017/'
+        val_img_prefix: '/myfile-datastore-G/COCO2017val2017/'
+        test_img_prefix: '/myfile-datastore-G/COCO2017val2017/'
+    test:
+        data_root: /myfile-datastore-G/COCO2017
+        train_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_train2017.json'
+        val_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_val2017.json'
+        test_ann_file: '/myfile-datastore-G/COCO2017/annotations/instances_val2017.json'
+        train_img_prefix: '/myfile-datastore-G/COCO2017train2017/'
+        val_img_prefix: '/myfile-datastore-G/COCO2017val2017/'
+        test_img_prefix: '/myfile-datastore-G/COCO2017val2017/'
+
+CurveLaneDataset:
+    train:
+        data_path: "/myfile_datastore/Muse/cvpr2020_dataset/dataset.py"
+    val:
+        data_path: "/myfile_datastore/Muse/cvpr2020_dataset/dataset.py"
+    test:
+        data_path: "/myfile_datastore/Muse/cvpr2020_dataset/dataset.py"

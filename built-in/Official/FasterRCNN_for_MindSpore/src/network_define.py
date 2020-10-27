@@ -39,7 +39,7 @@ class LossCallBack(Callback):
         per_print_times (int): Print loss every times. Default: 1.
     """
 
-    def __init__(self, per_print_times=1):
+    def __init__(self, per_print_times=1, rank_id=0):
         super(LossCallBack, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
             raise ValueError("print_step must be int and >= 0.")
@@ -51,6 +51,7 @@ class LossCallBack(Callback):
         self.rpn_reg_loss_sum = 0
         self.rcnn_cls_loss_sum = 0
         self.rcnn_reg_loss_sum = 0
+        self.rank_id = rank_id
 
         global time_stamp_init, time_stamp_first
         if not time_stamp_init:
@@ -91,7 +92,7 @@ class LossCallBack(Callback):
 
             total_loss = rpn_loss + rcnn_loss
 
-            loss_file = open("./loss.log", "a+")
+            loss_file = open("./loss_{}.log".format(self.rank_id), "a+")
             loss_file.write("%lu epoch: %s step: %s ,rpn_loss: %.5f, rcnn_loss: %.5f, rpn_cls_loss: %.5f, "
                             "rpn_reg_loss: %.5f, rcnn_cls_loss: %.5f, rcnn_reg_loss: %.5f, total_loss: %.5f" %
                             (time_stamp_current - time_stamp_first, cb_params.cur_epoch_num, cur_step_in_epoch,
@@ -110,8 +111,6 @@ class LossCallBack(Callback):
 
 class LossNet(nn.Cell):
     """FasterRcnn loss method"""
-    def __init__(self):
-        super(LossNet, self).__init__()
     def construct(self, x1, x2, x3, x4, x5, x6):
         return x1 + x2
 
@@ -162,11 +161,11 @@ class TrainOneStepCell(nn.Cell):
     def __init__(self, network, network_backbone, optimizer, sens=1.0, reduce_flag=False, mean=True, degree=None):
         super(TrainOneStepCell, self).__init__(auto_prefix=False)
         self.network = network
+        self.network.set_grad()
         self.backbone = network_backbone
         self.weights = ParameterTuple(network.trainable_params())
         self.optimizer = optimizer
-        self.grad = C.GradOperation('grad',
-                                    get_by_list=True,
+        self.grad = C.GradOperation(get_by_list=True,
                                     sens_param=True)
         self.sens = Tensor((np.ones((1,)) * sens).astype(np.float16))
         self.reduce_flag = reduce_flag

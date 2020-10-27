@@ -32,7 +32,7 @@ python ${PROJECT_DIR}/../run_task_distill.py \
     --do_eval="true" \
     --td_phase1_epoch_size=10 \
     --td_phase2_epoch_size=3 \
-    --num_labels=2 \
+    --task_name="" \
     --do_shuffle="true" \
     --enable_data_sink="true" \
     --data_sink_steps=100 \
@@ -43,5 +43,6 @@ python ${PROJECT_DIR}/../run_task_distill.py \
     --load_td1_ckpt_path="" \
     --train_data_dir="" \
     --eval_data_dir="" \
-    --schema_dir="" > log.txt 2>&1 &
+    --schema_dir="" \
+    --dataset_type="tfrecord" > log.txt 2>&1 &
 

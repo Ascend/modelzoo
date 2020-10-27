@@ -52,7 +52,7 @@ train_dataset = tf.data.TextLineDataset(args.train_file)
 print('##########################args_input.rank_id', os.environ['RANK_ID'])
 logging.info('shuffle seed_%s args.', os.environ['RANK_ID'])
 
-train_dataset = train_dataset.shuffle(args.train_img_cnt, seed=int(os.environ['RANK_ID']),
+train_dataset = train_dataset.shuffle(args.train_img_cnt, seed=int(os.environ['DEVICE_ID']),
                                       reshuffle_each_iteration=True)
 print('##########################args.train_img_cnt', args.train_img_cnt)
 

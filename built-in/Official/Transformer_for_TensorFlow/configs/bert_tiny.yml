@@ -1,0 +1,36 @@
+model_name: seq2seq_model
+model_params:
+  init_scale: 0.02
+  initializer: trunc_normal
+  embedding.dim: 128
+  embedding.initializer: null
+  embedding.multiply_mode: null
+  encoder.class: bert_encoder
+  special_vocabs:
+    sos: "[CLS]" 
+    eos: "[SEP]"
+    unk: "[UNK]"
+  encoder.params:
+    num_units: 128
+    num_layers: 3
+    ffn.num_units: 512
+    ffn.activation: gelu
+    attention.num_heads: 4
+    dropout_rate: 0.1
+    position.max_length: 512
+  decoder.class: bert_decoder
+  decoder.params:
+    num_units: 128
+    num_layers: 3
+    ffn.num_units: 512
+    ffn.activation: gelu
+    attention.num_heads: 4
+    dropout_rate: 0.1
+    position.max_length: 512
+  optimizer.name: LazyAdam
+  word_level_loss: true
+  learning_rate.constant: 2.0
+  max_grad_norm: null
+  label_smoothing_factor: 0.1
+  learning_rate.warmup_steps: 16000
+  learning_rate.schedule: "constant*rsqrt_hidden_size*linear_warmup*rsqrt_decay"

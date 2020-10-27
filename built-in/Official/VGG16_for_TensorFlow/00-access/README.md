@@ -83,7 +83,11 @@ cd modelzoo_vgg16_TF
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
-### 3. Train
+### 3. Set environment
+
+Set environment variable like *LD_LIBRARY_PATH*, *PYTHONPATH* and *PATH* to match your system before training and testing.
+
+### 4. Train
 - train on a single NPU
     - **edit** *scripts/run_1p.sh* and *scripts/train_1p.sh* (see example below)
     - bash run_1p.sh
@@ -128,7 +132,7 @@ Examples:
         bash run_8p.sh
         ```
 
-### 4. Test
+### 5. Test
 - Same procedure as training except 2 following modifications
     - change `--mode=train` to `--mode=evaluate`
     - add `--eval_dir=path/eval`

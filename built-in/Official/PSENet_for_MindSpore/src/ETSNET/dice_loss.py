@@ -1,3 +1,19 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+
 import mindspore.ops.operations as P
 import mindspore.common.dtype as mstype
 from mindspore import Tensor
@@ -56,7 +72,7 @@ class DiceLoss(_Loss):
             training_mask = self.reshape(training_mask, (640, 640))
 
             selected_mask = self.ohem_single(score, gt_text, training_mask)
-            selected_masks += (selected_mask, )
+            selected_masks = selected_masks + (selected_mask,)
 
         selected_masks = self.concat(selected_masks)
         return selected_masks
@@ -77,7 +93,7 @@ class DiceLoss(_Loss):
         neg_score = self.select(neg_mask, score, ignore_score)
         neg_score = self.reshape(neg_score, (640 * 640,))
 
-        topk_values, topk_indices = self.topk(neg_score, self.k)
+        topk_values, _ = self.topk(neg_score, self.k)
         threshold = self.gather(topk_values, neg_num, 0)
 
         selected_mask = self.logical_and(
@@ -90,7 +106,7 @@ class DiceLoss(_Loss):
 
         return selected_mask
 
-    def dice_loss(self, input, target, mask):
+    def dice_loss(self, input_params, target, mask):
         '''
 
         :param input: [N, H, W]
@@ -99,17 +115,17 @@ class DiceLoss(_Loss):
         :return:
         '''
 
-        input = self.sigmoid(input)
+        input_sigmoid = self.sigmoid(input_params)
 
-        input = self.reshape(input, (self.batch_size, 640 * 640))
+        input_reshape = self.reshape(input_sigmoid, (self.batch_size, 640 * 640))
         target = self.reshape(target, (self.batch_size, 640 * 640))
         mask = self.reshape(mask, (self.batch_size, 640 * 640))
 
-        input = input * mask
+        input_mask = input_reshape * mask
         target = target * mask
 
-        a = self.reduce_sum(input * target, 1)
-        b = self.reduce_sum(input * input, 1) + 0.001
+        a = self.reduce_sum(input_mask * target, 1)
+        b = self.reduce_sum(input_mask * input_mask, 1) + 0.001
         c = self.reduce_sum(target * target, 1) + 0.001
         d = (2 * a) / (b + c)
         dice_loss = self.reduce_mean(d)

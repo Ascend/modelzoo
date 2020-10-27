@@ -1,15 +1,12 @@
 #!/bin/bash
 
-
-rm -rf /var/log/npu/slog/host-0/*
-
 CURRENT_DIR=$(cd "$(dirname "$0")"; pwd)
-source ${CURRENT_DIR}/env.sh
  
 # user env
 export JOB_ID=9999001
 export RANK_SIZE=1
 export RANK_ID=npu1p
+export SLOG_PRINT_TO_STDOUT=0
 
 
 device_group="0"

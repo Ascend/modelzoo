@@ -1,0 +1,32 @@
+model_name: seq2seq_model
+model_params:
+  init_scale: 0.04
+  initializer: uniform
+  embedding.dim: 512
+  encoder.class: interleaved_bi_rnn_encoder
+  encoder.params:
+    rnn.cell_type: lstm
+    num_units: 512
+    dropout_rate: 0.2
+    num_layers: 4
+  decoder.class: gnmt_decoder
+  decoder.params:
+    attention.class: sum_attention
+    attention.params:
+      num_units: 512
+      norm: false
+      use_bias: true
+      dropout_rate: 0.2
+    rnn.cell_type: lstm
+    num_units: 512
+    dropout_rate: 0.2
+    num_layers: 8
+    use_new_attention: true
+    early_attention: true
+    pass_state: false
+  optimizer.name: adam
+  word_level_loss: true
+  optimizer.learning_rate: 0.0005
+  optimizer.lr_decay_steps: 200000
+  optimizer.lr_decay_factor: 0.5
+  optimizer.lr_start_decay_step: 1

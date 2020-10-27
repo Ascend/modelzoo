@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#" :===========================================================================
+# ===========================================================================
 """
 network config setting, will be used in train.py and eval.py
 """
@@ -132,14 +132,14 @@ config = ed({
     "save_checkpoint": True,
     "save_checkpoint_epochs": 1,
     "keep_checkpoint_max": 10,
-    "save_checkpoint_path": "./checkpoint",
+    "save_checkpoint_path": "./",
 
-    "mindrecord_dir": "../MindRecord",
-    "dataset_root": "../../dataset/cocodataset/",  # set to your dataset root
+    "mindrecord_dir": "../MindRecord_COCO_TRAIN",
+    "coco_root": "./cocodataset/",
     "train_data_type": "train2017",
     "val_data_type": "val2017",
     "instance_set": "annotations/instances_{}.json",
-    "classes": ('background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+    "coco_classes": ('background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                      'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
                      'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
                      'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra',
