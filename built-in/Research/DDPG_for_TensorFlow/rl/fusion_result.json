@@ -1,0 +1,115 @@
+{
+    "graphId": "1",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "6"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}{
+    "graphId": "1",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "6"
+        }
+    },
+    "sessionId": "1",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}{
+    "graphId": "21",
+    "graph_fusion": {
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "ATbeMatmulElemwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}{
+    "graphId": "21",
+    "graph_fusion": {
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "1",
+    "ub_fusion": {
+        "ATbeMatmulElemwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}{
+    "graphId": "31",
+    "graph_fusion": {
+        "ApplyAddOutputPass": {
+            "effect_times": "6",
+            "match_times": "6"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "6",
+            "match_times": "6"
+        },
+        "DreluFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "ATbeMatmulElemwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "MatmulGelugradUbFusion": {
+            "effect_times": "0",
+            "match_times": "2"
+        }
+    }
+}{
+    "graphId": "41",
+    "graph_fusion": {
+        "DreluFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "ATbeMatmulElemwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "MatmulGelugradUbFusion": {
+            "effect_times": "0",
+            "match_times": "2"
+        }
+    }
+}

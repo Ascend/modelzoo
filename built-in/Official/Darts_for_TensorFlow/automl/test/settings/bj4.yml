@@ -1,0 +1,72 @@
+general:
+    task:
+        local_base_path: /myfile-datastore/cache/local/
+        backup_base_path: ~
+    model_zoo:
+        model_zoo_path: /myfile-datastore/cache/model_zoo/
+        local_path: ~
+avazu:
+    train:
+        data_path: /myfile-datastore/Avazu/
+Cifar10:
+    train:
+        data_path: /myfile-datastore/cifar10/
+    val:
+        data_path: /myfile-datastore/cifar10/
+    test:
+        data_path: /myfile-datastore/cifar10/
+Cifar100:
+    train:
+        data_path: /myfile-datastore/cifar100/
+    val:
+        data_path: /myfile-datastore/cifar100/
+    test:
+        data_path: /myfile-datastore/cifar100/
+Cityscapes:
+    train:
+        root_path: /myfile-datastore/cityscapes_dataset/
+    test:
+        root_path: /myfile-datastore/cityscapes_dataset/
+Coco:
+    train:
+        data_root: /myfile-datastore/COCO2017/
+        train_ann_file: /myfile-datastore/COCO2017/annotations/instances_train2017.json
+        val_ann_file: /myfile-datastore/COCO2017/annotations/instances_val2017.json
+        test_ann_file: /myfile-datastore/COCO2017/annotations/instances_val2017.json
+        train_img_prefix: /myfile-datastore/COCO2017/train2017/
+        val_img_prefix: /myfile-datastore/COCO2017/val2017/
+        test_img_prefix: /myfile-datastore/COCO2017/val2017/
+DIV2K:
+    train:
+        root_HR: /myfile-datastore/DIV2K/div2k_train/hr
+        root_LR: /myfile-datastore/DIV2K/div2k_train/lr
+    test:
+        root_HR: /myfile-datastore/DIV2K/Set5/hr
+        root_LR: /myfile-datastore/DIV2K/Set5/lr
+FashionMnist:
+        train:
+            data_path: /myfile-datastore/fashion_mnist_data/
+        val:
+            data_path: /myfile-datastore/fashion_mnist_data/
+        test:
+            data_path: /myfile-datastore/fashion_mnist_data/
+Imagenet:
+    train:
+        data_path: /myfile-datastore/Imagenet/
+    val:
+        data_path: /myfile-datastore/Imagenet/
+    test:
+        data_path: /myfile-datastore/Imagenet/
+Mdc2dDetDataset:
+    train:
+        train_ann_file: /myfile-datastore/Mdc2dDetDataset/Vehicle_person/pieline_train_vp.txt
+        valid_ann_file: /myfile-datastore/Mdc2dDetDataset/Vehicle_person/pieline_test_vp.txt
+        gt_coco_file: /myfile-datastore/Mdc2dDetDataset/Vehicle_person/coco_style_file.json
+        img_prefix: /myfile-datastore/Mdc2dDetDataset/Vehicle_person/
+Mnist:
+    train:
+        data_path: /myfile-datastore/mnist_data/
+    val:
+        data_path: /myfile-datastore/mnist_data/
+    test:
+        data_path: /myfile-datastore/mnist_data/

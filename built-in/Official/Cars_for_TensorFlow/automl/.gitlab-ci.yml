@@ -1,0 +1,79 @@
+stages:
+- pylint
+- docstyle
+- pytorch
+- tf
+
+pylint:
+  stage: pylint
+  script:
+    - echo '-----------------------start run flake8 ------------------------------------- '
+    - flake8  --ignore=F401,F403,F405,F999,E722,E741,W504,E117,F632,F841,F523  --max-line-length=120 --max-complexity=15 /home/gitlab-runner/builds/*/0/ee/train/automl
+    - echo '-----------------------end run flake8 ------------------------------------- '
+  only:
+    - merge_requests
+
+docstyle:
+  stage: docstyle
+  script:
+    - echo '-----------------------start run pydocstyle ------------------------------------- '
+    - python3 -m pydocstyle  --add-ignore=D104,D107,D203,D212,D213,D402,D413,D415,D416,D417  /home/gitlab-runner/builds/*/0/ee/train/automl
+    - echo '-----------------------end run pydocstyle ------------------------------------- '
+  only:
+    - merge_requests
+
+
+prune-quant-cars-esr_ea-sr_ea-jdd_ea-backbone_nas-resnet:
+  stage: pytorch
+  script:
+    - cp -r /home/gitlab-runner/builds/*/0/ee/train/automl  /home/gitlab-runner/codes
+    - echo "------------------------start run prune-quant-cars-esr_ea-sr_ea-jdd_ea-backbone_nas-resnet----------------------------------"
+    - cd /home/gitlab-runner/scripts/ci_cd/
+    - python3  main.py  --alg_name=prune-quant-cars-esr_ea-sr_ea-jdd_ea-backbone_nas-resnet
+    - echo "------------------------end run prune-quant-cars-esr_ea-sr_ea-jdd_ea-backbone_nas-resnet----------------------------------"
+  after_script:
+    - bash /home/gitlab-runner/scripts/ci_cd/print_error.sh prune-quant-cars-esr_ea-sr_ea-jdd_ea-backbone_nas-resnet
+  only:
+    - merge_requests
+
+    
+asha-bo-bohb-boss-tpe-pba-random-random_pareto:
+  stage: pytorch
+  script:
+    - cp -r /home/gitlab-runner/builds/*/0/ee/train/automl  /home/gitlab-runner/codes
+    - echo "------------------------start run asha-bo-bohb-boss-tpe-pba-random-random_pareto----------------------------------"
+    - cd /home/gitlab-runner/scripts/ci_cd/
+    - python3  main.py  --alg_name=asha-bo-bohb-boss-tpe-pba-random-random_pareto
+    - echo "------------------------end run asha-bo-bohb-boss-tpe-pba-random-random_pareto----------------------------------"
+  after_script:
+    - bash /home/gitlab-runner/scripts/ci_cd/print_error.sh asha-bo-bohb-boss-tpe-pba-random-random_pareto
+  only:
+    - merge_requests
+    
+    
+faster_rcnn-darts_cnn-adelaide_ea-efficientnet_b0-cyclesr-auto_lane-spnas:
+  stage: pytorch
+  script:
+    - cp -r /home/gitlab-runner/builds/*/0/ee/train/automl  /home/gitlab-runner/codes
+    - echo "------------------------start run faster_rcnn-darts_cnn-adelaide_ea-efficientnet_b0-cyclesr-auto_lane-spnas----------------------------------"
+    - cd /home/gitlab-runner/scripts/ci_cd/
+    - python3  main.py  --alg_name=faster_rcnn-darts_cnn-adelaide_ea-efficientnet_b0-cyclesr-auto_lane-spnas
+    - echo "------------------------end run faster_rcnn-darts_cnn-adelaide_ea-efficientnet_b0-cyclesr-auto_lane-spnas----------------------------------"
+  after_script:
+    - bash /home/gitlab-runner/scripts/ci_cd/print_error.sh faster_rcnn-darts_cnn-adelaide_ea-efficientnet_b0-cyclesr-auto_lane-spnas
+  only:
+    - merge_requests
+
+
+prune_tf-quant_tf-simple_cnn_tf-resnet_variant_tf-darts_cnn_tf-adelaide_ea_tf:
+  stage: tf
+  script:
+    - cp -r /home/gitlab-runner/builds/*/0/ee/train/automl  /home/gitlab-runner/codes
+    - echo "------------------------start run prune_tf-quant_tf-simple_cnn_tf-resnet_variant_tf-darts_cnn_tf-adelaide_ea_tf----------------------------------"
+    - cd /home/gitlab-runner/scripts/ci_cd/
+    - python3  main.py  --alg_name=prune_tf-quant_tf-simple_cnn_tf-resnet_variant_tf-darts_cnn_tf-adelaide_ea_tf
+    - echo "------------------------end run prune_tf-quant_tf-simple_cnn_tf-resnet_variant_tf-darts_cnn_tf-adelaide_ea_tf----------------------------------"
+  after_script:
+    - bash /home/gitlab-runner/scripts/ci_cd/print_error.sh prune_tf-quant_tf-simple_cnn_tf-resnet_variant_tf-darts_cnn_tf-adelaide_ea_tf
+  only:
+    - merge_requests

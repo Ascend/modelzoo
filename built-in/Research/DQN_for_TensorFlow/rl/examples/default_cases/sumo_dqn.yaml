@@ -1,0 +1,52 @@
+alg_para:
+  alg_name: DQNSUMO
+  alg_config: {
+    'prepare_times_per_train': 2,
+    'learning_starts': 5000,  # 10000
+    'BUFFER_SIZE': 100000,
+    "TARGET_UPDATE_FREQ": 1000,
+    "GAMMA": 0.99,
+    "BATCH_SIZE": 32,
+    "train_per_checkpoint": 2000,
+  }
+
+env_para:
+  env_name: SumoEnv
+  env_info: {}
+
+agent_para:
+  agent_name: SumoDqn
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200 ,
+    'complete_step': 10000000000,
+    }
+
+model_para:
+  actor:
+    model_name: DdqNetworkSumo
+    state_dim: [31]
+    action_dim: 4
+    model_config: {
+      'LEARNING_RATE': 0.00001,
+    }
+
+#    model_format: pb
+
+
+model_name: sumo
+env_num: 1
+
+#node_config: [["10.155.170.208", "root", "Huawei12#$", "ubuntu_arm_sumo_xt_ssh:0528"]]
+node_config: [["127.0.0.1", "username", "passwd"]]
+#test_node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/train_model/
+#test_model_path: ../xt_train_data/train_model/sumo
+#result_path: ../xt_train_data/test_res/sumo.csv
+benchmark:
+  start: True
+  id: xt_default_benchmark
+
+  #remote_env:
+        #conda: /home/jack/anaconda2/envs/RL
+  #  env: {}

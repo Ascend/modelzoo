@@ -1,0 +1,36 @@
+alg_para:
+  alg_name: DDPGAD
+  alg_config: {
+    'train_per_checkpoint': 200,
+    'BUFFER_SIZE': 10000,
+    'BATCH_SIZE': 32,
+    "learning_starts": 100
+    }
+
+env_para:
+  env_name: GymEnv
+  env_info: {'vision': False, 'name': Pendulum-v0}
+
+agent_para:
+  agent_name: DdpgAgentAD
+  agent_num : 1
+  agent_config: {
+    'max_steps': 20000,
+    'complete_step': 10000000
+    }
+
+model_para:
+  actor:
+    model_name: DDPGActorNetwork
+    state_dim: [3]
+    action_dim: 1
+  critic:
+    model_name: DDPGCriticNetwork
+    state_dim: [[3], [1]]
+    action_dim: 1
+
+model_name: ddpg
+env_num: 2
+node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/test_model/ddpg
+result_path: ../xt_train_data/test_res1/ddpg.csv

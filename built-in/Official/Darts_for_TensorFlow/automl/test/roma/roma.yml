@@ -1,0 +1,14 @@
+general:
+    mode: roma
+    worker:
+      devices_per_job: 1
+    task:
+        local_base_path: "/efs/"
+        output_subpath: "output/"
+        backup_base_path: s3://automl-hn1/liuzhicheng/
+
+pipeline: [fake]
+
+fake:
+    pipe_step:
+        type: FakePipeStep

@@ -1,0 +1,139 @@
+general:
+    task:
+        local_base_path: /efs/cache/local/
+        backup_base_path: s3://noah-hb1/vega/back_up/
+    model_zoo:
+        model_zoo_path: /efs/cache/model_zoo/
+        local_path: ~
+
+Trainer:
+    output_model_path: s3://noah-hb1/vega/model_output/
+
+avazu:
+    train:
+        data_path: /efs/Avazu/
+
+Cifar10:
+    train:
+        data_path: s3://noah-hb1/dataset/cifar10_data/
+    val:
+        data_path: s3://noah-hb1/dataset/cifar10_data/
+    test:
+        data_path: s3://noah-hb1/dataset/cifar10_data/
+
+Cifar100:
+    train:
+        data_path: s3://noah-hb1/dataset/cifar100_data/
+    val:
+        data_path: s3://noah-hb1/dataset/cifar100_data/
+    test:
+        data_path: s3://noah-hb1/dataset/cifar100_data/
+
+Cityscapes:
+    train:
+        root_path: /efs/cityscapes_dataset/
+    test:
+        root_path: /efs/cityscapes_dataset/
+
+Coco:
+    train:
+        data_root: /efs/COCO2017/
+        train_ann_file: /efs/COCO2017/annotations/instances_train2017.json
+        val_ann_file: /efs/COCO2017/annotations/instances_val2017.json
+        test_ann_file: /efs/COCO2017/annotations/instances_val2017.json
+        train_img_prefix: /efs/COCO2017/train2017/
+        val_img_prefix: /efs/COCO2017/val2017/
+        test_img_prefix: /efs/COCO2017/val2017/
+
+DIV2K:
+    train:
+        root_HR: /efs/DIV2K/div2k_train/hr
+        root_LR: /efs/DIV2K/div2k_train/lr
+    test:
+        root_HR: /efs/DIV2K/div2k_valid/hr
+        root_LR: /efs/DIV2K/div2k_valid/lr
+
+Set5:
+    test:
+        root_HR: /efs/DIV2K/Set5/hr
+        root_LR: /efs/DIV2K/Set5/lr
+
+Set14:
+    test:
+        root_HR: /efs/DIV2K/Set14/hr
+        root_LR: /efs/DIV2K/Set14/lr
+
+BSDS100:
+    test:
+        root_HR: /efs/DIV2K/BSDS100/hr
+        root_LR: /efs/DIV2K/BSDS100/lr
+
+UBRAN100:
+    test:
+        root_HR: /efs/DIV2K/Urban100/hr
+        root_LR: /efs/DIV2K/Urban100/lr
+
+FashionMnist:
+        train:
+            data_path: /efs/fashion_mnist_data/
+        val:
+            data_path: /efs/fashion_mnist_data/
+        test:
+            data_path: /efs/fashion_mnist_data/
+
+Imagenet:
+    train:
+        data_path: /efs/Imagenet/
+    val:
+        data_path: /efs/Imagenet/
+    test:
+        data_path: /efs/Imagenet/
+
+Mdc2dDetDataset:
+    train:
+        train_ann_file: /efs/Mdc2dDetDataset/Vehicle_person/pieline_train_vp.txt
+        valid_ann_file: /efs/Mdc2dDetDataset/Vehicle_person/pieline_test_vp.txt
+        gt_coco_file: /efs/Mdc2dDetDataset/Vehicle_person/coco_style_file.json
+        img_prefix: /efs/Mdc2dDetDataset/Vehicle_person/
+
+Mnist:
+    train:
+        data_path: s3://noah-hb1/dataset/mnist_data/
+    val:
+        data_path: s3://noah-hb1/dataset/mnist_data/
+    test:
+        data_path: s3://noah-hb1/dataset/mnist_data/
+
+CocoDataset:
+    train:
+        data_root: /efs/COCO2017
+        train_ann_file: '/efs/COCO2017/annotations/instances_train2017.json'
+        val_ann_file: '/efs/COCO2017/annotations/instances_val2017.json'
+        test_ann_file: '/efs/COCO2017/annotations/instances_val2017.json'
+        train_img_prefix: '/efs/COCO2017train2017/'
+        val_img_prefix: '/efs/COCO2017val2017/'
+        test_img_prefix: '/efs/COCO2017val2017/'
+    val:
+        data_root: /efs/COCO2017
+        train_ann_file: '/efs/COCO2017/annotations/instances_train2017.json'
+        val_ann_file: '/efs/COCO2017/annotations/instances_val2017.json'
+        test_ann_file: '/efs/COCO2017/annotations/instances_val2017.json'
+        train_img_prefix: '/efs/COCO2017train2017/'
+        val_img_prefix: '/efs/COCO2017val2017/'
+        test_img_prefix: '/efs/COCO2017val2017/'
+    test:
+        data_root: /efs/COCO2017
+        train_ann_file: '/efs/COCO2017/annotations/instances_train2017.json'
+        val_ann_file: '/efs/COCO2017/annotations/instances_val2017.json'
+        test_ann_file: '/efs/COCO2017/annotations/instances_val2017.json'
+        train_img_prefix: '/efs/COCO2017train2017/'
+        val_img_prefix: '/efs/COCO2017val2017/'
+        test_img_prefix: '/efs/COCO2017val2017/'
+
+CurveLaneDataset:
+    train:
+        data_path: "/efs/Muse/cvpr2020_dataset/dataset.py"
+    val:
+        data_path: "/efs/Muse/cvpr2020_dataset/dataset.py"
+    test:
+        data_path: "/efs/Muse/cvpr2020_dataset/dataset.py"

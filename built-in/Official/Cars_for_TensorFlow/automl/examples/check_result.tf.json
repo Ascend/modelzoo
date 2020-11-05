@@ -1,0 +1,40 @@
+{
+  "op": [
+    {
+      "is_support": false,
+      "name": "save/MergeV2Checkpoints",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "MergeV2Checkpoints"
+    },
+    {
+      "is_support": false,
+      "name": "save/RestoreV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "RestoreV2"
+    },
+    {
+      "is_support": false,
+      "name": "save/SaveV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "SaveV2"
+    },
+    {
+      "is_support": false,
+      "name": "save/ShardedFilename",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ShardedFilename"
+    }
+  ]
+}

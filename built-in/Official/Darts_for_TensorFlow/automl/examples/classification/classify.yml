@@ -1,0 +1,114 @@
+general:
+    worker:
+        devices_per_job: -1
+
+pipeline: [nas1, hpo1, fullytrain1]
+
+nas1:
+    pipe_step:
+        type: NasPipeStep
+
+    search_algorithm:
+        type: BackboneNas
+        codec: BackboneNasCodec
+        policy:
+            random_ratio: 0.2
+            num_mutate: 10
+        range:
+            max_sample: 100
+            min_sample: 10
+        pareto:
+            object_count: 2
+            max_object_ids: [0]
+
+    search_space:
+        type: SearchSpace
+        modules: ['backbone', 'head']
+        backbone:
+            ResNetVariant:
+                base_depth: [18, 34, 50, 101]
+                base_channel: [32, 48, 56, 64]
+                doublechannel: [3]
+                downsample: [3]
+        head:
+            LinearClassificationHead:
+                num_classes: [10]
+
+    trainer:
+        type: Trainer
+        with_valid: True
+        epochs: 1
+
+    dataset:
+        type: Cifar10
+        common:
+            data_path: /cache/datasets/cifar10/
+
+hpo1:
+    pipe_step:
+        type: NasPipeStep
+
+    dataset:
+        ref: nas1.dataset
+
+    search_algorithm:
+        type: AshaHpo
+        policy:
+            total_epochs: 81
+
+    search_space:
+        type: SearchSpace
+        hyperparameters:
+            -   key: trainer.optim.params.lr
+                type: FLOAT_EXP
+                range: [0.00001, 0.1]
+            -   key: trainer.optim.type
+                type: STRING
+                range: ['Adam', 'SGD']
+            -   key: trainer.optim.params.momentum
+                type: FLOAT
+                range: [0.0, 0.99]
+        condition:
+            -   key: condition_for_sgd_momentum
+                child: trainer.optim.params.momentum
+                parent: trainer.optim.type
+                type: EQUAL
+                range: ["SGD"]
+
+    trainer:
+        type: Trainer
+        epochs: 10
+
+    model:
+        models_folder: "{local_base_path}/output/nas1/"
+
+    evaluator:
+        type: Evaluator
+        gpu_evaluator:
+            type: GpuEvaluator
+            metric:
+                type: accuracy
+
+fullytrain1:
+    pipe_step:
+        type: FullyTrainPipeStep
+        models_folder: "{local_base_path}/output/nas1/"
+
+    trainer:
+        type: Trainer
+        epochs: 160
+        optim:
+            type: SGD
+            params:
+                lr: 0.1
+                momentum: 0.9
+                weight_decay: 0.0001
+        lr_scheduler:
+            type: MultiStepLR
+            params:
+                milestones: [60, 120]
+                gamma: 0.5
+        hps_folder: "{local_base_path}/output/hpo1/"
+
+    dataset:
+        ref: nas1.dataset

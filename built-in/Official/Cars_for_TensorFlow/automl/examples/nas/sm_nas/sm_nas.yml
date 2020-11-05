@@ -1,0 +1,154 @@
+#pipeline: [smnass, smnasm, fullytrain]
+pipeline: [smnass, smnasm]
+
+smnass:
+    pipe_step:
+        type: SMNasPipeStep
+
+    search_algorithm:
+        type: SMNasS
+        max_sample: 2
+        min_sample: 1
+        pareto:
+            object_count: 2
+            max_object_ids: [0]
+        train_setting:
+            batch_size: 2
+            epoch: 1
+            optimizer:
+                type: 'SGD'
+                lr: 0.02
+                nesterov: True
+                paramwise_options:
+                    norm_decay_mult: 0
+            lr_scheduler:
+                policy: 'step'
+                min_lr: 0.0001
+                warmup_ratio: 0.33
+                step: [8, 11]
+        search_space:
+            dataset:
+                img_scale: [{train: [512, 512], test: [512,512], val: [512,512] },
+                            {train: [800, 600], test: [800, 600], val: [800, 600] },
+                            {train: [1000,600], test: [1000,600], val: [1000,600] }]
+            detector:
+                FasterRCNN: {}
+                CascadeRCNN:
+                     num_stages: [2, 3]
+                GACascadeRCNN: {}
+            backbone:
+                ResNet:
+                    depth: [18, 34, 50, 101]
+                ResNeXt:
+                    depth: [50, 101]
+            neck:
+                FPN:
+                    out_channels: [64, 128, 256]
+            rpn_head:
+                RPNHead: {}
+                GARPNHead: {}
+            bbox_head:
+                BBoxHead: {}
+                CascadeFCBBoxHead: {}
+                ConvFCBBoxHead: {}
+                SharedFCBBoxHead: {}
+        data_setting:
+            data_root: '/cache/datasets/COCO2017/'
+            num_classes: 81
+            batch_size:  2
+            num_workers: 1
+            multiscale_mode: 'range'   # using multiscale
+
+    search_space:
+        type: SearchSpace
+
+    trainer:
+        type: Trainer
+        callbacks: SMNasTrainerCallback
+        lazy_built: True
+        step_name: 'smnas_s'
+        epochs: 1
+        gpus: 8
+
+smnasm:
+    pipe_step:
+        type: SMNasPipeStep
+
+    search_algorithm:
+        type: SMNasM
+        random_ratio: 0.2
+        num_mutate: 10
+        max_sample: 10
+        min_sample: 2
+        sample_base: True
+        pareto:
+            object_count: 2
+            max_object_ids: [0]
+        train_setting:
+            batch_size: 2
+            epoch: 1
+            optimizer:
+                type: 'SGD'
+                lr: 0.02
+                nesterov: True
+                paramwise_options:
+                    norm_decay_mult: 0
+            lr_scheduler:
+                policy: 'step'
+                min_lr: 0.0001
+                warmup_ratio: 0.33
+                step: [8, 11]
+            train_from_scratch: True
+        sample_setting:
+            random_samples: 1
+            max_samples: 2
+            flops_constraint: [ 0.5, 1]
+            EA_setting:
+                num_mutate: 3
+        search_space:
+            backbone:
+                ResNet: {}
+                ResNeXt: {}
+                ResNet_Variant:
+                    arch:
+                        num_reduction: 3
+                        num_stage: 4
+                        num_block: [5, 15]
+                    base_channel: [32, 48, 64]
+                ResNeXt_Variant:
+                    arch:
+                        num_reduction: 3
+                        num_stage: 4
+                        num_block: [5, 15]
+                    base_channel: [32, 48, 56, 64]
+        data_setting:
+            data_root: '/cache/datasets/COCO2017/'
+            num_classes: 81
+            batch_size: 1
+            num_workers: 1
+            shuffle: False
+            multiscale_mode: 'range'   # using multiscale
+
+    search_space:
+        type: SearchSpace
+
+    trainer:
+        type: Trainer
+        callbacks: SMNasTrainerCallback
+        lazy_built: True
+        step_name: 'smnas_m'
+        epochs: 1
+        gpus: 8
+
+fullytrain:
+    pipe_step:
+        type: FullyTrainPipeStep
+
+    trainer:
+        type: Trainer
+        callbacks: SMNasTrainerCallback
+        lazy_built: True
+        step_name: 'fullytrain'
+        epochs: 12
+        mm_model_desc_file: 'smnas_m_best_config.py'
+        gpus: 8

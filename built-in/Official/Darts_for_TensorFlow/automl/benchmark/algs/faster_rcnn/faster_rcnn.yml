@@ -1,0 +1,181 @@
+general:
+    worker:
+        devices_per_job: 1
+
+pipeline: [fullytrain]
+
+fullytrain:
+    pipe_step:
+        type: FullyTrainPipeStep
+    model:
+        model_desc:
+            modules: ['detector']
+            detector:
+                name: 'FasterRCNN'
+                num_klass: 81
+                backbone:
+                    modules: ['backbone']
+                    backbone:
+                        depth: 18
+                        num_stages: 4
+                        out_indices: !!python/tuple [0, 1, 2, 3]
+                        frozen_stages: 1
+                        style: 'pytorch'
+                        name: 'ResNet_Det'
+                neck:
+                    modules: ['neck']
+                    neck:
+                        name: FPN
+                        in_channels: [64, 128, 256, 512]
+                        out_channels: 256
+                        num_outs: 5
+                rpn_head:
+                    modules: ['head']
+                    head:
+                        name: 'RPNHead'
+                        in_channels: 256
+                        share_hidden_channels: 256
+                        feat_channels_list: [0, 0, 0, 0, 0, 0]
+                        anchor_scales_list: [8]
+                        anchor_ratios_list: [0.5, 1., 2.]
+                        anchor_strides: [4, 8, 16, 32, 64]
+                        target_means: [.0, .0, .0, .0]
+                        target_stds: [1.0, 1.0, 1.0, 1.0]
+                        loss_cls:
+                            name: 'CustomCrossEntropyLoss'
+                            use_sigmoid: True
+                            loss_weight: 1.0
+                        loss_bbox:
+                            name: 'SmoothL1Loss'
+                            beta: 0.111111111111111111
+                            loss_weight: 1.0
+                bbox_roi_extractor:
+                    modules: ['roi_extractor']
+                    roi_extractor:
+                        name: 'SingleRoIExtractor'
+                        roi_layer: {type: 'RoIAlign', out_size: 7, sample_num: 2}
+                        out_channels: 256
+                        featmap_strides: !!python/tuple [4, 8, 16, 32]
+                shared_head:
+                    modules: ['shared_head']
+                    shared_head:
+                        name: 'ShareConvFc'
+                        num_shared_convs: 0
+                        num_shared_fcs: 2
+                        with_avg_pool: False
+                        roi_feat_size: 7
+                        in_channels: 256
+                        conv_out_channels: 256
+                        fc_out_channels: 1024
+                bbox_head:
+                    modules: ['head']
+                    head:
+                        name: 'BBoxHead'
+                        with_avg_pool: False
+                        roi_feat_size: 1
+                        in_channels: 1024
+                        num_classes: 82
+                        reg_class_agnostic: False
+                        target_means: [0., 0., 0., 0.]
+                        target_stds: [1.0, 1.0, 1.0, 1.0]
+                        loss_cls: {name: 'CustomCrossEntropyLoss', use_sigmoid: False, loss_weight: 1.0}
+                        loss_bbox: {name: 'SmoothL1Loss', beta: 1.0, loss_weight: 1.0}
+                train_cfg:
+                    rpn:
+                        assigner:
+                            name: MaxIoUAllNegAssigner
+                            pos_iou_thr: 0.7
+                            neg_iou_thr: !!python/tuple [-1, 0.3]
+                            min_pos_iou: 0.3
+                            ignore_iof_thr: 0.5
+                        sampler:
+                            name: RandomSampler
+                            num: 256
+                            pos_fraction: 0.5
+                            neg_pos_ub: -1
+                            add_gt_as_proposals: False
+                        allowed_border: 0
+                        pos_weight: -1
+                        debug: False
+                    rpn_proposal:
+                        nms_across_levels: False
+                        nms_pre: 2000
+                        nms_post: 2000
+                        max_num: 2000
+                        nms_thr: 0.7
+                        min_bbox_size: 0
+                    rcnn:
+                        assigner:
+                            name: MaxIoUAllNegAssigner
+                            pos_iou_thr: 0.5
+                            neg_iou_thr: !!python/tuple [-1, 0.5]
+                            min_pos_iou: 0.5
+                            ignore_iof_thr: -1
+                        sampler:
+                            name: RandomSampler
+                            num: 256
+                            pos_fraction: 0.25
+                            neg_pos_ub: -1
+                            add_gt_as_proposals: True
+                        pos_weight: -1
+                        debug: False
+                test_cfg:
+                    header_num: 2
+                    rpn:
+                        nms_across_levels: False
+                        nms_pre: 6000
+                        nms_post: 1000
+                        max_num: 1000
+                        nms_thr: 0.7
+                        min_bbox_size: 0
+                    rcnn:
+                        score_thr: 0.05
+                        nms:
+                            type: 'nms'
+                            iou_thr: 0.5
+                        max_per_img: 200
+                        vis_score_th: 0.5
+    trainer:
+        type: Trainer
+        model_statistics: False
+        is_detection_trainer: True
+        epochs: 1
+        optim:
+            type: SGD
+            params:
+                lr: 0.06
+                momentum: 0.9
+                weight_decay: 0.0001
+        lr_scheduler:
+            type: WarmupScheduler
+            params:
+                by_epoch: False
+                warmup_type: linear
+                warmup_iters: 2000
+                warmup_ratio: 0.1
+                after_scheduler_config:
+                    type: CosineAnnealingLR
+                    T_max: 30000
+                    eta_min: 0.0001
+                after_scheduler_by_epoch: False
+        loss:
+            type: SumLoss
+        metric:
+            type: DetMetric
+            params:
+                gt_anno_path: /cache/datasets/COCO2017/annotations/instances_val2017.json
+
+    dataset:
+        type: CocoDataset
+        common:
+            data_root: /cache/datasets/COCO2017/
+            train_ann_file: '/cache/datasets/COCO2017/annotations/instances_train2017.json'
+            val_ann_file: '/cache/datasets/COCO2017/annotations/instances_val2017.json'
+            test_ann_file: '/cache/datasets/COCO2017/annotations/instances_val2017.json'
+            train_img_prefix: '/cache/datasets/COCO2017/train2017/'
+            val_img_prefix: '/cache/datasets/COCO2017/val2017/'
+            test_img_prefix: '/cache/datasets/COCO2017/val2017/'
+            batch_size: 1
+            img_scale: {train: !!python/tuple [720, 480], test: !!python/tuple [1280, 720], val: !!python/tuple [1280, 720] }
+        train:
+            shuffle: True

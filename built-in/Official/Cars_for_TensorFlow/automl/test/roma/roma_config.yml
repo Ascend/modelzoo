@@ -1,0 +1,19 @@
+general:
+  task:
+    backup_base_path: ~
+  worker:
+    devices_per_job: 1
+
+pipeline: [Test]
+
+Test:
+  pipe_step:
+    type: FakePipeStep
+
+  dataset:
+    type: DIV2K
+    train:
+      num_workers: 1
+      batch_size: 16
+    test:
+      upscale: 2

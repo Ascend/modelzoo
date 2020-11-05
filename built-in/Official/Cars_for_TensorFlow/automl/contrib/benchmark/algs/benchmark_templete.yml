@@ -1,0 +1,31 @@
+
+pipeline: [nas, fully_train, benchmark]
+
+nas:
+    pipe_step:
+        type: NasPipeStep
+    dataset:
+        type: Cifar10
+    search_algorithm:
+        type: NewAlgorithm
+        policy: policy
+    search_space:
+        type: SearchSpace
+        modules: models
+    trainer:
+        type: Trainer
+
+fully_train:
+    pipe_step:
+        type: FullyTrainPipeStep
+    trainer: trainer
+    dataset:
+        type: Cifar10
+
+benchmark_cifar10:
+    pipe_step:
+        type: BenchmarkPipeStep
+    dataset:
+        type: Cifar10
+    evaluator:
+        type: Evaluator

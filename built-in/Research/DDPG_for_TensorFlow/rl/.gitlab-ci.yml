@@ -1,0 +1,47 @@
+
+#image: "xt_py36_pytorch-1.2_tf-1.15_rl_sim:v2"
+image: "xt_py36_cuda10.0_tf1.15_torch_1.2_sim:v2"
+
+variables:
+  BM_ARCHIVE: ./bm_archive
+  BM_CASE: "all"
+  BM_ROOT: "examples/benchmark_cases"
+  BM_STEPS: 10000000
+
+stages:
+ - build
+ - test
+ - deploy
+
+run_test_case:
+  except:
+    - schedules
+  stage: test
+  script:
+    - pwd
+    - pip3 install -e . --no-deps
+    - python3 scripts/guard_with_train.py scripts/case_config.yaml
+
+check_pylint:
+  except:
+    - schedules
+  stage: test
+  script:
+    - pwd
+    - pip3 install -e . --no-deps
+    - python3 scripts/guard_with_pylint.py
+
+run_benchemark:
+  only:
+    - schedules
+  stage: test
+  script:
+    - pwd
+    - pip3 install -e . --no-deps
+    - python3 scripts/benchmark_within_ci.py -yp $BM_ROOT -c $BM_CASE -s $BM_STEPS
+  artifacts:
+    paths:
+      - $BM_ARCHIVE/*/events.out.*
+      - $BM_ARCHIVE/*/benchmark/*
+      - $BM_ARCHIVE/*/*.json
+

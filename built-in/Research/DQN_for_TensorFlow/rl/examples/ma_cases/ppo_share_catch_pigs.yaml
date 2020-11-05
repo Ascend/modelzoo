@@ -1,0 +1,35 @@
+alg_para:
+  alg_name: PPOShareWeights
+
+env_para:
+  env_name: MaEnvCatchPigs
+  env_info: { 'size': 7, 'vision': False}
+
+agent_para:
+  agent_name: CatchPigsPpo
+  agent_num : 2
+  agent_config: {
+    'max_steps': 1000,
+    'complete_step': 3000000
+    }
+
+model_para:
+  actor:
+    model_name: PigPPOCnn
+    state_dim: [15,15,3]
+    action_dim: 4
+    summary: True
+
+model_name: catch_pigs
+env_num: 10
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+#test_node_config: [["127.0.0.1", "username", "passwd"],]
+
+benchmark:
+  id: xt_catch_pigs
+  archive_root: ../xt_archive  # default: ~/xt_archive
+#  archive_root: /usr1/xwei-home/xt_train_tmp
+  eval:
+    gap: 20
+    max_step_per_episode: 1000

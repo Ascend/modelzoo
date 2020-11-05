@@ -1,0 +1,17 @@
+general:
+    task:
+        local_base_path: "/tasks"
+
+pipeline: [fake]
+
+fake:
+    pipe_step:
+        type: FakePipeStep
+
+    dataset:
+        type: Cifar10
+        train:
+            data_path: "/Dataset/cifar10/"
+            batch_size: 1
+            num_workers: 4
+            shuffle: false

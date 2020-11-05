@@ -1,0 +1,24 @@
+alg_para:
+  alg_name: dqn
+
+env_para:
+  env_name: rl_simu_kyber
+  env_info: {'vision': False, 'name': lanechange, 'config': [Simulator/lanechange_config/goal_track_LOW_SPEED/DENSE_HIGH/0_0.yaml]}
+
+agent_para:
+  agent_name: overtake_kyber
+  agent_num : 1
+
+model_para:
+  actor:
+    model_name: critic_network_q
+    state_dim: [20]
+    #state_dim: [[20,11,2],3]
+    action_dim: 3
+
+
+model_name: overtake_kyber
+env_num: 1
+node_config: [['127.0.0.1', username, passwd]]
+model_path: ../xt_train_data/train_model/test
+result_path: ../xt_train_data/test_res/overtake_kyber.csv

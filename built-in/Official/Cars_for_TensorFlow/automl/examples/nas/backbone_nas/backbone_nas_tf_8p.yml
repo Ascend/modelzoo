@@ -1,0 +1,131 @@
+general:
+    worker:
+        devices_per_job: -1
+    task:
+        local_base_path: /root/projects/1.0/automl/examples/tasks
+        task_id: resnet_variant_8p
+    backend: tensorflow
+    device_category: NPU
+
+#pipeline: [nas]
+pipeline: [fully_train]
+
+nas:
+    pipe_step:
+        type: NasPipeStep
+    search_algorithm:
+        type: BackboneNas
+        codec: BackboneNasCodec
+        policy:
+            num_mutate: 10
+            random_ratio: 0.2
+        range:
+            max_sample: 100 #100
+            min_sample: 10 #10
+    search_space:
+        type: SearchSpace
+        modules: ['backbone']
+        backbone:
+            ResNetVariant:
+                base_depth: [50]
+                base_channel: [32, 48, 56, 64]
+                doublechannel: [3]
+                downsample: [3]
+                num_classes: 10
+    trainer:
+        type: Trainer
+        optim:
+            type: MomentumOptimizer
+            params:
+                learning_rate: 0.128
+                momentum: 0.9
+        lr_scheduler:
+            type: MultiStepLrWarmUp
+            params:
+                base_lr: 0.064
+                warmup: True
+                milestones: [30, 60, 80, 90]
+                decay_rates: [1, 0.1, 0.01, 0.001, 1.0e-4]
+        loss:
+            type: CrossEntropyWeightDecay
+            params:
+                cross_entropy: sparse_softmax_cross_entropy
+                weight_decay: !!float 1e-4
+        epochs: 2
+        save_steps: 250
+        distributed: False
+        amp: True
+        loss_scale: 128.0
+    dataset:
+        type: Cifar10
+        common:
+            data_path: /cache/datasets/cifar-10-batches-bin
+            batch_size: 64
+            num_parallel_batches: 64
+#    dataset:
+#        type: Imagenet
+#        common:
+#            data_path: /cache/datasets/imagenet_tfrecord
+#            image_size: 32
+#            batch_size: 32
+#            fp16: False
+
+fully_train:
+    pipe_step:
+        type: FullyTrainPipeStep
+    trainer:
+        type: Trainer
+        optim:
+            type: MomentumOptimizer
+            params:
+                learning_rate: 0.128
+                momentum: 0.9
+        lr_scheduler:
+            type: MultiStepLrWarmUp
+            params:
+                base_lr: 1.024
+                warmup: True
+                milestones: [30, 60, 80, 90]
+                decay_rates: [1, 0.1, 0.01, 0.001, 1.0e-4]
+        loss:
+            type: CrossEntropyWeightDecay
+            params:
+                cross_entropy: sparse_softmax_cross_entropy
+                weight_decay: !!float 1e-4
+        epochs: 100
+        save_steps: 500
+        distributed: True
+        amp: True
+        loss_scale: 128.0
+        train_in_once: True
+    model:
+        model_desc:
+            modules: [backbone]
+            backbone:
+                name: ResNetVariant
+                base_depth: 50
+                num_classes: 1000
+                base_channel: 64
+#                block_sizes: [5, 5, 5]
+#                block_strides: [1, 2, 2]
+                doublechannel: [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0]
+                downsample:    [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0]
+                data_format: 'channels_first'
+                fp16: False
+#    dataset:
+#        type: Cifar10
+#        common:
+#            data_path: /cache/datasets/cifar-10-batches-bin
+#            batch_size: 64
+#            num_parallel_batches: 64
+#            fp16: False
+    dataset:
+        type: Imagenet
+        common:
+            data_path: /root/datasets/imagenet_tfrecord
+            image_size: 224
+            batch_size: 256
+            fp16: False
+            drop_last: True
+            num_parallel_calls: 8
+            num_parallel_batches: 64

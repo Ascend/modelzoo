@@ -7,12 +7,16 @@
 		- [Bert-base_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Bert-base_for_TensorFlow)
 		- [Mask_R_CNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Mask_R_CNN_for_MindSpore)
 		- [Nezha-large_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Nezha-large_for_TensorFlow)
+		- [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Openpose_for_MindSpore)
 
 	- Official
 		- [AlexNet_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/AlexNet_for_MindSpore)
 		- [AlexNet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/AlexNet_for_TensorFlow)
 		- [Bert-base_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Bert-base_for_MindSpore)
+		- [Cars_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Cars_for_TensorFlow)
+		- [CenterFace_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/CenterFace_for_MindSpore)
 		- [CNN&CTC_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/CNN&CTC_for_MindSpore)
+		- [Darts_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Darts_for_TensorFlow)
 		- [DeepFM_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DeepFM_for_MindSpore)
 		- [DeeplabV3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DeeplabV3_for_TensorFlow)
 		- [DenseNet121_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/DenseNet121_for_MindSpore)
@@ -47,17 +51,21 @@
 		- [YoloV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/YoloV3_for_MindSpore)
 
 	- Research
+		- [DDPG_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DDPG_for_TensorFlow)
 		- [DeepFM_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DeepFM_for_TensorFlow)
 		- [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DeeplabV3_for_MindSpore)
+		- [DQN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DQN_for_TensorFlow)
 		- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/DSCNN_for_MindSpore)
 		- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceAttribute_for_MindSpore)
 		- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceDetection_for_MindSpore)
 		- [FaceQualityAssessment_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceQualityAssessment_for_MindSpore)
+		- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceRecognition_for_MindSpore)
 		- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/FaceRecognitionForTracking_for_MindSpore)
 		- [Music_Genre_Classification_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/Music_Genre_Classification_for_MindSpore)
 		- [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/SSD-Resnet34_for_TensorFlow)
 		- [UNet_Industrial_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/UNet_Industrial_for_TensorFlow)
 		- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/Wide&Deep_for_TensorFlow)
+		- [YOLOv4_Cspdarknet53_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Research/YOLOv4_Cspdarknet53_for_MindSpore)
 
 ## Disclaimers
 

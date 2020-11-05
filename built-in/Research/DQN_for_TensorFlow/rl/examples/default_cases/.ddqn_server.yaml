@@ -1,0 +1,37 @@
+alg_para:
+  alg_name: dqn_pri
+  alg_config: {
+    'prepare_times_per_train': 4,
+    'learning_starts': 1000,
+    'BUFFER_SIZE': 100000,
+    }
+
+env_para:
+  env_name: external_env
+  env_info: {'name': 'server', 'port': 10000}
+
+
+agent_para:
+  agent_name: server_agent
+  agent_num: 1
+  agent_config: {
+    'max_steps': 30,
+  }
+
+
+model_para:
+  actor:
+    model_name: ddq_network
+    state_dim: [128]
+    action_dim: 6
+
+
+model_name: ddqn_server
+env_num: 2
+
+node_config: [["127.0.0.1", "username", "passwd"]]
+#test_node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/train_model/
+test_model_path: ../xt_train_data/train_model/cartpole
+result_path: ../xt_train_data/test_res/cartpole.csv
+
