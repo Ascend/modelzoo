@@ -1,6 +1,6 @@
  **介绍** 
 
-Ascend modelzoo，欢迎各位开发者
+Ascend ModelZoo，欢迎各位开发者
 
  **贡献要求** 
 
