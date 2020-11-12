@@ -1,4 +1,4 @@
-##1、原始模型
+## 1、原始模型
 https://github.com/qubvel/efficientnet, 下载对应的ckpt，转成pb模型
 
 ##2、转om模型
