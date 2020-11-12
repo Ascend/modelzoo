@@ -14,15 +14,15 @@ Ascend modelzoo，欢迎各位开发者
 
  **二、readme** 
 
-- readme用于指导用户理解和部署样例，要包含如下内容：
+readme用于指导用户理解和部署样例，要包含如下内容：
 
-简介：
+- 简介：
 
 1、模型的来源及原理；
 
 2、模型复现的步骤，含训练、eval、在线/离线推理等，入口请封装成.sh、.python；
 
-关键要求：
+- 关键要求：
 
 1、模型的出处、对数据的要求、免责声明等，开源代码文件修改需要增加版权说明；
 
@@ -41,11 +41,12 @@ Ascend modelzoo，欢迎各位开发者
  **四、编程规范** 
 
 - 规范标准
+
 1、C++代码遵循google编程规范：Google C++ Coding Guidelines；单元测测试遵循规范： Googletest Primer。
 
 2、Python代码遵循PEP8规范：Python PEP 8 Coding Style；单元测试遵循规范： pytest
 
- **规范备注**
+- 规范备注
 1、优先使用string类型，避免使用char*；
 
 2、禁止使用printf，一律使用cout；
