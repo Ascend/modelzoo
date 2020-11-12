@@ -4,6 +4,11 @@ https://github.com/qubvel/efficientnet, 下载对应的ckpt，转成pb模型
 ## 2、转om模型
 obs链接：obs://nkxiaolei88/ATC Model/EfficientNet-B8/efficientnet-b8.om
 
+atc转换命令参考：
+```
+/home/HwHiAiUser/Ascend/ascend-toolkit/20.10.0.B023/atc/bin/atc --output_type=FP32 --input_shape="images:1,672,672,3" --check_report=/root/modelzoo/efficientnet-b8/device/network_analysis.report --input_format=NHWC --output="/root/modelzoo/efficientnet-b8/device/efficientnet-b8" --soc_version=Ascend310 --framework=3 --model="/home/HwHiAiUser/Orignal_Model/efficientnet-b8.pb" 
+```
+
 ## 3、将下载的om文件放在model文件夹
 
 ## 4、编译msame推理工具
