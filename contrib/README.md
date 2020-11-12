@@ -2,14 +2,17 @@
 Ascend modelzoo，欢迎各位开发者
 
 贡献要求
+
 开发者提交的模型包括源码、readme、参考模型license文件、测试用例和readme，并遵循以下标准
 
 一、源码
+
 训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++代码，符合第四部分编码规范
 
 参考sample:
 
 二、readme
+
 readme用于指导用户理解和部署样例，要包含如下内容：
 
 简介：
@@ -31,9 +34,11 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接
 
 三、测试用例和测试用例readme
+
 提供模型的测试用例和readme，提交PR需要门禁及模型测试用例通过，精度及性能达成原定目标
 
 四、编程规范
+
 规范标准
 C++代码遵循google编程规范：Google C++ Coding Guidelines；单元测测试遵循规范： Googletest Primer。
 
