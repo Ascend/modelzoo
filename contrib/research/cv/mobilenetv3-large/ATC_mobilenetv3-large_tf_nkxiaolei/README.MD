@@ -41,5 +41,10 @@ python3.7.5 img_preprocess.py ./originnal_pic/
 
 ### 6.3 执行推理和精度计算的shell脚本：
 bash start_inference.sh
+```
+ILSVRC2012_val_00049998.JPEG, inference label:232, gt_label:232
+ILSVRC2012_val_00049999.JPEG, inference label:982, gt_label:982
+ILSVRC2012_val_00050000.JPEG, inference label:355, gt_label:355
+```
 
 50000张Val数据集在NPU上推理的top1精度为：0.755， 论文参考精度值：0.752
