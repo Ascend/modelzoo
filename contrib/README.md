@@ -47,6 +47,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 2、Python代码遵循PEP8规范：Python PEP 8 Coding Style；单元测试遵循规范： pytest
 
 - 规范备注
+
 1、优先使用string类型，避免使用char*；
 
 2、禁止使用printf，一律使用cout；
