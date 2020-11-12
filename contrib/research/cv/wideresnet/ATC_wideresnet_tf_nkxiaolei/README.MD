@@ -1,12 +1,21 @@
-1、原始模型https://github.com/asmith26/wide_resnets_keras, 下载代码和数据集，进行训练。
+## 1、原始模型
+https://github.com/asmith26/wide_resnets_keras, 下载代码和数据集，进行训练。
 
-2、转om模型，obs链接：obs://nkxiaolei88/ATC Model/Wide-Resnet/WRN-28-10.om
+## 2、转om模型
+obs链接：obs://nkxiaolei88/ATC Model/Wide-Resnet/WRN-28-10.om
 
-3、将下载的om文件放在model文件夹
+ATC转换命令:
+```
+/home/HwHiAiUser/Ascend/ascend-toolkit/20.10.0.B023/atc/bin/atc --output_type=FP32 --input_shape="x:1,32,32,3" --check_report=/root/modelzoo/wide_resnet/device/network_analysis.report --input_format=NHWC --output="/root/modelzoo/wide_resnet/device/wide_resnet" --soc_version=Ascend310 --framework=3 --model="/home/HwHiAiUser/Orignal_Model/wide_resnet.pb" 
+```
 
-4、参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+## 3、将下载的om文件放在model文件夹
 
-5、使用msame推理工具，参考如下命令，发起推理性能测试： ./msame --model model/WRN-28-10.om --output output/ --loop 100
+## 4、编译msame推理工具
+参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+
+## 5、性能测试
+使用msame推理工具，参考如下命令，发起推理性能测试： ./msame --model model/WRN-28-10.om --output output/ --loop 100
 
 [INFO] output data success
 
@@ -21,14 +30,14 @@ Inference average time without first time: 3.470899 ms
 
 1Batch，shape:1x32x32x3，不带AIPP，平均推理性能3.47ms
 
-6、精度测试：
+## 6、精度测试：
 使用Cifar10验证集，1万张，分辨率为32x32x3\
 下载数据集：obs://nkxiaolei88/ATC Model/Wide-Resnet/input.tar.gz 至当前目录\
-6.1 解压数据集，已经做好了预处理的图片，并生成为bin文件：
+### 6.1 解压数据集，已经做好了预处理的图片，并生成为bin文件：
 ```
 tar -zxvf input.tar.gz
 ```
-6.2 开始执行精度测试：
+### 6.2 开始执行精度测试：
 ```
 bash start_inference.sh
 ```
