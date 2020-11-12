@@ -40,6 +40,6 @@ python3.7.5 img_preprocess.py ./originnal_pic/
 将生成的bin文件移动至input目录，标签文件val_map.txt放至ground_truth目录
 
 ### 6.3 执行推理和精度计算的shell脚本：
-bash ./start_inference.sh
+bash start_inference.sh
 
 50000张Val数据集在NPU上推理的top1精度为：0.755， 论文参考精度值：0.752
