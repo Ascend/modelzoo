@@ -31,7 +31,7 @@ Inference average time without first time: 0.436374 ms
 精度数据集从训练脚本中的Validation数据集分离得来，25000帧，shape为1*400，标签为对应的情感倾向，\
 使用训练集训练10个epoch得到的模型在GPU上，推理精度为：\
 val_acc: 0.8859\
-在NPU上验证精度：\
+在NPU上验证精度：
 ### 6.1、解压数据集：
 tar -zxvf fasttext_input.tar.gz
 
