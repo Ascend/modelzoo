@@ -2,7 +2,9 @@
 
 In order to facilitate developers to enjoy the benefits of Ascend ModelZoo, we will continue to add typical networks and some of the related pre-trained models. If you have needs for the modelzoo, you can file an issue on [gitee](https://gitee.com/ascend/modelzoo/issues) or [ModelZoo](https://bbs.huaweicloud.com/forum/forum-726-1.html), We will consider it in time.
 
-Before you start,Please read the [notice](https://gitee.com/ascend/modelzoo/blob/master/contrib/README.md)
+## Contributing
+
+Before you start,Please read the [notice](https://gitee.com/ascend/modelzoo/blob/master/contrib/CONTRIBUTING.md)
 
 Thank You!
 
