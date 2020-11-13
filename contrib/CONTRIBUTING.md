@@ -10,7 +10,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++代码，符合第四部分编码规范
 
-2、参考sample:
+2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/Transformer_for_TensorFlow)
 
  **二、readme** 
 
@@ -32,7 +32,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 4、精度和性能达成要求：尽量达到原始模型水平；
 
-5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接
+5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
  **三、测试用例和测试用例readme** 
 
