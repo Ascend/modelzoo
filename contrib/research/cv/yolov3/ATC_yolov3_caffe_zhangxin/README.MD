@@ -41,5 +41,5 @@ Batch: 1, shape: 416* 416 *3 ，带AIPP，平均推理性能12.10ms
 
 推理效果
 
-![1605264176806](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\1605264176806.png)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/160411_c5731771_8113712.jpeg "yolo-caffe.jpg")
 
