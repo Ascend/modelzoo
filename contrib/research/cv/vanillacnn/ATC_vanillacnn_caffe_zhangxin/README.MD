@@ -42,6 +42,4 @@ Batch: 4, shape: 3 * 40 * 40，不带AIPP，平均推理性能0.52ms
 
 推理效果
 
-
-
-![e269decb-5f25-4d8c-e4df-3fb98da9d306](C:\Users\83395\Desktop\e269decb-5f25-4d8c-e4df-3fb98da9d306.jpg)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/160149_83c721c6_8113712.jpeg "e269decb-5f25-4d8c-e4df-3fb98da9d306.jpg")
