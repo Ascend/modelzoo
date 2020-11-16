@@ -43,4 +43,4 @@ Batch: 1, shape: 352 * 640 * 3，带AIPP，平均推理性能4.54ms
 
 推理效果
 
-![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml3032\wps4.jpg)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/155650_fce340f7_8113712.png "图片3.png")
