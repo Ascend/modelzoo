@@ -43,6 +43,4 @@ Batch: 1, shape: 3 * 300 * 300，不带AIPP，平均推理性能 24.96ms
 
 推理效果
 
-
-
-![img](file:///C:\Users\ADMINI~1\AppData\Local\Temp\ksohtml3032\wps2.jpg)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/160255_32f676b5_8113712.png "图片4.png")
