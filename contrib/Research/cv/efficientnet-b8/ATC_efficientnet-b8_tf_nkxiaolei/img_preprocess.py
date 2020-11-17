@@ -2,6 +2,7 @@ import os
 import cv2
 import numpy as np
 import sys
+import argparse
 
 def resize_with_aspectratio(img, out_height, out_width, scale=87.5, inter_pol=cv2.INTER_LINEAR):
     height, width = img.shape[:2]
@@ -46,11 +47,19 @@ def pre_process_img(img, dims=None, precision="fp32"):
     return img
 
 if __name__ == "__main__":
-    src_path = sys.argv[1]
-    dst_path = sys.argv[2]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--src_path", default="./datasets/imagenet_10", help="path of original pictures")
+    parser.add_argument("--dst_path", default="./input", help="path of output bin files")
+    parser.add_argument("--pic_num", default=-1, help="picture number")
+    args = parser.parse_args()
+
+    src_path = args.src_path
+    dst_path = args.dst_path
+    pic_num  = args.pic_num
     files = os.listdir(src_path)
     files.sort()
     img_zise = '672,672,3'
+    n = 0
     image_size = list(map(int, img_zise.split(",")))
     for file in files:
         if file.endswith('.JPEG'):
@@ -59,3 +68,6 @@ if __name__ == "__main__":
             img_org = cv2.imread(src)
             res = pre_process_img(img_org,dims=image_size,precision ='fp32')
             res.tofile(dst_path+"/" + file+".bin")
+            n += 1
+            if int(pic_num) == n:
+                break
