@@ -17,4 +17,4 @@ rm -rf $output/*
 #top1 accuarcy
 python3.7.5 accuarcy_top1.py $output $label
 
-echo "Run testcase failed!"
+echo "Run testcase success!"
