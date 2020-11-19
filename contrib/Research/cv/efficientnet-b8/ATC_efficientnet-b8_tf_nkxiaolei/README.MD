@@ -35,9 +35,9 @@ Inference average time without first time: 139.011384 ms
 ### 6.2 预处理
 
 下载好的数据集JPEG图片放在任意其他目录(以originnal_pic为例)，执行预处理脚本生成bin文件：
-
-python3.7.5 img_preprocess.py ./originnal_pic/ ./input/
-
+```
+python3.7.5 img_preprocess.py --src_path=$originnal_pic --dst_path=$input
+```
 将生成的bin文件移动至input目录，标签文件val_map.txt放至ground_truth目录
 
 ### 6.3 执行推理和精度计算
