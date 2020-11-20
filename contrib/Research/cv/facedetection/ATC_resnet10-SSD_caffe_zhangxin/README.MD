@@ -41,7 +41,4 @@ Batch: 1, shape: 1 * 300 * 304，带AIPP，平均推理性能10.47ms
 
 推理效果
 
-
-
- ![img](C:/Users/83395/AppData/Roaming/WeLink/UserData//tixuan@da22f5115b0_c20663722d087bb57d8cc2f8c180d159/ReceiveFiles/originalImgfiles/08281691-0233-4419-f611-2cf65624d5d8.png) 
-
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/154908_240491cd_8113712.png "08281691-0233-4419-f611-2cf65624d5d8.png")

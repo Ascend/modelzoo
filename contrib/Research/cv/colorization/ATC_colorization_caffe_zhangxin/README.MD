@@ -41,6 +41,5 @@ Batch: 1, shape: 1 * 224 * 224，不带AIPP，平均推理性能10.21ms
 
 推理效果
 
-![图片1](C:\Users\Administrator\Desktop\图片1.png)
-
-![图片2](C:\Users\Administrator\Desktop\图片2.png)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/154713_d1cf11df_8113712.png "图片1.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/154747_583198c2_8113712.png "图片2.png")

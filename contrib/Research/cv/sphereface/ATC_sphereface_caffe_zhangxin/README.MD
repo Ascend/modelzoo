@@ -42,11 +42,7 @@ Batch: 8, shape: 112 * 96 * 3，带AIPP，平均推理性能7.69ms
 
 推理效果
 
- ![img](C:/Users/83395/AppData/Roaming/WeLink/UserData//tixuan@da22f5115b0_c20663722d087bb57d8cc2f8c180d159/ReceiveFiles/originalImgfiles/743d6e37-a426-4a30-cf19-41b1fdc20acc.png) 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/155901_c524d075_8113712.png "2.png")
 
-
-
-
-
- ![img](C:/Users/83395/AppData/Roaming/WeLink/UserData//tixuan@da22f5115b0_c20663722d087bb57d8cc2f8c180d159/ReceiveFiles/originalImgfiles/e30ed70a-b433-4dcb-c9b9-371808c8c689.png) 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/155916_32ff2587_8113712.png "1.PNG")
 
