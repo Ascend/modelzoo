@@ -12,7 +12,7 @@ atc转换命令参考：
 ## 3、将下载的om文件放在model文件夹
 
 ## 4、编译msame推理工具
-参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+参考https://gitee.com/ascend/tools/tree/ccl/msame, 编译出msame推理工具
 
 ## 5、性能测试
 使用msame推理工具，参考如下命令，发起推理性能测试： 
@@ -27,12 +27,23 @@ Inference average time without first time: 139.011384 ms
 ```
 1Batch，shape:1x672x672x3，不带AIPP，平均推理性能139ms
 
-## 6、精度测试：
+## 6、精度&性能自测试用例
+```
+bash offline_inference_testcase.sh
+```
+100张图片测试结果：
+```
+Average inference time is 138.10 ms, expect time is <145.00 ms
+Top1 accuarcy is 0.87, expect top1 is >0.86
+Run testcase success!
+```
 
-### 6.1 下载ImageNet 2012 val数据集
+## 7、全量数据集精度测试：
+
+### 7.1 下载ImageNet 2012 val数据集
 链接： http://www.image-net.org/download-images
 
-### 6.2 预处理
+### 7.2 预处理
 
 下载好的数据集JPEG图片放在任意其他目录(以originnal_pic为例)，执行预处理脚本生成bin文件：
 ```
@@ -40,7 +51,7 @@ python3.7.5 img_preprocess.py --src_path=$originnal_pic --dst_path=$input
 ```
 将生成的bin文件移动至input目录，标签文件val_map.txt放至ground_truth目录
 
-### 6.3 执行推理和精度计算
+### 7.3 执行推理和精度计算
 执行shell脚本： ./start_inference.sh
 ```
 ILSVRC2012_val_00049998.JPEG, inference label:232, gt_label:232
