@@ -34,7 +34,7 @@ if __name__ =="__main__":
     if avg_time < expect_time and top1 > expect_top1:
         print('Run testcase success!')
     else:
-        print('Run testcase failed!')
+        print('Run testcase failed!') 
 
 
 
