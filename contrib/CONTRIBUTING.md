@@ -34,9 +34,34 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
- **三、测试用例和测试用例readme** 
+ **三、自测试用例** 
 
-提供模型的测试用例和readme，提交PR需要门禁及模型测试用例通过，精度及性能达成原定目标
+提供模型的自测试用例和readme，提交PR需要门禁及模型测试用例通过，性能和精度检查通过
+
+- 简介：
+
+1、不同于完整的训练过程和全量数据集的推理，自测试用例的目的是验证提交代码基本功能可用，执行时长控制在10min之内；
+
+2、提交PR中训练用例入口train_testcase.sh, 在线推理用例入口online_inference_testcase.sh, 离线推理用例入口offline_inference_testcase.sh；
+
+3、提交PR后，会自动触发门禁流水，后台会根据用例入口shell，自动将代码分发到对应执行环境；
+
+4、Jekins预置账号：global_read/huawei@123，登录之后，可以查看到用例执行日志
+
+- 关键要求：
+
+1、自测试用例命名严格按照上述简介2要求来书写；
+
+2、用例应当包含精度（Loss值）、性能检查，检查通过打印"Run testcase success!"，失败则打印"Run testcase failed!"；
+
+3、执行环境已预装软件包和Python3.7.5环境，调用命令"python3"、"python3.7"、"python3.7.5"均可，安装第三方库依赖使用"pip3"、"pip3.7"均可；
+
+4、数据集和模型：小于500M的文件，建议使用obsutil命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前帮忙下载到执行环境上；
+
+5、环境和其他问题，请提交Issue跟踪；
+
+6、测试代码开发参考：
+[sample](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **四、编程规范** 
 
