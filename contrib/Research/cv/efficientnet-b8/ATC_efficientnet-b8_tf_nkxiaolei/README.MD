@@ -28,26 +28,17 @@ Inference average time without first time: 139.011384 ms
 1Batch，shape:1x672x672x3，不带AIPP，平均推理性能139ms
 
 ## 6、精度&性能自测试用例
-自测试使用Imagnet2012 Val中前100张图片来验证性能和精度，在test.py中调用subprocess.Popen发送shell命令来执行推理和后处理，\
+自测试使用Imagnet2012 Val中前100张图片来验证性能和精度，\
 然后根据获取到的回显来解析出平均推理时间和精度，判断用例是否通过
-```
-    expect_time = 145
-    expect_top1 = 0.86
-    print("Average inference time is %.2f ms, expect time is <%.2f ms"%(avg_time,expect_time))
-    print("Top1 accuarcy is %.2f, expect top1 is >%.2f"%(top1,expect_top1))
-    if avg_time < expect_time and top1 > expect_top1:
-        print('Run testcase success!')
-    else:
-        print('Run testcase failed!')
-```
+
 执行入口：
 ```
 bash offline_inference_testcase.sh
 ```
 100张图片测试结果：
 ```
-Average inference time is 138.10 ms, expect time is <145.00 ms
-Top1 accuarcy is 0.87, expect top1 is >0.86
+Average inference time is 138.61 ms, expect time is <145 ms
+Top1 accuarcy is 0.8700, expect top1 is >0.86
 Run testcase success!
 ```
 
