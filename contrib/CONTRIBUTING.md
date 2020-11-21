@@ -62,7 +62,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 6、测试用例开发参考：
 [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
-   [训练](https://gitee.com/alexcheng88/modelzoo/tree/master/built-in/Official/Transformer_for_TensorFlow)
+[训练](https://gitee.com/alexcheng88/modelzoo/tree/master/built-in/Official/Transformer_for_TensorFlow)
 
  **四、编程规范** 
 
