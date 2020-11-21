@@ -61,7 +61,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试代码开发参考：
-[sample](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
+[离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **四、编程规范** 
 
