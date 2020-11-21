@@ -71,7 +71,7 @@ python3 -m noahnmt.bin.train \
     params:
       max_length: 128
       files: $TRAIN_FILES" \
-  --train_steps=300000 \
+  --train_steps=1000 \
   --schedule=train \
   --eval_every_n_steps=5000 \
   --eval_run_autoregressive=False \
@@ -84,5 +84,19 @@ python3 -m noahnmt.bin.train \
   --data_parallelism=False \
   --dp_param_shard=False \
   --enable_graph_rewriter=False \
-  --model_dir=$MODEL_DIR --use_fp16=True
+  --model_dir=$MODEL_DIR --use_fp16=True >train.log
+#此处自测试用例只执行1000个step，保存打印信息至train.log
 
+#结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
+throughput=`grep "ThroughOutput" train.log | awk '{print $7}'`
+loss=`grep "Loss:" train.log | awk '{print $7}'`
+
+expect_throughput=145000
+expect_loss=0.86
+echo "Average throughput is $throughput fps, expect throughput is >$expect_throughput fps"
+echo "Loss is $loss, expect loss is <$expect_loss"
+if [[ $loss < $expect_loss ]] && [[ $throughput > $expect_throughput ]] ;then
+   echo "Run testcase success!"
+else
+   echo "Run testcase failed!"
+fi
