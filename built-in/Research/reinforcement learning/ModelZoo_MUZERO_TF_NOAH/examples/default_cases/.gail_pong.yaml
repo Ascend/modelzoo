@@ -1,0 +1,48 @@
+alg_para:
+  alg_name: gail
+  alg_config: {
+    'alg_name': 'ppo',
+    'async_flag': False,
+    'expert_data': '../../../minerl/rl/XT_TrainData/test_model/impala_pong/pong.h5'
+    }
+
+env_para:
+  env_name: atari_env
+  env_info: { 'name': PongNoFrameskip-v4, 'vision': False}
+
+agent_para:
+  agent_name: atari_ppo
+  agent_num : 1
+  agent_config: {
+    'max_steps': 128,
+    }
+
+model_para:
+  actor:
+    model_name: actor_critic_ppo_cnn
+    state_dim: [84,84,4]
+    action_dim: 6
+  gail:
+    model_name: gail_network_cnn
+    state_dim: [[84,84,4], [6], [84,84,4], [6]]
+    action_dim: 1
+
+model_name: pong_gail_0515
+env_num: 10
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+test_model_path: ../xt_train_data/train_model/pong_ppo_0515
+result_path: ../xt_train_data/test_res/pong_ppo_0515_1.csv
+
+benchmark:
+  start: False
+  id: xt_pong_ppo_benchmark
+  db:
+    type: mongo
+    ip: 127.0.0.1
+    port: 27017
+    user: user
+    passwd: passwd
+  eval:
+    gap: 20
+    max_step_per_episode: 2000
