@@ -1,0 +1,38 @@
+alg_para:
+  alg_name: PPOShareWeights
+  async_flag: False
+  alg_config:
+    train_freq: 10
+
+env_para:
+  env_name: MaEnvFigure8
+  env_info: { 'name': mafigure8, 'vision': False}
+
+agent_para:
+  agent_name: Figure8Ppo
+  agent_num : 10
+  agent_config: {
+    'max_steps': 1000,
+    'complete_step': 1000000
+    }
+
+model_para:
+  actor:
+    model_name: ActorCriticPPO
+    state_dim: [6]
+    action_dim: 3
+    summary: True
+
+model_name: figure_8
+env_num: 1
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+# test_node_config: [["127.0.0.1", "username", "passwd"],]
+# test_model_path: /home/ModelZoo_PPO_TF_NOAH/rl/ppo_figure/xt_ma_figure8+20200511155808/models/
+
+benchmark:
+  id: xt_ma_figure8
+  archive_root: ./ppo_figure8
+  eval:
+    gap: 20
+    max_step_per_episode: 1000

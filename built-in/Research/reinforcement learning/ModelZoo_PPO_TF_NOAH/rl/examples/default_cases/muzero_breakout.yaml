@@ -1,0 +1,45 @@
+alg_para:
+  alg_name: MuzeroNew
+  alg_config: {
+    "train_per_checkpoint": 100,
+    "prepare_times_per_train": -1,
+    'BUFFER_SIZE': 10000,
+    }
+
+env_para:
+  env_name: AtariEnv
+  env_info: { 'name': BreakoutNoFrameskip-v4, vision': False}
+
+agent_para:
+  agent_name: MuzeroPongNew
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200 ,
+    'complete_step': 500000000,
+    'NUM_SIMULATIONS': 50
+    }
+
+model_para:
+  actor:
+    model_name: MuzeroBreakout
+    state_dim: [84, 84, 4]
+    action_dim: 4
+    # init_weights: /home/code/B110/muzero_mspacman/rl/bm_archive/muzero_mspacman+20200914173535/models/actor_46649.h5
+    # init_weights: /home/code/B110/muzero_mspacman/rl/bm_archive/muzero_mspacman+20200921163047/models/actor_00660.h5
+    max_to_keep: 500
+
+env_num: 120
+node_config: [
+              ["127.0.0.1", "username", "passwd"],
+              # ["10.113.215.14", "jack", "123456"],
+              ]
+remote_env:
+  conda: /home/jack/anaconda2/envs/RL
+  env: {}
+
+benchmark:
+  id: muzero_breakout
+  archive_root: ./bm_archive
+  eval:
+    gap: 100
+    max_step_per_episode: 2000

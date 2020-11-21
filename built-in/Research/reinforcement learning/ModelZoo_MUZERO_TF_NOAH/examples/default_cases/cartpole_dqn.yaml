@@ -1,0 +1,39 @@
+alg_para:
+  alg_name: DQN
+  alg_config: {
+    'prepare_times_per_train': 4,
+    'learning_starts': 100,  # 10000
+    #'BUFFER_SIZE': 10000,
+    }
+
+env_para:
+  env_name: GymEnv
+  env_info: { 'name': CartPole-v0, 'vision': False}
+
+agent_para:
+  agent_name: CartpoleDqn
+  agent_num : 1
+  agent_config: {
+    'max_steps': 2000 ,
+    'complete_step': 100000
+    }
+
+model_para:
+  actor:
+    model_name: DqCriticNetworkQ
+    state_dim: [4]
+    action_dim: 2
+#    model_format: pb
+
+
+model_name: cartpole
+env_num: 1
+
+node_config: [["127.0.0.1", "username", "passwd"]]
+#test_node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/train_model/
+test_model_path: ../xt_train_data/train_model/cartpole
+result_path: ../xt_train_data/test_res/cartpole.csv
+#benchmark:
+#  start: True
+#  id: xt_default_benchmark

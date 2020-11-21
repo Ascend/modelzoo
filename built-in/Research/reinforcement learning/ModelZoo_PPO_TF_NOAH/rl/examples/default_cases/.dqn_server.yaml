@@ -1,0 +1,39 @@
+alg_para:
+  alg_name: dqn
+  alg_config: {
+    'prepare_times_per_train': 4,
+    'learning_starts': 100,  # 10000
+    #'BUFFER_SIZE': 10000,
+    }
+
+env_para:
+  env_name: digital_sky
+  env_info: {'name': 'server', 'port': 10000}
+
+agent_para:
+  agent_name: cartpole
+  agent_num : 1
+  agent_config: {
+    'max_steps': 30,
+    #'complete_step': 100000
+  }
+
+model_para:
+  actor:
+    model_name: critic_network_q
+    state_dim: [244]
+    action_dim: 9
+
+
+model_name: dqn_server
+env_num: 1
+
+node_config: [["127.0.0.1", "username", "passwd"]]
+#node_config: [["10.155.169.95", noahrl, noah]]
+#test_node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/train_model/
+test_model_path: ../xt_train_data/train_model/cartpole
+result_path: ../xt_train_data/test_res/cartpole.csv
+#benchmark:
+#  start: True
+#  id: xt_default_benchmark

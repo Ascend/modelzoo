@@ -1,0 +1,28 @@
+alg_para:
+  alg_name: DDQN
+
+env_para:
+  env_name: RlEnvSimu
+  env_info: { 'name': cavityfilter_discrete, 'vision': False,  'config': None}
+
+
+agent_para:
+  agent_name: CavityFilter
+  agent_num : 1
+  agent_config: {
+    'max_steps': 2000 ,
+    'complete_step': 100000
+  }
+
+model_para:
+  actor:
+    model_name: DdqNetwork
+    state_dim: [401]
+    action_dim: 10
+
+
+model_name: ddq_network
+env_num: 1
+node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/train_model/ddq_network
+result_path: ../xt_train_data/test_res/overtake_torcs.csv

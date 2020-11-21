@@ -1,0 +1,41 @@
+alg_para:
+  alg_name: Muzero
+  alg_config: {
+    "train_per_checkpoint": 1,
+    "prepare_times_per_train": 1,
+    "TD_STEP": 200,
+    }
+
+env_para:
+  env_name: GymEnv
+  env_info: { 'name': MountainCar-v0, 'vision': False}
+
+agent_para:
+  agent_name: Muzero
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200 ,
+    'complete_step': 50000000
+    }
+
+model_para:
+  actor:
+    model_name: MuzeroModel
+    state_dim: [2]
+    action_dim: 3
+    # init_weights: /home/xt/B100/muzero/rl/bm_archive/muzero_mountaincar+20200724094400/models/actor_11013.h5
+    # init_weights: /home/xt/B100/muzero/rl/bm_archive/muzero_mountaincar+20200723203346/models/actor_167931.h5
+env_num: 20
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+
+remote_env:
+  conda: /home/jack/anaconda2/envs/RL
+  env: {}
+
+benchmark:
+  id: muzero_mountaincar
+  archive_root: ./bm_archive
+  eval:
+    gap: 100
+    max_step_per_episode: 2000
