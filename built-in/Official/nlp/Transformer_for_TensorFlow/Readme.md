@@ -31,8 +31,8 @@ This example implements training and evaluation of Transformer Model, which is i
   		└─transformer_main_p2.sh
   	├─...
   ├─noahnmt
-  	├─bin
-    	├─train.py
+    ├─bin
+        ├─train.py
     	├─infer.py
     	└─...
     ├─data
