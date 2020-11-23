@@ -6,7 +6,7 @@ export DEVICE_ID=2
 export RANK_ID=0
 export RANK_SIZE=1
 
-python3 -m noahnmt.bin.infer \
+python3.7 -m noahnmt.bin.infer \
   --tasks="
     - class: decode_text
       params:
