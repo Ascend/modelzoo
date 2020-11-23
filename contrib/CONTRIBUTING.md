@@ -12,7 +12,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
 
-3、代码提交目录应遵守：modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID
+3、代码提交目录应遵守："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"
 
  **二、readme** 
 
