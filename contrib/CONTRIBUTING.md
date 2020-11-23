@@ -60,7 +60,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 4、数据集和模型：小于500M的文件，建议使用obsutil命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前下载到执行环境上,
 
-已预置数据集&python第三方库: [Environments](https://gitee.com/master/contrib/ENVIRONMENTS.md)
+已预置数据集&python第三方库: [Environments](https://gitee.com/ascend/modelzoo/blob/master/contrib/ENVIRONMENTS.md)
 
 5、环境和其他问题，请提交Issue跟踪；
 
