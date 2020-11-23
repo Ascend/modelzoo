@@ -12,6 +12,8 @@ Ascend ModelZoo，欢迎各位开发者
 
 2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
 
+3、代码提交目录应遵守：modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID
+
  **二、readme** 
 
 readme用于指导用户理解和部署样例，要包含如下内容：
@@ -58,7 +60,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 4、数据集和模型：小于500M的文件，建议使用obsutil命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前下载到执行环境上,
 
-已预置数据集&python第三方库: [数据集&第三方库](https://gitee.com/master/contrib/ENVIRONMENTS.md)
+已预置数据集&python第三方库: [Environments](https://gitee.com/master/contrib/ENVIRONMENTS.md)
 
 5、环境和其他问题，请提交Issue跟踪；
 
