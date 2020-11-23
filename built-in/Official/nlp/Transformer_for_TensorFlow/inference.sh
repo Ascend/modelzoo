@@ -1,6 +1,10 @@
 DATA_PATH="../wmt-ende"
 TEST_SOURCES="${DATA_PATH}/tfrecord/newstest2014.l128.tfrecord"
 MODEL_DIR="/home/chujun//transformer_p1/model_dir_0608"
+export JOB_ID=10086
+export DEVICE_ID=2
+export RANK_ID=0
+export RANK_SIZE=1
 
 python3 -m noahnmt.bin.infer \
   --tasks="
