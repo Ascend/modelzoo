@@ -10,7 +10,7 @@ label="ground_truth/val_map.txt"
 #obsutil cp obs://obsxxx/xxx/xxx.om ./model/ -f -r
 
 #testcase主体，开发者根据不同模型写作
-#怕热process
+#preprocess
 python3.7.5 img_preprocess.py --src_path=$originnal_pic --dst_path=$input --pic_num=100
 #start inference
 ./msame --model $model --input $input --output $output 2>&1 |tee inference.log
