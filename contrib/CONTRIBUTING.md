@@ -12,7 +12,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
 
-3、代码提交目录应遵守："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"
+3、贡献者模型代码目录规则："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
 
  **二、readme** 
 
@@ -52,7 +52,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 - 关键要求：
 
-1、自测试用例命名严格按照上述简介2要求来书写；
+1、自测试用例命名严格按照上述简介2要求来书写，否则门禁会校验失败；
 
 2、用例应当包含精度（Loss值）、性能检查，检查通过打印"Run testcase success!"，失败则打印"Run testcase failed!"；
 
@@ -65,8 +65,8 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试用例开发参考：
-[离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
+[离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **四、PR提交**
 
@@ -74,7 +74,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 1、请将modelzoo仓fork到个人分支,基于个人分支新增、修改和提交PR；
 
-2、PR标题：众筹活动，请在标题注明[线上众筹]；高校众筹，请注明[xxx学校][高校众筹]；
+2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 
  **五、编程规范** 
 
