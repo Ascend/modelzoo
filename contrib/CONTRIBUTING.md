@@ -40,7 +40,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 - 简介：
 
-1、不同于完整的训练过程和全量数据集的推理，自测试用例的目的是验证提交代码基本功能可用，执行时长控制在10min之内；
+1、不同于完整的训练过程和全量数据集的推理，自测试用例的目的是验证提交代码基本功能可用，执行时长控制在10min之内(推理或训练只需执行有限的图片或step)；
 
 2、提交PR中训练用例入口train_testcase.sh, 在线推理用例入口online_inference_testcase.sh, 离线推理用例入口offline_inference_testcase.sh；
 
@@ -61,7 +61,8 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试用例开发参考：
-[sample](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
+[离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
+[训练](https://gitee.com/alexcheng88/modelzoo/tree/master/built-in/Official/Transformer_for_TensorFlow)
 
  **四、编程规范** 
 
