@@ -6,7 +6,7 @@ input="input/"
 output="output/"
 label="ground_truth/val_map.txt"
 
-#开发个人独立预置的数据集、预训练模型、ATC-OM模型等，支持从OBS仓下载
+#开发者个人独立预置的数据集、预训练模型、ATC-OM模型等，支持从OBS仓下载
 #obsutil cp obs://obsxxx/xxx/xxx.om ./model/ -f -r
 
 #testcase主体，开发者根据不同模型写作
