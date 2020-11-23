@@ -56,8 +56,9 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 3、执行环境已预装软件包和Python3.7.5环境，调用命令"python3"、"python3.7"、"python3.7.5"均可，安装第三方库依赖使用"pip3"、"pip3.7"均可；
 
-4、数据集和模型：小于500M的文件，建议使用obsutil命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前帮忙下载到执行环境上；\
-已预置数据集&python第三方库 [数据集&第三方库](https://gitee.com/master/contrib/ENVIRONMENTS.md)
+4、数据集和模型：小于500M的文件，建议使用obsutil命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前下载到执行环境上,
+
+已预置数据集&python第三方库: [数据集&第三方库](https://gitee.com/master/contrib/ENVIRONMENTS.md)
 
 5、环境和其他问题，请提交Issue跟踪；
 
