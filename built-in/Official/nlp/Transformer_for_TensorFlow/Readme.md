@@ -107,7 +107,7 @@ This example implements training and evaluation of Transformer Model, which is i
     ```
 
 ## Running the example
-
+modify the permission of the script to 	be run in the file
 ### Training
 - Set basic configs in `configs/transformer_big.yml`, including model_params, learning rate and network hyperparameters. 
 
