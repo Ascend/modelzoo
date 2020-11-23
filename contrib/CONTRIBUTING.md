@@ -22,7 +22,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 1、模型的来源及原理；
 
-2、模型复现的步骤，含训练、eval、在线/离线推理等，入口请封装成.sh、.python；
+2、模型复现的步骤，含训练、eval、在线/离线推理等，入口请封装成.sh、.py；
 
 - 关键要求：
 
@@ -68,7 +68,15 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
 
- **四、编程规范** 
+ **四、PR提交**
+
+- 关键要求：
+
+1、请将modelzoo仓fork到个人分支,基于个人分支新增、修改和提交PR；
+
+2、PR标题：众筹活动，请在标题注明[线上众筹]；高校众筹，请注明[xxx学校][高校众筹]；
+
+ **五、编程规范** 
 
 - 规范标准
 
