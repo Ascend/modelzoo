@@ -1,6 +1,6 @@
 #! /bin/bash
 #Ascend社区已预置的数据集、预训练模型、ATC-OM模型等
-originnal_pic=$ILSVRC2012_VAL
+originnal_pic=$ImageNet2012_val
 model="$OBS_BUCKET/nkxiaolei/EfficientNet-B8/efficientnet-b8.om"
 input="input/"
 output="output/"
