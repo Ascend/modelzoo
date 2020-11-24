@@ -74,6 +74,11 @@ Thank You!
 		- [UNet_Industrial_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_segmentation/UNet_Industrial_for_TensorFlow)
 		- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/Wide&Deep_for_TensorFlow)
 		- [YOLOv4_Cspdarknet53_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Research/cv/detection/YOLOv4_Cspdarknet53_for_MindSpore)
+                - [WaveGlow_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/ModelZoo_WaveGlow_TensorFlow)
+                - [Yuefu_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/nlp/ModelZoo_Yuefu_TensorFlow)
+                - [MUZERO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/ModelZoo_MUZERO_TensorFlow)
+                - [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/ModelZoo_PPO_TensorFlow)
+                - [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/ModelZoo_QMIX_TensorFlow)
 
 ## Disclaimers
 
