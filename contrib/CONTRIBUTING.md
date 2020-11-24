@@ -65,7 +65,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试用例开发参考：
-[训练](https://gitee.com/ascend/modelzoo/tree/master/TensorFlow/built-in/Official/nlp/Transformer_for_TensorFlow)
+[训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **四、PR提交**
