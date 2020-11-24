@@ -16,6 +16,7 @@ Thank You!
 		- [Nezha-large_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Nezha-large_for_TensorFlow)
 		
 	- Official
+
                 - [Mask_R_CNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Mask_R_CNN_for_MindSpore)
                 - [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Openpose_for_MindSpore)
 		- [AlexNet_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/image_classification/AlexNet_for_MindSpore)
