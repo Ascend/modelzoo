@@ -12,7 +12,7 @@ Thank You!
 
 - Models
 	- Benchmark
-		- [Bert-base_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Bert-base_for_TensorFlow)
+		- [Bert-base_for_TensorFlow](https://gitee.com/hantao_kobe/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Bert-base_for_TensorFlow/00-access)
 		- [Mask_R_CNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Mask_R_CNN_for_MindSpore)
 		- [Nezha-large_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Nezha-large_for_TensorFlow)
 		- [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Benchmark/Openpose_for_MindSpore)
