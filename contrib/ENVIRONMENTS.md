@@ -11,7 +11,7 @@ Shell脚本中，访问时用提供变量即可
 | CV  | ImageNet2012_val | $ImageNet2012_val |
 | CV  | CIFAR10      | $CIFAR10      |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
-| NLP | wmt-ende     | $WMT_END      |
+| NLP | WMT_ENDE     | $WMT_ENDE      |
 |     |              |               |
 
 持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址
