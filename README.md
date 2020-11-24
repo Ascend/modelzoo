@@ -55,8 +55,9 @@ Thank You!
 		- [Wide_Deep_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/recommendation/Wide_Deep_for_MindSpore)
 		- [YOLOv3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/YoloV3_for_TensorFlow)
 		- [YoloV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/YoloV3_for_MindSpore)
-                - [Mask_R_CNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Mask_R_CNN_for_MindSpore)
+                - [Mask_R_CNN_for_MindSpore]https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Mask_R_CNN_for_MindSpore)
                 - [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Openpose_for_MindSpore)
+ 
 	- Research
 		- [DDPG_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/DDPG_for_TensorFlow)
 		- [DeepFM_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/DeepFM_for_TensorFlow)
