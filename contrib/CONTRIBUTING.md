@@ -10,7 +10,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++代码，符合第四部分编码规范
 
-2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
+2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 
 3、贡献者模型代码目录规则："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
 
@@ -65,7 +65,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试用例开发参考：
-[训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/Official/nlp/Transformer_for_TensorFlow)
+[训练](https://gitee.com/ascend/modelzoo/tree/master/TensorFlow/built-in/Official/nlp/Transformer_for_TensorFlow)
 [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **四、PR提交**
