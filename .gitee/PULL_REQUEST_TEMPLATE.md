@@ -1,6 +1,6 @@
 <!--  Thanks for sending a pull request!  Here are some tips for you:
 
-If this is your first time, please read our contributor guidelines: https://gitee.com/mindspore/mindspore/blob/master/CONTRIBUTING.md
+If this is your first time, please read our contributor guidelines: https://gitee.com/ascend/modelzoo/blob/master/contrib/CONTRIBUTING.md
 -->
 
 **What type of PR is this?**
