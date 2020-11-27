@@ -60,6 +60,7 @@ wrapt                 1.12.1
 zipp                  3.4.0
 ```
  **三、从个人的OBS桶中下载**
+
 如果需要的文件大小<500M，可以使用obsutil命令下载：
 ```
 obsutil cp obs://obsxxx/xxx/xxx.pb ./model/ -f -r
