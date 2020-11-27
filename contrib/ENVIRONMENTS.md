@@ -12,7 +12,7 @@ Shell脚本中，访问时用提供变量即可
 | CV  | CIFAR10      | $CIFAR10      |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
 | NLP | WMT_ENDE     | $WMT_ENDE      |
-|     |              |               |
+| NLP | SQUADV2      | $SQUADV2       |
 
 持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址
 
