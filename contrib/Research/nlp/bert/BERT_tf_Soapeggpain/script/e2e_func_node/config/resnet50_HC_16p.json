@@ -1,0 +1,13 @@
+{
+"status": "completed",
+"group_count": "1",
+"group_list": [
+{
+    "group_name": "training",
+    "device_count": "16",
+    "instance_count": "2",
+    "instance_list": [{"pod_name":"cloud-10.143.126.66-20200529095641-0","server_id":"10.143.126.66","devices":[{"device_id":"0","device_ip":"192.168.10.102"},{"device_id":"1","device_ip":"192.168.20.102"},{"device_id":"2","device_ip":"192.168.30.102"},{"device_id":"3","device_ip":"192.168.40.102"},{"device_id":"4","device_ip":"192.168.10.202"},{"device_id":"5","device_ip":"192.168.20.202"},{"device_id":"6","device_ip":"192.168.30.202"},{"device_id":"7","device_ip":"192.168.40.202"}]},{"pod_name":"cloud-10.143.126.68-20200529095641-1","server_id":"10.143.126.68","devices":[{"device_id":"0","device_ip":"192.168.10.101"},{"device_id":"1","device_ip":"192.168.20.101"},{"device_id":"2","device_ip":"192.168.30.101"},{"device_id":"3","device_ip":"192.168.40.101"},{"device_id":"4","device_ip":"192.168.10.201"},{"device_id":"5","device_ip":"192.168.20.201"},{"device_id":"6","device_ip":"192.168.30.201"},{"device_id":"7","device_ip":"192.168.40.201"}]}]
+}
+]
+}
+
