@@ -7,14 +7,14 @@ Shell脚本中，访问时用提供变量即可
 
 | 领域  | 数据集名称        | 访问变量            |
 |-----|--------------|---------------|
-| CV  | ImageNet2012_train | $ImageNet2012_train |
-| CV  | ImageNet2012_val | $ImageNet2012_val |
+| CV  | IMG12_train | $IMG12_train |
+| CV  | IMG12_val | $IMG12_val |
 | CV  | CIFAR10      | $CIFAR10      |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
 | NLP | WMT_ENDE     | $WMT_ENDE      |
 | NLP | SQUADV2      | $SQUADV2       |
 
-持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址
+持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址，数据集仅
 
  **二、Python第三方库** 
 
