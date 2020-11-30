@@ -79,13 +79,47 @@ cd modelzoo_vgg16_TF
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset
+1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
+### check json
+Check whether there is a JSON configuration file "8P_rank_table.json" for 8 Card IP in the scripts/ directory.
+The content of the 8p configuration file:
+
+```
+{
+	"group_count": "1",
+	"group_list": [
+		{
+			"group_name": "worker",
+			"device_count": "8",
+			"instance_count": "1",
+			"instance_list": [
+				{
+					"devices":[
+						{"device_id":"0","device_ip":"192.168.100.101"},
+						{"device_id":"1","device_ip":"192.168.101.101"},
+						{"device_id":"2","device_ip":"192.168.102.101"},
+						{"device_id":"3","device_ip":"192.168.103.101"},
+						{"device_id":"4","device_ip":"192.168.100.100"},
+						{"device_id":"5","device_ip":"192.168.101.100"},
+						{"device_id":"6","device_ip":"192.168.102.100"},
+						{"device_id":"7","device_ip":"192.168.103.100"}
+					],
+					"pod_name":"ascend8p",
+					"server_id":"127.0.0.1"
+				}
+			]
+		}
+	],
+	"status": "completed"
+}
+```
 ### 3. Set environment
 
-Set environment variable like *LD_LIBRARY_PATH*, *PYTHONPATH* and *PATH* to match your system before training and testing.
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
 ### 4. Train
 - train on a single NPU
@@ -178,6 +212,25 @@ Examples:
 ### Training process
 
 All the results of the training will be stored in the directory `log_dir`.
+Start single card or multi card training through the training instructions in "quick start". Single card and multi card support single card and eight card network training by running different scripts.
+The model storage path of the reference script is results/1p or results/8p. The training script log contains the following information.
+
+```
+2020-06-20 12:08:46.650335: I tf_adapter/kernels/geop_npu.cc:714] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp41_0[ 298635878us]
+2020-06-20 12:08:46.651767: I tf_adapter/kernels/geop_npu.cc:511] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp33_0, num_inputs:0, num_outputs:1
+2020-06-20 12:08:46.651882: I tf_adapter/kernels/geop_npu.cc:419] [GEOP] tf session directc244d6ef05380c63, graph id: 6 no need to rebuild
+2020-06-20 12:08:46.651903: I tf_adapter/kernels/geop_npu.cc:722] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp33_0 ,tf session: directc244d6ef05380c63 ,graph id: 6
+2020-06-20 12:08:46.652148: I tf_adapter/kernels/geop_npu.cc:735] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp33_0, ret_status:success ,tf session: directc244d6ef05380c63 ,graph id: 6 [0 ms]
+2020-06-20 12:08:46.654145: I tf_adapter/kernels/geop_npu.cc:64] BuildOutputTensorInfo, num_outputs:1
+2020-06-20 12:08:46.654179: I tf_adapter/kernels/geop_npu.cc:93] BuildOutputTensorInfo, output index:0, total_bytes:8, shape:, tensor_ptr:281471054129792, output281471051824928
+2020-06-20 12:08:46.654223: I tf_adapter/kernels/geop_npu.cc:714] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp33_0[ 2321us]
+step: 35028  epoch:  7.0  FPS: 4289.5  loss: 3.773  total_loss: 4.477  lr:0.00996
+2020-06-20 12:08:46.655903: I tf_adapter/kernels/geop_npu.cc:511] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp33_0, num_inputs:0, num_outputs:1
+2020-06-20 12:08:46.655975: I tf_adapter/kernels/geop_npu.cc:419] [GEOP] tf session directc244d6ef05380c63, graph id: 6 no need to rebuild
+2020-06-20 12:08:46.655993: I tf_adapter/kernels/geop_npu.cc:722] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp33_0 ,tf session: directc244d6ef05380c63 ,graph id: 6
+2020-06-20 12:08:46.656226: I tf_adapter/kernels/geop_npu.cc:735] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp33_0, ret_status:success ,tf session: directc244d6ef05380c63 ,graph id: 6 [0 ms]
+2020-06-20 12:08:46.657765: I tf_adapter/kernels/geop_npu.cc:64] BuildOutputTensorInfo, num_outputs:1
+```
  
 ## Performance
 
