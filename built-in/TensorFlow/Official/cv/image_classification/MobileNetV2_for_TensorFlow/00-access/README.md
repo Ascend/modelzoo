@@ -83,13 +83,49 @@ cd ModelZoo_MobileNetv2_TF_HARD
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset
+1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
 ### 3. Set environment
 
-Set environment variable like *LD_LIBRARY_PATH*, *PYTHONPATH* and *PATH* to match your system before training and testing.
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+### check json
+
+Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the directory
+8p configuration file example.
+
+```
+{
+ "group_count": "1",
+ "group_list": [
+  {
+   "group_name": "worker",
+   "device_count": "8",
+   "instance_count": "1",
+   "instance_list": [
+    {
+     "devices":[
+      {"device_id":"0","device_ip":"192.168.100.101"},
+      {"device_id":"1","device_ip":"192.168.101.101"},
+      {"device_id":"2","device_ip":"192.168.102.101"},
+      {"device_id":"3","device_ip":"192.168.103.101"},
+      {"device_id":"4","device_ip":"192.168.100.100"},
+      {"device_id":"5","device_ip":"192.168.101.100"},
+      {"device_id":"6","device_ip":"192.168.102.100"},
+      {"device_id":"7","device_ip":"192.168.103.100"}
+     ],
+     "pod_name":"ascend8p",
+     "server_id":"127.0.0.1"
+    }
+   ]
+  }
+ ],
+ "status": "completed"
+}
+```
 
 ### 4. Train
 - train on a single NPU
