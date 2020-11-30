@@ -100,16 +100,33 @@ execute the script when you get all three file ready.
  - voc-style segmentation annotation file
  - txt file for all the seg_image filenames
 
- 
-
-
-
+### check json
+Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the scripts/ directory.
+The content of the 8p configuration file:
+```
+{"group_count": "1","group_list":
+                    [{"group_name": "worker","device_count": "8","instance_count": "1", "instance_list":
+                    [{"devices":
+                                   [{"device_id":"0","device_ip":"192.168.100.101"},
+                                    {"device_id":"1","device_ip":"192.168.101.101"},
+                                    {"device_id":"2","device_ip":"192.168.102.101"},
+                                    {"device_id":"3","device_ip":"192.168.103.101"},
+                                    {"device_id":"4","device_ip":"192.168.100.100"},
+                                    {"device_id":"5","device_ip":"192.168.101.100"},
+                                    {"device_id":"6","device_ip":"192.168.102.100"},
+                                    {"device_id":"7","device_ip":"192.168.103.100"}],
+                                    "pod_name":"npu8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
+```
 
 ### 3. Train
+
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+
 All the scripts to tick off the training are located under `scripts/`.  As there are two types of resnet_101 checkpoints exist, original version 
 and a so-called beta version available, there are two sets of scripts one for each checkpoint. All the scripts that end with `beta` are meant for 
 resnet_v1_101_beta checkpoint. All the scripts that start with `train` are configuration files for the training. You are free to choose either of them as initial checkpoint since they can achieve comparable performance.  
-
 
 
 - For resnet_v1_101_beta, you can download from <http://download.tensorflow.org/models/resnet_v1_101_2018_05_04.tar.gz>
