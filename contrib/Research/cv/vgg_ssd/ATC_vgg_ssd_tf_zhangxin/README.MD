@@ -12,8 +12,9 @@ atc --model="vgg_ssd.prototxt" --weight="vgg_ssd.caffemodel" --soc_version=Ascen
 ## 2、转om模型
 若用户不想手动进行转换，可下载转换好的om模型
 
-obs链接：https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/VGG_SSD/vgg-ssd_framework_caffe_ascend310_aipp_0_batch_1_input_fp32_output_FP32.om 
+C73环境的obs链接：https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/VGG_SSD/vgg-ssd_framework_caffe_ascend310_aipp_0_batch_1_input_fp32_output_FP32_C73.om
 
+C75环境的obs链接：https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/VGG_SSD/vgg-ssd_framework_caffe_ascend310_aipp_0_batch_1_input_fp32_output_FP32_C75.om 
 
 
 ## 3、将下载的om文件放在model文件夹
