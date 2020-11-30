@@ -13,5 +13,5 @@ export NPU_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
 export BATCH_TASK_INDEX=0
 export TF_CPP_MIN_LOG_LEVEL=3
 
-python ${pwd}/run_example.py ${pwd}/nas/darts_cnn/darts_tf.yml
+python3 ${pwd}/run_example.py ${pwd}/nas/darts_cnn/darts_tf.yml
 
