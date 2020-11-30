@@ -10,19 +10,32 @@ NEZHA是华为诺亚方舟实验室推出的预训练语言模型结构，和BER
 
 ## 默认配置
 网络结构
+
 学习率为1e-4，使用polynomial decay
+
 优化器：Lamb
+
 优化器Weight decay为0.01
+
 优化器epsilon设置为1e-4
+
 单卡batchsize：64
+
 80卡batchsize：64*80
+
 总step数设置为1000000
+
 Warmup step设置为10000
+
 训练数据集预处理（以wikipedia为例，仅作为用户参考示例）：
+
 Sequence Length原则上用户可以自行定义
 以常见的设置128为例，mask其中的20个tokens作为自编码恢复的目标。
+
 下游任务预处理以用户需要为准。
+
 测试数据集预处理（以wikipedia为例，仅作为用户参考示例）：
+
 和训练数据集处理一致。
 
 ## 快速上手
