@@ -80,29 +80,39 @@ cd modelzoo_GoogleNet_TF
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset
+1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
+### check json
+Check whether there is a JSON configuration file "8P rank_table json" for 8 Card IP in the scripts/ directory.
+The content of the 8p configuration file:
+```
+{"group_count": "1","group_list": 
+                    [{"group_name": "worker","device_count": "8","instance_count": "1", "instance_list": 
+                    [{"devices":                    
+                                   [{"device_id":"0","device_ip":"192.168.100.101"},
+                                    {"device_id":"1","device_ip":"192.168.101.101"},
+                                    {"device_id":"2","device_ip":"192.168.102.101"},
+                                    {"device_id":"3","device_ip":"192.168.103.101"},
+                                    {"device_id":"4","device_ip":"192.168.100.100"},      
+                                    {"device_id":"5","device_ip":"192.168.101.100"},        
+                                    {"device_id":"6","device_ip":"192.168.102.100"},     
+                                    {"device_id":"7","device_ip":"192.168.103.100"}],      
+                                    "pod_name":"npu8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
+```
+
 ### 3. Train
+
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
 - train on a single NPU
     - **edit** *scripts/run_1p.sh* and *scripts/train_1p.sh* (see example below)
     - ./run_1p.sh
 - train on 8 NPUs
     - **edit** *scripts/run_8p.sh* and *scripts/train_8p.sh* (see example below)
     - ./run_8p.sh 
-
-Configure the env:
-- **edit** *scripts/run_1p.sh* and *scripts/run_8p.sh*
-    - add your own configuration info in *scripts/run_1p.sh* and *scripts/run_8p.sh*. The default configuration info could be considered as an example.
-```shell
-    #!/bin/bash
-    install_path=/usr/local/Ascend
-    export TBE_IMPL_PATH=${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbeexport 
-    LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib/:${install_path}/nnae/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons
-    export PYTHONPATH=$PYTHONPATH:${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbe:${install_path}/tfplugin/latest/tfplugin/python/site-packages/:${install_path}/nnae/latest/fwkacllib/python/site-packages/hccl:${install_path}/nnae/latest/fwkacllib/python/site-packages/te:${install_path}/nnae/latest/fwkacllib/python/site-packages/topi
-    export PATH=${install_path}/nnae/latest/fwkacllib/ccec_compiler/bin:${PATH}
-```
 
 Examples:
 - Case for single NPU

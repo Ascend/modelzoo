@@ -82,11 +82,34 @@ cd ModelZoo_InceptionV4_TF_Atlas
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset
+1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
+### check json
+
+Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the scripts/ directory.
+The content of the 8p configuration file:
+```
+{"group_count": "1","group_list":
+                    [{"group_name": "worker","device_count": "8","instance_count": "1", "instance_list":
+                    [{"devices":
+                                   [{"device_id":"0","device_ip":"192.168.100.101"},
+                                    {"device_id":"1","device_ip":"192.168.101.101"},
+                                    {"device_id":"2","device_ip":"192.168.102.101"},
+                                    {"device_id":"3","device_ip":"192.168.103.101"},
+                                    {"device_id":"4","device_ip":"192.168.100.100"},
+                                    {"device_id":"5","device_ip":"192.168.101.100"},
+                                    {"device_id":"6","device_ip":"192.168.102.100"},
+                                    {"device_id":"7","device_ip":"192.168.103.100"}],
+                                    "pod_name":"npu8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
+```
+
 ### 3. Train
+
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
 - train on a single NPU
     - **edit** *scripts/run_1p.sh* and *scripts/train_1p.sh* (see example below)
     - ./run_1p.sh
@@ -94,17 +117,6 @@ cd ModelZoo_InceptionV4_TF_Atlas
     - **edit** *scripts/run_8p.sh* and *scripts/train_8p.sh* (see example below)
     - ./run_8p.sh 
 
-Configure the env:
-- **edit** *scripts/run_1p.sh* and *scripts/run_8p.sh*
-    - add your own configuration info in *scripts/run_1p.sh* and *scripts/run_8p.sh*. The default configuration info could be considered as an example.
-```shell
-    #!/bin/bash
-    install_path=/usr/local/Ascend
-    export TBE_IMPL_PATH=${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbeexport 
-    LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib/:${install_path}/nnae/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons
-    export PYTHONPATH=$PYTHONPATH:${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbe:${install_path}/tfplugin/latest/tfplugin/python/site-packages/:${install_path}/nnae/latest/fwkacllib/python/site-packages/hccl:${install_path}/nnae/latest/fwkacllib/python/site-packages/te:${install_path}/nnae/latest/fwkacllib/python/site-packages/topi
-    export PATH=${install_path}/nnae/latest/fwkacllib/ccec_compiler/bin:${PATH}
-```
 
 Examples:
 
@@ -194,7 +206,32 @@ Examples:
 
 ### Training process
 
-All the results and training ckpt models of the training will be stored in the directory `log_dir`.
+Start single card or multi card training by training instruction in "quick start". Single card and multi card can support single card and 8 card network training by running different scripts.
+Set data_dir in training script （train_1p.sh,train_8p.sh） as the path of training data set. Please refer to the "quick start" example for the specific process.
+The storage path of the model is “results/1p”or“results/8p”, including the training log and checkpoints files. Taking single card training as an example, the loss information is in the file results/1p/0/model/inception_v4.log, and the example is as follows.
+```
+step: 12100  epoch:  1.2  FPS:  469.5  loss: 4.676  total_loss: 5.051  lr:0.04499
+step: 12200  epoch:  1.2  FPS:  469.6  loss: 4.922  total_loss: 5.297  lr:0.04499
+step: 12300  epoch:  1.2  FPS:  469.6  loss: 4.953  total_loss: 5.328  lr:0.04499
+step: 12400  epoch:  1.2  FPS:  469.7  loss: 4.758  total_loss: 5.133  lr:0.04499
+step: 12500  epoch:  1.2  FPS:  469.6  loss: 4.957  total_loss: 5.332  lr:0.04499
+step: 12600  epoch:  1.3  FPS:  469.5  loss: 4.594  total_loss: 4.969  lr:0.04499
+step: 12700  epoch:  1.3  FPS:  469.6  loss: 4.707  total_loss: 5.082  lr:0.04499
+step: 12800  epoch:  1.3  FPS:  469.6  loss: 4.574  total_loss: 4.950  lr:0.04499
+step: 12900  epoch:  1.3  FPS:  469.5  loss: 4.809  total_loss: 5.184  lr:0.04499
+step: 13000  epoch:  1.3  FPS:  469.7  loss: 4.664  total_loss: 5.040  lr:0.04499
+step: 13100  epoch:  1.3  FPS:  469.6  loss: 4.555  total_loss: 4.930  lr:0.04499
+step: 13200  epoch:  1.3  FPS:  469.6  loss: 4.703  total_loss: 5.079  lr:0.04499
+step: 13300  epoch:  1.3  FPS:  469.6  loss: 4.543  total_loss: 4.919  lr:0.04499
+step: 13400  epoch:  1.3  FPS:  469.7  loss: 4.738  total_loss: 5.114  lr:0.04499
+step: 13500  epoch:  1.3  FPS:  469.6  loss: 4.707  total_loss: 5.083  lr:0.04499
+step: 13600  epoch:  1.4  FPS:  469.6  loss: 4.793  total_loss: 5.169  lr:0.04499
+step: 13700  epoch:  1.4  FPS:  469.6  loss: 4.520  total_loss: 4.895  lr:0.04499
+step: 13800  epoch:  1.4  FPS:  469.6  loss: 4.672  total_loss: 5.048  lr:0.04499
+step: 13900  epoch:  1.4  FPS:  469.6  loss: 4.562  total_loss: 4.939  lr:0.04499
+step: 14000  epoch:  1.4  FPS:  469.6  loss: 4.742  total_loss: 5.118  lr:0.04499
+step: 14100  epoch:  1.4  FPS:  469.5  loss: 4.555  total_loss: 4.931  lr:0.04499
+```
  
 ## Performance
 

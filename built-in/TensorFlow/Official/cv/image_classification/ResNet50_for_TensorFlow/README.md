@@ -82,11 +82,14 @@ cd Modelzoo_Resnet50_HC
 
 ### 2. Download and preprocess the dataset
 
-1. Download the classification dataset, like ImageNet2012, CIFAR10, Flower and so on.
+1. Download the classification dataset, like ImageNet2012, CIFAR10, Flower and so on.The model is compatible with the datasets on tensorflow official website.
 2. Extract the training data
 3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
 
 ### 3. Train
+
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
 1P training:
 
