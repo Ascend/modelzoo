@@ -6,7 +6,6 @@ import random
 import numpy as np
 import tensorflow as tf
 
-
 # from data_reader import DataReader
 from params import hparams
 import glob
