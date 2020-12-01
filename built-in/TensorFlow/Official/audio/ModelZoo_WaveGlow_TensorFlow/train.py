@@ -6,7 +6,6 @@ import random
 import numpy as np
 import tensorflow as tf
 
-
 # from data_reader import DataReader
 from params import hparams
 import glob
@@ -21,6 +20,8 @@ from datetime import datetime
 from glow import WaveGlow, compute_waveglow_loss
 from tensorflow.python.client import timeline
 from ljspeech_to_tfrecords import get_tfrecords_dataset
+import librosa
+from audio_utils import melspectrogram
 
 
 from npu_bridge.estimator import npu_ops
@@ -58,6 +59,8 @@ def get_arguments():
     parser.add_argument('--ngpu', type=int, default=1, help='gpu numbers')
     parser.add_argument('--run_name', type=str, default='waveglow',
                         help='run name for log saving')
+    parser.add_argument('--infer_raw_audio_filepath', type=str, default='./LJSpeech-1.1/wavs/LJ001-0001.wav',
+                        help='infer_raw_audio_filepath')
     #"./logdir/waveglow/model.ckpt-160000"
     parser.add_argument('--restore_from', type=str, default=None,
                         help='restore model from checkpoint')
@@ -230,7 +233,7 @@ def main():
     global_step = tf.get_variable("global_step", [], initializer=tf.constant_initializer(0),dtype=tf.int32, trainable=False)
 
     #暂时不用学习率衰减
-    learning_rate = tf.train.exponential_decay(hparams.lr, global_step, hparams.decay_steps, 0.95, staircase=True)
+    learning_rate = tf.train.exponential_decay(hparams.lr, global_step, hparams.decay_steps, 0.93, staircase=True)
     learning_rate=tf.maximum(learning_rate,1.0e-4)
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 
@@ -249,6 +252,7 @@ def main():
                                            drop_remainder=True)
     traindata_iterator = train_input_fn().make_initializable_iterator()
     sess.run(traindata_iterator.initializer)
+    mel_spec=prepare_one_infer_data(args.infer_raw_audio_filepath, hparams)
 
     glow = WaveGlow(lc_dim=hparams.num_mels,
             n_flows=hparams.n_flows,
@@ -269,6 +273,12 @@ def main():
 
     audio_batch = batch_data["wav"]
     lc_batch = batch_data["mel"]
+
+    # inference for audio
+    with tf.variable_scope(tf.get_variable_scope(), reuse=True):
+        lc_placeholder_infer = tf.placeholder(tf.float32, shape=[1, mel_spec.shape[1], hparams.num_mels], name='lc_infer')
+        audio_infer_ops = glow.infer(lc_placeholder_infer, sigma=hparams.sigma)
+
     print("create network finished")
 
     all_trainable_variables = tf.trainable_variables()
@@ -349,6 +359,8 @@ def main():
             if step % hparams.save_model_every == 0:
                 save(saver, sess, args.logdir, step)
                 last_saved_step = step
+                print("inference generate one audio after train %d steps..."%(step))
+                generate_wave(lc_placeholder_infer, audio_infer_ops, sess, step, args.logdir,mel_spec)
         else:
             loss_value, _, lr, gstep = sess.run([total_loss, train_ops, learning_rate, global_step])
 
@@ -361,13 +373,32 @@ def main():
         save(saver, sess, args.logdir, step)
 
 
+def prepare_one_infer_data(infer_raw_audio_filepath,params):
+    ###prepare infer data
+    # read wave
+    audio, sample_rate = librosa.load(infer_raw_audio_filepath, sr=None, mono=True)
+
+    if sample_rate != params.sample_rate:
+        raise ValueError("{} SR doesn't match target {} SR".format(
+            sample_rate, params.sample_rate))
+    # compute mel spectrogram
+    mel_spec = melspectrogram(audio)
+
+    mel_spec = np.array(mel_spec, 'float32')
+    assert mel_spec.size % float(params.num_mels) == 0.0, \
+        'specified dimension %s not compatible with data' % (params.num_mels,)
+    mel_spec = mel_spec.reshape((1, -1, params.num_mels))
+
+    #print(mel_spec)
+    return mel_spec
 
 
-def generate_wave(audio_infer_ops, sess, step, path):
+
+def generate_wave(lc_placeholder_infer,audio_infer_ops, sess, step, path,mel_spec):
     save_name = str(step).zfill(8) + '.wav'
     save_name = os.path.join(path, save_name)
 
-    audio_output = sess.run(audio_infer_ops )
+    audio_output = sess.run(audio_infer_ops, feed_dict={lc_placeholder_infer: mel_spec} )
     audio_output = audio_output[-1].flatten()
     write_wav(audio_output, hparams.sample_rate, save_name)
 
