@@ -236,31 +236,12 @@ def main(_):
   spm_model_file = None
   #spm_model_file = os.path.join(FLAGS.model_dir, "30k-clean.model")
   init_checkpoint = os.path.join(FLAGS.model_dir, "model.ckpt-best")
-  print(init_checkpoint + ".index")
-  if os.path.exists(init_checkpoint+".index"):
-      print("file exits")
-      print(init_checkpoint)
-  else:
-      print("file not exits")
- 
-  tf.logging.info(albert_config_file)
-  tf.logging.info(init_checkpoint)
-  tf.logging.info(FLAGS.model_dir)
-  tf.logging.info(FLAGS.input_dir)
-  tf.logging.info("--------------------------")
+
   train_file = os.path.join(FLAGS.input_dir, "train-v2.0.json")
   predict_file = os.path.join(FLAGS.input_dir, "dev-v2.0.json")
   train_feature_file = os.path.join(FLAGS.input_dir, "train.tfrecord")
   predict_feature_file = os.path.join(FLAGS.input_dir, "dev.tfrecord")
   predict_feature_left_file = os.path.join(FLAGS.input_dir, "pred_left_file.pkl")
-  tf.logging.info("--------------------------")
-  tf.logging.info(albert_config_file)
-  tf.logging.info(init_checkpoint)
-  tf.logging.info(train_file)
-  tf.logging.info("--------------------------")
-  
- 
-
 
   albert_config = modeling.AlbertConfig.from_json_file(albert_config_file)
 
