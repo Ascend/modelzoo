@@ -1,12 +1,12 @@
- **介绍** 
+ **介绍**
 
 Ascend ModelZoo，欢迎各位开发者
 
- **贡献要求** 
+ **贡献要求**
 
 开发者提交的模型包括源码、readme、参考模型license文件、测试用例和readme，并遵循以下标准
 
- **一、源码** 
+ **一、源码**
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++代码，符合第四部分编码规范
 
@@ -14,28 +14,50 @@ Ascend ModelZoo，欢迎各位开发者
 
 3、贡献者模型代码目录规则："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
 
-4、从其他开源迁移的代码，请增加lisence声明
+4、从其他开源迁移的代码，请增加License声明
 
-```
-/**
- * Copyright 2019 Huawei Technologies Co., Ltd
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-```
+* Python
 
+    ```
+    # Copyright 2019 Huawei Technologies Co., Ltd
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    # http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    # ============================================================================
+    ```
 
- **二、readme** 
+* C++
+
+    ```
+    /**
+    * Copyright 2019 Huawei Technologies Co., Ltd
+    *
+    * Licensed under the Apache License, Version 2.0 (the "License");
+    * you may not use this file except in compliance with the License.
+    * You may obtain a copy of the License at
+    *
+    * http://www.apache.org/licenses/LICENSE-2.0
+    *
+    * Unless required by applicable law or agreed to in writing, software
+    * distributed under the License is distributed on an "AS IS" BASIS,
+    * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    * See the License for the specific language governing permissions and
+    * limitations under the License.
+    */
+    ```
+
+> 关于License声明时间，应注意： 2020年新建的文件，应该是Copyright 2020 Huawei Technologies Co., Ltd 2019年创建年份，2020年修改年份，应该是Copyright 2019-2020 Huawei Technologies Co., Ltd
+
+ **二、readme**
 
 readme用于指导用户理解和部署样例，要包含如下内容：
 
@@ -57,7 +79,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
- **三、自测试用例** 
+ **三、自测试用例**
 
 提供模型的自测试用例和readme，提交PR需要门禁及模型测试用例通过，性能和精度检查通过
 
@@ -97,7 +119,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 
- **五、编程规范** 
+ **五、编程规范**
 
 - 规范标准
 
