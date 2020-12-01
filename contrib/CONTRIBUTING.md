@@ -6,6 +6,8 @@ Ascend ModelZoo，欢迎各位开发者
 
 开发者提交的模型包括源码、readme、参考模型license文件、测试用例和readme，并遵循以下标准
 
+请贡献者在提交代码之前签署CLA协议，“个人签署”，[链接](https://clasign.osinfra.cn/sign/Z2l0ZWUlMkZhc2NlbmQ=)
+
  **一、源码**
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++代码，符合第四部分编码规范
