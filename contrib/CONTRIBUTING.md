@@ -99,7 +99,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 1、自测试用例命名严格按照上述简介2要求来书写，否则门禁会校验失败；
 
-2、用例应当包含精度（Loss值）、性能检查，检查通过打印"Run testcase success!"，失败则打印"Run testcase failed!"；
+2、用例应当包含功能、精度（Loss值）、性能检查，检查通过打印"Run testcase success!"，失败则打印"Run testcase failed!"；
 
 3、执行环境已预装软件包和Python3.7.5环境，调用命令"python3"、"python3.7"、"python3.7.5"均可，安装第三方库依赖使用"pip3"、"pip3.7"均可；
 
