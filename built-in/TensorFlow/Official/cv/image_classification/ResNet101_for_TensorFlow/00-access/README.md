@@ -20,6 +20,15 @@ check if path '/usr/local/HiAI' or ''/usr/local/Ascend' is existed or not.
 modify '/usr/local/HiAI' to the actual path in scripts/run.sh
 
 ### Train and evaluate model
+
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+During training, you need to modify the script startup parameters (the script is located in `official/r1/resnet/run_imagenet.sh` ) and set `eval_only` to `False`.
+When testing, you need to modify the script startup parameters (the script is located in `official/r1/resnet/run_imagenet.sh`) and set `eval_only` to `True`.
+
+--num_gpus=1 ---Number of NPU devices, 1p set to 1, 8p set to 8
+
 [imagenet_main.py](official/r1/resnet/imagenet_main.py) is the Entry Python script.
 [resnet_run_loop.py](official/r1/resnet/resnet_run_loop.py) is the Main Python script.
 

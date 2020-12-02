@@ -20,6 +20,10 @@ Then the converted TensorFlow checkpoint file will be saved to `./data/darknet_w
 In this repo, conerted weight is contained. 
 
 ### 4. Training
+
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
 #### 4.1 Data preparation 
 0. dataset
 To compare with official implement, for example, we use [get_coco_dataset.sh](https://github.com/pjreddie/darknet/blob/master/scripts/get_coco_dataset.sh) to prepare our dataset.
@@ -67,6 +71,18 @@ Then you will get 9 anchors and the average IoU. Save the anchors to a txt file.
 The COCO dataset anchors offered by YOLO's author is placed at `./data/yolo_anchors.txt`, you can use that one too.
 
 The yolo anchors computed by the kmeans script is on the resized image scale.  The default resize method is the letterbox resize, i.e., keep the original aspect ratio in the resized image.
+
+(4) Configuration file description:
+
+|field              | meaning                                                       |
+| :-----------------| :-----------------------------------------------------------: |
+| work_path         |Absolute path of the project (please configure before training)|
+| train_file        |Training sample label file path                                |
+| val_file          | Verify sample label file path                                 |
+| restore_path      | Pre training model saving path                                |
+| anchor_path       | Anchor file save path                                         |
+| class_name_path   | Save path of category name file                               |
+
 
 #### 4.2 Training
 1. single scale
