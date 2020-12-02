@@ -1,28 +1,3 @@
-训练和预测脚本:
-
-albert_base
-```
-./squad2_base.sh
-```
-albert_large
-```
-./squad2_large.sh
-```
-如果只训练则注释掉--do_train
-
-只预测则注释掉--do_predict
-
-输入文件需要建立squad_v2文件夹
-
-对于albert_base需要建立albert_base_v2, output_base_v2文件夹
-
-对于albert_large需要建立albert_base_v2, output_base_v2文件夹
-
-上述文件夹均可从
-
-[百度网盘](https://pan.baidu.com/s/1F_8A398wefDj9woOJ71MwQ)提取码: 7taq 下载
-
-
 # ALBERT
 ## 概述
 迁移[Albert](https://github.com/google-research/albert) 到ascend910平台
@@ -109,7 +84,7 @@ albert
   --save_checkpoints_steps 多少批次保存
   --n_best_size 预测的个数
   --max_answer_length 最大答案长度
-### 训练
+## 训练
 
 albert_base
 ```
@@ -121,7 +96,7 @@ albert_large
 ```
 如果只训练则注释掉--do_predict
 
-### 预测和精度对比
+## 预测和精度对比
 
 albert_base
 ```
