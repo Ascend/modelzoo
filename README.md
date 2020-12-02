@@ -58,6 +58,7 @@ Thank You!
         - [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Openpose_for_MindSpore)
  		- [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/image_segmentation/DeeplabV3_for_MindSpore)
         - [WaveGlow_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/audio/ModelZoo_WaveGlow_TensorFlow)
+		- [UNet_Industrial_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_segmentation/UNet_Industrial_for_TensorFlow)
 	- Research
         - [Darts_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Darts_for_TensorFlow)
         - [Cars_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Cars_for_TensorFlow)
@@ -71,7 +72,6 @@ Thank You!
 		- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Research/cv/detection/FaceRecognition_for_MindSpore)
 		- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Research/cv/detection/FaceRecognitionForTracking_for_MindSpore)
 		- [Music_Genre_Classification_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Research/audio/Music_Genre_Classification_for_MindSpore)
-		- [UNet_Industrial_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_segmentation/UNet_Industrial_for_TensorFlow)
 		- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/Wide&Deep_for_TensorFlow)
 		- [YOLOv4_Cspdarknet53_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Research/cv/detection/YOLOv4_Cspdarknet53_for_MindSpore)
         - [Yuefu_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/nlp/ModelZoo_Yuefu_TensorFlow)
