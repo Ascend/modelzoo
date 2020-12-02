@@ -70,12 +70,15 @@ The yolo anchors computed by the kmeans script is on the resized image scale.  T
 
 (4) Configuration file description:
 
-work_path:------Absolute path of the project (please configure before training)
-train_file:------Training sample label file path
-val_file:------Verify sample label file path
-restore_path:------Pre training model saving path
-anchor_path:------Anchor file save path
-class_name_path:------Save path of category name file
+|field              | meaning                                                       |
+| :-----------------| :-----------------------------------------------------------: |
+| work_path         |Absolute path of the project (please configure before training)|
+| train_file        |Training sample label file path                                |
+| val_file          | Verify sample label file path                                 |
+| restore_path      | Pre training model saving path                                |
+| anchor_path       | Anchor file save path                                         |
+| class_name_path   | Save path of category name file                               |
+
 
 #### 4.2 Training
 1. single scale
