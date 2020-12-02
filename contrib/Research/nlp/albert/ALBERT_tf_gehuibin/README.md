@@ -1,6 +1,7 @@
 # ALBERT
 ## 概述
 迁移[Albert](https://github.com/google-research/albert) 到ascend910平台
+得到的结果和论文的对比
 使用的是albert_v2版本的预训练模型
 |  | F1| EM |
 | :-----| ----: | :----: |
@@ -61,7 +62,7 @@ albert
 ---
 
 ## 准备数据和模型
-- 数据预训练模型以及微调后的模型均可以从 
+数据预训练模型以及微调后的模型均可以从 
 [百度网盘](https://pan.baidu.com/s/1F_8A398wefDj9woOJ71MwQ) 提取码: 7taq 下载
 
 
@@ -95,7 +96,7 @@ albert_large
 ./squad2_large.sh
 ```
 如果只训练则注释掉--do_predict
-
+训练base用的batch_size为32，训练large的batch_size为16
 ## 预测和精度对比
 
 albert_base
