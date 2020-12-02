@@ -44,6 +44,7 @@ Thank You!
 		- [ResNext50_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/image_classification/ResNext50_for_MindSpore)
 		- [ResNext50_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_for_TensorFlow)
 		- [SSD_MobileNetV2_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/image_classification/SSD_MobileNetV2_for_MindSpore)
+		- [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/SSD-Resnet34_for_TensorFlow)
 		- [TinyBERT_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/nlp/TinyBERT_for_MindSpore)
 		- [Transformer_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/nlp/Transformer_for_MindSpore)
 		- [Transformer_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
@@ -56,7 +57,6 @@ Thank You!
         - [Mask_R_CNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Mask_R_CNN_for_MindSpore)
         - [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/detection/Openpose_for_MindSpore)
  		- [DeeplabV3_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/Mindspore/Official/cv/image_segmentation/DeeplabV3_for_MindSpore)
-        - [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/SSD-Resnet34_for_TensorFlow)
         - [WaveGlow_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/audio/ModelZoo_WaveGlow_TensorFlow)
 	- Research
         - [Darts_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Darts_for_TensorFlow)
