@@ -68,6 +68,15 @@ The COCO dataset anchors offered by YOLO's author is placed at `./data/yolo_anch
 
 The yolo anchors computed by the kmeans script is on the resized image scale.  The default resize method is the letterbox resize, i.e., keep the original aspect ratio in the resized image.
 
+(4) Configuration file description:
+
+work_path:------Absolute path of the project (please configure before training)
+train_file:------Training sample label file path
+val_file:------Verify sample label file path
+restore_path:------Pre training model saving path
+anchor_path:------Anchor file save path
+class_name_path:------Save path of category name file
+
 #### 4.2 Training
 1. single scale
 Using `npu_train_*p_single.sh`. The hyper-parameters and the corresponding annotations can be found in `args_single.py`:
