@@ -65,8 +65,8 @@ albert
 数据预训练模型以及微调后的模型均可以从 
 [百度网盘](https://pan.baidu.com/s/16gib5liqMXD7c7rXJ5LEsQ) 提取码: 9k39  
 其中squad_v2目录夹为数据  
-albert_*_v2为预训练模型  
-output_*_v2为微调后的模型  
+albert_base/large_v2为预训练模型  
+output_base/large_v2为微调后的模型  
 
 
 
