@@ -62,9 +62,9 @@ Thank You!
 	- Research
         - [Darts_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Darts_for_TensorFlow)
         - [Cars_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Cars_for_TensorFlow)
-		- [DDPG_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/DDPG_for_TensorFlow)
+		- [DDPG_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/DDPG_for_TensorFlow)
 		- [DeepFM_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/DeepFM_for_TensorFlow)
-		- [DQN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/DQN_for_TensorFlow)
+		- [DQN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/DQN_for_TensorFlow)
 		- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/DSCNN_for_MindSpore)
 		- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceAttribute_for_MindSpore)
 		- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceDetection_for_MindSpore)
@@ -75,9 +75,9 @@ Thank You!
 		- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/Wide&Deep_for_TensorFlow)
 		- [YOLOv4_Cspdarknet53_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/YOLOv4_Cspdarknet53_for_MindSpore)
         - [Yuefu_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/nlp/ModelZoo_Yuefu_TensorFlow)
-        - [MUZERO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/ModelZoo_MUZERO_TensorFlow)
-        - [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/ModelZoo_PPO_TensorFlow)
-        - [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement%20learning/ModelZoo_QMIX_TensorFlow)
+        - [MUZERO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/ModelZoo_MUZERO_TensorFlow)
+        - [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/ModelZoo_PPO_TensorFlow)
+        - [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/ModelZoo_QMIX_TensorFlow)
 
 ## Disclaimers
 
