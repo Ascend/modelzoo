@@ -33,7 +33,7 @@ Inference average time without first time: 0.885677 ms
 ["angry", "scared", "happy", "sad", "surprised", "neutral"]\
 使用的数据集为icml_face_data, 数据集的下载和预处理, 存放至ground_truth文件夹
 
-public_test.txt：\
+public_test.zip：\
 obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/ShufflenetV2/public_test.zip
 
 标签文件：\
