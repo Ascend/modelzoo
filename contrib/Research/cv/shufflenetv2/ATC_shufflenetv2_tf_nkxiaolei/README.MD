@@ -3,7 +3,7 @@
 将保存的h5文件转化为pb文件之后，使用ATC工具转化成om模型
 
 ## 2、转om模型
-obs链接：obs://nkxiaolei88/ATC Model/ShufflenetV2/shufflenetv2_emotion_recogn.om
+obs链接：obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/ShufflenetV2/shufflenetv2_emotion_recogn.om
 
 ATC转换命令：
 ```
@@ -13,7 +13,7 @@ ATC转换命令：
 ## 3、将下载的om文件放在model文件夹
 
 ## 4、编译msame推理工具
-参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+参考https://gitee.com/ascend/tools/tree/ccl/msame, 编译出msame推理工具
 
 ## 5、性能测试
 使用msame推理工具，参考如下命令，发起推理性能测试： 
@@ -31,8 +31,13 @@ Inference average time without first time: 0.885677 ms
 ## 6、精度测试：
 这个网络是使用ShufflenetV2来实现人脸表情识别的，输入为48*48的灰度图，输出为表情分类：\
 ["angry", "scared", "happy", "sad", "surprised", "neutral"]\
-使用的数据集为icml_face_data, 数据集的下载和预处理参考：\
-https://www.kaggle.com/mohammed94/facial-emotion-detection-cnn
+使用的数据集为icml_face_data, 数据集的下载和预处理, 存放至ground_truth文件夹
+
+public_test.txt：\
+obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/ShufflenetV2/public_test.zip
+
+标签文件：\
+obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/ShufflenetV2/shufflenetv2_emotion_labels.txt
 
 原始的数据集为csv文件，将灰度图的信息和标签保存在csv文件中，本案例中已经集成预处理、推理和精度计算：\
 先解压出public_test.txt
