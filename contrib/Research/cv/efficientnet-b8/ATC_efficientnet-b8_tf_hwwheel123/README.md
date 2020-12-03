@@ -5,7 +5,7 @@ backend_C++/dnmetis_backend/README.md
 
 ## 2.Download dataset and model(.om)
 
-1.download  Imagenet-val dataset URL: http://www.image-net.org/download-imageurls
+1.download  Imagenet-val dataset
 
 2.download  efficientnet-b8 model(.om) URL: obs://hwwheel23/efficientnet-b8.om 
 
