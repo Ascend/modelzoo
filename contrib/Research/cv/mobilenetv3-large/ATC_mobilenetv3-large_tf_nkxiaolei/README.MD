@@ -2,7 +2,7 @@
 链接：https://github.com/xiaochus/MobileNetV3, 下载对应的ckpt，转成pb模型
 
 ## 2、转om模型
-obs链接：obs://nkxiaolei88/ATC Model/MobileNetV3-large/mobilenet-v3-large.om
+obs链接：obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/MobileNetV3-large/mobilenet-v3-large.om
 
 ATC转换命令：
 ```
@@ -12,7 +12,7 @@ ATC转换命令：
 ## 3、将下载的om文件放在model文件夹
 
 ## 4、编译msame推理工具
-参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+参考https://gitee.com/ascend/tools/tree/ccl/msame, 编译出msame推理工具
 
 ## 5、性能测试
 使用msame推理工具，参考如下命令，发起推理性能测试： 
@@ -29,8 +29,7 @@ Inference average time without first time: 3.096515 ms
 
 ## 6、精度测试：
 
-### 6.1 下载ImageNet 2012 val数据集：
-http://www.image-net.org/download-images
+### 6.1 下载ImageNet 2012 val数据集
 
 ### 6.2 图片预处理
 下载好的数据集JPEG图片放在任意其他目录，执行预处理脚本生成bin文件：

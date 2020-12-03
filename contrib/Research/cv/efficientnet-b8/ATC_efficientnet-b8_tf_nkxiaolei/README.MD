@@ -45,7 +45,6 @@ Run testcase success!
 ## 7、全量数据集精度测试：
 
 ### 7.1 下载ImageNet 2012 val数据集
-链接： http://www.image-net.org/download-images
 
 ### 7.2 预处理
 
