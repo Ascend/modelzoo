@@ -2,7 +2,7 @@
 https://github.com/ShawnyXiao/TextClassification-Keras, 训练10个Epoch，得到h5模型，转成pb模型
 
 ## 2、转om模型
-obs链接：obs://nkxiaolei88/ATC Model/FastText/fast_text_frozen.om
+obs链接：obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/FastText/fast_text_frozen.om
 
 ATC转换命令：
 ```
@@ -12,7 +12,7 @@ ATC转换命令：
 ## 3、将下载的om文件放在model文件夹
 
 ## 4、编译msame推理工具
-参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+参考https://gitee.com/ascend/tools/tree/ccl/msame, 编译出msame推理工具
 
 ## 5、性能测试
 使用msame推理工具，参考如下命令，发起推理性能测试： 
@@ -31,6 +31,13 @@ Inference average time without first time: 0.436374 ms
 精度数据集从训练脚本中的Validation数据集分离得来，25000帧，shape为1*400，标签为对应的情感倾向，\
 使用训练集训练10个epoch得到的模型在GPU上，推理精度为：\
 val_acc: 0.8859\
+
+下载数据集至当前目录：
+obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/FastText/fasttext_input.tar.gz
+
+下载标签至ground_truth目录：
+obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/FastText/fasttext_label.bin
+
 在NPU上验证精度：
 ### 6.1、解压数据集：
 tar -zxvf fasttext_input.tar.gz
