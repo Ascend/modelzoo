@@ -53,7 +53,6 @@ Ascend ModelZoo，欢迎各位开发者
     # See the License for the specific language governing permissions and
     # limitations under the License.
      ```
-
 * PyTorch
 
 1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License
