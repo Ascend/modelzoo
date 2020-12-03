@@ -10,7 +10,7 @@ Ascend ModelZoo，欢迎各位开发者
 
  **一、源码**
 
-1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++代码，符合第四部分编码规范
+1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++或python代码，符合第四部分编码规范
 
 2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 
