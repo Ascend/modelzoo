@@ -9,7 +9,7 @@ export TASK_QUEUE_ENABLE=1
 device_id_list=0,1
 
 currentDir=$(cd "$(dirname "$0")";pwd)
-currtime=`data + %Y%m%d%H%M%S`
+currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_2p_job_${currtime}
 mkdir -p ${train_log_dir}
 cd ${train_log_dir}

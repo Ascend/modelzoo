@@ -7,14 +7,14 @@ export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 
 currentDir=$(cd "$(dirname "$0")";pwd)
-currtime=`data + %Y%m%d%H%M%S`
+currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_8p_job_${currtime}
 mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 python3.7 ${currentDir}/DistributedResnet50/main-apex-d76-npu.py \
         --data /data/imagenet \
-        --addr=$(hostname -l |awk '{print $1}') \
+        --addr=$(hostname -I |awk '{print $1}') \
         --seed=49 \
         --workers=128 \
         --learning-rate=1.6 \
