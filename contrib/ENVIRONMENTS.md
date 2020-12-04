@@ -10,6 +10,11 @@ Shell脚本中，访问时用提供变量即可
 | CV  | IMG12_train | $IMG12_train |
 | CV  | IMG12_val | $IMG12_val |
 | CV  | CIFAR10      | $CIFAR10      |
+| CV  | ADEChallenge      | $ADEChallenge      |
+| CV  | COCO_train      | $COCO_train      |
+| CV  | COCO_val      | $COCO_val      |
+| CV  | SBD      | $SBD      |
+| CV  | VOC2012      | $VOC2012      |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
 | NLP | WMT_ENDE     | $WMT_ENDE      |
 | NLP | SQUADV2      | $SQUADV2       |
