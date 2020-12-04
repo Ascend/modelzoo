@@ -10,6 +10,11 @@ Shell脚本中，访问时用提供变量即可
 | CV  | IMG12_train | $IMG12_train |
 | CV  | IMG12_val | $IMG12_val |
 | CV  | CIFAR10      | $CIFAR10      |
+| CV  | ADEChallenge      | $ADEChallenge      |
+| CV  | COCO_train      | $COCO_train      |
+| CV  | COCO_val      | $COCO_val      |
+| CV  | SBD      | $SBD      |
+| CV  | VOC2012      | $VOC2012      |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
 | NLP | WMT_ENDE     | $WMT_ENDE      |
 | NLP | SQUADV2      | $SQUADV2       |
@@ -24,13 +29,20 @@ Shell脚本中，访问时用提供变量即可
 Package               Version
 --------------------- --------
 absl-py               0.11.0
+anyconfig             0.9.11
 astor                 0.8.1
 cached-property       1.5.2
 cycler                0.10.0
+decorator             4.4.2
+easydict              1.9
+enum34                1.1.10
 gast                  0.2.2
 google-pasta          0.2.0
 grpcio                1.33.2
 h5py                  3.1.0
+hccl                  0.1.0
+imageio               2.9.0
+imgaug                0.4.0
 importlib-metadata    2.0.0
 Keras                 2.3.1
 Keras-Applications    1.0.8
@@ -38,23 +50,37 @@ Keras-Preprocessing   1.1.2
 kiwisolver            1.3.1
 Markdown              3.3.3
 matplotlib            3.3.3
+mpmath                1.1.0
+munch                 2.5.0
+networkx              2.5
+npu-bridge            1.15.0
 numpy                 1.19.4
 opencv-contrib-python 4.4.0.46
 opencv-python         4.4.0.46
 opt-einsum            3.3.0
 Pillow                8.0.1
-pip                   20.2.4
+pip                   20.3
 protobuf              3.14.0
+pyclipper             1.2.0
 pyparsing             2.4.7
 python-dateutil       2.8.1
+PyWavelets            1.1.1
 PyYAML                5.3.1
+scikit-image          0.17.2
 scipy                 1.5.4
 setuptools            41.2.0
+Shapely               1.7.1
 six                   1.15.0
+sympy                 1.6.2
+te                    0.4.0
 tensorboard           1.15.0
 tensorflow            1.15.0
 tensorflow-estimator  1.15.1
 termcolor             1.1.0
+tifffile              2020.11.26
+topi                  0.4.0
+tqdm                  4.54.0
+utils                 1.0.1
 Werkzeug              1.0.1
 wheel                 0.35.1
 wrapt                 1.12.1
