@@ -1,6 +1,6 @@
 # Copyright (c) 2018-2019, NVIDIA CORPORATION
 # Copyright (c) 2017-      Facebook, Inc
-#
+# Copyright 2020 Huawei Technologies Co., Ltd
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without

@@ -40,10 +40,4 @@
 
         /home/ResNet50/result/training_8p_job_20201121023601
 	
-自测数据（不同系统和机器性能可能存在差异，以下性能数据仅供参考）：
-
-```
-	1.A+K平台，EulerOS2.8，1卡测试，精度76.230，性能fps 1585 images/s
-	2.A+K平台，EulerOS2.8，8卡测试，精度76.202，性能fps 10611 images/s
-```
 
