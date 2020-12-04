@@ -9,10 +9,10 @@ export TASK_QUEUE_ENABLE=1
 device_id=0
 
 currentDir=$(cd "$(dirname "$0")";pwd)
-currtime=`data + %Y%m%d%H%M%S`
+currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_1p_job_${currtime}
 mkdir -p ${train_log_dir}
-
+cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 python3.7 ${currentDir}/pytorch-resnet50-apex.py \
         --data /data/imagenet \
@@ -23,7 +23,7 @@ python3.7 ${currentDir}/pytorch-resnet50-apex.py \
         --warmup 5 \
         --label-smoothing=0.1 \
         --epochs 90 \
-        --optimizer-batch-size 512 > ./resnet50_1p.log &
+        --optimizer-batch-size 512 > ./resnet50_1p.log 2>&1 &
 
 
 
