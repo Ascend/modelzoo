@@ -52,8 +52,8 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
 python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./data/val.tfrecord    --image_num  50000 --class_num  1000  --batch_size  100  
      
 -  **参数解释**   
-model_path 加载模型的路径（例如 ./model/xception_model.ckpt）
-data_path  tfrecord数据集的路径 （例如 ./data/val.tfrecord）
+- model_path 加载模型的路径（例如 ./model/xception_model.ckpt）
+- data_path  tfrecord数据集的路径 （例如 ./data/val.tfrecord）
 output_path  经过fine_turn后的模型保存路径 
 do_train  是否训练，默认加载模型进行eval，如若需要加载预训练模型进行训练需将该值设为True
 image_num 相应数据集包含图片数量
