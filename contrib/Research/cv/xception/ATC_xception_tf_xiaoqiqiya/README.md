@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.79 | 0.781  |
+| Top-1 accuracy | 0.79 | 0.7856  |
 
 -  **Requirements** 
 1. Tensorflow 1.15
