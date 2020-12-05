@@ -1,7 +1,8 @@
-### -  **XCEPTION** 
+###   **XCEPTION** 
 
 
--  **概述** 
+###   **概述** 
+
 迁移Xception到ascend910平台
 将结果与原论文进行比较
 
@@ -13,7 +14,8 @@
 1. Tensorflow 1.15
 2. Ascend910
 
--  **代码及路径解释** 
+###   **代码及路径解释** 
+
 
 
 ```
@@ -39,19 +41,23 @@ xception
   ├─run_xception.py 进行train和eval的一些逻辑操作
   ├─run.sh 模型的启动脚本，其中包含两种模式，一种是加载预训练模型继续训练，另一种是加载模型进行eval
 ```
--  **数据集和模型** 
+###   **数据集和模型** 
+
 验证集数据\
 obs://public-dataset/imagenet/valid_tf_299/val.tfrecord\
 精度达标模型\
 obs://xception-training/MA-model_arts_xception-11-27-13-23/pre_training_model/
 
--  **train** \
+###   **train** 
+
 python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./data/val.tfrecord  --output_path  ./model_save  --do_train True  --image_num  50000 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.001   --save_checkpoints_steps  100
 
--  **eval** \
+###  **eval** 
+
 python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./data/val.tfrecord    --image_num  50000 --class_num  1000  --batch_size  100  
      
--  **参数解释**   
+###  **参数解释**  
+ 
  model_path 加载模型的路径（例如 ./model/xception_model.ckpt）\
  data_path  tfrecord数据集的路径 （例如 ./data/val.tfrecord）\
  output_path  经过fine_turn后的模型保存路径 \
