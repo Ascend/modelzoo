@@ -17,45 +17,27 @@
 
 
 ```
-albert
+xception
 └─ 
   ├─README.md
-  ├─output_base_v2 基于squadv2微调过的albert base模型路径
-  	├─checkpoint
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
+  ├─data 用于存放数据集
+  	├─val.record
   	└─...
-  ├─output_large_v2 基于squadv2微调过的albert base模型路径
+  ├─model 用于存放预训练模型
   	├─checkpoint
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
+  	├─xception_model.ckpt.data-00000-of-00001
+  	├─xception_model.index
+  	├─xception_model.meta
   	└─...
-  ├─albert_base_v2 albert base的预训练模型
-  	├─30k-clean.model
-  	├─30k-clean.vocab
-  	├─albert_config.json
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-
-  ├─albert_large_v2 albert large的预训练模型
-  	├─30k-clean.model
-  	├─30k-clean.vocab
-  	├─albert_config.json
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-  ├─squad_v2 存放数据目录
-  	├─train-v2.0.json 数据源文件
-  	├─dev-v2.0.json 数据源文件
-  	├─train.tfrecord 根据train-v2.0.json生成的文件
-  	├─dev.tfrecord 根据dev-v2.0.json生成的文件
-  	├─pred_left_file.pkl 根据dev-v2.0.json生成的文件
-
-  ├─squad2_base.sh albert base的启动脚本
-  ├─squad2_large.sh albert large的启动脚本
+  ├─save_model 用于存放经过fine_turn后的模型文件
+  	├─checkpoint
+  	├─xception_model.ckpt.data-00000-of-00001
+  	├─xception_model.index
+  	├─xception_model.meta
+  	└─...
+  ├─xception_model.py xception网络架构
+  ├─run_xception.py 进行train和eval的一些逻辑操作
+  ├─run.sh 模型的启动脚本，其中包含两种模式，一种是加载预训练模型继续训练，另一种是加载模型进行eval
 ```
 
 
