@@ -10,7 +10,7 @@
 |----------------|------|--------|
 | Top-1 accuracy | 0.79 | 0.7856  |
 
--  **Requirements** 
+ ** **Requirements** ** 
 1. Tensorflow 1.15
 2. Ascend910
 
