@@ -73,3 +73,18 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
  epoch  该值只在do_train 为True时有效，表示训练轮次\
  learning_rate 学习率\
  save_checkpoints_steps 保存模型的批次\
+
+### 说明
+本项目默认加载预训练模型进行再训练，如若希望重新开始训练则需要注释以下语句 \
+		#model = FLAGS.model_path \
+		#saver = tf.train.Saver() \
+		#saver.restore(sess, model) \
+
+由于imagenet数据较大，制作难度大，所以在制作过程中将imagenet分为24个tfrecord文件，放入同一文件夹内 \
+ 
+filepath = FLAGS.data_path \
+data_list = os.listdir(filepath) \
+for i in  data_list:  \
+	tf_data.append(os.path.join(filepath,i)) \
+print(tf_data) \
+以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data,读取文件时将此作为参数进行传递。
