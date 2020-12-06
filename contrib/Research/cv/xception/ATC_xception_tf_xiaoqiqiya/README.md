@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.79 | 0.7900  |
+| Top-1 accuracy | 0.7900 | 0.7900  |
 
 ###  Requirements
 
