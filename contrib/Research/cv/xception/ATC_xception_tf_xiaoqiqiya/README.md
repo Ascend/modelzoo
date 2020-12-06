@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.79 | 0.7856  |
+| Top-1 accuracy | 0.79 | 0.7900  |
 
 ###  Requirements
 
@@ -23,7 +23,10 @@
 xception
 └─ 
   ├─README.md
-  ├─data 用于存放数据集
+  ├─train_data 用于存放训练数据集
+  	├─train.tfrecord
+  	└─...
+  ├─test_data 用于存放测试数据集
   	├─val.tfrecord
   	└─...
   ├─model 用于存放预训练模型
@@ -40,7 +43,8 @@ xception
   	└─...
   ├─xception_model.py xception网络架构
   ├─run_xception.py 进行train和eval的一些逻辑操作
-  ├─run.sh 模型的启动脚本，其中包含两种模式，一种是加载预训练模型继续训练，另一种是加载模型进行eval
+  ├─train_1p.sh 模型的启动脚本，其中包含两种模式，一种是加载预训练模型继续训练，另一种是重新训练（model_path=None时）
+  ├─test_1p.sh 模型的启动测试脚本
 ```
 ###   **数据集和模型** 
 
@@ -54,18 +58,22 @@ https://github.com/HiKapok/Xception_Tensorflow \
 
 
 ###   **train** 
+加载预训练模型 \
+python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.001   --save_checkpoints_steps  100 \
 
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./data/val.tfrecord  --output_path  ./model_save  --do_train True  --image_num  50000 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.001   --save_checkpoints_steps  100
+从头开始训练 \
+python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.001   --save_checkpoints_steps  100
+
 
 ###  **eval** 
 
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./data/val.tfrecord    --image_num  50000 --class_num  1000  --batch_size  100  
+python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./test_data    --image_num  50000 --class_num  1000  --batch_size  100  
      
 ###  **参数解释**  
  
- model_path 加载模型的路径（例如 ./model/xception_model.ckpt）\
- data_path  tfrecord数据集的路径 （例如 ./data/val.tfrecord）\
- output_path  经过fine_turn后的模型保存路径 \
+ model_path 加载模型的路径（例如 ./model/xception_model.ckpt）不加载预训练模型时设为None即可\
+ data_path  tfrecord数据集的路径 （例如 ./train_data），只需要将所有的tfrecord文件放入其中 \
+ output_path  经过fine_turn后的模型保存路径 （若文件夹不存在则会自动新建！！！）\
  do_train  是否训练，默认加载模型进行eval，如若需要加载预训练模型进行训练需将该值设为True\
  image_num 相应数据集包含图片数量\
  class_num 图片标签数目\
@@ -75,16 +83,12 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
  save_checkpoints_steps 保存模型的批次\
 
 ### 说明
-本项目默认加载预训练模型进行再训练，如若希望重新开始训练则需要注释以下语句 \
-		#model = FLAGS.model_path \
-		#saver = tf.train.Saver() \
-		#saver.restore(sess, model) \
-
 由于imagenet数据较大，制作难度大，所以在制作过程中将imagenet分为24个tfrecord文件，放入同一文件夹内 \
- 
-filepath = FLAGS.data_path \
-data_list = os.listdir(filepath) \
-for i in  data_list:  \
-	tf_data.append(os.path.join(filepath,i)) \
-print(tf_data) \
-以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data,读取文件时将此作为参数进行传递。
+
+	filepath = tf_data_path \
+	tf_data_list = [] \
+	file_list = os.listdir(filepath) \
+	for i in file_list: \
+		tf_data_list.append(os.path.join(filepath,i)) \
+	return tf_data_list  \
+以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
