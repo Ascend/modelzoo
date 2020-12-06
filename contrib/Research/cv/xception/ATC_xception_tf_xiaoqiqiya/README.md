@@ -49,8 +49,8 @@ obs://public-dataset/imagenet/valid_tf_299/val.tfrecord\
 精度达标模型\
 obs://xception-training/MA-model_arts_xception-11-27-13-23/pre_training_model\
 预训练模型\
-https://github.com/HiKapok/Xception_Tensorflow\
-经测试发现预训练模型精度与论文中的精度有差距，但差距较小。\
+https://github.com/HiKapok/Xception_Tensorflow \
+经测试发现预训练模型精度与论文中的精度有差距，但差距较小.
 
 
 ###   **train** 
