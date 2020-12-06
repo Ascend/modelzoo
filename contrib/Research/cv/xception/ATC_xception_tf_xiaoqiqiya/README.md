@@ -71,16 +71,17 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
      
 ###  **参数解释**  
  
- model_path                 加载模型的路径（例如 ./model/xception_model.ckpt）不加载预训练模型时设为None即可\
- data_path                  tfrecord数据集的路径 （例如 ./train_data），只需要将所有的tfrecord文件放入其中 \
- output_path                经过fine_turn后的模型保存路径 （若文件夹不存在则会自动新建！！！）\
- do_train                   是否训练，默认加载模型进行eval，如若需要加载预训练模型进行训练需将该值设为True\
- image_num                  相应数据集包含图片数量\
- class_num                  图片标签数目\
- batch_size                 当do_train 为False时，该值需要能被图片数量整除，以确保最终准确率的准确性，do_train为True时则无该要求\
- epoch                      该值只在do_train 为True时有效，表示训练轮次\
- learning_rate              学习率\
- save_checkpoints_steps     保存模型的批次
+
+ model_path---------------加载模型的路径（例如 ./model/xception_model.ckpt）不加载预训练模型时设为None即可  
+ data_path----------------tfrecord数据集的路径 （例如 ./train_data），只需要将所有的tfrecord文件放入其中 \
+ output_path--------------经过fine_turn后的模型保存路径 （若文件夹不存在则会自动新建！！！）\
+ do_train-----------------是否训练，默认加载模型进行eval，如若需要加载预训练模型进行训练需将该值设为True\
+ image_num----------------相应数据集包含图片数量\
+ class_num----------------图片标签数目\
+ batch_size---------------当do_train 为False时，该值需要能被图片数量整除，以确保最终准确率的准确性，do_train为True时则无该要求\
+ epoch--------------------该值只在do_train 为True时有效，表示训练轮次\
+ learning_rate------------学习率\
+ save_checkpoints_steps---保存模型的批次
 
 ### 说明
 由于imagenet数据较大，制作难度大，所以在制作过程中将imagenet分为24个tfrecord文件，放入同一文件夹内 \
