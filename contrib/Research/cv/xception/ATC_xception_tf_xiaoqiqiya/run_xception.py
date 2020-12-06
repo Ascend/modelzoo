@@ -9,7 +9,7 @@ import sys
 # from tensorflow.python import pywrap_tensorflow
 
 from xception_model import XceptionModel
-from  Data import get_train_data,get_test_data
+from  data_utils import get_train_data,get_test_data
 
 
 
