@@ -59,10 +59,10 @@ https://github.com/HiKapok/Xception_Tensorflow \
 
 ###   **train** 
 加载预训练模型 \
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.001   --save_checkpoints_steps  100 \
+python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  100 \
 
 从头开始训练 \
-python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.001   --save_checkpoints_steps  100
+python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  100
 
 
 ###  **eval** 
