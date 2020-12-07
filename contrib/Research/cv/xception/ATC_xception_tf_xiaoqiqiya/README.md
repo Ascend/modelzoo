@@ -23,13 +23,13 @@
 xception
 └─ 
   ├─README.md
-  ├─train_data 用于存放训练数据集
+  ├─train_data 用于存放训练数据集 #obs://public-dataset/imagenet/train_tf_299/ 
   	├─train.tfrecord
   	└─...
-  ├─test_data 用于存放测试数据集
-  	├─val.tfrecord
+  ├─test_data 用于存放测试数据集 #obs://public-dataset/imagenet/valid_tf_299/
+  	├─val.tfrecord  
   	└─...
-  ├─model 用于存放预训练模型
+  ├─model 用于存放预训练模型 #obs://xception-training/MA-model_arts_xception-11-27-13-23/pre_training_model/
   	├─checkpoint
   	├─xception_model.ckpt.data-00000-of-00001
   	├─xception_model.index
@@ -48,13 +48,15 @@ xception
 ```
 ###   **数据集和模型** 
 
-验证集数据\
-obs://public-dataset/imagenet/valid_tf_299/val.tfrecord\
-精度达标模型\
-obs://xception-training/MA-model_arts_xception-11-27-13-23/pre_training_model\
+数据集 imagenet 2012
+http://www.image-net.org/
+
 预训练模型\
 https://github.com/HiKapok/Xception_Tensorflow \
-经测试发现预训练模型精度与论文中的精度有差距，但差距较小.
+注：经测试发现预训练模型精度与论文中的精度有差距，但差距较小.
+
+模型下载链接
+https://drive.google.com/file/d/1sJCRDhaNaJAnouKKulB3YO8Hu3q91KjP/view
 
 
 ###   **train** 
