@@ -56,16 +56,22 @@ https://github.com/HiKapok/Xception_Tensorflow \
 注：经测试发现预训练模型精度与论文中的精度有差距，但差距较小.
 
 模型下载链接
-https://drive.google.com/file/d/1sJCRDhaNaJAnouKKulB3YO8Hu3q91KjP/view
+https://drive.google.com/file/d/1sJCRDhaNaJAnouKKulB3YO8Hu3q91KjP/view \
+
+经过训练精度达标模型
+obs://xception-training/MA-model_arts_xception-11-27-13-23/model/
 
 
 ###   **train** 
 加载预训练模型 \
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  100 \
+python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  1000 \
+
+加载预训练模型直至精度达标耗时共计25小时左右
+
 
 从头开始训练 \
 python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  100
-
+注：只提供该训练方式，但并未采用该方式进行训练！！
 
 ###  **eval** 
 
