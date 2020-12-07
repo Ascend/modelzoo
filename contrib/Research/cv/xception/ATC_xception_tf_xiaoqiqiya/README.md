@@ -71,6 +71,7 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
 
 从头开始训练 \
 python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  100
+
 注：只提供该训练方式，但并未采用该方式进行训练！！
 
 ###  **eval** 
@@ -97,7 +98,7 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
 	filepath = tf_data_path 
 	tf_data_list = [] 
 	file_list = os.listdir(filepath) 
-	for i in file_list: \
+	for i in file_list: 
 		tf_data_list.append(os.path.join(filepath,i)) 
 	return tf_data_list  
 以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
