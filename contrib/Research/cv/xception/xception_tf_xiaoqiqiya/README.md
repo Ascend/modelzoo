@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.7900 | 0.7900  |
+| Top-1 accuracy | 0.7900 | 0.7998  |
 
 ###  Requirements
 
@@ -67,7 +67,7 @@ batch_size=64
 lr=0.01
 耗费4小时
 
-xception eval  loss=6.13379   acc=0.7998 
+xception eval  loss=6.13379   acc=0.7998 \
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1208/185828_331e9fdd_8376014.png "屏幕截图.png")
 
 
