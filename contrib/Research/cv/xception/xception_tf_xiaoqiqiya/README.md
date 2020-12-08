@@ -73,13 +73,13 @@ xception eval  loss=6.13379   acc=0.7998 \
 
 ###   **train** 
 加载预训练模型 \
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  1 --learning_rate  0.01   --save_checkpoints_steps  1000 \
+python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  1 --learning_rate  0.01   --save_checkpoints_steps  10 \
 
 加载预训练模型直至精度达标耗时共计25小时左右
 
 
 从头开始训练 \
-python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  100 --learning_rate  0.01   --save_checkpoints_steps  100
+python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  100 --learning_rate  0.01   --save_checkpoints_steps  10
 
 注：只提供该训练方式，但并未采用该方式进行训练！！
 
