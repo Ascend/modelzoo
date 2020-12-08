@@ -61,16 +61,25 @@ https://drive.google.com/file/d/1sJCRDhaNaJAnouKKulB3YO8Hu3q91KjP/view \
 经过训练精度达标模型
 obs://xception-training/MA-model_arts_xception-11-27-13-23/model/
 
+### 训练过程及结果
+epoch=1
+batch_size=64
+lr=0.01
+耗费4小时
+
+xception eval  loss=6.13379   acc=0.7998 
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1208/185828_331e9fdd_8376014.png "屏幕截图.png")
+
 
 ###   **train** 
 加载预训练模型 \
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  1000 \
+python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  1 --learning_rate  0.01   --save_checkpoints_steps  1000 \
 
 加载预训练模型直至精度达标耗时共计25小时左右
 
 
 从头开始训练 \
-python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  10 --learning_rate  0.01   --save_checkpoints_steps  100
+python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  100 --learning_rate  0.01   --save_checkpoints_steps  100
 
 注：只提供该训练方式，但并未采用该方式进行训练！！
 
