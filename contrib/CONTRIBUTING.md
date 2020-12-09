@@ -18,20 +18,24 @@ Ascend ModelZoo，欢迎各位开发者
 
 4、从其他开源迁移的代码，请增加License声明
 
-* TensorFlow
-  
-    1、迁移TensorFlow模型中若源项目目录已包含License文件则必须拷贝引用，否则在模型项目目录下添加TensorFlow Apache 2.0 License  [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+ **二、License规则**
 
-    2、基于TensorFlow第三方框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
+* TensorFlow
+    
+    迁移场景
+  
+    1、迁移TensorFlow模型中若源项目目录已包含License文件则必须拷贝引用，否则在模型项目目录下添加TensorFlow Apache 2.0 License， [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+
+    2、迁移TensorFlow第三方框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
     
     ```
-    # Copyright 2019 Huawei Technologies Co., Ltd
+    # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
     # You may obtain a copy of the License at
     #
-    # http://www.apache.org/licenses/LICENSE-2.0
+    #     http://www.apache.org/licenses/LICENSE-2.0
     #
     # Unless required by applicable law or agreed to in writing, software
     # distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,11 +57,31 @@ Ascend ModelZoo，欢迎各位开发者
     # See the License for the specific language governing permissions and
     # limitations under the License.
      ```
+   开发场景
+
+    1、基于TensorFlow框架开发模型，需在模型项目目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+
+    2、基于TensorFlow框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
+    ```
+    # Copyright 2020 Huawei Technologies Co., Ltd
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #     http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    ```
 * PyTorch
 
-1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License  [PyTorch License链接](https://github.com/pytorch/pytorch/blob/master/LICENSE)
+    1、迁移PyTorch模型中若源项目目录已包含PyTorch License文件则必须拷贝引用，否则在模型项目目录下添加BSD-3 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
 
-2、基于PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区的BSD-3 Clause License头部声明，并在其下追加新增完整华为公司License声明
+    2、基于PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区PyTorch BSD-3 License头部声明，并在其下追加新增完整华为公司License声明
 
  
 * MindSpore/ACL
