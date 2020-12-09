@@ -152,7 +152,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 * MindSpore/ACL
     
-    1、迁移或开发场景下MindSpore/ACL模型顶层目录下需要包含华为公司 License [TensorFlow License链接](https://gitee.com/mindspore/mindspore/blob/master/LICENSE)
+    1、迁移或开发场景下MindSpore/ACL模型顶层目录下需要包含华为公司 License [华为公司 License链接](https://gitee.com/mindspore/mindspore/blob/master/LICENSE)
     
     2、迁移或开发场景下MindSpore/ACL模型，需要在模型目录下每个源文件中添加区华为公司Apache 2.0 License头部声明
      ```
@@ -171,11 +171,10 @@ Ascend ModelZoo，欢迎各位开发者
     # limitations under the License.
     ```
 
-
 > 关于License声明时间，应注意： 2020年新建的文件，应该是Copyright 2020 Huawei Technologies Co., Ltd 2019年创建年份，2020年修改年份，应该是Copyright 2019-2020 Huawei Technologies Co., Ltd
 
  
- **二、readme**
+ **三、readme**
 
 readme用于指导用户理解和部署样例，要包含如下内容：
 
@@ -197,7 +196,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
- **三、自测试用例**
+ **四、自测试用例**
 
 提供模型的自测试用例和readme，提交PR需要门禁及模型测试用例通过，性能和精度检查通过
 
@@ -229,7 +228,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
- **四、PR提交**
+ **五、PR提交**
 
 - 关键要求：
 
@@ -237,7 +236,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 
- **五、编程规范**
+ **六、编程规范**
 
 - 规范标准
 
