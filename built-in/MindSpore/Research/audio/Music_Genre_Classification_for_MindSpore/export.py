@@ -13,6 +13,6 @@ if __name__ == "__main__":
                                               1366]).astype(np.float32)
     export(network,
            Tensor(input),
-           file_name="{}/{}.air".format(cfg.checkpoint_path,
+           filename="{}/{}.air".format(cfg.checkpoint_path,
                                        cfg.model_name[:-5]),
            file_format="AIR")

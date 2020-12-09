@@ -47,7 +47,7 @@ music_cfg = edict({
     'device_id': 0,
     'keep_checkpoint_max': 10,
     'save_step': 2000,
-    'checkpoint_path': '/dev/data/Music_Tagger_Data/model',
+    'checkpoint_path': '/dev/data/Music_Tagger_Data/model/',
     'prefix': 'MusicTagger',
     'model_name': 'MusicTagger_3-50_543.ckpt',
 })
