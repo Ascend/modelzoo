@@ -337,6 +337,7 @@ if __name__ == '__main__':
     custom_op.parameter_map["enable_data_pre_proc"].b = True
     custom_op.parameter_map["mix_compile_mode"].b = False 
     custom_op.parameter_map["use_off_line"].b = True
+    custom_op.parameter_map["iterations_per_loop"].i = 10
     custom_op.parameter_map["min_group_size"].b = 1
     custom_op.parameter_map["hcom_parallel"].b = True
     custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")    
