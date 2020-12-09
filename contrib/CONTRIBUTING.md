@@ -20,9 +20,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 * TensorFlow
   
-1、迁移TensorFlow模型中若源项目目录已包含License文件则必须拷贝引用，否则在模型项目目录下添加TensorFlow Apache 2.0 License
-   
-     [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+1、迁移TensorFlow模型中若源项目目录已包含License文件则必须拷贝引用，否则在模型项目目录下添加TensorFlow Apache 2.0 License  [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
 
 2、基于TensorFlow第三方框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
     
@@ -57,7 +55,7 @@ Ascend ModelZoo，欢迎各位开发者
      ```
 * PyTorch
 
-1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License
+1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License  [PyTorch License链接](https://github.com/pytorch/pytorch/blob/master/LICENSE)
 
 2、基于PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区的BSD-3 Clause License头部声明，并在其下追加新增完整华为公司License声明
 
