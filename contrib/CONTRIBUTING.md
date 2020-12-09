@@ -24,9 +24,9 @@ Ascend ModelZoo，欢迎各位开发者
     
     迁移场景
   
-    1、迁移TensorFlow模型中若源项目目录已包含License文件则必须拷贝引用，否则在模型项目目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+    1、迁移TensorFlow模型中若源项目已包含License文件则必须拷贝引用，否则在模型顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
 
-    2、迁移TensorFlow第三方框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
+    2、迁移TensorFlow框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
     
     ```
     # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
@@ -59,7 +59,7 @@ Ascend ModelZoo，欢迎各位开发者
      ```
    开发场景
 
-    1、基于TensorFlow框架开发模型，需在模型项目目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+    1、基于TensorFlow框架开发模型，需在模型项目顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
 
     2、基于TensorFlow框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
     ```
@@ -81,7 +81,7 @@ Ascend ModelZoo，欢迎各位开发者
 
     迁移场景
   
-    1、迁移PyTorch模型中若源项目目录已包含PyTorch License文件则必须拷贝引用，否则在模型项目目录下添加BSD-3 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+    1、迁移PyTorch模型中若源项目录已包含PyTorch License文件则必须拷贝引用，否则在模型顶层目录下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
     
     2、迁移PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区PyTorch BSD-3 License头部声明，并在其下追加新增完整华为公司License声明
     ```
@@ -129,9 +129,10 @@ Ascend ModelZoo，欢迎各位开发者
     # See the License for the specific language governing permissions and
     # limitations under the License.
     ```
+    
     开发场景
 
-    1、基于PyTorch框架开发模型，需在模型项目目录下添加BSD-3 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+    1、基于PyTorch框架开发模型，需在模型项目下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
 
     2、基于PyTorch框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
      ```
