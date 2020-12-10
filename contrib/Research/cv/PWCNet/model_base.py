@@ -147,6 +147,7 @@ class ModelBase:
         save_path = self.saver.save(ranking_value, self.sess, self.g_step_op)
 
         # Li Zhongyu: save ck to obs
+        # TODO set obs path
         name = save_path.split('/')[-1]
         mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.data-00000-of-00001')
         mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.meta')
