@@ -68,20 +68,22 @@ lr=0.0001
 
 ###   **train** 
 加载预训练模型 \
-python    run_resnet.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  1 --learning_rate  0.01   --save_checkpoints_steps  10 \
+python    run_resnet.py  --model_path ./model/resnet_v1_152.ckpt  --data_path  ./train_data --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  128 --epoch  5  --learning_rate  0.0001   --save_checkpoints_steps  100 \
+    
 
 加载预训练模型直至精度达标耗时共计25小时左右
 
 
 从头开始训练 \
-python    run_xception.py  --model_path None  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  100 --learning_rate  0.01   --save_checkpoints_steps  10
+python    run_resnet.py  --model_path None  --data_path  ./train_data --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  128 --epoch  5  --learning_rate  0.0001   --save_checkpoints_steps  100
+    
 
 注：只提供该训练方式，但并未采用该方式进行训练！！
 
 ###  **eval** 
 
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./test_data    --image_num  50000 --class_num  1000  --batch_size  100  
-     
+python    run_resnet.py  --model_path ./model/resnet.ckpt --data_path ./test_data/    --image_num  50000 --class_num  1000  --batch_size  100
+
 ###  **参数解释**  
  
 
