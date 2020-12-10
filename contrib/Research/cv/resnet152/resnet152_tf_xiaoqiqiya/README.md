@@ -1,14 +1,14 @@
-###   **XCEPTION** 
+###   **resnet-152** 
 
 
 ###   **概述** 
 
-迁移Xception到ascend910平台
+迁移resnet-152到ascend910平台
 将结果与原论文进行比较
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.7900 | 0.7998  |
+| Top-1 accuracy | 0.7700 | 0.75.9  |
 
 ###  Requirements
 
@@ -23,26 +23,25 @@
 xception
 └─ 
   ├─README.md
-  ├─train_data 用于存放训练数据集 #obs://public-dataset/imagenet/train_tf_299/ 
+  ├─train_data 用于存放训练数据集 #obs://public-dataset/imagenet/train_tf_224/ 
   	├─train.tfrecord
   	└─...
-  ├─test_data 用于存放测试数据集 #obs://public-dataset/imagenet/valid_tf_299/
+  ├─test_data 用于存放测试数据集 #obs://public-dataset/imagenet/valid_tf_224/
   	├─val.tfrecord  
   	└─...
-  ├─model 用于存放预训练模型 #obs://xception-training/MA-model_arts_xception-11-27-13-23/pre_training_model/
-  	├─checkpoint
-  	├─xception_model.ckpt.data-00000-of-00001
-  	├─xception_model.index
-  	├─xception_model.meta
+  ├─model 用于存放预训练模型 #obs://resnet-training/MA-model_art_resnet-11-26-20-34/pretrain_model/
+  	├─resnet_v1_152.ckpt
   	└─...
   ├─save_model 用于存放经过fine_turn后的模型文件
   	├─checkpoint
-  	├─xception_model.ckpt.data-00000-of-00001
-  	├─xception_model.index
-  	├─xception_model.meta
+  	├─resnet152_model.ckpt.data-00000-of-00001
+  	├─resnet152_model.index
+  	├─resnet152_model.meta
   	└─...
-  ├─xception_model.py xception网络架构
-  ├─run_xception.py 进行train和eval的一些逻辑操作
+  ├─data_utils.py 获取数据
+  ├─resnet52.py resnet152网络架构
+  ├─resnet_utils.py resnet网络架构
+  ├─run_resnet.py 进行train和eval的一些逻辑操作
   ├─train_1p.sh 模型的启动脚本，其中包含两种模式，一种是加载预训练模型继续训练，另一种是重新训练（model_path=None时）
   ├─test_1p.sh 模型的启动测试脚本
 ```
@@ -52,28 +51,24 @@ xception
 http://www.image-net.org/
 
 预训练模型\
-https://github.com/HiKapok/Xception_Tensorflow \
-注：经测试发现预训练模型精度与论文中的精度有差距，但差距较小.
+https://github.com/tensorflow/models/blob/master/research/slim/nets/resnet_v1.py \
+注：经测试发现预训练模型精度与论文中的精度有差距，但差距较大，可能是由于数据预处理未对齐.
 
 模型下载链接
-https://drive.google.com/file/d/1sJCRDhaNaJAnouKKulB3YO8Hu3q91KjP/view \
+http://download.tensorflow.org/models/resnet_v1_152_2016_08_28.tar.gz \
 
-经过训练精度达标模型
-obs://xception-training/MA-model_arts_xception-11-27-13-23/model/
+
 
 ### 训练过程及结果
-epoch=1
-batch_size=64
-lr=0.01
-耗费4小时
-
-xception eval  loss=6.13379   acc=0.7998 \
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1208/185828_331e9fdd_8376014.png "屏幕截图.png")
+epoch=4
+batch_size=128
+lr=0.0001
+耗费7小时
 
 
 ###   **train** 
 加载预训练模型 \
-python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  1 --learning_rate  0.01   --save_checkpoints_steps  10 \
+python    run_resnet.py  --model_path ./model/xception_model.ckpt  --data_path ./train_data  --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  64  --epoch  1 --learning_rate  0.01   --save_checkpoints_steps  10 \
 
 加载预训练模型直至精度达标耗时共计25小时左右
 
