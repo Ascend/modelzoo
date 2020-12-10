@@ -32,14 +32,14 @@ def train_parse_augmentation(image, label):
     #image = tf.image.random_brightness(image,max_delta=0.5)
     #image = tf.image.random_contrast(image,1, 5)
     #imaeg = tf.image.random_saturation(image,1,5)
-    image /= 127.5
-    image -= 1.0
+    #image /= 127.5
+    #image -= 1.0
     return image, label
 
 
 def test_parse_augmentation(images, labels):
-    images /= 127.5
-    images -= 1.0
+    #images /= 127.5
+    #images -= 1.0
     return images, labels
 
 
