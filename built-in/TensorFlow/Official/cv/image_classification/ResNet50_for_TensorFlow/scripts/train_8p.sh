@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 currentDir=$(cd "$(dirname "$0")"; pwd)
 cd ${currentDir}
 

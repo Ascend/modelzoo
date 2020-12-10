@@ -21,7 +21,7 @@ config = {
     'data_type': 'TFRECORD',
     'model_name': 'resnet50', 
     'num_classes': 1001,
-    'num_epochs': None,
+    'num_epochs': 90,
     'height':224,
     'width':224, 
     'dtype': tf.float32,
