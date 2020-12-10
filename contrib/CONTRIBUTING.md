@@ -89,7 +89,7 @@ Ascend ModelZoo，欢迎各位开发者
     #
     # Copyright (c) 2017 xxxx 
     # All rights reserved.
-    # ** Copyright 2020 Huawei Technologies Co., Ltd** 
+    # Copyright 2020 Huawei Technologies Co., Ltd 
     #
     # Redistribution and use in source and binary forms, with or without
     # modification, are permitted provided that the following conditions are met:
