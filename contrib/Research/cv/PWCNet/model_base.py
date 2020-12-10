@@ -1,4 +1,3 @@
-
 """
 model_base.py
 Model base class.
@@ -19,10 +18,13 @@ from mixed_precision import float32_variable_storage_getter
 
 _DEBUG_USE_REF_IMPL = False
 
-####zhangcb change NPU
-import npu_bridge # 导入TFAdapter插件库
+# zhangcb change NPU
+import npu_bridge  # 导入TFAdapter插件库
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-####zhangcb change NPU
+# zhangcb change NPU
+
+import moxing as mox  # obs Lizy
+
 
 class ModelBase:
     def __init__(self, name='base', mode='train_with_val', session=None, options=None):
@@ -39,7 +41,7 @@ class ModelBase:
             # self.graph = tf.Graph()
             # with self.graph.as_default():
         """
-        assert(mode in ['train_noval', 'train_with_val', 'val', 'val_notrain', 'test'])
+        assert (mode in ['train_noval', 'train_with_val', 'val', 'val_notrain', 'test'])
         self.mode, self.sess, self.opts = mode, session, options
         self.y_hat_train_tnsr = self.y_hat_val_tnsr = self.y_hat_test_tnsr = None
         self.name = name
@@ -84,19 +86,18 @@ class ModelBase:
         #    self.sess = tf.Session(config=config)
         # else:
         #    self.sess = sess
-            
+
         if sess is None:
             print(">>>>>>>>>use NPU session<<<<<<<<<")
             config = tf.ConfigProto()
             custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
             custom_op.name = "NpuOptimizer"
-            custom_op.parameter_map["use_off_line"].b = True # 必须显式开启，在昇腾AI处理器执行训练
+            custom_op.parameter_map["use_off_line"].b = True  # 必须显式开启，在昇腾AI处理器执行训练
             config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显式关闭remap
             self.sess = tf.Session(config=config)
         else:
             self.sess = sess
             print('>>>>>>>not use NPU<<<<<<')
-            
 
         tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -138,12 +139,22 @@ class ModelBase:
         Args:
             ranking_value: The ranking value by which to rank the checkpoint.
         """
-        assert(self.mode in ['train_noval', 'train_with_val'])
+        assert (self.mode in ['train_noval', 'train_with_val'])
         if self.opts['verbose']:
             print("Saving model...")
 
         # save_path = self.saver.save(self.sess, self.opts['ckpt_dir'] + self.name, self.g_step_op)
         save_path = self.saver.save(ranking_value, self.sess, self.g_step_op)
+
+        # Li Zhongyu: save ck to obs
+        name = save_path.split('/')[-1]
+        mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.data-00000-of-00001')
+        mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.meta')
+        mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.index')
+
+        mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-lxm/log/checkpoints/' + 'checkpoint')
+        mox.file.copy_parallel(save_path[0:-len(name)] + 'best_checkpoints', 'obs://pwcnet-lxm/log/checkpoints/' + 'best_checkpoints')
+        # Li Zhongyu: save ck to obs
 
         if self.opts['verbose']:
             if save_path is None:
@@ -161,7 +172,7 @@ class ModelBase:
             self.last_ckpt = None
             if self.opts['train_mode'] == 'fine-tune':
                 # In fine-tuning mode, we just want to load the trained params from the file and that's it...
-                assert(tf.train.checkpoint_exists(self.opts['ckpt_path']))
+                assert (tf.train.checkpoint_exists(self.opts['ckpt_path']))
                 if self.opts['verbose']:
                     print(f"Initializing from pre-trained model at {self.opts['ckpt_path']} for finetuning...\n")
                 # ...however, the AdamOptimizer also stores variables in the graph, so reinitialize them as well
@@ -196,7 +207,7 @@ class ModelBase:
         else:
             # Initialize the graph with the content of the checkpoint
             self.last_ckpt = self.opts['ckpt_path']
-            assert(self.last_ckpt is not None)
+            assert (self.last_ckpt is not None)
             if self.opts['verbose']:
                 print(f"Loading model checkpoint {self.last_ckpt} for eval or testing...\n")
             self.saver.restore(self.sess, self.last_ckpt)
@@ -375,4 +386,3 @@ class ModelBase:
             if self.dbg:
                 self.summary()
             print(f"  {'trainable params':22} {np.sum([np.prod(v.shape) for v in tf.trainable_variables()])}")
-            
