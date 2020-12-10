@@ -145,7 +145,7 @@ def main(_):
 		saver = tf.train.Saver()
 
 		if FLAGS.model_path != "None":
-			model = "./resnet_v1_152.ckpt"
+			model = FLAGS.model_path
 			saver.restore(sess, model)
 
 
@@ -162,7 +162,7 @@ def main(_):
 							print('Epoch %d, step %d, train loss = %.4f, train accuracy = %.2f%%' % (
 							epoch + 1, step + 1, tra_loss, tra_acc * 100.0))	
 						if (step+1)%FLAGS.save_checkpoints_steps==0:
-							checkpoint_path = os.path.join(FLAGS.output_path, "xception_model.ckpt")
+							checkpoint_path = os.path.join(FLAGS.output_path, "resnet_model.ckpt")
 							saver.save(sess, checkpoint_path)
 			#测试模块 eval
 			if FLAGS.do_train==False:
