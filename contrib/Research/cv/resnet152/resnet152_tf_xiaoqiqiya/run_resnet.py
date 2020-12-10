@@ -2,11 +2,11 @@ import tensorflow as tf
 import os
 import numpy as np
 import sys
-# import moxing as mox
-# from npu_bridge.estimator import npu_ops
-# from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-# from tensorflow.python.framework import graph_util
-# from tensorflow.python import pywrap_tensorflow
+import moxing as mox
+from npu_bridge.estimator import npu_ops
+from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+from tensorflow.python.framework import graph_util
+from tensorflow.python import pywrap_tensorflow
 import tensorflow.contrib.slim as slim
 from resnet152 import resnet_v1_152
 from  data_utils import get_train_data,get_test_data
@@ -135,11 +135,11 @@ def main(_):
 			images_batch ,labels_batch =  get_test_data(tf_data_list(FLAGS.data_path), FLAGS.batch_size)
 
 		config = tf.ConfigProto(allow_soft_placement=True)
-		# custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
-		# custom_op.name = "NpuOptimizer"
-		# custom_op.parameter_map["use_off_line"].b = True  # 在昇腾AI处理器执行训练
-		# config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 关闭remap开关
-		# config.gpu_options.allow_growth = True
+		custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+		custom_op.name = "NpuOptimizer"
+		custom_op.parameter_map["use_off_line"].b = True  # 在昇腾AI处理器执行训练
+		config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 关闭remap开关
+		config.gpu_options.allow_growth = True
 		sess = tf.Session(config=config)
 		sess.run(tf.global_variables_initializer())
 		saver = tf.train.Saver()
