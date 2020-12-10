@@ -33,9 +33,9 @@ This example implements training and evaluation of Transformer Model, which is i
     ```
 
 ### Key configuration changes
-- Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-  - [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
-- modify the permission of the script to be run in the file
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
 
 ## Running the example
 ### Training
@@ -84,11 +84,14 @@ It contains of parameters of Transformer model and options for training and eval
 ### Parameters:
 ```
 Parameters for training (Training/Evaluation):
-    batch_size                      batch size of input dataset: N, default is 40
-    max_length                      length of input sequence: N, default is 128
-    train_steps						totally training steps for training: N, default is 300000
-    dropout_rate             		dropout probability for TransformerOutput: Q, default is 0.2
-    optimizer.name					optimizer used in the network: Adam, default is "Adam"
-    learning_rate.warmup_steps		value of learning rate: N
-    init_loss_scale                 initial value of loss scale: N, default is 2^10
+    --config_paths                 Path for training config file.
+    --model_params                 Model parameters for training the model, like learning_rate,dropout_rate.
+    --metrics                      Metrics for model eval.
+    --input_pipeline_train         Dataset input pipeline for training.
+    --input_pipeline_dev           Dataset input pipeline for dev.
+    --train_steps                  Training steps, default is 300000.
+    --keep_checkpoint_max          Number of the checkpoint kept in the checkpoint dir.
+    --batch_size                   Batch size for training, default is 40.
+    --model_dir                    Model dir for saving checkpoint
+    --use_fp16                     Whether to use fp16, default is True.
 ```
