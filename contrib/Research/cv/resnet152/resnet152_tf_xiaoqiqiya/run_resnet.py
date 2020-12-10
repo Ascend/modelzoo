@@ -174,7 +174,7 @@ def main(_):
 					test_losss, test_accs = sess.run([test_loss, test_acc], feed_dict={inputx: x_in, inputy: y_in})
 					acc.append(test_accs)
 					loss.append(test_losss)
-				print("xception eval  loss=%.5f   acc=%.4f "%(np.mean(loss),np.mean(acc)))            
+				print("resnet152 eval  loss=%.5f   acc=%.4f "%(np.mean(loss),np.mean(acc)))            
 		except tf.errors.OutOfRangeError:
 			print('epoch limit reached')
 		finally:
