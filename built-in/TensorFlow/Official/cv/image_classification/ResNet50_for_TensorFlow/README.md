@@ -153,7 +153,7 @@ Only Evaluate:
   --batch_size            mini-batch size (default: 256) per gpu
   --lr_decay_mode         type of LR schedule: exponential, cosine_annealing
   --learning_rate_maximum initial learning rate
-  --num_epochs            poch num to train the model
+  --num_epochs            poch num to train the model (default: 90)
   --warmup_epochs         warmup epoch(when batchsize is large)
   --weight_decay          weight decay (default: 1e-4)
   --momentum              momentum(default: 0.9)
