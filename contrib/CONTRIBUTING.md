@@ -83,13 +83,14 @@ Ascend ModelZoo，欢迎各位开发者
   
     1、迁移PyTorch模型中若源项目录已包含PyTorch License文件则必须拷贝引用，否则在模型顶层目录下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
     
-    2、迁移PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区PyTorch BSD-3 License头部声明，并在其下追加新增完整华为公司License声明
+    2、迁移PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区PyTorch BSD-3 License头部声明，并在其下追加新增一行华为公司License声明
     ```
     # BSD 3-Clause License
     #
-    # Copyright (c) 2017,
+    # Copyright (c) 2017 xxxx 
     # All rights reserved.
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # ** Copyright 2020 Huawei Technologies Co., Ltd** 
+    #
     # Redistribution and use in source and binary forms, with or without
     # modification, are permitted provided that the following conditions are met:
     #
@@ -115,19 +116,6 @@ Ascend ModelZoo，欢迎各位开发者
     # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
     # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     # ============================================================================
-    # Copyright 2020 Huawei Technologies Co., Ltd
-    #
-    # Licensed under the Apache License, Version 2.0 (the "License");
-    # you may not use this file except in compliance with the License.
-    # You may obtain a copy of the License at
-    #
-    #     http://www.apache.org/licenses/LICENSE-2.0
-    #
-    # Unless required by applicable law or agreed to in writing, software
-    # distributed under the License is distributed on an "AS IS" BASIS,
-    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    # See the License for the specific language governing permissions and
-    # limitations under the License.
     ```
     
     开发场景
@@ -138,11 +126,11 @@ Ascend ModelZoo，欢迎各位开发者
      ```
     # Copyright 2020 Huawei Technologies Co., Ltd
     #
-    # Licensed under the Apache License, Version 2.0 (the "License");
+    # Licensed under the BSD 3-Clause License  (the "License");
     # you may not use this file except in compliance with the License.
     # You may obtain a copy of the License at
     #
-    #     http://www.apache.org/licenses/LICENSE-2.0
+    # https://opensource.org/licenses/BSD-3-Clause
     #
     # Unless required by applicable law or agreed to in writing, software
     # distributed under the License is distributed on an "AS IS" BASIS,
