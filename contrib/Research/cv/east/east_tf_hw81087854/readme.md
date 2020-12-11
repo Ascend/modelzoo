@@ -79,7 +79,7 @@ If you want to train on NPU , use this command:
 python3 npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
---checkpoint_path=./ckpt/ \
+--checkpoint_path=./checkpoint/ \
 --text_scale=512 \
 --training_data_path=./ocr/icdar2015/ \
 --geometry=RBOX \
