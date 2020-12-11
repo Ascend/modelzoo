@@ -1,4 +1,4 @@
-python3 npu_train.py \
+python npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
 --checkpoint_path=./checkpoint/ \
