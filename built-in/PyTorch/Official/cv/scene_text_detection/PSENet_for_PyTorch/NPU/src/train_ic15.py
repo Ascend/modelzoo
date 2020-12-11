@@ -77,7 +77,6 @@ def ohem_batch(scores, gt_texts, training_masks):
 
 
 def dice_loss(input, target, mask):
-    # print shape stride
     input = torch.sigmoid(input)
 
     input = input.reshape(input.size()[0], -1)
@@ -179,7 +178,7 @@ def train(train_loader, model, criterion, optimizer, epoch, all_step,  args, npu
         end = time.time()
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % npu_per_node == 0):
-
+            cur_step = epoch * all_step + batch_idx
             output_log = '({batch}/{size}) cur_step: {cur_step} Batch: {btv:.5f}s {bta:.5f}s | Data: {dtv:.5f}s {dta:.5f}s | Train: {ttv:.5f}s {tta:.5f}s | TOTAL: {total:.0f}min | ETA: {eta:.0f}min | Loss: {lossv:.4f} {lossa:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
                 batch=batch_idx + 1,
                 size=len(train_loader),
