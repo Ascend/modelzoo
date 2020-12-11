@@ -18,7 +18,7 @@ https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/AT
 
 对应的cfg文件下载地址： 
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/car/following/insert_op.cfg
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/car/following/insert_op_road_following.cfg
 
 ## om模型
 
@@ -29,7 +29,7 @@ https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/AT
 使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
 
 ```
-atc --model="road_following_model.prototxt" --weight="road_following_model.caffemodel" --soc_version=Ascend310 --framework=0 --output="road_following_model_test" --insert_op_conf=insert_op.cfg 
+atc --model="road_following_model.prototxt" --weight="road_following_model.caffemodel" --soc_version=Ascend310 --framework=0 --output="road_following_model" --insert_op_conf=insert_op_road_following.cfg 
 ```
 
 
