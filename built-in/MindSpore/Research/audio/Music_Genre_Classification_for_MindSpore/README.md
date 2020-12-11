@@ -1,5 +1,7 @@
 # Contents
 
+This repository provides a script and recipe to train the Music Auto Tagging model to achieve state-of-the-art accuracy.
+
 - [Music Auto Tagging Description](#fcn-4-description)
 - [Model Architecture](#model-architecture)
 - [Features](#features)
@@ -40,8 +42,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 # [Environment Requirements](#contents)
 
-- Hardware（Ascend
-  - If you want to try Ascend  , please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources. 
+- Hardware（Ascend/GPU）
+  - Prepare hardware environment with Ascend or GPU processor. If you want to try Ascend  , please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources. 
 - Framework
   - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -72,14 +74,14 @@ python pre_process_data.py --device_id 0
 
 Then, you can start training the model by using the following codes
 ```shell
-SLOG_PRINT_TO_STDOUT=1 python train.py --device_id 0
+SLOG_PRINT_TO_STDOUT=0 python train.py --device_id 0
 ```
 
 ### 4. Test
 
 Then you can test your model
 ```shell
-SLOG_PRINT_TO_STDOUT=1 python eval.py --device_id 0
+SLOG_PRINT_TO_STDOUT=0 python eval.py --device_id 0
 ```
 
 # [Script Description](#contents)

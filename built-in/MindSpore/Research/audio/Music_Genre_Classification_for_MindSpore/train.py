@@ -29,7 +29,6 @@ from src.config import music_cfg as cfg
 import mindspore as ms
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.ops import operations as P
-from mindspore.common import set_seed
 from src.dataset import create_dataset
 
 
@@ -63,11 +62,10 @@ def train(
                     LossMonitor(per_print_times=181),
                     TimeMonitor()
                 ],
-                dataset_sink_mode=True)
+                dataset_sink_mode=False)
 
 
 if __name__ == "__main__":
-    set_seed(1)
     parser = argparse.ArgumentParser(description='Train model')
     parser.add_argument('--device_id',
                         type=int,
@@ -117,5 +115,5 @@ if __name__ == "__main__":
           save_checkpoint_steps=cfg.save_step,
           keep_checkpoint_max=cfg.keep_checkpoint_max,
           prefix=cfg.prefix,
-          directory=cfg.checkpoint_path + "_{}".format(cfg.device_id))
+          directory=cfg.checkpoint_path)
     print("train success")

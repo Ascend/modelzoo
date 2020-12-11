@@ -18,20 +18,24 @@ Ascend ModelZoo，欢迎各位开发者
 
 4、从其他开源迁移的代码，请增加License声明
 
-* TensorFlow
- 
-1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License
+ **二、License规则**
 
-2、基于TensorFlow第三方框架开发的模型，需要在模型目录下每个源文件附上源社区的Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
+* TensorFlow
+    
+    迁移场景
+  
+    1、迁移TensorFlow模型中若源项目已包含License文件则必须拷贝引用，否则在模型顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+
+    2、迁移TensorFlow框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
     
     ```
-    # Copyright 2019 Huawei Technologies Co., Ltd
+    # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
     # You may obtain a copy of the License at
     #
-    # http://www.apache.org/licenses/LICENSE-2.0
+    #     http://www.apache.org/licenses/LICENSE-2.0
     #
     # Unless required by applicable law or agreed to in writing, software
     # distributed under the License is distributed on an "AS IS" BASIS,
@@ -53,23 +57,113 @@ Ascend ModelZoo，欢迎各位开发者
     # See the License for the specific language governing permissions and
     # limitations under the License.
      ```
+   开发场景
+
+    1、基于TensorFlow框架开发模型，需在模型项目顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
+
+    2、基于TensorFlow框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
+    ```
+    # Copyright 2020 Huawei Technologies Co., Ltd
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #     http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    ```
 * PyTorch
 
-1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License
+    迁移场景
+  
+    1、迁移PyTorch模型中若源项目录已包含PyTorch License文件则必须拷贝引用，否则在模型顶层目录下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
+    
+    2、迁移PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区PyTorch BSD-3 License头部声明，并在其下追加新增一行华为公司License声明
+    ```
+    # BSD 3-Clause License
+    #
+    # Copyright (c) 2017 xxxx 
+    # All rights reserved.
+    # Copyright 2020 Huawei Technologies Co., Ltd 
+    #
+    # Redistribution and use in source and binary forms, with or without
+    # modification, are permitted provided that the following conditions are met:
+    #
+    # * Redistributions of source code must retain the above copyright notice, this
+    #   list of conditions and the following disclaimer.
+    #
+    # * Redistributions in binary form must reproduce the above copyright notice,
+    #   this list of conditions and the following disclaimer in the documentation
+    #   and/or other materials provided with the distribution.
+    #
+    # * Neither the name of the copyright holder nor the names of its
+    #   contributors may be used to endorse or promote products derived from
+    #   this software without specific prior written permission.
+    #
+    # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    # DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+    # FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    # DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    # SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+    # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    # ============================================================================
+    ```
+    
+    开发场景
 
-2、基于PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区的BSD-3 Clause License头部声明，并在其下追加新增完整华为公司License声明
+    1、基于PyTorch框架开发模型，需在模型项目下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
 
- 
+    2、基于PyTorch框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
+     ```
+    # Copyright 2020 Huawei Technologies Co., Ltd
+    #
+    # Licensed under the BSD 3-Clause License  (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    # https://opensource.org/licenses/BSD-3-Clause
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    ```
+
 * MindSpore/ACL
-
-1、迁移中若源项目包含License文件则拷贝，否则在模型项目目录下添加Apache 2.0 License
-
-2、基于MindSpore/ACL模型，需要在模型目录下每个源文件附上源社区的华为公司Apache 2.0 License头部声明
+    
+    1、迁移或开发场景下MindSpore/ACL模型顶层目录下需要包含华为公司 License [华为公司 License链接](https://gitee.com/mindspore/mindspore/blob/master/LICENSE)
+    
+    2、迁移或开发场景下MindSpore/ACL模型，需要在模型目录下每个源文件中添加区华为公司Apache 2.0 License头部声明
+     ```
+    # Copyright 2020 Huawei Technologies Co., Ltd
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    #     http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    ```
 
 > 关于License声明时间，应注意： 2020年新建的文件，应该是Copyright 2020 Huawei Technologies Co., Ltd 2019年创建年份，2020年修改年份，应该是Copyright 2019-2020 Huawei Technologies Co., Ltd
 
  
- **二、readme**
+ **三、readme**
 
 readme用于指导用户理解和部署样例，要包含如下内容：
 
@@ -91,7 +185,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
- **三、自测试用例**
+ **四、自测试用例**
 
 提供模型的自测试用例和readme，提交PR需要门禁及模型测试用例通过，性能和精度检查通过
 
@@ -123,7 +217,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
- **四、PR提交**
+ **五、PR提交**
 
 - 关键要求：
 
@@ -131,7 +225,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 
- **五、编程规范**
+ **六、编程规范**
 
 - 规范标准
 

@@ -1,3 +1,16 @@
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the BSD 3-Clause License  (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://opensource.org/licenses/BSD-3-Clause
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #!/usr/bin/env python
 import os
 import sys
@@ -6,7 +19,6 @@ import argparse
 import subprocess
 import shutil
 from datetime import datetime
-
 
 def get_bm_fix_path(bm_info, key_seq, last_path=None):
     """get model path of benchmark yaml."""
