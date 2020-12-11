@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.7700 | 0.75.9  |
+| Top-1 accuracy | 0.770 | 0.759  |
 
 ###  Requirements
 
@@ -60,10 +60,10 @@ http://download.tensorflow.org/models/resnet_v1_152_2016_08_28.tar.gz \
 
 
 ### 训练过程及结果
-epoch=4
+epoch=7
 batch_size=128
 lr=0.0001
-耗费7小时
+耗费11小时
 
 
 ###   **train** 
@@ -71,7 +71,7 @@ lr=0.0001
 python    run_resnet.py  --model_path ./model/resnet_v1_152.ckpt  --data_path  ./train_data --output_path  ./model_save  --do_train True  --image_num  1281167 --class_num  1000  --batch_size  128 --epoch  5  --learning_rate  0.0001   --save_checkpoints_steps  100 \
     
 
-加载预训练模型直至精度达标耗时共计25小时左右
+加载预训练模型直至精度达标耗时共计11小时左右
 
 
 从头开始训练 \
