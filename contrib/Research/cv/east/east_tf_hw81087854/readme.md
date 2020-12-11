@@ -51,7 +51,7 @@ If you want to train the model, you should provide the dataset path, in the data
 and run
 
 ```
-python3 multigpu_train.py \
+python multigpu_train.py \
 --gpu_list=0  \
 --input_size=512 \
 --batch_size_per_gpu=14 \
@@ -76,7 +76,7 @@ See the examples in training_samples/**
 ### NPU Train
 If you want to train on NPU , use this command:
 ```
-python3 npu_train.py \
+python npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
 --checkpoint_path=./checkpoint/ \
