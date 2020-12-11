@@ -45,7 +45,7 @@ The following sections introduce the default configurations and hyperparameters 
 
 ### Prepare the dataset
 
-- You may use this [shell script](https://github.com/tensorflow/nmt/blob/master/nmt/scripts/wmt16_en_de.sh) to download and preprocess WMT English-German dataset. Assuming you get the following files:
+- You can download and preprocess WMT English-German dataset by yourself. Assuming you get the following files:
   - train.tok.clean.bpe.32000.en
   - train.tok.clean.bpe.32000.de
   - vocab.share
@@ -117,9 +117,10 @@ Script will store:
     ```
     You will get two files, REF_DATA.forbleu and EVAL_OUTPUT.forbleu, for BLEU score calculation.
 
-- Calculate BLEU score, you may use this [perl script](https://github.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl) and run following command to get the BLEU score.
+- Calculate BLEU score, go to directory `ModelZoo_Transformer_TF/` and run following command to get the BLEU score.
 
     ```bash
+    cd ModelZoo_Transformer_TF
     perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
     ```
 
