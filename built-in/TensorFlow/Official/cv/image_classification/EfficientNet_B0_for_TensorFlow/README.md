@@ -24,7 +24,7 @@ This repository provides scripts and recipe to train the EfficientNet-B0 model t
 
 EfficientNets are a family of image classification models developed based on AutoML and Compound Scaling. EfficientNet-B0 is the mobile-size baseline network in this family. It is mainly constructed based on mobile inverted bottleneck blocks with squeeze-and-excitation optimization.
 
-- EfficientNet-B0 model from:[Mingxing Tan and Quoc V. Le.  EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019]<https://arxiv.org/abs/1905.11946>. 
+- EfficientNet-B0 model from: [Mingxing Tan and Quoc V. Le.  EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019]<https://arxiv.org/abs/1905.11946>. 
 - reference implementation: <https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet>.
 
 ## Requirements
@@ -78,7 +78,7 @@ For more details, we refer readers to read the corresponding source code.
 ### Prepare the dataset
 
 1. Download the ImageNet2012 dataset
-2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
+2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and validation tfrecord files are under the path/data directories.
 
 ### Key configuration changes
