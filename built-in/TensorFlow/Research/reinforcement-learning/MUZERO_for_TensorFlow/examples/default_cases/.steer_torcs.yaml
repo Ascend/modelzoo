@@ -1,0 +1,26 @@
+alg_para:
+  alg_name: DDPG
+
+env_para:
+  env_name: RlEnvSimu
+  env_info: {'vision': False, 'name': torcs_steer, 'config': None}
+
+agent_para:
+  agent_name: SteerTorcs
+  agent_num : 1
+
+model_para:
+  actor:
+    model_name: DDPGActorNetwork
+    state_dim: [3]
+    action_dim: 1
+  critic:
+    model_name: DDPGCriticNetwork
+    state_dim: [[3], [1]]
+    action_dim: 1
+
+model_name: steer_torcs_1
+env_num: 1
+node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/test_model/steer_torcs
+result_path: ../xt_train_data/test_res1/steer_torcs.csv

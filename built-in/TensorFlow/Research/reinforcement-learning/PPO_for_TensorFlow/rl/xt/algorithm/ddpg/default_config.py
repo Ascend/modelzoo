@@ -1,0 +1,6 @@
+"""
+@Desc  : Static Variable in DDPG
+"""
+BATCH_SIZE = 32
+BUFFER_SIZE = 100000
+TARGET_UPDATE_FREQ = 100

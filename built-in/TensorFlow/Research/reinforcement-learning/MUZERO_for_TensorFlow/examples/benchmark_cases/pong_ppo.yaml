@@ -1,0 +1,51 @@
+alg_para:
+  alg_name: PPO
+  alg_config: {
+    'BATCH_SIZE': 1280
+    }
+
+env_para:
+  env_name: AtariEnv
+  env_info: { 'name': PongNoFrameskip-v4, 'vision': False}
+
+agent_para:
+  agent_name: AtariPpo
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200,
+    'complete_step': 10000000
+    }
+
+model_para:
+  actor:
+    model_name: PPOCnnTfSmall
+    state_dim: [84,84,4]
+    action_dim: 6
+    model_config: {
+      'LR': 0.00025,
+      'LOSS_CLIPPING': 0.1,
+      'ENTROPY_LOSS': 0.01,
+      }
+
+
+model_name: pong_ppo_0515
+env_num: 10
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+# test_node_config: [["127.0.0.1", "username", "passwd"],
+#               ]
+test_model_path: ../xt_train_data/train_model/pong_ppo_0515/pong_ppo_0515/actor02042.h5
+result_path: ../xt_train_data/test_res/pong_ppo_0515_1.csv
+
+benchmark:
+  start: False
+  id: xt_pong_ppo_benchmark
+  # db:
+  #   type: mongo
+  #   ip: 127.0.0.1
+  #   port: 27017
+  #   user: user
+  #   passwd: passwd
+  eval:
+    gap: 80
+    max_step_per_episode: 2000

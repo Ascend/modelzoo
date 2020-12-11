@@ -1,0 +1,33 @@
+alg_para:
+  alg_name: Rainbow
+  alg_config: {
+    'prepare_times_per_train': 1,
+    'learning_starts': 100,
+    'BUFFER_SIZE': 100000,
+    'BATCH_SIZE': 64,
+    }
+
+env_para:
+  env_name: GymEnv
+  env_info: { 'name': CartPole-v0, 'vision': False}
+
+agent_para:
+  agent_name: AtariDqn
+  agent_num : 1
+  agent_config: {
+    'episode_count': 10000
+    }
+
+model_para:
+  actor:
+    model_name: RainbowNetworkMlp
+    state_dim: [4]
+    action_dim: 2
+
+
+model_name: rainbow_cartpole
+env_num: 1
+node_config: [["127.0.0.1", "username", "passwd"]]
+model_path: ../xt_train_data/train_model
+test_model_path: ../xt_train_data/train_model/rainbow_cartpole
+result_path: ../xt_train_data/test_res/rainbow_cartpole.csv
