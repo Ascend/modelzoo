@@ -1,0 +1,13 @@
+docker run -itd \
+    --device=/dev/davinci1 \
+    --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+    -v /var/log/npu/conf/slog:/var/log/npu/conf/slog \
+    -v /var/log/npu/conf/profiling:/var/log/npu/conf/profiling \
+    -v /var/log/npu/profiling/container/4:/var/log/npu/profiling/ \
+    -v /usr/local/Ascend/driver/lib64:/usr/local/Ascend/driver/lib64 \
+    -v /usr/local/Ascend/driver/tools:/usr/local/Ascend/driver/tools \
+    -v /usr/local/Ascend/add-ons:/usr/local/Ascend/add-ons \
+    -v `pwd`:/xt-src \
+    --network=host \
+    -w /xt-src \
+    --name=qmix_proj qmix_test_tmp:1014 /bin/bash

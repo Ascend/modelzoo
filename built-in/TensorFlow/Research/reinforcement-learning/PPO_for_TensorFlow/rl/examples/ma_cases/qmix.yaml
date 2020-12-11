@@ -1,0 +1,116 @@
+alg_para:
+  alg_name: QMixAlg
+  alg_config:
+    batch_size: 32
+    batch_size_run: 1
+    buffer_size: 5000
+    checkpoint_path: "./"
+    critic_lr: 0.0005
+    epsilon_anneal_time: 50000
+    epsilon_finish: 0.05
+    epsilon_start: 1.0
+    evaluate: False
+    gamma: 0.99
+    grad_norm_clip: 10
+    hypernet_embed: 64
+    hypernet_layers: 2
+    label: "default_label"
+    learner_log_interval: 10000
+    load_step: 0
+    local_results_path: "results"
+    log_interval: 10000
+    lr: 0.0005
+    mixing_embed_dim: 32
+
+    obs_agent_id: True
+    obs_last_action: True
+    optim_alpha: 0.99
+    optim_eps: 1e-05
+    repeat_id: 1
+    rnn_hidden_dim: 64
+    runner_log_interval: 10000
+    save_model: True
+    save_model_interval: 2000000
+    save_replay: False
+    seed: 720353393
+    t_max: 2050000
+    target_update_interval: 200  # 50
+    test_greedy: True
+    test_interval: 10000
+    test_nepisode: 32
+    use_tensorboard: False
+
+env_para:
+  env_name: StarCraft2Xt
+  env_info: {
+    "continuing_episode": False,
+    "difficulty": "7",
+    "game_version": null,  #  "latest",
+    "map_name": "2s_vs_1sc",
+    "move_amount": 2,
+    "obs_all_health": True,
+    "obs_instead_of_state": False,
+    "obs_last_action": False,
+    "obs_own_health": True,
+    "obs_pathing_grid": False,
+    "obs_terrain_height": False,
+    "obs_timestep_number": False,
+    "reward_death_value": 10,
+    "reward_defeat": 0,
+    "reward_negative_scale": 0.5,
+    "reward_only_positive": True,
+    "reward_scale": True,
+    "reward_scale_rate": 20,
+    "reward_sparse": False,
+    "reward_win": 200,
+    "replay_dir": "",
+    "replay_prefix": "",
+    "state_last_action": True,
+    "state_timestep_number": False,
+    "step_mul": 8,
+    "seed": null,
+    "heuristic_ai": False,
+    "heuristic_rest": False,
+    "debug": False,
+  }
+
+agent_para:
+  agent_name: StarCraftQMix
+  agent_num : 1
+  agent_config: {
+    'complete_step': 2050000
+    }
+
+model_para:
+  actor:
+    model_name: QMixModel
+    model_config:
+      gamma: 0.99
+      grad_norm_clip: 10
+      hypernet_embed: 64
+      hypernet_layers: 2
+      lr: 0.0005
+      mixing_embed_dim: 32
+      rnn_hidden_dim: 64
+      batch_size: 32
+      use_double_q: True
+
+env_num: 2
+node_config: [["127.0.0.1", "username", "passwd"],]
+#node_config: [["10.113.215.14", "jack", "passwd"]]
+test_node_config: [["127.0.0.1", "username", "passwd"],]
+remote_env:
+  conda: /home/jack/anaconda2/envs/xt_qmix
+  env:
+    SC2PATH: /home/jack/xw-proj/marl_sim/StarCraftII
+    no_proxy: "192.168.1.*,127.0.0.1,10.*,.huawei.com,.huawei.net"
+
+benchmark:
+  id: xt_qmix
+#  archive_root: ../xt_archive  # default: ~/xt_archive
+#  archive_root: /usr1/xwei-home/xt_train_tmp
+  eval:
+    gap: 256                      # train times call once evaluate
+    evaluator_num: 1              # run eval with how much evaluator instance
+    episodes_per_eval: 32         # run how much episodes within one evaluate
+    max_step_per_episode: 1000

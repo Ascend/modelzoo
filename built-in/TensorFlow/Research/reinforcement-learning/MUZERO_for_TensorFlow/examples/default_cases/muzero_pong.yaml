@@ -1,0 +1,43 @@
+alg_para:
+  alg_name: Muzero
+  alg_config: {
+    "train_per_checkpoint": 1,
+    "prepare_times_per_train": 1,
+    }
+
+env_para:
+  env_name: AtariEnv
+  env_info: { 'name': PongNoFrameskip-v4, vision': False}
+
+agent_para:
+  agent_name: MuzeroPong
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200 ,
+    'complete_step': 50000000,
+    'NUM_SIMULATIONS': 100
+    }
+
+model_para:
+  actor:
+    model_name: MuzeroPongTest
+    state_dim: [84, 84, 4]
+    action_dim: 6
+    # init_weights: /home/jack/RL_PlatForm/code-test/B100/muzero_new/muzero_atari/rl/bm_archive/muzero_pong+20200818035910/models/actor_01662.h5
+    init_weights: /home/jack/RL_PlatForm/code-test/B100/muzero_new/muzero_atari/rl/bm_archive/muzero_pong+20200818051439/models/actor_35521.h5
+
+env_num: 15
+node_config: [
+              ["127.0.0.1", "username", "passwd"],
+              # ["10.113.215.14", "jack", "123456"],
+              ]
+remote_env:
+  conda: /home/jack/anaconda2/envs/RL
+  env: {}
+
+benchmark:
+  id: muzero_pong
+  archive_root: ./bm_archive
+  eval:
+    gap: 100
+    max_step_per_episode: 2000

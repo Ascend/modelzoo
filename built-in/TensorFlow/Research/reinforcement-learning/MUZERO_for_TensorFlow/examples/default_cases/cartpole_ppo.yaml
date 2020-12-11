@@ -1,0 +1,40 @@
+alg_para:
+  alg_name: PPO
+  alg_config:
+    process_num: 1
+    only_save_best_model: True
+
+env_para:
+  env_name: GymEnv
+  env_info: { 'name': CartPole-v0, 'vision': False}
+
+agent_para:
+  agent_name: CartpolePpo
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200 ,
+    'complete_step': 500000
+    }
+
+model_para:
+  actor:
+    model_name:  ActorCriticPPO
+    state_dim: [4]
+    action_dim: 2
+    summary: True
+
+env_num: 1
+node_config: [["127.0.0.1", "username", "passwd"]]
+#node_config: [["10.113.215.14", "jack", ""]]
+#remote_env: /home/jack/anaconda2/envs/xt-tf1.8-py36
+
+test_node_config: [["127.0.0.1", "username", "passwd"]]  # also as a flag
+#test_model_path: /home/xwei/xt_archive/xt_cartpole+20200511155808/models/
+
+benchmark:
+  id: xt_cartpole  # default: default_ENV_ALG ('+'.join([ID, START_time]))
+#  archive_root: /usr1/xwei-home/xt_train_tmp # default: ~/xt_archive
+  eval:
+    gap: 40
+    episodes_per_eval: 2        # run how much episodes within one evaluate
+#    max_step_per_episode: 2000

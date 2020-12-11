@@ -1,0 +1,36 @@
+alg_para:
+  alg_name: PPO
+  alg_config: {
+    # 'BATCH_SIZE': 1280
+    }
+
+env_para:
+  env_name: AtariEnv
+  env_info: { 'name': BreakoutNoFrameskip-v4, 'vision': False}
+
+agent_para:
+  agent_name: AtariPpo
+  agent_num : 1
+  agent_config: {
+    'max_steps': 200,
+    'complete_step': 10000000
+    }
+
+model_para:
+  actor:
+    model_name: PPOCnnTfSmall
+    state_dim: [84,84,4]
+    action_dim: 4
+    model_config: {
+      'LR': 0.00025,
+      'LOSS_CLIPPING': 0.1,
+      'ENTROPY_LOSS': 0.01
+      }
+
+model_name: break_ppo_1025
+env_num: 10
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+
+model_path: ../xt_train_data/test_model/break_ppo_0516
+result_path: ../xt_train_data/test_res/break_ppo_0516_1.csv

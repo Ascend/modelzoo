@@ -1,0 +1,43 @@
+alg_para:
+  alg_name: IMPALA
+
+  alg_config: {
+    "train_per_checkpoint": 10,
+    'prepare_times_per_train': 4,
+    'BATCH_SIZE': 512,
+    }
+
+env_para:
+  env_name: AtariEnv
+  env_info: { 'name': PongNoFrameskip-v4, 'vision': False, 'dim': 42}
+
+agent_para:
+  agent_name: AtariImpala
+  agent_num : 1
+  agent_config: {
+    'max_steps': 128,
+    'complete_step': 10000000
+    }
+
+model_para:
+  actor:
+    model_name: ImpalaNetworkCnnSmall
+    state_dim: [42,42,4]
+    action_dim: 6
+    model_config: {
+      'LR': 0.0003
+      }
+
+model_name: pong_impala_1016
+env_num: 20
+node_config: [["127.0.0.1", "username", "passwd"],
+              ]
+
+test_model_path: ../xt_train_data/train_model/pong_ppo_0605
+result_path: ../xt_train_data/test_res/pong_ppo_0605.csv
+benchmark:
+  start: False
+  id: xt_pong_benchmark_1014
+  eval:
+    gap: 80
+    max_step_per_episode: 2000
