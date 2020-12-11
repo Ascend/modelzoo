@@ -25,7 +25,7 @@ modifications are made to run on NPU
 - Deeplabv3 model from: Liang-Chieh Chen et al. "Rethinking Atrous Convolution for Semantic Image Segmentation". <https://arxiv.org/abs/1706.05587>.
 - reference implementation: <https://github.com/tensorflow/models/tree/master/research/deeplab>
 
-## Requirement
+## Requirements
 
 - Tensorflow NPU environmemnt Pillow.
 - Download and preprocess VOC dataset,COCO dataset or SBD dataset for training and evaluation.
@@ -33,9 +33,9 @@ modifications are made to run on NPU
 ## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for Deeplabv3 model. We reproduce two training setups 
-on VOC_trainaug datasets, evaluate on four setups. See [Results](#results) for setups details.
+on VOC_trainaug datasets, evaluate on four setups. 
 
-For detailed hpyerparameters,, please refer to corresponding scripts under directory `scripts/`
+For detailed hpyerparameters, please refer to corresponding scripts under directory `scripts/`
 
 ### Optimizer
 
