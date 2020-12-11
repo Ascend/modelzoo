@@ -15,11 +15,14 @@ Shell脚本中，访问时用提供变量即可
 | CV  | COCO_val      | $COCO_val      |
 | CV  | SBD      | $SBD      |
 | CV  | VOC2012      | $VOC2012      |
+| CV  | Cityscape      | $cityscapes_dataset   |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
 | NLP | WMT_ENDE     | $WMT_ENDE      |
 | NLP | SQUADV2      | $SQUADV2       |
 
-持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址，\
+使用示例：python3 run.py --dataurl=$cityscapes_dataset ...
+
+预置数据集持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址，\
 涉及数据集由第三方开发者提供，仅用于性能或精度调试or自测试，华为方不会存储或使用该数据集。
 
  **二、Python第三方库** 
