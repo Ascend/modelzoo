@@ -4,47 +4,40 @@ This repository provides scripts and recipe to train the EfficientNet-B0 model t
 
 ## Table Of Contents
 
-- [EfficientNet-B0 for Tensorflow](#efficientnet-b0-for-tensorflow)
-  - [Table Of Contents](#table-of-contents)
-  - [Model overview](#model-overview)
-    - [Model architecture](#model-architecture)
-    - [Default configuration](#default-configuration)
-      - [Optimizer](#optimizer)
-      - [Data augmentation](#data-augmentation)
-  - [Setup](#setup)
-    - [Requirements](#requirements)
-  - [Quick Start Guide](#quick-start-guide)
-    - [1. Clone the respository and change the working directory](#1-clone-the-respository-and-change-the-working-directory)
-    - [2. Download and preprocess the dataset](#2-download-and-preprocess-the-dataset)
-    - [3. Set environment](#3-set-environment)
-    - [4. Train](#4-train)
-    - [5. Test](#5-test)
-  - [Advanced](#advanced)
-    - [Command-line options](#command-line-options)
-    - [Training process](#training-process)
-  - [Performance](#performance)
-    - [Result](#result)
-      - [Training accuracy results](#training-accuracy-results)
-      - [Training performance results](#training-performance-results)
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
+* [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#Training-process)    
+    * [Evaluation](#Evaluation)
+* [Advanced](#advanced)
+  * [Command-line options](#Command-line-options) 
+​     
 
-
-    
-
-## Model overview
-
-In this repository, we implement EfficientNet-B0 from paper [Mingxing Tan and Quoc V. Le.  EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019](https://arxiv.org/abs/1905.11946). Our code is based on Google's [implementation](https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet).
+## Description
 
 EfficientNets are a family of image classification models developed based on AutoML and Compound Scaling. EfficientNet-B0 is the mobile-size baseline network in this family. It is mainly constructed based on mobile inverted bottleneck blocks with squeeze-and-excitation optimization.
 
-### Model architecture
+- EfficientNet-B0 model from:[Mingxing Tan and Quoc V. Le.  EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019]<https://arxiv.org/abs/1905.11946>. 
+- reference implementation: <https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet>.
 
-The model architecture can be found from the reference paper.
+## Requirements
 
-### Default configuration
+- Tensorflow 1.15.0
+- Download and preprocess ImageNet2012,CIFAR10 or Flower dataset for training and evaluation.
+
+
+## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for EfficientNet-B0 model.
 
-#### Optimizer
+### Optimizer
 
 This model uses RMSProp optimizer from Tensorflow with the following hyperparameters (for 8 NPUs):
 
@@ -63,7 +56,7 @@ This model uses RMSProp optimizer from Tensorflow with the following hyperparame
   
 Users can find more detailed parameters from the source code.
 
-#### Data augmentation
+### Data augmentation
 
 This model uses the following data augmentation:
 
@@ -79,35 +72,23 @@ This model uses the following data augmentation:
 
 For more details, we refer readers to read the corresponding source code.
 
-## Setup
-The following section lists the requirements to start training the EfficientNet-B0 model.
 
-### Requirements
+## Quick start guide
 
-Tensorflow 1.15.0
-
-## Quick Start Guide
-
-### 1. Clone the respository and change the working directory
-
-```shell
-git clone xxx
-cd ModelZoo_EfficientNet-B0_TF_HARD/00-access
-cd tpu-r1.15/models/official/efficientnet
-```
-
-### 2. Download and preprocess the dataset
+### Prepare the dataset
 
 1. Download the ImageNet2012 dataset
 2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
 3. The train and validation tfrecord files are under the path/data directories.
 
-### 3. Set environment
+### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-### 4. Train
+### Running the example
+
+#### Training
 - train on a single NPU
     - **edit** *train_1p.sh* (see example below)
     - bash run_1p.sh
@@ -151,7 +132,12 @@ Examples:
         bash run_8p.sh
         ```
 
-### 5. Test
+#### Training process
+
+After training, all the results of the training will be stored in the directory `result`.
+
+#### Evaluation
+
 - In *test.sh*, python scripts part should look like as follows:
      ```shell 
     python3.7 ${currentDir}/main_npu.py \
@@ -166,8 +152,8 @@ Examples:
     bash test.sh
     ```
 
-
 ## Advanced
+
 ### Command-line options
 
 We list those important parameters to train this network here. For more details of all the parameters, please read *main_npu.py* and other related files.
@@ -185,30 +171,9 @@ We list those important parameters to train this network here. For more details 
   --base_learning_rate              base learning rate for each card (default: 0.016)
 ```
 
-### Training process
 
-After training, all the results of the training will be stored in the directory `result`.
  
-## Performance
 
-### Result
-
-Our results were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
-
-#### Training accuracy results
-
-| **epochs** |      Top1      |
-| :--------: | :------------: |
-|    350     |     76.38%     |
-
-#### Training performance results
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |   1400 images/s   |
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |   11000 images/s  |
 
 
 
