@@ -59,7 +59,7 @@ This model uses the following data augmentation:
   - CenterCrop to (224, 224)
   - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
 
-## Quick Start Guide
+## Quick start guide
 
 ### Prepare the dataset
 
