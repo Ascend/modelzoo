@@ -9,7 +9,7 @@
   * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
   * [Prepare the dataset](#Prepare-the-dataset)
-  * [check json](#check-json)
+  * [Check json](#Check-json)
   * [Key configuration changes](#Key-configuration-changes)
   * [Running the example](#Running-the-example)
     * [Training](#Training)
@@ -80,7 +80,7 @@ execute the script when you get all three file ready.
  - voc-style segmentation annotation file
  - txt file for all the seg_image filenames
 
-### check json
+### Check json
 
 Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the scripts/ directory.
 The content of the 8p configuration file:
