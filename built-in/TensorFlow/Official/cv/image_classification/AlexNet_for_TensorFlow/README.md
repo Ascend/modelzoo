@@ -18,7 +18,7 @@ This repository provides a script and recipe to train the AlexNet model .
     * [Training process](#Training-process)    
     * [Evaluation](#Evaluation)
 * [Advanced](#advanced)
-  * [Commmand-line options](#Commmand-line-options)   
+  * [Command-line options](#Command-line-options)   
 
 ## Description
 
