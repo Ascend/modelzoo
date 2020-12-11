@@ -51,9 +51,21 @@ If you want to train the model, you should provide the dataset path, in the data
 and run
 
 ```
-python multigpu_train.py --gpu_list=0 --input_size=512 --batch_size_per_gpu=14 --checkpoint_path=/tmp/east_icdar2015_resnet_v1_50_rbox/ \
---text_scale=512 --training_data_path=/data/ocr/icdar2015/ --geometry=RBOX --learning_rate=0.0001 --num_readers=24 \
---pretrained_model_path=/tmp/resnet_v1_50.ckpt
+python3 multigpu_train.py \
+--gpu_list=0  \
+--input_size=512 \
+--batch_size_per_gpu=14 \
+--checkpoint_path=./checkpoint/ \
+--text_scale=512 \
+--training_data_path=./ocr/icdar2015/ \
+--geometry=RBOX \
+--learning_rate=0.0001 \
+--num_readers=24 \
+--pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
+```
+or excute the shell:
+```
+bash train_gpu.sh
 ```
 
 If you have more than one gpu, you can pass gpu ids to gpu_list(like --gpu_list=0,1,2,3)
@@ -67,7 +79,7 @@ If you want to train on NPU , use this command:
 python3 npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
---checkpoint_path=./checkpoint/ \
+--checkpoint_path=./ckpt/ \
 --text_scale=512 \
 --training_data_path=./ocr/icdar2015/ \
 --geometry=RBOX \
