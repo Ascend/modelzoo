@@ -46,7 +46,7 @@ Please cite his [paper](https://arxiv.org/abs/1704.03155v2) if you find this use
 1. Models trained on ICDAR 2013 (training set) + ICDAR 2015 (training set): [BaiduYun link](http://pan.baidu.com/s/1jHWDrYQ) [GoogleDrive](https://drive.google.com/open?id=0B3APw5BZJ67ETHNPaU9xUkVoV0U)
 2. Resnet V1 50 provided by tensorflow slim: [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz)
 
-### Train
+### GPU Train
 If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image
 and run
 
@@ -60,6 +60,30 @@ If you have more than one gpu, you can pass gpu ids to gpu_list(like --gpu_list=
 
 **Note: you should change the gt text file of icdar2015's filename to img_\*.txt instead of gt_img_\*.txt(or you can change the code in icdar.py), and some extra characters should be removed from the file.
 See the examples in training_samples/**
+
+### NPU Train
+If you want to train on NPU , use this command:
+```
+python3 npu_train.py \
+--input_size=512 \
+--batch_size_per_gpu=14 \
+--checkpoint_path=./checkpoint/ \
+--text_scale=512 \
+--training_data_path=./ocr/icdar2015/ \
+--geometry=RBOX \
+--learning_rate=0.0001 \
+--num_readers=24 \
+--pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
+```
+or excute the shell:
+```
+bash train_npu.sh
+```
+
+### Contrast of Total Loss on GPU and NPU
+After finished 4000steps，Total loss seems have issue on NPU:
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1211/201432_0afde048_8432352.png "TotalLoss.png")
+
 
 ### Demo
 If you've downloaded the pre-trained model, you can setup a demo server by
