@@ -41,7 +41,7 @@ The following sections introduce the default configurations and hyperparameters 
 - num_layers: 6
 - attention.num_heads: 16
 
-## Quick Start Guide
+## Quick start guide
 
 ### Prepare the dataset
 
