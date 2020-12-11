@@ -1,20 +1,71 @@
 # Deeplabv3 for Tensorflow   
 
+## Table Of Contents
+
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
+* [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [check json](#check-json)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#training-process)
+    * [Evaluation](#Evaluation)
+* [Advanced](#advanced)
+  * [Commmand-line options](#Commmand-line-options)
+
 ## Description
+
 This repository provides a script and recipe to train the Deeplabv3 model. The code is based on tensorflow/models/research/deeplab,
 modifications are made to run on NPU
 - Deeplabv3 model from: Liang-Chieh Chen et al. "Rethinking Atrous Convolution for Semantic Image Segmentation". <https://arxiv.org/abs/1706.05587>.
 - reference implementation: <https://github.com/tensorflow/models/tree/master/research/deeplab>
 
 ## Requirement
+
 - Tensorflow NPU environmemnt Pillow.
 - Download and preprocess VOC dataset,COCO dataset or SBD dataset for training and evaluation.
 
+## Default configuration
+
+The following sections introduce the default configurations and hyperparameters for Deeplabv3 model. We reproduce two training setups 
+on VOC_trainaug datasets, evaluate on four setups. See [Results](#results) for setups details.
+
+For detailed hpyerparameters,, please refer to corresponding scripts under directory `scripts/`
+
+### Optimizer
+
+This model uses Momentum optimizer from Tensorflow with the following hyperparameters:
+
+- Momentum : 0.9
+- LR schedule: cosine_annealing
+- Batch size : 8 * 8   
+- Weight decay :  0.0001. 
+
+### Data augmentation
+
+This model uses the following data augmentation:
+
+- For training:
+  - RandomResizeCrop, scale=(0.08, 1.0), ratio=(0.75, 1.333)
+  - RandomHorizontalFlip, prob=0.5
+  - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
+- For inference:
+  - Resize to (256, 256)
+  - CenterCrop to (224, 224)
+  - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
+
 ## Quick Start Guide
+
 ### Prepare the dataset
+
 You can use any datasets as you wish. Here, we only use voc2012_trainaug dataset as an example to illustrate the data generation. 
  - download the voc2012 datasets. 
- - check if `SegmentationClassAug.zip` exists under `datasets/`,if not, you can download from <https://www.dropbox.com/s/oeu149j8qtbs1x0/SegmentationClassAug.zip?dl=0>
+ - check if `SegmentationClassAug.zip` exists under `datasets/`,if not, you can download Semantic Boundaries Dataset by yourself.
  - txt file named trainaug.txt containing all the seg_image filenames
  - put all three files under `datasets/` directory
  - go the datasets directory and run the script to create tfrecord file. tfrecord file will be saved under `dataset/pascal_voc_seg/tfrecord`
@@ -30,6 +81,7 @@ execute the script when you get all three file ready.
  - txt file for all the seg_image filenames
 
 ### check json
+
 Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the scripts/ directory.
 The content of the 8p configuration file:
 ```
@@ -48,17 +100,20 @@ The content of the 8p configuration file:
 ```
 
 ### Key configuration changes
+
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
 - [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-## Running the example
-### Training
+### Running the example
+
+#### Training
+
 All the scripts to tick off the training are located under `scripts/`.  As there are two types of resnet_101 checkpoints exist, original version 
 and a so-called beta version available, there are two sets of scripts one for each checkpoint. All the scripts that end with `beta` are meant for 
 resnet_v1_101_beta checkpoint. All the scripts that start with `train` are configuration files for the training. You are free to choose either of them as initial checkpoint since they can achieve comparable performance.  
 
-- For resnet_v1_101_beta, you can download from <http://download.tensorflow.org/models/resnet_v1_101_2018_05_04.tar.gz>
-- For resnet_v1_101, you can download from <http://download.tensorflow.org/models/resnet_v1_101_2016_08_28.tar.gz>
+- For resnet_v1_101_beta, you can download by yourself.
+- For resnet_v1_101, you can download by yourself.
 
 Create `pretrained/` directory, after you download either checkpoint or both, un-compress the tarball file and put them under `pretrained/` directory.
 
@@ -90,8 +145,15 @@ For instance, to train the model with beta version checkpoints
 
 ***Note***: As the time consumption of the training for single NPU is much higher than that of 8 NPUs, we mainly experiment training using 8 NPUs.
 
+#### Training process
 
-### Evaluation
+All the results of the training will be stored in the directory `results`.
+Script will store:
+ - checkpoints
+ - log
+
+#### Evaluation
+
 Test results will be saved as log file under `eval/${DEVICE_ID}/resnet_101/training.log`. The value for DEVICE_ID is 
 specified in the scripts
 
@@ -120,8 +182,9 @@ cd scripts
 
 ```
 
-## Parameters
-### Parameters
+## Advanced
+
+### Commmand-line options
 ```
   --tf_initial_checkpoint           path to checkpoint of pretrained resnet_v1_101, default None
   --model_variant                   the backbone of model, default mobilenet_v2
