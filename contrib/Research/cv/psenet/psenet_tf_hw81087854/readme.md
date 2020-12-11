@@ -24,14 +24,14 @@ You can finetune on it or you can do a lot of optimization based on this code.
 | ICDAR 2015(val) | 74.61 | 80.93 | 77.64 |
 
 
-### Train
+### GPU Train
 If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image, and **make sure that gt text and image file have the same names**.
 
 Then run train.py like:
 
 ```
 python train.py --gpu_list=0 --input_size=512 --batch_size_per_gpu=8 --checkpoint_path=./resnet_v1_50/ \
---training_data_path=./data/ocr/icdar2015/
+--training_data_path=./ocr/icdar2015/
 ```
 
 If you have more than one gpu, you can pass gpu ids to gpu_list(like --gpu_list=0,1,2,3)
@@ -43,6 +43,18 @@ but you can modify data_provider.py to support polygon format input
 3. this re-implementation is just for fun, but I'll continue to improve this code.
 4. re-implementation pse algorithm by using c++
 ***(if you use python2, just run it, if python3, please replace python-config with python3-config in makefile)***
+
+### NPU Train
+If you want to train the model on NPU，run npu_train.py like:
+```
+python npu_train.py \
+--input_size=512 \
+--batch_size_per_gpu=8 \
+--checkpoint_path=./resnet_v1_50/ \
+--training_data_path=./ocr/icdar2015/
+```
+Log of Npu training in npu_training.log
+
 
 ### Test
 run eval.py like:
