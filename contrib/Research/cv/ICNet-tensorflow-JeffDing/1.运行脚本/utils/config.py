@@ -3,16 +3,13 @@ import os
 
 class Config(object):
     # Setting dataset directory
-    #CITYSCAPES_DATA_DIR = './data/cityscapes_dataset/cityscape/'# Tianyi Li
     CITYSCAPES_DATA_DIR = '/data/dataset/storage/cityscapes/'
     ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
       
     ADE20K_eval_list = os.path.join('./data/list/ade20k_val_list.txt')
-    # CITYSCAPES_eval_list = os.path.join('./data/list/cityscapes_val_list.txt')# Tianyi Li
     CITYSCAPES_eval_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_val_list.txt')
     
     ADE20K_train_list = os.path.join('./data/list/ade20k_train_list.txt')
-    # CITYSCAPES_train_list = os.path.join('./data/list/cityscapes_train_list.txt')# Tianyi Li
     CITYSCAPES_train_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_train_list.txt')
     
     
@@ -55,7 +52,7 @@ class Config(object):
     ## You can modify following lines to train different training configurations.
     INFER_SIZE = [1024, 2048, 3] 
     TRAINING_SIZE = [720, 720] 
-    TRAINING_STEPS = 2  # 原代码为60001
+    TRAINING_STEPS = 60001
     
     N_WORKERS = 8
     BATCH_SIZE = 16
