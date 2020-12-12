@@ -16,6 +16,7 @@ Shell脚本中，访问时用提供变量即可
 | CV  | SBD      | $SBD      |
 | CV  | VOC2012      | $VOC2012      |
 | CV  | Cityscape      | $cityscapes_dataset   |
+| CV  | icdar2015      | $icdar2015_train   |
 | NLP | Wikipedia_CN | $Wikipedia_CN |
 | NLP | WMT_ENDE     | $WMT_ENDE      |
 | NLP | SQUADV2      | $SQUADV2       |
@@ -25,7 +26,13 @@ Shell脚本中，访问时用提供变量即可
 预置数据集持续建设中，若有新增需求，请提交ISSUE，标题注明[新增数据集]，内容写上数据集名称和下载地址，\
 涉及数据集由第三方开发者提供，仅用于性能或精度调试or自测试，华为方不会存储或使用该数据集。
 
- **二、Python第三方库** 
+ **二、预训练模型** 
+| 领域  | 数据集名称        | 访问变量            |
+|-----|--------------|---------------|
+| CV  | resnetv1_50_ckpt| $resnetv1_50_ckpt|
+
+
+ **三、Python第三方库** 
 
 安装第三方库依赖使用"pip3"、"pip3.7"，已安装的库：
 ```
@@ -89,7 +96,7 @@ wheel                 0.35.1
 wrapt                 1.12.1
 zipp                  3.4.0
 ```
- **三、从个人的OBS桶中下载**
+ **四、从个人的OBS桶中下载**
 
 如果需要的文件大小<500M，可以使用obsutil命令下载：
 ```
