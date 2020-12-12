@@ -16,8 +16,6 @@
 ./data_dir/ICDAR/Challenge/ch4_test_localization_transcription_gt
 ```
 
-## GPU
-进入GPU目录，查看相关README文件
 
 ## NPU
 进入NPU/src目录，查看相关README文件
