@@ -25,6 +25,10 @@
 
   启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
 
+  [Ascend910训练平台环境变量设置]: https://gitee.com/ascend/modelzoo/wikis/Ascend910训练平台环境变量设置?sort_id=3148819
+  
+  
+  
   - [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend 910训练平台环境变量设置?sort_id=3148819)
 
 
