@@ -24,7 +24,7 @@ python3 -W ignore train_8p_anycard.py \
     --device 'npu' \
     --opt-level 'O2' \
     --loss-scale 64 \
-    --addr='10.136.181.127'  \  #修改本机ip地址
+    --addr='XX.XXX.XXX.XXX'  \  #修改本机ip地址
     --seed 16  \
     --n_epoch 600 \
     --data-dir '/home/w50015720/npu/PSENet_data' \ #修改数据集目录
@@ -49,7 +49,7 @@ python3 -W ignore train_8p_anycard.py \
     --device 'npu' \
     --opt-level 'O2' \
     --loss-scale 64 \
-    --addr='10.246.246.76' \ #修改本机ip地址
+    --addr='XX.XXX.XXX.XXX' \ #修改本机ip地址
     --seed 16  \
     --n_epoch 600 \
     --data-dir '/home/data/' \ #修改数据集目录

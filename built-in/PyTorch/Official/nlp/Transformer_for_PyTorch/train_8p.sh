@@ -13,7 +13,7 @@ python train_8p.py $DATA_DIR \
   --share-all-embeddings \
   --optimizer adam \
   --adam-betas '(0.9, 0.997)' \
-  --addr='10.246.246.76' \
+  --addr='XX.XXX.XXX.XXX' \
   --adam-eps "1e-9" \
   --clip-norm 0.0 \
   --lr-scheduler inverse_sqrt \

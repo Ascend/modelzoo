@@ -70,7 +70,7 @@ STAT_FILE="log.txt"
 
 python train_8p.py $DATA_DIR \
   --arch transformer_wmt_en_de \
-  --addr='10.246.246.76' \
+  --addr='XX.XXX.XXX.XXX' \
   --share-all-embeddings \
   --optimizer adam \
   --adam-betas '(0.9, 0.997)' \

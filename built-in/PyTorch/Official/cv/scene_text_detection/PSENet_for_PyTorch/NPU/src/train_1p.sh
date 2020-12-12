@@ -21,7 +21,7 @@ python3.7 -W ignore train_ic15.py \
 	--device 'npu' \
 	--opt-level 'O2' \
 	--loss-scale 64 \
-	--addr='10.246.246.76' \
+	--addr='XX.XXX.XXX.XXX' \
 	--seed 16  \
 	--n_epoch 600 \
 	--data-dir '/home/data/' \
