@@ -8,6 +8,8 @@ Ascend ModelZoo，欢迎各位开发者
 
 请贡献者在提交代码之前签署CLA协议，“个人签署”，[链接](https://clasign.osinfra.cn/sign/Z2l0ZWUlMkZhc2NlbmQ=)
 
+如您完成签署，可在自己提交的PR评论区输入/check-cla进行核实校验
+
  **一、源码**
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++或python代码，符合第四部分编码规范
