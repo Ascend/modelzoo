@@ -1,48 +1,65 @@
-# 1、【目的】
+# Bert Tnews for ACL
 
-基于Bert网络进行文本的Tnews 新闻分类的离线推理
+## 目录
 
-# 2、【环境安装依赖】
+* [目的](#目的)
+* [环境安装依赖](#环境安装依赖)
+* [数据集及模型准备](#数据集及模型准备)
+* [模型转换](#模型转换)
+* [demo编译](#demo编译)
+* [离线推理](#离线推理)
+* [备注](#备注)
 
-参考 驱动和开发环境安装指南 完成环境安装
+## 目的
+
+- 基于Bert网络进行文本的Tnews 新闻分类的离线推理
+
+  
+
+## 环境安装依赖
+
+- 参考《驱动和开发环境安装指南》安装NPU训练环境
 
 
 
-# 3、【数据集及模型准备】
+
+## 数据集及模型准备
 
 FineTuning的代码路径：
 
-${FineTuning}/CLUEdataset/tnews/
-
-
+[FineTuning代码参考](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertTnews_for_TensorFlow)
 
 获取在线推理的数据集目录下的文件，拷贝到./datasets/bert_tnews_origin/目录下
 
+```
 cp ${FineTuning}/CLUEdataset/tnews/* ./datasets/bert_tnews_origin/
-
-
+```
 
 Pb模型：
 基于Fine Tuning 获取bert_tnews checkpoint转pb 的pb模型,将pb模型放在model目录下
 
-# 4、【模型转换】
 
+
+## 模型转换
+
+离线模型转换
+
+```
 cd model
-样例：./bert_tnews_convert_om.sh --model=Bert_tnews --batchSize=1 --soc_version=Ascend310
+./bert_tnews_convert_om.sh --model=Bert_tnews --batchSize=1 --soc_version=Ascend310
+```
+
 该脚本用来做bert模型的atc转换，支持三个参数：
---batchSize  离线推理模型的batchSize，默认值为1
---soc_version 离线推理的soc_version，对于1910，这个参数设置为Ascend310，对于1980，这个参数设置为Ascend910，默认值为Ascend310
---model  模型名称，该模型名称不需要带后面的.pb 后缀，默认值为Bert_tnews
 
-# 5、【可执行文件准备】
+```
+--batchSize     离线推理模型的batchSize，默认值为1
+--soc_version   离线推理的soc_version，对于1910，这个参数设置为Ascend310，对于1980，这个参数设置为Ascend910，默认值为Ascend310
+--model         模型名称，该模型名称不需要带后面的.pb 后缀，默认值为Bert_tnews
+```
 
-获取benchmark_info的可执行文件，benchmark_infer代码路径,编译及json文件说明参考README
-代码路径：
 
-将可执行文件拷贝到output目录下
 
-# 6、【离线推理demo编译】
-
+## demo编译
 
 如果demo编译后在host侧运行，则执行以下脚本：
 
@@ -63,7 +80,7 @@ chmod +x build_device.sh
 
   可执行文件生成在../output目录
 
-# 7、【离线推理】
+## 离线推理
 
 端到端拉起离线推理：
 
@@ -73,7 +90,7 @@ chmod +x build_device.sh
 
 脚本中包含预处理，后处理和推理
 
-## 7.1、预处理脚本
+#### 预处理脚本
 
 ```
 ./prerun_bert_tnews_infer_input.sh
@@ -82,7 +99,7 @@ chmod +x build_device.sh
 
 ​     export GLUE_DATA_DIR=$CURRENT_DIR/../datasets/bert_tnews_origin/  这个目录为环境上FineTuning的CLUE数据集的路径，根据实际修改
 
-## 7.2、推理脚本
+#### 推理脚本
 
 ```
 ./bert_infer inference_syn_bert_b1.json
@@ -92,7 +109,7 @@ chmod +x build_device.sh
 ​    输出结果路径：./model1_dev_0_chn_0_results/bert/
 ​    精度数据：./output/perform_static_dev_0_chn_0.txt
 
-## 7.3、后处理脚本
+#### 后处理脚本
 
 ```
 ./bert_tnews_accuracy_calc.sh
@@ -103,9 +120,7 @@ chmod +x build_device.sh
 ​    label_file="../datasets/bert_tnews_origin/labels.json"
 ​    基线的精度值：55.9%
 
-
-
-# 8、【备注说明】
+## 备注
 
 执行中文解码时，需要关注本地的LANG设置应该为LANG=en_US.UTF-8,否则可能导致预处理解码失败
 echo $LANG
