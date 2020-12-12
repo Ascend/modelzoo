@@ -138,8 +138,6 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        # self.avgpool = nn.AvgPool2d(7, stride=1)
-        # self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         # Top layer
         self.toplayer = nn.Conv2d(2048, 256, kernel_size=1, stride=1, padding=0)  # Reduce channels
@@ -223,10 +221,6 @@ class ResNet(nn.Module):
         h = h.float()
         h = self.maxpool(h)
         h = h.half()
-        # self.maxpool = self.maxpool.cpu()
-        # h = self.maxpool(h.cpu())
-        # h = h.npu()
-        # self.maxpool = self.maxpool.npu()
 
         h = self.layer1(h)
         c2 = h
