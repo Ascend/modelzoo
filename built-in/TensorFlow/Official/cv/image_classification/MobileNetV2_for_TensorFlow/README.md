@@ -4,39 +4,40 @@ This repository provides a script and recipe to train the MobileNetv2 model to a
 
 ## Table Of Contents
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Data augmentation](#data-augmentation)
-* [Setup](#setup)
-  * [Requirements](#requirements)
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Check json](#Check-json)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#Training-process)    
+    * [Evaluation](#Evaluation)
 * [Advanced](#advanced)
-  * [Command line arguments](#command-line-arguments)
-  * [Training process](#training-process)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
-
+  * [Command-line options](#Command-line-options) 
 
     
 
-## Model overview
-
-In this repository, we implement MobileNetv2 from paper [Sandler, Mark, et al. "Mobilenetv2: Inverted residuals and linear bottlenecks." CVPR 2018.](https://arxiv.org/abs/1801.04381)
+## Description
 
 MobileNetv2 is a mobile architecture. It is mainly constructed based on depthwise separable convolutions, linear bottlenecks and inverted residuals.
 
-### Model architecture
+MobileNetv2 model from: [Sandler, Mark, et al. "Mobilenetv2: Inverted residuals and linear bottlenecks." CVPR 2018.](https://arxiv.org/abs/1801.04381)
 
-The model architecture can be found from the reference paper.
+## Requirements
 
-### Default configuration
+- Tensorflow 1.15.0
+- Download and preprocess ImageNet2012 or CIFAR10 dataset for training and evaluation.
+
+## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for MobileNetv2 model.
 
-#### Optimizer
+### Optimizer
 
 This model uses Momentum optimizer from Tensorflow with the following hyperparameters:
 
@@ -51,7 +52,7 @@ This model uses Momentum optimizer from Tensorflow with the following hyperparam
 - We train for:
   - 300 epochs for a standard training process using ImageNet2012
 
-#### Data augmentation
+### Data augmentation
 
 This model uses the data augmentation from InceptionV2:
 
@@ -66,33 +67,21 @@ This model uses the data augmentation from InceptionV2:
 
 For more details, we refer readers to read the corresponding source code in Slim.
 
-## Setup
-The following section lists the requirements to start training the MobileNetv2 model.
-### Requirements
 
-Tensorflow 1.15.0
+## Quick start guide
 
-## Quick Start Guide
+### Prepare the dataset
 
-### 1. Clone the respository
-
-```shell
-git clone xxx
-cd ModelZoo_MobileNetv2_TF_HARD
-```
-
-### 2. Download and preprocess the dataset
-
-1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
-2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
+1. Download the ImageNet2012 dataset.
+2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and validation tfrecord files are under the path/data directories.
 
-### 3. Set environment
+### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-### check json
+### Check json
 
 Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the directory
 8p configuration file example.
@@ -127,7 +116,10 @@ Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the 
 }
 ```
 
-### 4. Train
+### Running the example
+
+#### Training
+
 - train on a single NPU
     - **edit** *train_1p.sh* (see example below)
     - bash run_1p.sh
@@ -182,7 +174,11 @@ Examples:
         bash run_8p.sh
         ```
 
-### 5. Test
+#### Training process
+
+All the results of the training will be stored in the directory `result`.
+
+#### Evaluation
 - We evaluate results by using following commands:
      ```shell 
     python3.7 eval_image_classifier_mobilenet.py --dataset_dir=/opt/npu/slimImagenet \
@@ -192,7 +188,8 @@ Examples:
 
 
 ## Advanced
-### Commmand-line options
+
+### Command-line options
 
 We list those important parameters to train this network here. For more details of all the parameters, please read *train.py* and other related files.
 
@@ -214,30 +211,8 @@ We list those important parameters to train this network here. For more details 
   --warmup_epochs                   warmup epochs for learning rate (default: 5)
 ```
 
-### Training process
 
-All the results of the training will be stored in the directory `result`.
  
-## Performance
-
-### Result
-
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
-
-#### Training accuracy results
-
-| **epochs** |      Top1      |
-| :--------: | :------------: |
-|    300     |     72.47%     |
-
-#### Training performance results
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |     1400 img/s    |
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |    11000 img/s    |
 
 
 

@@ -4,39 +4,40 @@ This repository provides a script and recipe to train the InceptionV4 model.
 
 ## Table Of Contents
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Data augmentation](#data-augmentation)
-* [Setup](#setup)
-  * [Requirements](#requirements)
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Check json](#Check-json)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#Training-process)    
+    * [Evaluation](#Evaluation)
 * [Advanced](#advanced)
-  * [Command line arguments](#command-line-arguments)
-  * [Training process](#training-process)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
-
+  * [Command-line options](#Command-line-options) 
+​     
 
     
 
-## Model overview
-
-In this repository, we implement InceptionV4 from paper [Christian Szegedy, Sergey loffe, Vincent Vanhoucke, Alex Alemi. "Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning".](https://arxiv.org/abs/1602.07261).
+## Description
 
 This is an implementation of the official InceptionV4 network as in Google's ModelZoo, written in Tensorflow 1.15.0 and run on Ascend 910.
+InceptionV4 model from: [Christian Szegedy, Sergey loffe, Vincent Vanhoucke, Alex Alemi. "Inception-v4, Inception-ResNet and the Impact of Residual Connections on Learning".](https://arxiv.org/abs/1602.07261).
 
-### Model architecture
+## Requirements
 
-The model architecture can be found from the reference paper.
+- Tensorflow 1.15.0
+- Download and preprocess ImageNet2012,CIFAR10 or Flower dataset for training and evaluation.
 
-### Default configuration
+## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for InceptionV4 model.
 
-#### Optimizer
+### Optimizer
 
 This model uses the RMSprop optimizer with the following hyperparameters:
 
@@ -51,7 +52,7 @@ This model uses the RMSprop optimizer with the following hyperparameters:
 - We train for:
   - 100 epochs for a standard training process using official TFRecord dataset of ImageNet2012
 
-#### Data augmentation
+### Data augmentation
 
 This model uses the following data augmentation:
 
@@ -65,28 +66,15 @@ This model uses the following data augmentation:
   - CenterCrop
   - Normalized to [-1, 1]
 
-## Setup
-The following section lists the requirements to train the InceptionV4 network.
-### Requirements
+## Quick start guide
 
-Tensorflow 1.15.0
+### Prepare the dataset
 
-## Quick Start Guide
-
-### 1. Clone the respository
-
-```shell
-git clone xxx
-cd ModelZoo_InceptionV4_TF_Atlas
-```
-
-### 2. Download and preprocess the dataset
-
-1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
-2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
+1. Download the ImageNet2012 dataset.
+2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and validation tfrecord files are under the path/data directories.
 
-### check json
+### Check json
 
 Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the scripts/ directory.
 The content of the 8p configuration file:
@@ -105,10 +93,14 @@ The content of the 8p configuration file:
                                     "pod_name":"npu8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
 ```
 
-### 3. Train
+### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+### Running the example
+
+#### Training
 
 - train on a single NPU
     - **edit** *scripts/run_1p.sh* and *scripts/train_1p.sh* (see example below)
@@ -160,7 +152,14 @@ Examples:
         ./run_8p.sh
         ```
 
-### 4. Test
+#### Training process
+
+All the results of the training will be stored in the directory results. Script will store:
+
+- checkpoints
+- log
+
+#### Evaluation
 - Same procedure as training except 2 following modifications
     - change `--mode=train` to `--mode=evaluate`
     - add `--eval_dir=path/eval`
@@ -180,7 +179,8 @@ Examples:
 
 
 ## Advanced
-### Commmand-line options
+
+### Command-line options
 
 ```
   --rank_size                       number of NPUs to use (default: 1)
@@ -203,63 +203,6 @@ Examples:
   --log_name                        name of log file (default: inception_v4.log)
   --log_dir                         path to save checkpoint and log (default: ./model)  
 ```
-
-### Training process
-
-Start single card or multi card training by training instruction in "quick start". Single card and multi card can support single card and 8 card network training by running different scripts.
-Set data_dir in training script （train_1p.sh,train_8p.sh） as the path of training data set. Please refer to the "quick start" example for the specific process.
-The storage path of the model is “results/1p”or“results/8p”, including the training log and checkpoints files. Taking single card training as an example, the loss information is in the file results/1p/0/model/inception_v4.log, and the example is as follows.
-```
-step: 12100  epoch:  1.2  FPS:  469.5  loss: 4.676  total_loss: 5.051  lr:0.04499
-step: 12200  epoch:  1.2  FPS:  469.6  loss: 4.922  total_loss: 5.297  lr:0.04499
-step: 12300  epoch:  1.2  FPS:  469.6  loss: 4.953  total_loss: 5.328  lr:0.04499
-step: 12400  epoch:  1.2  FPS:  469.7  loss: 4.758  total_loss: 5.133  lr:0.04499
-step: 12500  epoch:  1.2  FPS:  469.6  loss: 4.957  total_loss: 5.332  lr:0.04499
-step: 12600  epoch:  1.3  FPS:  469.5  loss: 4.594  total_loss: 4.969  lr:0.04499
-step: 12700  epoch:  1.3  FPS:  469.6  loss: 4.707  total_loss: 5.082  lr:0.04499
-step: 12800  epoch:  1.3  FPS:  469.6  loss: 4.574  total_loss: 4.950  lr:0.04499
-step: 12900  epoch:  1.3  FPS:  469.5  loss: 4.809  total_loss: 5.184  lr:0.04499
-step: 13000  epoch:  1.3  FPS:  469.7  loss: 4.664  total_loss: 5.040  lr:0.04499
-step: 13100  epoch:  1.3  FPS:  469.6  loss: 4.555  total_loss: 4.930  lr:0.04499
-step: 13200  epoch:  1.3  FPS:  469.6  loss: 4.703  total_loss: 5.079  lr:0.04499
-step: 13300  epoch:  1.3  FPS:  469.6  loss: 4.543  total_loss: 4.919  lr:0.04499
-step: 13400  epoch:  1.3  FPS:  469.7  loss: 4.738  total_loss: 5.114  lr:0.04499
-step: 13500  epoch:  1.3  FPS:  469.6  loss: 4.707  total_loss: 5.083  lr:0.04499
-step: 13600  epoch:  1.4  FPS:  469.6  loss: 4.793  total_loss: 5.169  lr:0.04499
-step: 13700  epoch:  1.4  FPS:  469.6  loss: 4.520  total_loss: 4.895  lr:0.04499
-step: 13800  epoch:  1.4  FPS:  469.6  loss: 4.672  total_loss: 5.048  lr:0.04499
-step: 13900  epoch:  1.4  FPS:  469.6  loss: 4.562  total_loss: 4.939  lr:0.04499
-step: 14000  epoch:  1.4  FPS:  469.6  loss: 4.742  total_loss: 5.118  lr:0.04499
-step: 14100  epoch:  1.4  FPS:  469.5  loss: 4.555  total_loss: 4.931  lr:0.04499
-```
- 
-## Performance
-
-### Result
-
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
-
-#### Training accuracy results
-
-| **epochs** |    Top1/Top5   |
-| :--------: | :------------: |
-|    100     | 74.9 %/92.3 %  |
-
-#### Training performance results
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |     483 img/s    |
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |     3170 img/s    |
-
-
-
-
-
-
-
 
 
 
