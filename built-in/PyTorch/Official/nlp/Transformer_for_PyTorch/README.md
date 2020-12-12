@@ -1,11 +1,13 @@
 # Machine Translation with Transformer
 
 ## Requirements
+* NPU配套的run包安装
 * Python 3.7.5
-* PyTorch
+* PyTorch（NPU版本）
+* apex（NPU版本）
 * sacrebleu
 * dllogger
-* apex
+
 
 ## Dataset Prepare
 1. 运行sh run_preprocessing.sh下载数据集，并处理

@@ -1,4 +1,6 @@
 #! /bin/bash
+source npu_set_env.sh
+su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 172.17.0.1:22118 --log \"SetLogLevel(0)[error]\" --device 0"
 DATA_DIR=./data/dataset/wmt14_en_de_joined_dict/
 MODELDIR="./checkpoints/"
 mkdir -p "$MODELDIR"
