@@ -10,7 +10,7 @@ export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 
-python3 -W ignore train_8p_anycard.py \
+python3 -W ignore train_ic15.py \
   --lr 0.001\
 	--dist-backend 'hccl' \
 	--rank 0  \
@@ -21,13 +21,11 @@ python3 -W ignore train_8p_anycard.py \
 	--device 'npu' \
 	--opt-level 'O2' \
 	--loss-scale 64 \
-	--addr='10.136.181.127' \
+	--addr='10.246.246.76' \
 	--seed 16  \
 	--n_epoch 600 \
-	--data-dir '/home/w50015720/npu/PSENet_data' \
+	--data-dir '/home/data/' \
 	--port 8272 \
 	--schedule 200 400 \
-	--device-list '0' \
+	--device-list '1' \
 	--remark 'test'
-# --resume "/home/z00524916/deploy/8p/best/npu8pscheule_0.3868_0.9474_0.8690_0.9098_588.pth"
-# --resume 'best/0.4274_0.9001_0.8578_146.pth'\
