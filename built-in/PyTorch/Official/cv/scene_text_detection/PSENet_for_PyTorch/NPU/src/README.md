@@ -1,11 +1,12 @@
 # Shape Robust Text Detection with Progressive Scale Expansion Network
 
 ## Requirements
+* NPU配套的run包安装
 * Python 3.7.5
-* PyTorch
+* PyTorch（NPU版本）
+* apex（NPU版本）
 * pyclipper
 * Polygon3
-* apex
 * opencv-python 3.4
 
 ## 1P
