@@ -1,3 +1,0 @@
-实现安装运行依赖库
-pip install tqdm better_exceptions
-之后python运行cifar10.py就可以开始运行了
