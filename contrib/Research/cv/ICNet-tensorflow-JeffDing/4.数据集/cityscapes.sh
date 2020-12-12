@@ -1,1 +1,0 @@
-cp -r /data/dataset/storage/cityscapes/ ./data/cityscapes_dataset/
