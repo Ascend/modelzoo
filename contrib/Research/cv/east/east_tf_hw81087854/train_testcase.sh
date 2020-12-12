@@ -1,19 +1,18 @@
 #How to download pretrain_model and dataset?
 #Need resnet_v1_50.ckpt model and icdar2015
 
-:<<!
-python3 npu_train.py \
+python3.7 npu_train.py \
+--max_steps=20  \
 --input_size=512 \
 --batch_size_per_gpu=14 \
 --checkpoint_path=./checkpoint/ \
 --text_scale=512 \
---training_data_path=./ocr/icdar2015/ \
+--training_data_path=$icdar2015_train \
 --geometry=RBOX \
 --learning_rate=0.0001 \
 --num_readers=24 \
---pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt >train.log 2>&1
-!
-echo "Run testcase success!"
+--pretrained_model_path=$resnetv1_50_ckpt >train.log 2>&1
+
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
 key1="[GEOP]"  #功能检查字
 key2="xxx"  #性能检查字
