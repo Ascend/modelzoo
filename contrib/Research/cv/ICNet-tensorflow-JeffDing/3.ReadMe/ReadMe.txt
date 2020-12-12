@@ -1,1 +1,0 @@
-运行脚本train_test.sh
