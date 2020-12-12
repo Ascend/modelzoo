@@ -4,9 +4,9 @@
 
 * [目的](#目的)
 * [环境设置](#环境设置)
-* [执行Fine Tuning](#执行Fine Tuning)
-* [执行predict](#执行 predict)
-* [checkpoint转pb](#checkpoint 转 pb)
+* [FineTuning](#FineTuning)
+* [predict](#predict)
+* [checkpoint转pb](#checkpoint转pb)
 * [pb在线推理](#pb在线推理)
 
 ## 目的
@@ -29,7 +29,7 @@
 
 
 
-## 执行Fine Tuning
+## FineTuning
 
 执行Tnews的Fine Tuning
 
@@ -42,7 +42,7 @@ Fine Tuning执行结束后会在当前目录生成 tnews_output目录，Fine Tun
 
 
 
-## 执行 predict
+## predict
 
 基于checkpoint执行predict
 
@@ -53,7 +53,7 @@ cd ./bert
 
 
 
-## checkpoint 转 pb
+## checkpoint转pb
 
 ```
 ./run_bert_tnews_ckpt_to_pb.sh
