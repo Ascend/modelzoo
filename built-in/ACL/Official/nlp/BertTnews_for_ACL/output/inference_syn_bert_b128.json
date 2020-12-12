@@ -1,0 +1,22 @@
+{
+    "test_case_name":"ACL_INFERENCE_PROCESSS_SYN_MULTI_INPUTS_005",
+    "test_scenario":"INFERENCE",
+    "common":{
+		"device_num":1,
+		"device_id_list":[0],
+		"loop_num":1
+	},
+	"dataset_config":{
+        "dataset_channel_num":1,
+        "dir_path_list":["../datasets/bert_tnews_10/input_ids","../datasets/bert_tnews_10/input_masks", "../datasets/bert_tnews_10/segments"]
+    },
+    "infer_config":{
+		"batch_size":128,
+		"model_config":{
+			"model_num":1,
+			"om_path_list":["../model/bert_tnews/Bert_tnews_batch_128_INT32_output_FP32.om"],
+			"model_type":["bert"],
+			"result_path_list":["../model1"]
+		}
+	}
+}
