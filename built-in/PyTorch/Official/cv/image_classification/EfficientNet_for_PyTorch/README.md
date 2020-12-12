@@ -4,9 +4,9 @@
 
 ```
 	1.安装环境
-	2.修改npu_1p.sh字段"data"为当前磁盘的数据集路径
+	2.修改run_1p.sh字段"data"为当前磁盘的数据集路径
 	3.修改字段device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
-	4.cd到npu_1p.sh文件的目录，执行bash npu_1p.sh单卡脚本， 进行单卡训练
+	4.cd到run_1p.sh文件的目录，执行bash run_1p.sh单卡脚本， 进行单卡训练
 ```
 
 	
@@ -16,7 +16,7 @@
 	1.安装环境
 	2.修改多P脚本中字段"data"为当前磁盘的数据集路径
 	3.修改run_8p.sh字段"addr"为当前主机ip地址
-	4.cd到run_8p.sh文件的目录，执行bash npu_8p.sh等多卡脚本， 进行多卡训练	
+	4.cd到run_8p.sh文件的目录，执行bash run_8p.sh等多卡脚本， 进行多卡训练	
 ```
 
 
