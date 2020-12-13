@@ -182,23 +182,11 @@ def main():
             
         feed_dict = {step_ph: step}
         if step % cfg.SAVE_PRED_EVERY == 0:
-            config = tf.ConfigProto()
-            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-            custom_op.name =  "NpuOptimizer"
-            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
-
             loss_value, loss1, loss2, loss3, val_loss_value, _ = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss, train_op], feed_dict=feed_dict)
             train_net.save(saver, cfg.SNAPSHOT_DIR, step)
         else:
-            config = tf.ConfigProto()
-            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-            custom_op.name =  "NpuOptimizer"
-            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
-            loss_value, loss1, loss2, loss3, val_loss_value, _ = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss, train_op], feed_dict=feed_dict)            
+            if step % cfg.SAVE_PRED_EVERY == 0:
+                loss_value, loss1, loss2, loss3, val_loss_value, _ = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss, train_op], feed_dict=feed_dict)            
 
         duration = time.time() - start_time
         print('step {:d} \t total loss = {:.3f}, sub4 = {:.3f}, sub24 = {:.3f}, sub124 = {:.3f}, val_loss: {:.3f} ({:.3f} sec/step)'.\

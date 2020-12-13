@@ -30,6 +30,10 @@ import numpy as np
 import tensorflow as tf
 import os
 
+from npu_bridge.estimator import npu_ops
+from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+
+
 DEFAULT_PADDING = 'VALID'
 DEFAULT_DATAFORMAT = 'NHWC'
 layer_name = []
@@ -91,11 +95,18 @@ class Network(object):
     
     def create_session(self):
         # Set up tf session and initialize variables.
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
+        #config = tf.ConfigProto()
+        #config.gpu_options.allow_growth = True
         
         global_init = tf.global_variables_initializer()
         local_init = tf.local_variables_initializer()
+        
+        config = tf.ConfigProto()
+        custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+        custom_op.name =  "NpuOptimizer"
+        custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+        #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
         
         self.sess = tf.Session(config=config)
         self.sess.run([global_init, local_init])
