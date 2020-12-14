@@ -1,6 +1,6 @@
 DATA_PATH="../wmt-ende"
 TEST_SOURCES="${DATA_PATH}/tfrecord/newstest2014.l128.tfrecord"
-MODEL_DIR="/home/chujun//transformer_p1/model_dir_0608"
+MODEL_DIR="file://PATH_TO_BE_CONFIGURED"
 export JOB_ID=10086
 export DEVICE_ID=2
 export RANK_ID=0
