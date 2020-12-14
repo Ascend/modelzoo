@@ -30,7 +30,7 @@ def proc_node_module(checkpoint,AttrName):
     return new_state_dict
 def convert():
     checkpoint = torch.load("./checkpoint.pth", map_location='cpu')
-    checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
+    checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
     model = EfficientNet.from_name("efficientnet-b0")
     model.set_swish(memory_efficient=False)
     model.load_state_dict(checkpoint['state_dict'])
