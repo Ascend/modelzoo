@@ -4,40 +4,42 @@ This repository provides a script and recipe to train the ResNet50 model to achi
 
 ## Table Of Contents
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Data augmentation](#data-augmentation)
-* [Setup](#setup)
-  * [Requirements](#requirements)
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#Training-process)    
+    * [Evaluation](#Evaluation)
 * [Advanced](#advanced)
-  * [Command line arguments](#command-line-arguments)
-  * [Training process](#training-process)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
-
+  * [Command-line options](#Command-line-options) 
+  * [Config file options](#Config-file-options) 
 
     
 
-## Model overview
+## Description
 
 ResNet50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`
 
-This is ResNet50 V1.5 model. The difference between V1 and V1.5 is that, ResNet V1.5 set stride=2 at the 3x3 convolution layer for a bottleneck block where V1 set stride=2 at the first 1x1 convolution layer.
+This is ResNet50 V1.5 model. The difference between V1 and V1.5 is that, ResNet V1.5 set stride=2 at the 3x3 convolution layer for a bottleneck block where V1 set stride=2 at the first 1x1 convolution layer.ResNet50 builds on 4 residuals bottleneck block.
 
-### Model architecture
+## Requirements
+Ensure you have the following components:
+  - Tensorflow
+  - Hardware environment with the Ascend AI processor
+  - Download and preprocess ImageNet2012, CIFAR10 or Flower dataset for training and evaluation.
 
-ResNet50 builds on 4 residuals bottleneck block.
-
-### Default configuration
+## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for ResNet50 model.
 
-#### Optimizer
+### Optimizer
 
 This model uses Momentum optimizer from tensorflow with the following hyperparameters:
 
@@ -51,7 +53,7 @@ This model uses Momentum optimizer from tensorflow with the following hyperparam
   - 90 epochs -> configuration that reaches 76.9% top1 accuracy
   - 120 epochs -> 120 epochs is a standard for ResNet50
 
-#### Data augmentation
+### Data augmentation
 
 This model uses the following data augmentation:
 
@@ -63,33 +65,24 @@ This model uses the following data augmentation:
   - CenterCrop, ratio=0.8
   - Normalize, mean=(121, 115, 100), std=(70, 68, 71)
 
-## Setup
-The following section lists the requirements to start training the ResNet50 model.
-### Requirements
-Ensure you have the following components:
-  - Tensorflow
-  - Hardware environment with the Ascend AI processor
+
+## Quick start guide
+
+### Prepare the dataset
+1. Download the classification dataset, like ImageNet2012, CIFAR10, Flower and so on.
+2. Please convert the dataset to tfrecord format file by yourself.
+3. The train and validation tfrecord files are under the path/data directories.
 
 
-## Quick Start Guide
-
-### 1. Clone the respository
-
-```shell
-git clone xxx
-cd Modelzoo_Resnet50_HC
-```
-
-### 2. Download and preprocess the dataset
-
-1. Download the classification dataset, like ImageNet2012, CIFAR10, Flower and so on.The model is compatible with the datasets on tensorflow official website.
-2. Extract the training data
-3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
-
-### 3. Train
+### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+### Running the example
+#### Training
+The 1P training script is located in `scripts/train_1p.sh`, and each independent process of 8P training is located in `scripts/train_sample.sh`.
+The configuration file is located in scr/configs, res50_256bs_1p.py is used to verify the functionality of the model. res50_256bs_1p_eval.py is used to verify the accuracy and performance of the model, 8p is the same, users can modify the configuration by themselves.
 
 1P training:
 
@@ -108,27 +101,43 @@ python3.7 ../src/mains/res50.py \
 More parameters are in --config_file under src/configs.
 ```shell
 cd /path/to/Modelzoo_Resnet50_HC/scripts
-sh ./train_1p.sh
+bash train_1p.sh
 ```
 
-8P training is similar to the former.
+8P training is similar to the former：
+```shell
+cd /path/to/Modelzoo_Resnet50_HC/scripts
+bash train_8p.sh
+```
+
+#### Training process
+
+All the results of the training will be stored in the directory specified with `--model_dir` argument.
+Script will store:
+ - d_solution.
+ - log.
+
+#### Evaluation
+
+The configuration file is located in `src/configs`, and the file name is configured by "--config_file". After modifying the mode=evaluate in the configuration file, execute the training script.
+```
+  # ======= basic config ======= #
+     'mode':'evaluate',             # "train","evaluate","train_and_evaluate"
+     'epochs_between_evals': 4,     # used if mode is "train_and_evaluate"
+```
+1P test instruction (the script is located in `scripts/train_1p.sh`)
+
+```
+bash train_1p.sh
+```
+
+8P training instructions (the script is located in `scripts/train_8p.sh`)
+
+```
+bash train_8p.sh
+```
 
 
-### 4. Test
-
-Evaluate after training:
-1. Set --eval=True.
-2. Set --config_file=resnet50_256bs_8p_eval
-
-Evaluate while training:
-1. Set --eval=True.
-2. Set --config_file=resnet50_256bs_8p_eval.
-3. Set `mode` in --config_file as `train_and_evaluate`.
-
-Only Evaluate:
-1. Set --eval=True.
-2. Set --config_file=resnet50_256bs_8p_eval.
-3. Set `mode` in --config_file as `evaluate`.
 
 ## Advanced
 ### Command-line options
@@ -153,7 +162,7 @@ Only Evaluate:
   --batch_size            mini-batch size (default: 256) per gpu
   --lr_decay_mode         type of LR schedule: exponential, cosine_annealing
   --learning_rate_maximum initial learning rate
-  --num_epochs            poch num to train the model (default: 90)
+  --num_epochs            poch num to train the model 
   --warmup_epochs         warmup epoch(when batchsize is large)
   --weight_decay          weight decay (default: 1e-4)
   --momentum              momentum(default: 0.9)
@@ -162,32 +171,9 @@ Only Evaluate:
   --log_dir               path to save log
 ```
 
-### Training process
 
-All the results of the training will be stored in the directory specified with `--model_dir` argument.
-Script will store:
- - d_solution.
- - log.
  
-## Performance
 
-### Result
-
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
-
-#### Training accuracy results
-
-| **epochs** |   Top1/Top5   |
-| :--------: | :-----------: |
-|     90     | 76.90%/93.63% |
-|    120     | 77.04%/93.69% |
-
-#### Training performance results
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |   2200 img/s   |
-|    8     |   17400 img/s   |
 
 
 

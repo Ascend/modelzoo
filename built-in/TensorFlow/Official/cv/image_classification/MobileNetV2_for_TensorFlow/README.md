@@ -129,7 +129,7 @@ Check whether there is a JSON configuration file "8p.json" for 8 Card IP in the 
 
 Examples:
 - Case for single NPU
-    - In *train_1p.sh*, python scripts part should look like as follows. For more detailed command lines arguments, please refer to [Command line arguments](#command-line-arguments)
+    - In *train_1p.sh*, python scripts part should look like as follows.Make sure that the "--dataset_dir" modify the path of the user generated tfrecord. 
         ```shell
         python3.7 ${currentDir}/train.py \
             --dataset_dir=/opt/npu/slimImagenet \
@@ -152,7 +152,7 @@ Examples:
         bash run_1p.sh
         ```
 - Case for 8 NPUs
-    - In *train_8p.sh*, python scripts part should look like as follows.
+    - In *train_8p.sh*, python scripts part should look like as follows.Make sure that the "--dataset_dir" modify the path of the user generated tfrecord.
         ```shell 
         python3.7 ${currentDir}/train.py \
             --dataset_dir=/opt/npu/slimImagenet \
@@ -179,7 +179,7 @@ Examples:
 All the results of the training will be stored in the directory `result`.
 
 #### Evaluation
-- We evaluate results by using following commands:
+- We evaluate results by using following commands,make sure that the "--dataset_dir" modify the path of the user generated tfrecord.:
      ```shell 
     python3.7 eval_image_classifier_mobilenet.py --dataset_dir=/opt/npu/slimImagenet \
         --checkpoint_path=result/8p/0/results/model.ckpt-187500

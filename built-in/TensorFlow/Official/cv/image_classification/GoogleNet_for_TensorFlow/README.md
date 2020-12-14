@@ -109,7 +109,7 @@ Before starting the training, first configure the environment variables related 
 Examples:
 - Case for single NPU
     - Modify the ID of NPU in *device_group* in *scripts/run_1p.sh*, default ID is *0*.
-    - In *scripts/train_1p.sh* , python scripts part should look like as follows. For more detailed command lines arguments, please refer to [Command line arguments](#command-line-arguments)
+    - In *scripts/train_1p.sh* , python scripts part should look like as follows, make sure that the "--data_dir" modify the path of the user generated tfrecord. 
         ```shell
         python3.7 ${dname}/train.py --rank_size=1 \
             --mode=train \
@@ -126,7 +126,7 @@ Examples:
         ```
 - Case for 8 NPUs
     - Modify the ID of NPU in *device_group* in *scripts/run_8p.sh*, default ID is *0,1,2,3,4,5,6,7*.
-    - In *scripts/train_8p.sh* , python scripts part should look like as follows.
+    - In *scripts/train_8p.sh* , python scripts part should look like as follows, make sure that the "--data_dir" modify the path of the user generated tfrecord.
         ```shell 
         python3.7 ${dname}/train.py --rank_size=8 \
             --mode=train \

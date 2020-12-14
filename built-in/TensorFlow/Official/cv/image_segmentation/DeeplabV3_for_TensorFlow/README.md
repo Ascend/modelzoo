@@ -64,7 +64,7 @@ This model uses the following data augmentation:
 ### Prepare the dataset
 
 You can use any datasets as you wish. Here, we only use voc2012_trainaug dataset as an example to illustrate the data generation. 
- - download the voc2012 datasets. 
+ - download the voc2012 datasets and put it under the `datasets/` path.
  - check if `SegmentationClassAug.zip` exists under `datasets/`,if not, you can download Semantic Boundaries Dataset by yourself.
  - txt file named trainaug.txt containing all the seg_image filenames
  - put all three files under `datasets/` directory
@@ -76,9 +76,10 @@ convert_voc2012_aug.sh
 
 For other datasets, you need following three files.  Create a script similar to `convert_voc2012_aug.sh` and 
 execute the script when you get all three file ready. 
- - original images
- - voc-style segmentation annotation file
+ - Training pictures and their annotation files (voc-style segmentation annotation format)
  - txt file for all the seg_image filenames
+ - Similar to the processing script of convert_voc2012_aug.sh
+
 
 ### Check json
 
@@ -118,6 +119,23 @@ resnet_v1_101_beta checkpoint. All the scripts that start with `train` are confi
 Create `pretrained/` directory, after you download either checkpoint or both, un-compress the tarball file and put them under `pretrained/` directory.
 
 For instance, to train the model with beta version checkpoints
+
+Set single card training parameters (the script is located in `scripts/train_1p_s16_beta.sh`), the example is as follows, please refer to the script for details:
+
+```
+CKPT_NAME=${CURRENT_DIR}/pretrained/model.ckpt
+PASCAL_DATASET=${CURRENT_DIR}/datasets/pascal_voc_seg/tfrecord
+NUM_ITERATIONS=30000
+```
+
+Set 8 card training parameters (the script is located in `scripts/train_s16_r1_beta.sh`, `scripts/train_s16_r2_beta.sh`), the example (`scripts/train_s16_r1_beta.sh`) is as follows:
+
+```
+CKPT_NAME=${CURRENT_DIR}/pretrained/model.ckpt
+PASCAL_DATASET=${CURRENT_DIR}/datasets/pascal_voc_seg/tfrecord
+NUM_ITERATIONS=15000 
+```
+
 - with OS=16
     - train on single NPU 
     
