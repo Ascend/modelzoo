@@ -1,0 +1,27 @@
+{
+	"group_count": "1",
+	"group_list": [
+		{
+			"group_name": "worker",
+			"device_count": "8",
+			"instance_count": "1",
+			"instance_list": [
+				{
+					"devices":[
+						{"device_id":"0","device_ip":"192.168.10.2"},
+						{"device_id":"1","device_ip":"192.168.11.2"},
+						{"device_id":"2","device_ip":"192.168.12.2"},
+						{"device_id":"3","device_ip":"192.168.13.2"},
+						{"device_id":"4","device_ip":"192.168.10.3"},
+						{"device_id":"5","device_ip":"192.168.11.3"},
+						{"device_id":"6","device_ip":"192.168.12.3"},
+						{"device_id":"7","device_ip":"192.168.13.3"}
+					],
+					"pod_name":"ascend8p",
+					"server_id":"127.0.0.1"
+				}
+			]
+		}
+	],
+	"status": "completed"
+}

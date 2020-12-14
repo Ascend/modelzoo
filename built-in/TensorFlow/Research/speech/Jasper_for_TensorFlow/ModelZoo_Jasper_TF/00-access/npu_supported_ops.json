@@ -1,0 +1,2770 @@
+{
+  "Abs": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AccumulateNV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AccumulatorApplyGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AccumulatorNumAccumulated": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AccumulatorSetGlobalStep": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AccumulatorTakeGradient": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Acos": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AcosGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Acosh": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AdamApplyOneAssign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AdamApplyOneWithDecayAssign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Add": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AddManySparseToTensorsMap": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "AddN": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AddSparseToTensorsMap": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "AddV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AdjustContrastv2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AdjustHue": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AdjustSaturation": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AippData": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "All": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AllCandidateSampler": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Any": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAdaMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAdadelta": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAdagradDA": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAdagradV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAdam": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyAddSign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyCenteredRMSProp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyFtrl": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyFtrlV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyGradientDescent": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyMomentum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyPowerSign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyProximalAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyProximalGradientDescent": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApplyRMSProp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ApproximateEqual": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ArgMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ArgMin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AsString": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "AscendAntiQuant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AscendDequant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AscendPadding": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AscendQuant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AscendWeightQuant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Asin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AsinGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Asinh": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AsinhGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Assert": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Assign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AssignAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AssignAddVariableOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AssignSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AssignSubVariableOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AssignVariableOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Atan": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Atan2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AtanGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Atanh": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AudioSpectrogram": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AvgPool": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AvgPool3D": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "AvgPoolGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNInfer": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNInferGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNTrainingReduce": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNTrainingReduceGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNTrainingUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNTrainingUpdateGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BNTrainingUpdateV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Barrier": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BarrierClose": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BarrierIncompleteSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BarrierInsertMany": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BarrierReadySize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BarrierTakeMany": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BasicLSTMCell": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BasicLSTMCellCStateGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BasicLSTMCellInputGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BasicLSTMCellWeightGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Batch": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BatchMatMul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BatchMatMulV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BatchMultiClassNonMaxSuppression": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BatchToSpace": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BatchToSpaceND": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BesselI0e": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BesselI1e": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Betainc": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "BiasAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BiasAddGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Bincount": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Bitcast": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BitwiseAnd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BitwiseOr": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BitwiseXor": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BoostedTreesBucketize": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BroadcastArgs": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BroadcastGradientArgs": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "BroadcastTo": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Bucketize": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CTCBeamSearchDecoder": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "CTCLoss": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Case": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Cast": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Ceil": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CheckNumerics": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Cholesky": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CholeskyGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ClipBoxes": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ClipByValue": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CombinedNonMaxSuppression": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CompareAndBitpack": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ComplexAbs": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ComputeAccidentalHits": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Concat": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ConcatOffset": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ConcatV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ConditionalAccumulator": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ConfusionMatrix": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conj": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Const": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Constant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ControlTrigger": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conv2D": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conv2DBackpropFilter": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conv2DBackpropInput": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conv3D": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conv3DBackpropFilterV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Conv3DBackpropInputV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Cos": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Cosh": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CountUpTo": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CropAndResize": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CropAndResizeGradBoxes": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CropAndResizeGradImage": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Cumprod": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Cumsum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "CumulativeLogsumexp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Data": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DataFormatDimMap": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DataFormatVecPermute": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DecodeBase64": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DecodeBbox": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DecodeBboxV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DecodeWav": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DeformableConv2D": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DeformableOffsets": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DenseToDenseSetOperation": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DenseToSparseSetOperation": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DepthToSpace": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DepthwiseConv2dNative": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DepthwiseConv2dNativeBackpropFilter": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DepthwiseConv2dNativeBackpropInput": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Dequantize": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DeserializeManySparse": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DeserializeSparse": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DestroyTemporaryVariable": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Diag": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DiagPart": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Div": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DivNoNan": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DrawBoundingBoxes": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DrawBoundingBoxesV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DropOutDoMask": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DropOutGenMask": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Dropout": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DynamicLSTM": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DynamicPartition": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "DynamicRNN": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "DynamicStitch": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "EditDistance": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Elu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "EluGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "EmbeddingRankId": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Empty": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "EncodeBase64": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "EncodeJpeg": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "EncodePng": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "EncodeWav": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "End": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Enter": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Equal": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Erf": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Erfc": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "EuclideanNorm": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Exit": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Exp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ExpandDims": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Expm1": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ExtractGlimpse": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ExtractImagePatches": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ExtractJpegShape": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ExtractVolumePatches": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FIFOQueueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "FakeQuantWithMinMaxArgs": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FakeQuantWithMinMaxArgsGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FakeQuantWithMinMaxVars": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FakeQuantWithMinMaxVarsGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FakeQuantWithMinMaxVarsPerChannel": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FakeQuantWithMinMaxVarsPerChannelGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FastGelu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FastGeluGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FastrcnnPredictions": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Fill": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Fingerprint": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FixedUnigramCandidateSampler": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Floor": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FloorDiv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FloorMod": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "For": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FractionalAvgPool": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "FractionalAvgPoolGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FractionalMaxPool": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "FractionalMaxPoolGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FusedBatchNorm": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FusedBatchNormGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FusedBatchNormGradV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FusedBatchNormGradV3": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FusedBatchNormV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "FusedBatchNormV3": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Gather": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "GatherNd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "GatherV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Gelu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "GeluGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "GetSpan": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Greater": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "GreaterEqual": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "GuaranteeConst": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HSVToRGB": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HashTableV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "HcomAllGather": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HcomAllReduce": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HcomBroadcast": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HcomReceive": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HcomReduceScatter": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HcomSend": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HistogramFixedWidth": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HorovodAllgather": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HorovodAllreduce": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "HorovodBroadcast": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Identity": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "IdentityN": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "If": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Igamma": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "IgammaGradA": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Igammac": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "InTopKV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "InitializeTableV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "InplaceAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "InplaceSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "InplaceUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Inv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "InvGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Invert": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "InvertPermutation": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "IsFinite": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "IsInf": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "IsNan": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "IsVariableInitialized": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "L2Loss": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LRN": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LRNGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LarsV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LayerNorm": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LayerNormGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LeakyRelu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LeakyReluGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LearnedUnigramCandidateSampler": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Less": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LessEqual": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LinSpace": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ListDiff": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Log": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Log1p": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogMatrixDeterminant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogSoftmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogSoftmaxGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogUniformCandidateSampler": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogicalAnd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogicalNot": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LogicalOr": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LookupTableExportV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "LookupTableFindV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "LookupTableImportV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "LookupTableInsertV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "LookupTableSizeV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "LoopCond": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "LowerBound": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Lu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MapClear": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MapIncompleteSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MapPeek": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MapSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MapStage": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MapUnstage": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MapUnstageNoKey": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Mask2Argmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatMul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixBandPart": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixDeterminant": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixDiag": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixDiagPart": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixDiagPartV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MatrixDiagV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MatrixInverse": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixSetDiag": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixSetDiagV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MatrixSolve": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixSolveLs": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixSquareRoot": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MatrixTriangularSolve": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Max": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPool": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPool3D": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPool3DGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPool3DGradGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPoolGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPoolGradGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPoolGradGradWithArgmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPoolGradWithArgmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPoolV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaxPoolWithArgmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Maximum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MaximumGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Mean": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Merge": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Mfcc": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Min": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Minimum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MinimumGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MirrorPad": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MirrorPadGrad": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Mod": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Mul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MulNoNan": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Multinomial": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "MutableDenseHashTableV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MutableHashTableOfTensorsV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "MutableHashTableV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Neg": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NextAfter": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NextIteration": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NoOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NonDeterministicInts": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NonMaxSuppression": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NonMaxSuppressionV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NonMaxSuppressionV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NonMaxSuppressionV4": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NonMaxSuppressionV5": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NonMaxSuppressionWithOverlaps": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "NormalizeBBox": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NotEqual": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NpuAllocFloatStatus": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NpuClearFloatStatus": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NpuGetFloatStatus": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "NthElement": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OneHot": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "OnesLike": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "OrderedMapClear": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OrderedMapIncompleteSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OrderedMapPeek": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OrderedMapSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OrderedMapStage": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OrderedMapUnstage": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OrderedMapUnstageNoKey": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "OutfeedEnqueueOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Pack": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Pad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PaddingFIFOQueueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ParallelConcat": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ParallelDynamicStitch": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ParameterizedTruncatedNormal": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PartitionedCall": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Placeholder": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PlaceholderV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PlaceholderWithDefault": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PopulationCount": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Pow": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PreventGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Print": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PrintV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "PriorityQueueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Prod": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Qr": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "QuantizedResizeBilinear": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "QueueCloseV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueDequeueManyV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueDequeueUpToV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueDequeueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueEnqueueManyV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueEnqueueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueIsClosedV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "QueueSizeV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RFFT": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RGBToHSV": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ROIAlign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RaggedGather": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RaggedRange": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RaggedTensorToSparse": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RaggedTensorToTensor": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RandomChoiceWithMask": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RandomGamma": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RandomGammaGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RandomPoissonV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RandomShuffle": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RandomShuffleQueueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RandomStandardNormal": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RandomUniform": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RandomUniformInt": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Range": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Rank": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ReFormat": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ReadVariableOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Real": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RealDiv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Reciprocal": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ReciprocalGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RecordInput": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ReduceMean": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RefEnter": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RefExit": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RefMerge": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RefNextIteration": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RefSwitch": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RegexFullMatch": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "RegexReplace": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Relu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Relu6": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Relu6Grad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ReluGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Reshape": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeArea": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeBicubic": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeBicubicGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeBilinear": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeBilinearGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeNearestNeighbor": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResizeNearestNeighborGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceAccumulatorApplyGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceAccumulatorNumAccumulated": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceAccumulatorSetGlobalStep": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceAccumulatorTakeGradient": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ResourceApplyAdaMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAdadelta": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAdagradDA": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAdagradV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAdam": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAdamWithAmsgrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyAddSign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyCenteredRMSProp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyFtrl": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyFtrlV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyGradientDescent": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyKerasMomentum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyMomentum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyPowerSign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyProximalAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyProximalGradientDescent": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceApplyRMSProp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceConditionalAccumulator": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceGather": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceGatherNd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterDiv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterMin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterMul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterNdAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterNdSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterNdUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceScatterUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyAdadelta": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyAdagradV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyFtrl": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyFtrlV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyProximalAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceSparseApplyRMSProp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ResourceStridedSliceAssign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ReverseSequence": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ReverseV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RightShift": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Rint": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RngSkip": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Round": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RpnProposals": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Rsqrt": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "RsqrtGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SampleDistortedBoundingBoxV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScaleAndTranslate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScaleAndTranslateGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterDiv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterMin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterMul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterNd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterNdAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterNdNonAliasingAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterNdSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterNdUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ScatterUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SdcaOptimizerV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SegmentMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SegmentMean": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SegmentMin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SegmentProd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SegmentSum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Select": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SelectV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SelfAdjointEigV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Selu": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SerializeManySparse": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SerializeSparse": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SetSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Shape": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ShapeN": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Sigmoid": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SigmoidGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Sign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Sin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Sinh": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Size": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Slice": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Snapshot": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Softmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SoftmaxCrossEntropyWithLogits": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SoftmaxGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Softplus": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SoftplusGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Softsign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SpaceToBatch": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SpaceToBatchND": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SpaceToDepth": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseAccumulatorApplyGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseAccumulatorTakeGradient": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseAdd": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseAddGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyAdadelta": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyAdagradV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyFtrl": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyFtrlV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyProximalAdagrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseApplyRMSProp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseConcat": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseConditionalAccumulator": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseCross": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseDenseCwiseAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseDenseCwiseDiv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseDenseCwiseMul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseFillEmptyRows": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseFillEmptyRowsGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseReduceMax": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseReduceMaxSparse": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseReduceSum": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseReduceSumSparse": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseReorder": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseReshape": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseSegmentMean": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseSegmentMeanGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseSegmentSum": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseSlice": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseSliceGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseSoftmax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseSoftmaxCrossEntropyWithLogits": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseSparseMaximum": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseSparseMinimum": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseSplit": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "SparseTensorDenseAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseTensorDenseMatMul": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseToDense": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SparseToSparseSetOperation": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Split": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SplitV": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Sqrt": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SqrtGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Square": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SquaredDifference": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Squeeze": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StackClear": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StackCloseV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StackPeek": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StackPopV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StackPushV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StackV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Stage": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StageClear": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StagePeek": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StageSize": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatefulPartitionedCall": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StatefulRandomBinomial": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatefulStandardNormalV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatefulTruncatedNormal": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatefulUniform": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatefulUniformFullInt": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatefulUniformInt": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StatelessIf": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StatelessMultinomial": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StatelessRandomUniformInt": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StatelessWhile": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StopGradient": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StridedSlice": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StridedSliceAssign": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StridedSliceGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "StringFormat": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringJoin": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringLength": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringSplit": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringSplitV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringStrip": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringToHashBucket": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringToHashBucketFast": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringToHashBucketStrong": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "StringToNumber": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Sub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Substr": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Sum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Svd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Switch": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "SwitchN": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TakeManySparseFromTensorsMap": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Tan": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Tanh": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TanhGrad": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TemporaryVariable": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TensorArrayCloseV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayConcatV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayGatherV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayGradV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayGradWithShape": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayReadV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayScatterV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArraySizeV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArraySplitV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorArrayWriteV3": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "TensorScatterAdd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TensorScatterSub": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TensorScatterUpdate": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ThreadUnsafeUnigramCandidateSampler": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Tile": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Timestamp": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "ToAbsoluteBBox": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TopKV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TransShape": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Transpose": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TridiagonalSolve": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TruncateDiv": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TruncateMod": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "TruncatedNormal": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Unbatch": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UnbatchGrad": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UnicodeScript": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UniformCandidateSampler": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Unique": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UniqueV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UniqueWithCounts": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UniqueWithCountsV2": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "Unpack": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "UnravelIndex": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UnsortedSegmentMax": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "UnsortedSegmentMin": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "UnsortedSegmentProd": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "UnsortedSegmentSum": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Unstage": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "UpperBound": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "VarHandleOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "VarIsInitializedOp": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Variable": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "VariableShape": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "VariableV2": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Where": {
+    "isGray": true,
+    "isHeavy": false
+  },
+  "While": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Xdivy": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Xlogy": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "ZerosLike": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "Zeta": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "_Arg": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "_If": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "_ParallelConcatStart": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "_Retval": {
+    "isGray": false,
+    "isHeavy": false
+  },
+  "_While": {
+    "isGray": false,
+    "isHeavy": false
+  }
+}
