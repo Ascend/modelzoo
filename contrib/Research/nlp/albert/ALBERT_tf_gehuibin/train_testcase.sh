@@ -29,7 +29,7 @@ python3.7 -m run_squad_v2 \
 
 end_time=`date +%s`
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
-key1="[GEOP]"  #功能检查字
+key1="\[GEOP\]"  #功能检查字
 key2="xxx"  #性能检查字
 key3="xxx"  #精度检查字
 
