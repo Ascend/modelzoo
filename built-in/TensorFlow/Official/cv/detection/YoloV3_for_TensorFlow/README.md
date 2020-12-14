@@ -30,6 +30,7 @@ Main Python Packages:
 - tensorflow >= 1.15.0 (satisfied with NPU)
 - opencv-python
 - tqdm
+
 Dataset:
 - Download and preprocess COCO2014 or COCO2017 dataset for training and evaluation.
 
@@ -326,9 +327,13 @@ bash npu_train_8p_multi.sh
 Check the `args.py` for more details. You should set the parameters yourself in your own specific task.
 
 #### Training process
+
 All the results of the training will be stored:
+
      1. nohup.out -- training task main_log
+
      2. training/t1/D0/train_0.log -- training host log
+
      3. training/t1/D0/training/train.log -- training perf log
 
 #### Evaluation
