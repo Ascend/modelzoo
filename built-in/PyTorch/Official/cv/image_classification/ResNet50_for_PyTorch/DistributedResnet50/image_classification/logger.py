@@ -1,6 +1,5 @@
 # Copyright (c) 2018-2019, NVIDIA CORPORATION
 # Copyright (c) 2017-      Facebook, Inc
-#
 # Copyright 2020 Huawei Technologies Co., Ltd
 #
 # Licensed under the BSD 3-Clause License  (the "License");
