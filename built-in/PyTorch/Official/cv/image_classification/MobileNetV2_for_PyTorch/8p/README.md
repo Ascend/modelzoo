@@ -1,1 +1,1 @@
-# MobileNetV2 NPU训练
+# MobileNetV2 NPU 8P训练
