@@ -120,11 +120,11 @@ Script will store:
 #### Evaluation
 
 The configuration file is located in `src/configs`, and the file name is configured by "--config_file". After modifying the mode=evaluate in the configuration file, execute the training script.
-
+```
   # ======= basic config ======= #
      'mode':'evaluate',             # "train","evaluate","train_and_evaluate"
      'epochs_between_evals': 4,     # used if mode is "train_and_evaluate"
-
+```
 1P test instruction (the script is located in `scripts/train_1p.sh`)
 
 ```
