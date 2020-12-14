@@ -8,6 +8,8 @@ Ascend ModelZoo，欢迎各位开发者
 
 请贡献者在提交代码之前签署CLA协议，“个人签署”，[链接](https://clasign.osinfra.cn/sign/Z2l0ZWUlMkZhc2NlbmQ=)
 
+如您完成签署，可在自己提交的PR评论区输入/check-cla进行核实校验
+
  **一、源码**
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++或python代码，符合第四部分编码规范
@@ -198,6 +200,8 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 3、提交PR后，会自动触发门禁流水，后台会根据用例入口shell，自动将代码分发到对应执行环境；
 
 4、Jekins预置账号：global_read/huawei@123，登录之后，可以查看到用例执行日志
+
+5、如果提交失败，请查看日志，修复代码或其他问题后，在你当前的PR中，评论“compile”即可重新触发用例执行
 
 - 关键要求：
 

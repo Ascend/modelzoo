@@ -4,39 +4,39 @@ This repository provides a script and recipe to train the GoogleNet model.
 
 ## Table Of Contents
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Data augmentation](#data-augmentation)
-* [Setup](#setup)
-  * [Requirements](#requirements)
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Check json](#Check-json)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#Training-process)    
+    * [Evaluation](#Evaluation)
 * [Advanced](#advanced)
-  * [Command line arguments](#command-line-arguments)
-  * [Training process](#training-process)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
+  * [Command-line options](#Command-line-options) 
+​     
 
-
-    
-
-## Model overview
-
-In this repository, we implement GoogleNet from paper [Christian Szegedy, Wei Liu, Yangqing Jia. " Going Deeper with Convolutions".](https://arxiv.org/abs/1409.4842).
+## Description
 
 Googlenet is a convolutional neural network architecture. This is an implementation of the official GoogleNet network as is Google ModelZoo, written in Tensorflow 1.15.0 and run on Ascend 910.
 
-### Model architecture
+GoogleNet model from: [Christian Szegedy, Wei Liu, Yangqing Jia. " Going Deeper with Convolutions".](https://arxiv.org/abs/1409.4842).
 
-The model architecture can be found from the reference paper.
+## Requirements
 
-### Default configuration
+- Tensorflow 1.15.0
+- Download and preprocess ImageNet2012,CIFAR10 or Flower dataset for training and evaluation.
+
+## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for GoogleNet model.
 
-#### Optimizer
+### Optimizer
 
 This model uses the Momentum optimizer with following hyperparameters:
 
@@ -49,7 +49,7 @@ This model uses the Momentum optimizer with following hyperparameters:
 - We train for:
   - 200 epochs for a standard training process using official TFRecord dataset of ImageNet2012
 
-#### Data augmentation
+### Data augmentation
 
 This model uses the following data augmentation:
 
@@ -63,28 +63,16 @@ This model uses the following data augmentation:
   - CenterCrop
   - Normalized to [-1, 1]
 
-## Setup
-The following section lists the requirements to train the GoogleNet network.
-### Requirements
 
-Tensorflow 1.15.0
+## Quick start guide
 
-## Quick Start Guide
+### Prepare the dataset
 
-### 1. Clone the respository
-
-```shell
-git clone xxx
-cd modelzoo_GoogleNet_TF
-```
-
-### 2. Download and preprocess the dataset
-
-1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
-2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
+1. Download the ImageNet2012 dataset.
+2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and validation tfrecord files are under the path/data directories.
 
-### check json
+### Check json
 Check whether there is a JSON configuration file "8P rank_table json" for 8 Card IP in the scripts/ directory.
 The content of the 8p configuration file:
 ```
@@ -102,10 +90,14 @@ The content of the 8p configuration file:
                                     "pod_name":"npu8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
 ```
 
-### 3. Train
+### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+### Running the example
+ 
+#### Training
 
 - train on a single NPU
     - **edit** *scripts/run_1p.sh* and *scripts/train_1p.sh* (see example below)
@@ -150,8 +142,11 @@ Examples:
         ```
         ./run_8p.sh
         ```
+#### Training process
 
-### 4. Test
+All the results and training ckpt models of the training will be stored in the directory `log_dir`.
+
+#### Evaluation
 - Same procedure as training except 2 following modifications
     - change `--mode=train` to `--mode=evaluate`
     - add `--eval_dir=path/eval`
@@ -170,7 +165,8 @@ Examples:
 
 
 ## Advanced
-### Commmand-line options
+
+### Command-line options
 
 ```
   --rank_size                       number of NPUs to use (default: 1)
@@ -194,30 +190,8 @@ Examples:
   --log_dir                         path to save checkpoint and log (default: ./model)  
 ```
 
-### Training process
 
-All the results and training ckpt models of the training will be stored in the directory `log_dir`.
  
-## Performance
-
-### Result
-
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
-
-#### Training accuracy results
-
-| **epochs** |    Top1/Top5   |
-| :--------: | :------------: |
-|    200     | 70.2 %/89.8 %  |
-
-#### Training performance results
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |     1300 img/s    |
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |     6000 img/s    |
 
 
 
