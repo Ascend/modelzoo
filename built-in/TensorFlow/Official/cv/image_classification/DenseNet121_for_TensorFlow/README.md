@@ -22,7 +22,7 @@ This repository provides a script and recipe to train the DenseNet-121 model .
 ## Description
 
 DenseNet-121 is a classic image classification network that uses a Dense Block structure that is connected at each layer.To improve the model efficiency and reduce parameters, the BN-ReLU-Conv(1*1)-BN-ReLU-Conv(3*3)bottleneck layer is used and the 1*1 conv is used to limit the number of input channels at each layer in the Dense Block to 4k(k indicates the number of output channels at each layer).DenseNet can effectively mitigate gradient loss,facilitates feature transmission and reuse.
-reference paper: Gao Huang,Zhuang Liu,Laurens van der Maaten,Kilian Q.Weinberger."Densely Connected Convolutional Networks."arXiv:1608.06993
+DenseNet-121 model from: Gao Huang,Zhuang Liu,Laurens van der Maaten,Kilian Q.Weinberger."Densely Connected Convolutional Networks."arXiv:1608.06993
 
 
 ## Requirements
@@ -47,8 +47,8 @@ This model uses Momentum optimizer from Tensorflow with the following hyperparam
 ### Prepare the dataset
 
 The model is compatible with the datasets on tensorflow official website.
-1. download the ImageNet dataset
-2. Extract the training data
+1. download the ImageNet dataset.
+2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
 
 ### Check json 
@@ -94,7 +94,7 @@ Before starting the training, first configure the environment variables related 
 #### Training
 - Single card training process
 Configure training parameters
-First, in the script scritps/train_1p.sh,the training data set path and other parameters are configured.
+First, in the script `scritps/train_1p`.sh,the training dataset path and other parameters are configured,make sure that the "--data_dir" modify the path of the user generated tfrecord.
 ```
 python3.7 ${dname}/train.py --rank_size=1 \
     --mode=train \
@@ -106,13 +106,13 @@ python3.7 ${dname}/train.py --rank_size=1 \
     --log_name=densenet121_1p.log
 ```
 Start training.
-Starter card training(the script is scripts/run_1p.sh）:
+Starter card training(the script is `scripts/run_1p.sh`）:
 ```
 bash run_1p.sh
 ```
 - 8-card training process
 Configure training parameters
-First, in the script scritps/train_8p.sh,the training data set path and other parameters are configured.
+First, in the script `scritps/train_8p.sh`,the training data set path and other parameters are configured,make sure that the "--data_dir" modify the path of the user generated tfrecord.
 ```
 python3.7 ${dname}/train.py --rank_size=8 \
     --mode=train_and_evaluate \
@@ -125,7 +125,7 @@ python3.7 ${dname}/train.py --rank_size=8 \
     --log_name=densenet121_8p.log
 ```
 Start training.
-Starter 8-card training(the script is scripts/run_8p.sh）:
+Starter 8-card training(the script is `scripts/run_8p.sh`）:
 ```
 bash run_8p.sh
 ```
@@ -138,7 +138,7 @@ Script will store:
  - log
 
 #### Evaluation
-When testing, you need to modify the script startup parameters(script in scripts/test.sh).Configure mode to evaluate and set it in eval_dir configure the path of checkpoint file.
+When testing, you need to modify the script startup parameters(script in `scripts/test.sh`).Configure mode to evaluate and set it in eval_dir configure the path of checkpoint file.
 ```
 python3.7 ${dname}/train.py --rank_size=1 \
     --mode=evaluate \
@@ -147,7 +147,7 @@ python3.7 ${dname}/train.py --rank_size=1 \
     --log_dir=./ \
     --log_name=eval_densenet121.log > eval.log
 ```
-Test instruction(script in scripts/test.sh)
+Test instruction(script in `scripts/test.sh`)
 ```
 bash test.sh
 ```
