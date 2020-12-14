@@ -10,7 +10,7 @@ export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 
-python3.7 -W ignore train_ic15.py \
+python3.7 -W ignore train_ic15_8p.py \
   --lr 0.001\
 	--dist-backend 'hccl' \
 	--rank 0  \
@@ -26,6 +26,5 @@ python3.7 -W ignore train_ic15.py \
 	--n_epoch 600 \
 	--data-dir '/home/data/' \
 	--port 8272 \
-	--schedule 200 400 \
 	--device-list '0,1,2,3,4,5,6,7' \
 	--remark 'test'
