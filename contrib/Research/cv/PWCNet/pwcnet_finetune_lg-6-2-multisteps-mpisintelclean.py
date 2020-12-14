@@ -72,9 +72,9 @@ nn_opts['use_res_cx'] = True
 nn_opts['pyr_lvls'] = 6
 nn_opts['flow_pred_lvl'] = 2
 
-nn_opts['loss_fn'] = 'loss_multiscale'
-nn_opts['q'] = 1.
-nn_opts['epsilon'] = 0.
+nn_opts['loss_fn'] = 'loss_robust'
+nn_opts['q'] = 0.4
+nn_opts['epsilon'] = 0.01
 
 # Set the learning rate schedule. This schedule is for a single GPU using a batch size of 8.
 # Below,we adjust the schedule to the size of the batch and the number of GPUs.
