@@ -148,13 +148,17 @@ class ModelBase:
 
         # Li Zhongyu: save ck to obs
         # TODO set obs path
+        dir = save_path.split('/')[-2]
         name = save_path.split('/')[-1]
-        mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.data-00000-of-00001')
-        mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.meta')
-        mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-lxm/log/checkpoints/' + name + '.index')
+        mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-lxm/log/{0}/{1}.data-00000-of-00001'
+                               .format(dir, name))
+        mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-lxm/log/{0}/{1}.meta'.format(dir, name))
+        mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-lxm/log/{0}/{1}.index'.format(dir, name))
 
-        mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-lxm/log/checkpoints/' + 'checkpoint')
-        mox.file.copy_parallel(save_path[0:-len(name)] + 'best_checkpoints', 'obs://pwcnet-lxm/log/checkpoints/' + 'best_checkpoints')
+        mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-lxm/log/{0}/checkpoint'
+                               .format(dir))
+        mox.file.copy_parallel(save_path[0:-len(name)] + 'best_checkpoints', 'obs://pwcnet-lxm/log/{0}/best_checkpoints'
+                               .format(dir))
         # Li Zhongyu: save ck to obs
 
         if self.opts['verbose']:
