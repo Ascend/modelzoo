@@ -120,15 +120,21 @@ Create `pretrained/` directory, after you download either checkpoint or both, un
 
 For instance, to train the model with beta version checkpoints
 
-Set single card training parameters (the script is located in scripts/train_1p_s16_beta.sh), the example is as follows, please refer to the script for details:
+Set single card training parameters (the script is located in `scripts/train_1p_s16_beta.sh`), the example is as follows, please refer to the script for details:
+
+```
 CKPT_NAME=${CURRENT_DIR}/pretrained/model.ckpt
 PASCAL_DATASET=${CURRENT_DIR}/datasets/pascal_voc_seg/tfrecord
 NUM_ITERATIONS=30000
+```
 
-Set 8 card training parameters (the script is located in scripts/train_s16_r1_beta.sh, scripts/train_s16_r2_beta.sh), the example (scripts/train_s16_r1_beta.sh) is as follows:
+Set 8 card training parameters (the script is located in `scripts/train_s16_r1_beta.sh`, `scripts/train_s16_r2_beta.sh`), the example (`scripts/train_s16_r1_beta.sh`) is as follows:
+
+```
 CKPT_NAME=${CURRENT_DIR}/pretrained/model.ckpt
 PASCAL_DATASET=${CURRENT_DIR}/datasets/pascal_voc_seg/tfrecord
 NUM_ITERATIONS=15000 
+```
 
 - with OS=16
     - train on single NPU 
