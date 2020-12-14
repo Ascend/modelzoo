@@ -27,7 +27,8 @@ Docker侧训练步骤
 
         ./docker_start.sh pytorch:b020 /train/imagenet /home/CRNN_for_Pytorch
 
-3.执行步骤一训练流程（环境安装除外）
+3.执行2进入容器后，执行命令hostname -I |awk '{print $1}'获取到ip，若yaml配置文件中有addr参数， 请将addr的值配置为ip后执行步骤一
+  训练流程（环境安装除外）
 
 测试结果
 ----------
