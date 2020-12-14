@@ -65,7 +65,7 @@ This model uses the following data augmentation:
 ### Prepare the dataset
 
 1. Please download the ImageNet dataset by yourself. 
-2. Extract the training data
+2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
 
 ### Check json
