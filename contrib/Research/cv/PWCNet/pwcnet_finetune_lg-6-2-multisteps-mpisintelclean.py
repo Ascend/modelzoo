@@ -28,11 +28,12 @@ import shutil
 if sys.platform.startswith("win"):
     _DATASET_ROOT = 'E:/datasets/'
 else:
-    _DATASET_ROOT = './'
+    _DATASET_ROOT = '/cache/'
 _MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'    
 
-os.makedirs(_DATASET_ROOT)
-mox.file.copy_parallel('obs://pwcnet-lxm/MPI-Sintel-complete', './MPI-Sintel-complete')
+os.makedirs(_MPISINTEL_ROOT)
+mox.file.copy_parallel('obs://pwcnet-lxm/MPI-Sintel-complete', _MPISINTEL_ROOT)
+mox.file.copy_parallel('obs://pwcnet-lxm/pretrained', './pretrained')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
@@ -81,8 +82,9 @@ nn_opts['lr_policy'] = 'multisteps'
 nn_opts['lr_boundaries'] = [40000, 60000, 80000, 100000]
 nn_opts['lr_values'] = [1e-05, 5e-06, 2.5e-06, 1.25e-06, 6.25e-07]
 nn_opts['max_steps'] = 100000
-nn_opts['display_step'] = 100
-nn_opts['val_opts'] = 500
+nn_opts['display_step'] = 1
+nn_opts['snapshot_step'] = 10
+nn_opts['val_steps'] = 10
 
 # Below,we adjust the schedule to the size of the batch and our number of GPUs (2).
 nn_opts['max_steps'] = int(nn_opts['max_steps'] * 4 / ds_opts['batch_size'])

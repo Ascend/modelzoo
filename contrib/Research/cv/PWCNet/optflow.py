@@ -257,4 +257,4 @@ def flow_write_as_png(flow, dst_file, info=None, flow_mag_max=None):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         # imsave(dst_file, img)
-        Image.save(dst_file, Image.fromarray(img.astype(np.uint8)))
+        Image.fromarray(img.astype(np.uint8)).save(dst_file)

@@ -58,8 +58,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 print(os.listdir())
 
 # shutil.rmtree('../../FlyingChairs_subset')
-os.makedirs('./FlyingChairs_subset/')
-mox.file.copy_parallel('obs://pwcnn/content/FlyingChairs_subset', './FlyingChairs_subset')
+os.makedirs('./FlyingChairs/')
+mox.file.copy_parallel('obs://pwcnet-lxm/FlyingChairs', './FlyingChairs')
 
 
 """
@@ -94,7 +94,7 @@ if sys.platform.startswith("win"):
     _DATASET_ROOT = 'E:/datasets/'
 else:
     _DATASET_ROOT = './'
-_FLYINGCHAIRS_ROOT = _DATASET_ROOT + 'FlyingChairs_subset'
+_FLYINGCHAIRS_ROOT = _DATASET_ROOT + 'FlyingChairs'
 _FLYINGTHINGS3DHALFRES_ROOT = _DATASET_ROOT + 'FlyingThings3D_HalfRes'
     
 # TODO: You MUST adjust the settings below based on the number of GPU(s) used for training

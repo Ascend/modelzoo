@@ -586,7 +586,7 @@ class ModelPWCNet(ModelBase):
     def train(self):
         """Training loop
         """
-        print('>>>>>>>>>>>>>>>start train<<<<<<<<<<<<<<<<<<') #zhangcb debug
+        # print('>>>>>>>>>>>>>>>start train<<<<<<<<<<<<<<<<<<') #zhangcb debug
         with self.graph.as_default():
             # Reset step counter
             if self.opts['train_mode'] == 'fine-tune':
@@ -632,9 +632,9 @@ class ModelPWCNet(ModelBase):
                 # Ops for initializing the two different iterators
                 train_next_batch = train_tf_ds.make_one_shot_iterator().get_next()
                 val_next_batch = val_tf_ds.make_one_shot_iterator().get_next()
-            print('>>>>>>>>>>>>>>before while<<<<<<<<<<<<<<<<') #zhangcb debug
+            # print('>>>>>>>>>>>>>>before while<<<<<<<<<<<<<<<<') #zhangcb debug
             while step < self.opts['max_steps'] + 1:
-                #print('>>>>>>>>>>>>>step = {}<<<<<<<<<<<<'.format(step))
+                # print('>>>>>>>>>>>>>step = {}<<<<<<<<<<<<'.format(step))
                 # Get a batch of samples and make them conform to the network's requirements
                 # x: [batch_size*num_gpus,2,H,W,3] uint8 y: [batch_size*num_gpus,H,W,2] float32
                 # x_adapt: [batch_size,2,H,W,3] float32 y_adapt: [batch_size,H,W,2] float32
@@ -643,11 +643,11 @@ class ModelPWCNet(ModelBase):
                 else:
                     x, y, _ = self.ds.next_batch(batch_size * self.num_gpus, split='train')
                     
-                print('>>>>>>>>>>>>>before adapt>>>>>>>>>')
+                # print('>>>>>>>>>>>>>before adapt>>>>>>>>>')
                 x_adapt, _ = self.adapt_x(x)
                 y_adapt, _ = self.adapt_y(y)
-                print('>>>>>>>>>>>>>after adapt>>>>>>>>>>')
-                print(x_adapt.shape, y_adapt.shape)
+                # print('>>>>>>>>>>>>>after adapt>>>>>>>>>>')
+                # print(x_adapt.shape, y_adapt.shape)
                 # Run the samples through the network (loss, error rate, and optim ops (backprop))
                 feed_dict = {self.x_tnsr: x_adapt, self.y_tnsr: y_adapt}
                 start_time = time.time()
@@ -656,7 +656,7 @@ class ModelPWCNet(ModelBase):
                 loss, epe = self.postproc_y_hat_train(y_hat)  # y_hat: [107.0802, 5.8556495, None]
                 # if self.num_gpus == 1: # Single-GPU case
                 # else: # Multi-CPU case
-                print('>>>>>>>>>>>after sess.run<<<<<<<<<<<')
+                # print('>>>>>>>>>>>after sess.run<<<<<<<<<<<')
                 train_loss.append(loss), train_epe.append(epe)
 
                 # Show training progress

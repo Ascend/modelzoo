@@ -150,6 +150,8 @@ class ModelBase:
         # TODO set obs path
         dir = save_path.split('/')[-2]
         name = save_path.split('/')[-1]
+        if not mox.file.exists('obs://pwcnet-lxm/log/{0}'.format(dir)):
+            mox.file.make_dirs('obs://pwcnet-lxm/log/{0}'.format(dir))
         mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-lxm/log/{0}/{1}.data-00000-of-00001'
                                .format(dir, name))
         mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-lxm/log/{0}/{1}.meta'.format(dir, name))
