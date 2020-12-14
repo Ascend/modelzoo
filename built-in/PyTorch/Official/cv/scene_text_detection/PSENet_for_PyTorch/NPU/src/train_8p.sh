@@ -11,13 +11,13 @@ export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 
 python3.7 -W ignore train_ic15_8p.py \
-  --lr 0.001\
+  --lr 0.004\
 	--dist-backend 'hccl' \
 	--rank 0  \
 	--workers 32 \
 	--multiprocessing-distributed \
 	--world-size 1 \
-	--batch_size 16 \
+	--batch_size 32 \
 	--device 'npu' \
 	--opt-level 'O2' \
 	--loss-scale 64 \
