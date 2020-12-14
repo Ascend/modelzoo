@@ -1,39 +1,82 @@
 #  YOLOv3_TensorFlow
 
-### 1. Introduction
-This is npu implementation of [YOLOv3](https://pjreddie.com/media/files/papers/YOLOv3.pdf) using TensorFlow modified from [YOLOv3_TensorFlow](https://github.com/wizyoung/YOLOv3_TensorFlow).   
+## Table Of Contents
 
-### 2. Requirements
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+* [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Prepare the pretrained model](#Prepare-the-pretrained-model)
+  * [Check json](#Check-json)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#training-process)
+    * [Evaluation](#Evaluation)
+* [Advanced](#advanced)
+  * [Command-line options](#Command-line-options)
+
+## Description
+YOLOv3 is currently a very widely used and effective target detection network, which has both high accuracy and performance. YOLOv3 is the third version of the YOLO series. Compared with YOLOv2, YOLOv3 mainly draws on some good solutions and integrates it into YOLO. While maintaining the speed advantage, it improves the prediction accuracy, especially the ability to recognize small objects. . The main improvements of YOLOv3 include: adjusting the network structure; using multi-scale features for object detection; and replacing softmax with Logistic for object classification.
+
+- YOLOv3 model from: Redmon, Joseph, and Ali Farhadi. Yolov3: An incremental improvement.(https://pjreddie.com/media/files/papers/YOLOv3.pdf) 
+- reference implementation: <https://github.com/wizyoung/YOLOv3_TensorFlow>   
+
+## Requirements
 Python version: 3.7.5  
 Main Python Packages:
 - tensorflow >= 1.15.0 (satisfied with NPU)
 - opencv-python
 - tqdm
+Dataset:
+- Download and preprocess COCO2014 or COCO2017 dataset for training and evaluation.
 
-### 3. Weights convertion
-The pretrained darknet53 weights file can be downloaded [here](https://pjreddie.com/media/files/darknet53.conv.74).        
-Place this weights file under directory `./data/darknet_weights/` and then run:
-```python
-python3 convert_weight.py
-```
-Then the converted TensorFlow checkpoint file will be saved to `./data/darknet_weights/` directory.  
-In this repo, conerted weight is contained. 
+## Default configuration
+The following sections introduce the default configurations and hyperparameters for Deeplabv3 model. 
 
-### 4. Training
+### Optimizer
+This model uses Momentum optimizer from Tensorflow with the following hyperparameters:
 
-Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+Training hyperparameters (single card-multi-scale):
+- Batch size: 16
+- Momentum: 0.9
+- LR scheduler: cosine
+- Base Learning rate: 0.0075
+- Learning rate base batch size: 64
+- loss scale: 128
+- Weight decay: 0.0005
+- Batch norm decay: 0.99
+- Warm up epoch: 3
+- train epoch: 200
 
-#### 4.1 Data preparation 
-0. dataset
-To compare with official implement, for example, we use [get_coco_dataset.sh](https://github.com/pjreddie/darknet/blob/master/scripts/get_coco_dataset.sh) to prepare our dataset.
+Training hyperparameter (single card-single scale):
+- Batch size: 32
+- Momentum: 0.9
+- LR scheduler: cosine
+- Base Learning rate: 0.005
+- Learning rate base batch size: 64
+- loss scale: 128
+- Weight decay: 0.0005
+- Batch norm decay: 0.99
+- Warm up epoch: 3
+- train epoch: 200 
 
-1. annotation file
-Using script generate `coco2014_trainval.txt/coco2014_minival.txt` files under `./data/` directory.
+## Quick start guide
+
+### Prepare the dataset
+
+- Users are requested to prepare a dataset by themselves, including training set and verification set, optional including COCO2014, COCO2017, etc. The default read path in the training execution script is /opt/npu/dataset/coco, and some operations can be simplified through the soft chain real data to the default path.
+
+- The currently provided training script uses the COCO2014 data set as an example, and data preprocessing operations are performed during the training process. If you change the data set, please modify the data set loading and preprocessing method in the training script before using the script.
+
+(1)  According to the actual path of the COCO2014 data set, use `coco_trainval_anns.py` and `coco_minival_anns.py` to generate training and verification sample annotation files `coco2014_trainval.txt` and `coco2014_minival.txt`, and place them in the data directory. This code warehouse has generated annotation under data based on the default data set location. If the actual data set address location is consistent with the default location, this step can be skipped.
+
 ```python
 python3 coco_trainval_anns.py
 python3 coco_minival_anns.py
-```   
+```  
 One line for one image, in the format like `image_index image_absolute_path img_width img_height box_1 box_2 ... box_n`.    
 Box_x format: 
 - `label_index x_min y_min x_max y_max`. (The origin of coordinates is at the left top corner, left top => (xmin, ymin), right bottom => (xmax, ymax).)       
@@ -70,9 +113,184 @@ Then you will get 9 anchors and the average IoU. Save the anchors to a txt file.
 
 The COCO dataset anchors offered by YOLO's author is placed at `./data/yolo_anchors.txt`, you can use that one too.
 
-The yolo anchors computed by the kmeans script is on the resized image scale.  The default resize method is the letterbox resize, i.e., keep the original aspect ratio in the resized image.
+The yolo anchors computed by the kmeans script is on the resized image scale.  The default resize method is the letterbox resize, i.e., keep the original aspect ratio in the resized image. 
 
-(4) Configuration file description:
+
+### Prepare the pretrained model
+
+Please download the pre-trained model under the darknet framework by yourself.        
+Place this weights file under directory `./data/darknet_weights/` and then use the script `convert_weight.py` to convert to the ckpt file of the TensorFlow framework:
+
+```python
+python3 convert_weight.py
+```
+
+Then the converted TensorFlow checkpoint file will be saved to `./data/darknet_weights/` directory.  
+
+After the conversion of the ckpt model is completed, configure the corresponding location to `restore_path`.
+
+
+
+### Check json
+Modify the *.json configuration file in the `hccl_config` directory, modify the corresponding IP to the current IP, and change the board_id to the ID of the motherboard of the machine.
+Note: board_id is 0x0000 under X86, and 0x002f under arm.
+1P rank_table json configuration file:
+
+```
+{
+    "board_id": "0x0000",
+    "chip_info": "910",
+    "deploy_mode": "lab",
+    "group_count": "1",
+    "group_list": [
+        {
+            "device_num": "1",
+            "server_num": "1",
+            "group_name": "",
+            "instance_count": "1",
+            "instance_list": [
+                {
+                    "devices": [
+                        {
+                            "device_id": "0",
+                            "device_ip": "192.168.100.101"
+                        }
+                    ],
+                    "rank_id": "0",
+                    "server_id": "0.0.0.0"
+                }
+           ]
+        }
+    ],
+    "para_plane_nic_location": "device",
+    "para_plane_nic_name": [
+        "eth0"
+    ],
+    "para_plane_nic_num": "1",
+    "status": "completed"
+}
+```
+
+8P rank_table json configuration file:
+
+```
+{
+    "board_id": "0x0000",
+    "chip_info": "910",
+    "deploy_mode": "lab",
+    "group_count": "1",
+    "group_list": [
+        {
+            "device_num": "8",
+            "server_num": "1",
+            "group_name": "",
+            "instance_count": "8",
+            "instance_list": [
+                {
+                    "devices": [
+                        {
+                            "device_id": "0",
+                            "device_ip": "192.168.100.101"
+                        }
+                    ],
+                    "rank_id": "0",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "1",
+                            "device_ip": "192.168.101.101"
+                        }
+                    ],
+                    "rank_id": "1",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "2",
+                            "device_ip": "192.168.102.101"
+                        }
+                    ],
+                    "rank_id": "2",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "3",
+                            "device_ip": "192.168.103.101"
+                        }
+                    ],
+                    "rank_id": "3",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "4",
+                            "device_ip": "192.168.100.100"
+                        }
+                    ],
+                    "rank_id": "4",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "5",
+                            "device_ip": "192.168.101.100"
+                        }
+                    ],
+                    "rank_id": "5",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "6",
+                            "device_ip": "192.168.102.100"
+                        }
+                    ],
+                    "rank_id": "6",
+                    "server_id": "0.0.0.0"
+                },
+                {
+                    "devices": [
+                        {
+                            "device_id": "7",
+                            "device_ip": "192.168.103.100"
+                        }
+                    ],
+                    "rank_id": "7",
+                    "server_id": "0.0.0.0"
+                }
+            ]
+        }
+    ],
+    "para_plane_nic_location": "device",
+    "para_plane_nic_name": [
+        "eth0",
+        "eth1",
+        "eth2",
+        "eth3",
+        "eth4",
+        "eth5",
+        "eth6",
+        "eth7"
+    ],
+    "para_plane_nic_num": "8",
+    "status": "completed"
+}
+```
+
+### Key configuration changes
+Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+Modify the configuration file args_single.py (single scale) or args_multi.py (multi-scale) to configure the relevant path to the user's actual path. The meaning of each field is shown in the table.
+Configuration file description:
 
 |field              | meaning                                                       |
 | :-----------------| :-----------------------------------------------------------: |
@@ -84,7 +302,9 @@ The yolo anchors computed by the kmeans script is on the resized image scale.  T
 | class_name_path   | Save path of category name file                               |
 
 
-#### 4.2 Training
+### Running the example
+
+#### Training
 1. single scale
 Using `npu_train_*p_single.sh`. The hyper-parameters and the corresponding annotations can be found in `args_single.py`:
 
@@ -105,12 +325,13 @@ bash npu_train_8p_multi.sh
 
 Check the `args.py` for more details. You should set the parameters yourself in your own specific task.
 
-3. training details
+#### Training process
+All the results of the training will be stored:
      1. nohup.out -- training task main_log
-     2. ./training/t1/D0/train_0.log -- training host log
+     2. training/t1/D0/train_0.log -- training host log
      3. training/t1/D0/training/train.log -- training perf log
 
-### 5. Evaluation
+#### Evaluation
 
 Using `eval.sh` to evaluate the validation or test dataset. The parameters are as following:
 
@@ -123,32 +344,56 @@ Check the `eval.py` for more details. You could set the parameters yourself.
 You will get the mAP metrics results using official cocoapi.
 Using `tail -f eval_*.out` to watching results of models.
 
+## Advanced
 
-### 6. Training result
+### Command-line options
 
-| Model                 | Npu_nums | mAP      | FPS       |
-| :-------------------- | :------: | :------: | :------:  |
-| single_scale          | 8        |    30.0  | 740       |
-| multi_scale           | 8        |    31.0  | 340       |
-| single_scale          | 1        |    ----  | 96        |
-| multi_scale           | 1        |    ----  | 44        |
+```
+save_dir ='./training/'                            # save the path of ckpt
+log_dir ='./training/logs/'                        # Path to save log files
+progress_log_path ='./training/train.log'          # The path to save the training process log file
+
+if not os.path.exists(save_dir):
+    os.makedirs(save_dir)
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+work_path ='../../../'
+### Some paths
+train_file = os.path.join(work_path,'./data/coco2014_trainval.txt')                  # Training annotation file path
+val_file = os.path.join(work_path,'./data/coco2014_minival.txt')                     # Verify the label file path
+restore_path = os.path.join(work_path,'./data/darknet_weights/darknet53.ckpt')       # pre-training model path
+anchor_path = os.path.join(work_path,'./data/yolo_anchors.txt')                      # anchor file path
+class_name_path = os.path.join(work_path,'./data/coco.names')                        # category name file path
+
+### Distribution setting
+num_gpus=int(os.environ['RANK_SIZE'])
+iterations_per_loop=10                  # The number of small loops per sink
+
+### Training releated numbersls
+
+batch_size = 16                               # The batch size on each npu, multi-scale is 16 and single-scale is 32
+img_size = [608, 608]                         # Model input width and height, multi-scale is 608*608, single-scale is 416*416
+letterbox_resize = True                       # Whether to keep the input image aspect ratio, it needs to be turned on
+total_epoches = 200                           # Total number of training epochs
+train_evaluation_step = 1000                  # This parameter is currently invalid
+val_evaluation_epoch = 2                      # This parameter is currently invalid
+save_epoch = 10                               # Save the epoch interval of ckpt
+batch_norm_decay = 0.99                       # decay parameter in bn operator
+weight_decay = 5e-4                           # Weight decay parameter
+global_step = 0                               # Specify to continue training from a specific step when continuing training
+
+### tf.data parameters
+num_threads = 8                              # Number of data preprocessing threads
+prefetech_buffer = batch_size * 4            # The number of buffer prefetches in data preprocessing
+
+### Learning rate and optimizer
+optimizer_name ='momentum'                       # Optimizer, choose from [sgd, momentum, adam, rmsprop]
+save_optimizer = True                            # Whether to save the optimizer in the ckpt file
+learning_rate_base = 75e-4                       # Basic learning rate
+learning_rate_base_batch_size = 64               # The basic batch size corresponding to the basic learning rate, the actual basic learning rate changes according to the batch size
+```
 
 
 
 
--------
-
-### Credits:
-
-I referred to many fantastic repos during the implementation:
-
-[YunYang1994/tensorflow-yolov3](https://github.com/YunYang1994/tensorflow-yolov3)
-
-[qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3)
-
-[eriklindernoren/PyTorch-YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3)
-
-[pjreddie/darknet](https://github.com/pjreddie/darknet)
-
-[dmlc/gluon-cv](https://github.com/dmlc/gluon-cv/tree/master/scripts/detection/yolo)
 
