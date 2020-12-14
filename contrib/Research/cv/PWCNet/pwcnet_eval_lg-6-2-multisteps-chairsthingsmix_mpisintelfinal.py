@@ -15,7 +15,7 @@ from copy import deepcopy
 import pandas as pd
 
 from dataset_base import _DEFAULT_DS_VAL_OPTIONS
-from dataset_flyingchairs import FlyingChairsDataset
+from dataset_mpisintel import MPISintelDataset
 from model_pwcnet import ModelPWCNet, _DEFAULT_PWCNET_VAL_OPTIONS
 from visualize import display_img_pairs_w_flows
 import moxing as mox
@@ -26,24 +26,24 @@ if sys.platform.startswith("win"):
     _DATASET_ROOT = 'E:/datasets/'
 else:
     _DATASET_ROOT = '/cache/'
-_FLYINGCHAIRS_ROOT = _DATASET_ROOT + 'FlyingChairs'
+_MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
 
-os.makedirs(_FLYINGCHAIRS_ROOT)
-mox.file.copy_parallel('obs://pwcnet-lxm/FlyingChairs', _FLYINGCHAIRS_ROOT)
+os.makedirs(_MPISINTEL_ROOT)
+mox.file.copy_parallel('obs://pwcnet-lxm/MPI-Sintel-complete', _MPISINTEL_ROOT)
 mox.file.copy_parallel('obs://pwcnet-lxm/pretrained', './pretrained')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
 
 # More options...
-mode = 'val'  # We're doing the evaluation on the validation split of the dataset
+mode = 'val_notrain'  # We're doing evaluation using the entire dataset for evaluation
 num_samples = 10  # Number of samples for error analysis
 ckpt_path = './pretrained/pwcnet.ckpt-595000'  # Model to eval
 
 # Load the dataset in evaluation mode, starting with the default evaluation options
 ds_opts = deepcopy(_DEFAULT_DS_VAL_OPTIONS)
-ds = FlyingChairsDataset(mode=mode, ds_root=_FLYINGCHAIRS_ROOT, options=ds_opts)
-
+ds_opts['type'] = 'final'
+ds = MPISintelDataset(mode=mode, ds_root=_MPISINTEL_ROOT, options=ds_opts)
 # Display dataset configuration
 ds.print_config()
 
@@ -56,14 +56,21 @@ nn_opts['use_tf_data'] = False  # Don't use tf.data reader for this simple task
 nn_opts['gpu_devices'] = gpu_devices
 nn_opts['controller'] = controller  # Evaluate on CPU or GPU?
 
+# We're evaluating the PWC-Net-large model in quarter-resolution mode
+# That is, with a 6 level pyramid, and uspampling of level 2 by 4 in each dimension as the final flow prediction
 nn_opts['use_dense_cx'] = True
 nn_opts['use_res_cx'] = True
 nn_opts['pyr_lvls'] = 6
 nn_opts['flow_pred_lvl'] = 2
 
+# The size of the images in this dataset are not multiples of 64, while the model generates flows padded to multiples
+# of 64. Hence, we need to crop the predicted flows to their original size
+nn_opts['adapt_info'] = (1, 436, 1024, 2)
+
 # Instantiate the model in evaluation mode and display the model configuration
 nn = ModelPWCNet(mode=mode, options=nn_opts, dataset=ds)
 nn.print_config()
 
+# ## Evaluate the model
 avg_metric, avg_duration, df = nn.eval(metric_name='EPE', save_preds=True)
 print(f'Average EPE={avg_metric:.2f}, mean inference time={avg_duration * 1000.:.2f}ms')
