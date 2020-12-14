@@ -81,6 +81,26 @@ For more details, we refer readers to read the corresponding source code.
 2. Please convert the dataset to tfrecord format file by yourself.
 3. The train and validation tfrecord files are under the path/data directories.
 
+### Check json
+Unzip the file and switch to the `efficientnet` directory, and check whether there is an 8 card IP json configuration file "8p.json" in the root directory.
+8P json configuration file content:
+
+```
+{"group_count": "1","group_list": 
+                    [{"group_name": "worker","device_count": "8","instance_count": "1", "instance_list": 
+                    [{"devices":                    
+                                   [{"device_id":"0","device_ip":"192.168.100.101"},
+                                    {"device_id":"1","device_ip":"192.168.101.101"},
+                                    {"device_id":"2","device_ip":"192.168.102.101"},
+                                    {"device_id":"3","device_ip":"192.168.103.101"},
+                                    {"device_id":"4","device_ip":"192.168.100.100"},      
+                                    {"device_id":"5","device_ip":"192.168.101.100"},        
+                                    {"device_id":"6","device_ip":"192.168.102.100"},     
+                                    {"device_id":"7","device_ip":"192.168.103.100"}],      
+                                    "pod_name":"ascend8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
+```
+
+
 ### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
@@ -98,7 +118,8 @@ Before starting the training, first configure the environment variables related 
 
 Examples:
 - Case for single NPU
-    - In *train_1p.sh*, python scripts part should look like as follows. For more detailed command lines arguments, please refer to [Command-line options](#command-line-options)
+    - In *train_1p.sh*, python scripts part should look like as follows.Make sure that the "--data_dir" modify the path of the user generated tfrecord.
+
         ```shell
         python3.7 ${currentDir}/main_npu.py \
           --data_dir=/data/slimImagenet \
@@ -114,7 +135,7 @@ Examples:
         bash run_1p.sh
         ```
 - Case for 8 NPUs
-    - In *train_8p.sh*, python scripts part should look like as follows.
+    - In *train_8p.sh*, python scripts part should look like as follows.Make sure that the "--data_dir" modify the path of the user generated tfrecord.
         ```shell 
         python3.7 ${currentDir}/main_npu.py \
           --data_dir=/data/slimImagenet \
