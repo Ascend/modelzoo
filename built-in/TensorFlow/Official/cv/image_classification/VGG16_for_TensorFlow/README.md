@@ -4,52 +4,56 @@ This repository provides a script and recipe to train the VGG16 model .
 
 ## Table Of Contents
 
-* [Model overview](#model-overview)
-  * [Model Architecture](#model-architecture)  
-  * [Default configuration](#default-configuration)
-* [Data augmentation](#data-augmentation)
-* [Setup](#setup)
-  * [Requirements](#requirements)
+* [Description](#Description)
+* [Requirements](#Requirements)
+* [Default configuration](#Default-configuration)
+  * [Optimizer](#Optimizer)
+  * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
+  * [Prepare the dataset](#Prepare-the-dataset)
+  * [Check json](#Check-json)
+  * [Key configuration changes](#Key-configuration-changes)
+  * [Running the example](#Running-the-example)
+    * [Training](#Training)
+    * [Training process](#Training-process)    
+    * [Evaluation](#Evaluation)
 * [Advanced](#advanced)
-  * [Command line arguments](#command-line-arguments)
-  * [Training process](#training-process)
-* [Performance](#performance)
-  * [Results](#results)
-    * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
+  * [Command-line options](#Command-line-options) 
+
 
 
     
 
-## Model overview
+## Description
 
 In this repository, we implement VGG16 from paper [Simonyan, Karen, and Andrew Zisserman. "Very deep convolutional networks for large-scale image recognition.](https://arxiv.org/abs/1409.1556).
 
 VGG16 is a convolutional neural network architecture, its name VGG16 comes from the fact that it has 16 layers. This is an implementation of the official VGG16 network, written mainly in Tensorflow and can run on Ascend 910.
 
-### Model architecture
 
-The model architecture can be found from the reference paper.
+## Requirements
 
-### Default configuration
+- Tensorflow 1.15.0
+- Download and preprocess ImageNet2012 or CIFAR10 dataset for training and evaluation.
+
+## Default configuration
 
 The following sections introduce the default configurations and hyperparameters for VGG16 model.
 
-#### Optimizer
+### Optimizer
 
 This model uses Nesterov Momentum optimizer from Tensorflow with the following hyperparameters:
 
 - Momentum : 0.9
 - Learning rate (LR) : 0.01
-- LR schedule: cosine_annealing
+- LR schedule: cosine
 - Batch size : 32*8 
 - Weight decay :  0.0001. 
 - Label smoothing = 0.1
 - We train for:
   - 150 epochs for a standard training process using ImageNet2012
 
-#### Data augmentation
+### Data augmentation
 
 This model uses the following data augmentation:
 
@@ -62,29 +66,18 @@ This model uses the following data augmentation:
   - CenterCrop to (224, 224)
   - Normalize, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
 
-## Setup
-The following section lists the requirements to start training the VGG16 model.
-### Requirements
 
-Tensorflow 1.15.0
 
-## Quick Start Guide
+## Quick start guide
 
-### 1. Clone the respository
+### Prepare the dataset
 
-```shell
-git clone xxx
-cd modelzoo_vgg16_TF
-```
+1. Download the ImageNet2012 dataset.
+2. Please convert the dataset to tfrecord format file by yourself.
+3. The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
 
-### 2. Download and preprocess the dataset
-
-1. Download the ImageNet2012 dataset.The model is compatible with the datasets on tensorflow official website.
-2. Generate tfrecord files following [Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim).
-3. The train and validation tfrecord files are under the path/data directories.
-
-### check json
-Check whether there is a JSON configuration file "8P_rank_table.json" for 8 Card IP in the scripts/ directory.
+### Check json
+Check whether there is a JSON configuration file "8P_rank_table.json" for 8 Card IP in the `scripts/` directory.
 The content of the 8p configuration file:
 
 ```
@@ -116,12 +109,15 @@ The content of the 8p configuration file:
 	"status": "completed"
 }
 ```
-### 3. Set environment
+### Key configuration changes
 
 Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910 environment variable settings](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-### 4. Train
+### Running the example
+
+#### Training
+
 - train on a single NPU
     - **edit** *scripts/run_1p.sh* and *scripts/train_1p.sh* (see example below)
     - bash run_1p.sh
@@ -132,7 +128,7 @@ Before starting the training, first configure the environment variables related 
 Examples:
 - Case for single NPU
     - Modify the ID of NPU in *device_group* in *scripts/run_1p.sh*, default ID is *0*.
-    - In *scripts/train_1p.sh* , python scripts part should look like as follows. For more detailed command lines arguments, please refer to [Command line arguments](#command-line-arguments)
+    - In *scripts/train_1p.sh* , python scripts part should look like as follows, make sure that the "--data_dir" modify the path of the user generated tfrecord.
         ```shell
         python3.7 ${dname}/train.py --rank_size=1 \
             --mode=train \
@@ -149,7 +145,7 @@ Examples:
         ```
 - Case for 8 NPUs
     - Modify the ID of NPU in *device_group* in *scripts/run_8p.sh*, default ID is *0,1,2,3,4,5,6,7*.
-    - In *scripts/train_8p.sh* , python scripts part should look like as follows.
+    - In *scripts/train_8p.sh* , python scripts part should look like as follows, make sure that the "--data_dir" modify the path of the user generated tfrecord.
         ```shell 
         python3.7 ${dname}/train.py --rank_size=8 \
             --mode=train_and_evaluate \
@@ -166,7 +162,14 @@ Examples:
         bash run_8p.sh
         ```
 
-### 5. Test
+#### Training process
+
+All the results of the training will be stored in the directory `log_dir`.
+Start single card or multi card training through the training instructions in "quick start guide". Single card and multi card support single card and eight card network training by running different scripts.
+The model storage path of the reference script is `results/1p` or `results/8p`. 
+
+
+#### Evaluation
 - Same procedure as training except 2 following modifications
     - change `--mode=train` to `--mode=evaluate`
     - add `--eval_dir=path/eval`
@@ -185,7 +188,7 @@ Examples:
 
 
 ## Advanced
-### Commmand-line options
+### Command-line options
 
 ```
   --rank_size                       number of NPUs to use (default: 0)
@@ -209,49 +212,9 @@ Examples:
   --log_dir                         path to save checkpoint and log (default: ./model_1p)  
 ```
 
-### Training process
 
-All the results of the training will be stored in the directory `log_dir`.
-Start single card or multi card training through the training instructions in "quick start". Single card and multi card support single card and eight card network training by running different scripts.
-The model storage path of the reference script is results/1p or results/8p. The training script log contains the following information.
-
-```
-2020-06-20 12:08:46.650335: I tf_adapter/kernels/geop_npu.cc:714] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp41_0[ 298635878us]
-2020-06-20 12:08:46.651767: I tf_adapter/kernels/geop_npu.cc:511] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp33_0, num_inputs:0, num_outputs:1
-2020-06-20 12:08:46.651882: I tf_adapter/kernels/geop_npu.cc:419] [GEOP] tf session directc244d6ef05380c63, graph id: 6 no need to rebuild
-2020-06-20 12:08:46.651903: I tf_adapter/kernels/geop_npu.cc:722] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp33_0 ,tf session: directc244d6ef05380c63 ,graph id: 6
-2020-06-20 12:08:46.652148: I tf_adapter/kernels/geop_npu.cc:735] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp33_0, ret_status:success ,tf session: directc244d6ef05380c63 ,graph id: 6 [0 ms]
-2020-06-20 12:08:46.654145: I tf_adapter/kernels/geop_npu.cc:64] BuildOutputTensorInfo, num_outputs:1
-2020-06-20 12:08:46.654179: I tf_adapter/kernels/geop_npu.cc:93] BuildOutputTensorInfo, output index:0, total_bytes:8, shape:, tensor_ptr:281471054129792, output281471051824928
-2020-06-20 12:08:46.654223: I tf_adapter/kernels/geop_npu.cc:714] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp33_0[ 2321us]
-step: 35028  epoch:  7.0  FPS: 4289.5  loss: 3.773  total_loss: 4.477  lr:0.00996
-2020-06-20 12:08:46.655903: I tf_adapter/kernels/geop_npu.cc:511] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp33_0, num_inputs:0, num_outputs:1
-2020-06-20 12:08:46.655975: I tf_adapter/kernels/geop_npu.cc:419] [GEOP] tf session directc244d6ef05380c63, graph id: 6 no need to rebuild
-2020-06-20 12:08:46.655993: I tf_adapter/kernels/geop_npu.cc:722] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp33_0 ,tf session: directc244d6ef05380c63 ,graph id: 6
-2020-06-20 12:08:46.656226: I tf_adapter/kernels/geop_npu.cc:735] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp33_0, ret_status:success ,tf session: directc244d6ef05380c63 ,graph id: 6 [0 ms]
-2020-06-20 12:08:46.657765: I tf_adapter/kernels/geop_npu.cc:64] BuildOutputTensorInfo, num_outputs:1
-```
  
-## Performance
 
-### Result
-
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
-
-#### Training accuracy results
-
-| **epochs** |    Top1/Top5   |
-| :--------: | :------------: |
-|    150     | 73.986%/91.75% |
-
-#### Training performance results
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    1     |     850 img/s     |
-
-| **NPUs** | train performance |
-| :------: | :---------------: |
-|    8     |     4200 img/s    |
 
 
 
