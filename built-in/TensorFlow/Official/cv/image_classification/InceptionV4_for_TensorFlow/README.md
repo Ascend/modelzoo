@@ -114,19 +114,19 @@ Examples:
 
 - Case for single NPU
     - Modify the ID of NPU in *device_group* in *scripts/run_1p.sh*, default ID is *0*.
-    - In *scripts/train_1p.sh* , python scripts part should look like as follows. For more detailed command lines arguments, please refer to [Command line arguments](#command-line-arguments)
+    - In *scripts/train_1p.sh* , python scripts part should look like as follows. Make sure that the "--data_dir" modify the path of the user generated tfrecord.
         ```shell
         python3.7 ${dname}/train.py --rank_size=1 \
-            --mode=train \
-            --max_epoches=100 \
-            --T_max=100 \
-            --iterations_per_loop=10 \
-            --data_dir=/opt/npu/data_PATH \
-            --batch_size=128 \
-            --lr=0.045 \
-            --display_every=10 \
-            --log_dir=./model \
-            --log_name=inception_v4.log
+        --mode=train \
+        --max_epochs=100 \
+        --T_max=100 \
+        --data_dir=/opt/npu/imagenet_data \
+        --iterations_per_loop=10 \
+        --batch_size=128 \
+        --lr=0.045 \
+        --display_every=100 \
+        --log_dir=./model \
+        --log_name=inception_v4.log > ${currentDir}/result/1p/train_${device_id}.log 2>&1 
         ```
     - Run the program  
         ```
@@ -134,18 +134,19 @@ Examples:
         ```
 - Case for 8 NPUs
     - Modify the ID of NPU in *device_group* in *scripts/run_8p.sh*, default ID is *0,1,2,3,4,5,6,7*.
-    - In *scripts/train_8p.sh* , python scripts part should look like as follows.
+    - In *scripts/train_8p.sh* , python scripts part should look like as follows.Make sure that the "--data_dir" modify the path of the user generated tfrecord.
         ```shell 
         python3.7 ${dname}/train.py --rank_size=8 \
-            --mode=train \
-            --max_epochs=100 \
-            --T_max=100 \
-            --iterations_per_loop=10 \
-            --data_dir=/opt/npu/data_PATH \
-            --lr=0.045 \
-            --log_dir=./model \
-            --eval_dir=./model \
-            --log_name=inception_v4.log
+        --mode=train \
+        --max_epochs=100 \
+        --T_max=100 \
+        --data_dir=/opt/npu/imagenet_data \
+        --iterations_per_loop=10 \
+        --batch_size=64 \
+        --lr=0.045 \
+        --display_every=100 \
+        --log_dir=./model \
+        --log_name=inception_v4.log > ${currentDir}/result/1p/train_${device_id}.log 2>&1 
         ```
     - Run the program  
         ```
@@ -166,11 +167,11 @@ All the results of the training will be stored in the directory results. Script 
      ```shell 
     python3.7 ${dname}/train.py --rank_size=1 \
         --mode=evaluate \
-        --data_dir=/opt/npu/data_PATH \
-        --eval_dir=${dname}/scripts/result/8p/0/model \
+        --data_dir=/opt/npu/imagenet_data \
+        --batch_size=128 \
         --log_dir=./model \
         --eval_dir=./model \
-        --log_name=eval_inceptionv4.log > eval.log
+        --log_name=eval_inceptionv4.log > ${currentDir}/result/1p/eval_${device_id}.log 2>&1 
     ```
     run the program  
     ```
