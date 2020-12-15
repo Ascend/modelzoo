@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 docker_image=$1

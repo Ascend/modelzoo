@@ -30,7 +30,7 @@
 
 2.执行docker_start.sh后带三个参数：步骤1生成的REPOSITORY:TAG；数据集路径；模型执行路径；比如：
 
-        ./docker_start.sh pytorch:b020 /train/imagenet /home/Densenet121
+        ./docker_start.sh pytorch:b020 /train/imagenet /home/Densenet121_for_PyTorch
 
 3.执行步骤一训练流程（环境安装除外）
 	
@@ -38,10 +38,8 @@
     
 训练日志路径：在训练脚本的同目录下result文件夹里，如：
 
-        /home/ResNet50/result/training_8p_job_20201121023601
+        /home/Densenet121_for_PyTorch/result/training_8p_job_20201121023601
         
-自测数据（不同环境可能存在差异，仅供参考）：
-1. A+K平台， EulerOS2.8, 1卡测试，精度73.75%，性能 FPS 593 images/s
-2. A+K平台， EulerOS2.8, 8卡测试，精度73.94%，性能 FPS 4100 images/s
+
 	
 

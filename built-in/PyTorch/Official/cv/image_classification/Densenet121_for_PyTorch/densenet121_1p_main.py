@@ -2,32 +2,19 @@
 
 # Copyright (c) Soumith Chintala 2016,
 # Copyright 2020 Huawei Technologies Co., Ltd
-# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-
-# * Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer.
-
-# * Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-
-# * Neither the name of the copyright holder nor the names of its
-#   contributors may be used to endorse or promote products derived from
-#   this software without specific prior written permission.
-
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
 import os
@@ -58,8 +45,8 @@ from apex import amp
 warnings.filterwarnings('ignore')
 
 model_names = sorted(name for name in models.__dict__
-    if name.islower() and not name.startswith("__")
-    and callable(models.__dict__[name]))
+                     if name.islower() and not name.startswith("__")
+                     and callable(models.__dict__[name]))
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('--data', metavar='DIR', default='/opt/npu/dataset/imagenet',
@@ -67,8 +54,8 @@ parser.add_argument('--data', metavar='DIR', default='/opt/npu/dataset/imagenet'
 parser.add_argument('-a', '--arch', metavar='ARCH', default='densenet121',
                     choices=model_names,
                     help='model architecture: ' +
-                        ' | '.join(model_names) +
-                        ' (default: resnet18)')
+                         ' | '.join(model_names) +
+                         ' (default: resnet18)')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 8)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -124,7 +111,6 @@ parser.add_argument('--loss-scale', default=1024., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
-
 
 
 def main():
@@ -193,7 +179,6 @@ def main_worker(gpu, ngpus_per_node, args):
         model = models.__dict__[args.arch](pretrained=True)
     else:
         print("=> creating model '{}'".format(args.arch))
-        # model = models.__dict__[args.arch]()
         model = densenet121()
 
     if args.distributed:
@@ -224,9 +209,6 @@ def main_worker(gpu, ngpus_per_node, args):
             model.cuda()
         else:
             model = model.to(CALCULATE_DEVICE)
-            #for item in model.npu_unsupport_list:
-            #    print("npu_unsupport: ", item)
-            #    item.cpu()
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().to(CALCULATE_DEVICE)
@@ -294,7 +276,6 @@ def main_worker(gpu, ngpus_per_node, args):
         validate(val_loader, model, criterion, args)
         return
 
-
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
@@ -303,7 +284,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, args)
 
-        if (epoch+1)%(args.eval_freq)==0 or epoch==args.epochs-1 :
+        if (epoch + 1) % (args.eval_freq) == 0 or epoch == args.epochs - 1:
             # evaluate on validation set
             acc1 = validate(val_loader, model, criterion, args, epoch)
 
@@ -320,7 +301,7 @@ def main_worker(gpu, ngpus_per_node, args):
                         'arch': args.arch,
                         'state_dict': model.state_dict(),
                         'best_acc1': best_acc1,
-                        'optimizer' : optimizer.state_dict(),
+                        'optimizer': optimizer.state_dict(),
                         'amp': amp.state_dict(),
                     }, is_best)
                 else:
@@ -329,8 +310,8 @@ def main_worker(gpu, ngpus_per_node, args):
                         'arch': args.arch,
                         'state_dict': model.state_dict(),
                         'best_acc1': best_acc1,
-                        'optimizer' : optimizer.state_dict(),
-                    }, is_best) 
+                        'optimizer': optimizer.state_dict(),
+                    }, is_best)
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
@@ -353,7 +334,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         data_time.update(time.time() - end)
 
         target = target.to(torch.int32)
-        images, target = images.to(CALCULATE_DEVICE, non_blocking=False), target.to(CALCULATE_DEVICE, non_blocking=False)
+        images, target = images.to(CALCULATE_DEVICE, non_blocking=False), target.to(CALCULATE_DEVICE,
+                                                                                    non_blocking=False)
 
         # compute output
         output = model(images)
@@ -381,7 +363,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         if i % args.print_freq == 0:
             progress.display(i)
 
-    print(' * FPS@all {:.3f}'.format(args.batch_size/batch_time.avg))
+    print(' * FPS@all {:.3f}'.format(args.batch_size / batch_time.avg))
+
 
 def validate(val_loader, model, criterion, args, epoch=0, writer=None):
     batch_time = AverageMeter('Time', ':6.3f')
@@ -400,7 +383,8 @@ def validate(val_loader, model, criterion, args, epoch=0, writer=None):
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
             target = target.to(torch.int32)
-            images, target = images.to(CALCULATE_DEVICE, non_blocking=False), target.to(CALCULATE_DEVICE, non_blocking=False)
+            images, target = images.to(CALCULATE_DEVICE, non_blocking=False), target.to(CALCULATE_DEVICE,
+                                                                                        non_blocking=False)
 
             # compute output
             output = model(images)
@@ -429,11 +413,12 @@ def validate(val_loader, model, criterion, args, epoch=0, writer=None):
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'model_best_acc%.4f_epoch%d.pth.tar'%(state['best_acc1'], state['epoch']))
+        shutil.copyfile(filename, 'model_best_acc%.4f_epoch%d.pth.tar' % (state['best_acc1'], state['epoch']))
 
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self, name, fmt=':f'):
         self.name = name
         self.fmt = fmt
@@ -449,9 +434,9 @@ class AverageMeter(object):
     def update(self, val, n=1):
         self.val = val
         self.count += n
-        if self.count>(self.start_count_index*n):
+        if self.count > (self.start_count_index * n):
             self.sum += val * n
-            self.avg = self.sum / (self.count-self.start_count_index*n)
+            self.avg = self.sum / (self.count - self.start_count_index * n)
 
     def __str__(self):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
