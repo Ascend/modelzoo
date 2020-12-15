@@ -2,33 +2,18 @@
 
 # Copyright (c) Soumith Chintala 2016,
 # Copyright 2020 Huawei Technologies Co., Ltd
-# All rights reserved.
-
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-
-# * Redistributions of source code must retain the above copyright notice, this
-#   list of conditions and the following disclaimer.
-
-# * Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-
-# * Neither the name of the copyright holder nor the names of its
-#   contributors may be used to endorse or promote products derived from
-#   this software without specific prior written permission.
-
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# -*- coding: utf-8 -*-
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import argparse
 import os
@@ -53,12 +38,11 @@ from densenet_0_2_2 import densenet121
 
 from apex import amp
 
-
 BATCH_SIZE = 512
-OPTIMIZER_BATCH_SIZE=2048
+OPTIMIZER_BATCH_SIZE = 2048
 model_names = sorted(name for name in models.__dict__
-    if name.islower() and not name.startswith("__")
-    and callable(models.__dict__[name]))
+                     if name.islower() and not name.startswith("__")
+                     and callable(models.__dict__[name]))
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('--data', metavar='DIR', default='/opt/npu/dataset/imagenet',
@@ -66,8 +50,8 @@ parser.add_argument('--data', metavar='DIR', default='/opt/npu/dataset/imagenet'
 parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet50',
                     choices=model_names,
                     help='model architecture: ' +
-                        ' | '.join(model_names) +
-                        ' (default: resnet18)')
+                         ' | '.join(model_names) +
+                         ' (default: resnet18)')
 parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -79,14 +63,14 @@ parser.add_argument('-b', '--batch-size', default=BATCH_SIZE, type=int,
                     help='mini-batch size (default: 256), this is the total '
                          'batch size of all GPUs on the current node when '
                          'using Data Parallel or Distributed Data Parallel')
-parser.add_argument('--lr', '--learning-rate',  default=0.1, type=float,
+parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
                     metavar='LR', help='initial learning rate', dest='lr')
 parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
                     help='momentum')
 parser.add_argument('--wd', '--weight-decay', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)',
                     dest='weight_decay')
-parser.add_argument('--workspace',type=str,default='./',metavar='DIR',
+parser.add_argument('--workspace', type=str, default='./', metavar='DIR',
                     help='path to directory where checkpoints will be stored')
 parser.add_argument('-p', '--print-freq', default=10, type=int,
                     metavar='N', help='print frequency (default: 10)')
@@ -118,11 +102,11 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
 parser.add_argument('-bm', '--benchmark', default=0, type=int,
                     metavar='N', help='set benchmark status (default: 1,run benchmark)')
 parser.add_argument('--device', default='npu', type=str,
-                        help='npu or gpu')
+                    help='npu or gpu')
 parser.add_argument('--addr', default='10.136.181.115', type=str,
-                        help='master addr')
+                    help='master addr')
 parser.add_argument('--checkpoint-nameprefix', default='checkpoint', type=str,
-                        help='checkpoint-nameprefix')
+                    help='checkpoint-nameprefix')
 parser.add_argument('--checkpoint-freq', default=0, type=int,
                     metavar='N', help='checkpoint frequency (default: 0)'
                                       '0: save only one file whitch per epoch;'
@@ -139,6 +123,8 @@ parser.add_argument('--opt-level', default='O2', type=str,
 
 warnings.filterwarnings('ignore')
 best_acc1 = 0
+
+
 def device_id_to_process_device_map(device_list):
     devices = device_list.split(",")
     devices = [int(x) for x in devices]
@@ -150,6 +136,7 @@ def device_id_to_process_device_map(device_list):
 
     return process_device_map
 
+
 def main():
     args = parser.parse_args()
     print("===============main()=================")
@@ -157,7 +144,7 @@ def main():
     print("===============main()=================")
 
     os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:",os.environ['KERNEL_NAME_ID'])
+    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if args.seed is not None:
         random.seed(args.seed)
@@ -169,7 +156,7 @@ def main():
                       'You may see unexpected behavior when restarting '
                       'from checkpoints.')
 
-    os.environ['MASTER_ADDR'] = args.addr  # '10.136.181.51'
+    os.environ['MASTER_ADDR'] = args.addr
     os.environ['MASTER_PORT'] = '29688'
 
     if args.gpu is not None:
@@ -205,12 +192,13 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = args.process_device_map[gpu]
-    print("[npu id:",args.gpu,"]","+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",os.environ['KERNEL_NAME_ID'])
+    print("[npu id:", args.gpu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",
+          os.environ['KERNEL_NAME_ID'])
     os.environ['KERNEL_NAME_ID'] = str(gpu)
-    print("[npu id:",args.gpu,"]","+++++++++++++++++++++++++++KERNEL_NAME_ID:",os.environ['KERNEL_NAME_ID'])
+    print("[npu id:", args.gpu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if args.gpu is not None:
-        print("[npu id:",args.gpu,"]","Use GPU: {} for training".format(args.gpu))
+        print("[npu id:", args.gpu, "]", "Use GPU: {} for training".format(args.gpu))
 
     if args.distributed:
         if args.dist_url == "env://" and args.rank == -1:
@@ -221,12 +209,11 @@ def main_worker(gpu, ngpus_per_node, args):
             args.rank = args.rank * ngpus_per_node + gpu
 
         if args.device == 'npu':
-            dist.init_process_group(backend=args.dist_backend, #init_method=args.dist_url,
-                                world_size=args.world_size, rank=args.rank)
+            dist.init_process_group(backend=args.dist_backend,  # init_method=args.dist_url,
+                                    world_size=args.world_size, rank=args.rank)
         else:
             dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
-                                world_size=args.world_size, rank=args.rank)
-
+                                    world_size=args.world_size, rank=args.rank)
 
     loc = 'npu:{}'.format(args.gpu)
     torch.npu.set_device(loc)
@@ -234,10 +221,9 @@ def main_worker(gpu, ngpus_per_node, args):
     args.batch_size = int(args.batch_size / ngpus_per_node)
     args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
 
-    print("[npu id:",args.gpu,"]","===============main_worker()=================")
-    print("[npu id:",args.gpu,"]",args)
-    print("[npu id:",args.gpu,"]","===============main_worker()=================")
-
+    print("[npu id:", args.gpu, "]", "===============main_worker()=================")
+    print("[npu id:", args.gpu, "]", args)
+    print("[npu id:", args.gpu, "]", "===============main_worker()=================")
 
     # Data loading code
     traindir = os.path.join(args.data, 'train')
@@ -274,8 +260,7 @@ def main_worker(gpu, ngpus_per_node, args):
         num_workers=args.workers, pin_memory=False, drop_last=True)
 
     # create model
-    print("[npu id:",args.gpu,"]","=> creating model '{}'".format(args.arch))
-    # model = models.__dict__[args.arch]()
+    print("[npu id:", args.gpu, "]", "=> creating model '{}'".format(args.arch))
     model = densenet121()
     model = model.to(loc)
 
@@ -299,14 +284,13 @@ def main_worker(gpu, ngpus_per_node, args):
             model.load_state_dict(checkpoint['state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer'])
             if args.amp:
-              amp.load_state_dict(checkpoint['amp'])
+                amp.load_state_dict(checkpoint['amp'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     cudnn.benchmark = True
-
 
     if args.evaluate:
         validate(val_loader, model, criterion, args)
@@ -318,25 +302,25 @@ def main_worker(gpu, ngpus_per_node, args):
         adjust_learning_rate(optimizer, epoch, args)
 
         # train for one epoch
-        train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node)
+        train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node)
 
-        if (epoch+1)%(args.eval_freq)==0 or epoch==args.epochs-1 :
+        if (epoch + 1) % (args.eval_freq) == 0 or epoch == args.epochs - 1:
             # evaluate on validation set
-            acc1 = validate(val_loader, model, criterion, args,ngpus_per_node)
+            acc1 = validate(val_loader, model, criterion, args, ngpus_per_node)
 
             # remember best acc@1 and save checkpoint
             is_best = acc1 > best_acc1
             best_acc1 = max(acc1, best_acc1)
 
             if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                    and args.rank % ngpus_per_node == 0 and epoch == args.epochs - 1):
+                                                        and args.rank % ngpus_per_node == 0 and epoch == args.epochs - 1):
                 if args.amp:
                     save_checkpoint({
                         'epoch': epoch + 1,
                         'arch': args.arch,
                         'state_dict': model.state_dict(),
                         'best_acc1': best_acc1,
-                        'optimizer' : optimizer.state_dict(),
+                        'optimizer': optimizer.state_dict(),
                         'amp': amp.state_dict(),
                     }, is_best)
                 else:
@@ -345,10 +329,11 @@ def main_worker(gpu, ngpus_per_node, args):
                         'arch': args.arch,
                         'state_dict': model.state_dict(),
                         'best_acc1': best_acc1,
-                        'optimizer' : optimizer.state_dict(),
+                        'optimizer': optimizer.state_dict(),
                     }, is_best)
 
-def train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node):
+
+def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node):
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
@@ -362,7 +347,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node)
     # switch to train mode
     model.train()
     end = time.time()
-    if args.benchmark == 1 :
+    if args.benchmark == 1:
         optimizer.zero_grad()
     for i, (images, target) in enumerate(train_loader):
         # measure data loading time
@@ -384,7 +369,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node)
         top5.update(acc5[0], images.size(0))
 
         # compute gradient and do SGD step
-        if args.benchmark == 0 :
+        if args.benchmark == 0:
             optimizer.zero_grad()
 
         if args.amp:
@@ -393,9 +378,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node)
         else:
             loss.backward()
 
-        if args.benchmark == 0 :
+        if args.benchmark == 0:
             optimizer.step()
-        elif args.benchmark == 1 :
+        elif args.benchmark == 1:
             BATCH_SIZE_multiplier = int(OPTIMIZER_BATCH_SIZE / args.batch_size)
             BM_optimizer_step = ((i + 1) % BATCH_SIZE_multiplier) == 0
             if BM_optimizer_step:
@@ -407,7 +392,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node)
 
         if i % args.print_freq == 0:
             if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                    and args.rank % ngpus_per_node == 0):
+                                                        and args.rank % ngpus_per_node == 0):
                 progress.display(i)
 
         # measure elapsed time
@@ -415,11 +400,13 @@ def train(train_loader, model, criterion, optimizer, epoch, args,ngpus_per_node)
         end = time.time()
 
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-            and args.rank % ngpus_per_node == 0):
-        print("[npu id:",args.gpu,"]",'* FPS@all {:.3f}'.format(ngpus_per_node*args.batch_size/batch_time.avg))
-        hwlog.remark_print(key=hwlog.FPS, value=' * FPS@all {:.3f}'.format(ngpus_per_node*args.batch_size / batch_time.avg))
+                                                and args.rank % ngpus_per_node == 0):
+        print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
+        hwlog.remark_print(key=hwlog.FPS,
+                           value=' * FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
 
-def validate(val_loader, model, criterion, args,ngpus_per_node):
+
+def validate(val_loader, model, criterion, args, ngpus_per_node):
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
     top1 = AverageMeter('Acc@1', ':6.2f')
@@ -456,24 +443,27 @@ def validate(val_loader, model, criterion, args,ngpus_per_node):
 
             if i % args.print_freq == 0:
                 if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                        and args.rank % ngpus_per_node == 0):
+                                                            and args.rank % ngpus_per_node == 0):
                     progress.display(i)
 
         # TODO: this should also be done with the ProgressMeter
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                and args.rank % ngpus_per_node == 0):
-            print("[npu id:",args.gpu,"]",'[AVG-ACC] * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
-                    .format(top1=top1, top5=top5))
+                                                    and args.rank % ngpus_per_node == 0):
+            print("[npu id:", args.gpu, "]", '[AVG-ACC] * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
+                  .format(top1=top1, top5=top5))
 
     return top1.avg
+
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'model_best_acc%.4f_epoch%d.pth.tar'%(state['best_acc1'], state['epoch']))
+        shutil.copyfile(filename, 'model_best_acc%.4f_epoch%d.pth.tar' % (state['best_acc1'], state['epoch']))
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self, name, fmt=':f'):
         self.name = name
         self.fmt = fmt
@@ -489,9 +479,9 @@ class AverageMeter(object):
     def update(self, val, n=1):
         self.val = val
         self.count += n
-        if self.count>(self.start_count_index*n):
+        if self.count > (self.start_count_index * n):
             self.sum += val * n
-            self.avg = self.sum / (self.count-self.start_count_index*n)
+            self.avg = self.sum / (self.count - self.start_count_index * n)
 
     def __str__(self):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
@@ -507,7 +497,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[npu id:",os.environ['KERNEL_NAME_ID'],"]",'\t'.join(entries))
+        print("[npu id:", os.environ['KERNEL_NAME_ID'], "]", '\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
@@ -541,4 +531,3 @@ def accuracy(output, target, topk=(1,)):
 
 if __name__ == '__main__':
     main()
-

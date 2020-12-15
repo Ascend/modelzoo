@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 source npu_set_env.sh
-
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 172.17.0.1:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 172.17.0.1:22118 --log \"SetLogLevel(0)[error]\" --device 4"
+ip=$(hostname -I|awk '{print $1}')
+su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host ${ip}:22118 --log \"SetLogLevel(0)[error]\" --device 0"
+su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host ${ip}:22118 --log \"SetLogLevel(0)[error]\" --device 4"
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
@@ -33,5 +33,3 @@ python3.7 ${currentDir}/densenet121_1p_main.py \
         --amp \
         --benchmark 0 \
         --data /data/imagenet/ > ./densenet121_1p.log 2>&1 &
-
-
