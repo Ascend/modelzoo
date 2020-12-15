@@ -36,7 +36,7 @@ from absl import flags
 import tensorflow as tf
 from tensorflow.python.client import device_lib
 
-from official.utils.logs import cloud_lib
+from utils.logs import cloud_lib
 
 METRIC_LOG_FILE_NAME = "metric.log"
 BENCHMARK_RUN_LOG_FILE_NAME = "benchmark_run.log"
@@ -68,7 +68,7 @@ def config_benchmark_logger(flag_obj=None):
     elif flag_obj.benchmark_logger_type == "BenchmarkFileLogger":
       _benchmark_logger = BenchmarkFileLogger(flag_obj.benchmark_log_dir)
     elif flag_obj.benchmark_logger_type == "BenchmarkBigQueryLogger":
-      from official.benchmark import benchmark_uploader as bu  # pylint: disable=g-import-not-at-top
+      from benchmark import benchmark_uploader as bu  # pylint: disable=g-import-not-at-top
       bq_uploader = bu.BigQueryUploader(gcp_project=flag_obj.gcp_project)
       _benchmark_logger = BenchmarkBigQueryLogger(
           bigquery_uploader=bq_uploader,
@@ -194,7 +194,7 @@ class BenchmarkFileLogger(BaseBenchmarkLogger):
   def log_run_info(self, model_name, dataset_name, run_params, test_id=None):
     """Collect most of the TF runtime information for the local env.
 
-    The schema of the run info follows official/benchmark/datastore/schema.
+    The schema of the run info follows benchmark/datastore/schema.
 
     Args:
       model_name: string, the name of the model.
@@ -265,7 +265,7 @@ class BenchmarkBigQueryLogger(BaseBenchmarkLogger):
   def log_run_info(self, model_name, dataset_name, run_params, test_id=None):
     """Collect most of the TF runtime information for the local env.
 
-    The schema of the run info follows official/benchmark/datastore/schema.
+    The schema of the run info follows benchmark/datastore/schema.
 
     Args:
       model_name: string, the name of the model.

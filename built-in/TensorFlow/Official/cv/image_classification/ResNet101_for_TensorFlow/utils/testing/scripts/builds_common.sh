@@ -57,7 +57,7 @@ get_py_files_to_check() {
     if [[ "$1" == "--incremental" ]]; then
         get_changed_files_from_master_branch -- '*.py'
     elif [[ -z "$1" ]]; then
-        find official/ -name '*.py'
+        find ./ -name '*.py'
     else
         die "Found unsupported args: $@ for get_py_files_to_check."
     fi

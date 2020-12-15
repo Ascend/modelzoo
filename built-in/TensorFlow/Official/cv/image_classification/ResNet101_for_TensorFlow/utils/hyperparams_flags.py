@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 from absl import flags
-from official.utils.flags import core as flags_core
+from utils.flags import core as flags_core
 
 FLAGS = flags.FLAGS
 

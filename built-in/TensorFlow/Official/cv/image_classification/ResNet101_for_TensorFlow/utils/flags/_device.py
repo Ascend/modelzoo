@@ -21,7 +21,7 @@ from __future__ import print_function
 from absl import flags
 from absl import logging
 
-from official.utils.flags._conventions import help_wrap
+from utils.flags._conventions import help_wrap
 
 
 def require_cloud_storage(flag_names):

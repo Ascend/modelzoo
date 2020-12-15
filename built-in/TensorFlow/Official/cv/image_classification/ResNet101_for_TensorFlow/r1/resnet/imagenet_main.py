@@ -29,11 +29,11 @@ import tensorflow as tf
 import shutil
 import random
 
-from official.r1.resnet import imagenet_preprocessing
-from official.r1.resnet import resnet_model
-from official.r1.resnet import resnet_run_loop
-from official.utils.flags import core as flags_core
-from official.utils.logs import logger
+from r1.resnet import imagenet_preprocessing
+from r1.resnet import resnet_model
+from r1.resnet import resnet_run_loop
+from utils.flags import core as flags_core
+from utils.logs import logger
 
 ############## npu modify begin #############
 from npu_bridge.estimator import npu_ops

@@ -22,9 +22,9 @@ import unittest
 import tensorflow as tf  # pylint: disable=g-bad-import-order
 from absl import logging
 
-from official.r1.resnet import imagenet_main
-from official.utils.misc import keras_utils
-from official.utils.testing import integration
+from r1.resnet import imagenet_main
+from utils.misc import keras_utils
+from utils.testing import integration
 
 logging.set_verbosity(logging.ERROR)
 

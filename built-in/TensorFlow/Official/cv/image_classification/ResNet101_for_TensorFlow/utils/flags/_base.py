@@ -21,8 +21,8 @@ from __future__ import print_function
 from absl import flags
 import tensorflow as tf
 
-from official.utils.flags._conventions import help_wrap
-from official.utils.logs import hooks_helper
+from utils.flags._conventions import help_wrap
+from utils.logs import hooks_helper
 
 ############## npu modify begin #############
 from hccl.manage.api import get_rank_size
@@ -128,7 +128,7 @@ def define_base(data_dir=True, model_dir=True, clean=False, train_epochs=False,
         help=help_wrap(
             u"A list of (case insensitive) strings to specify the names of "
             u"training hooks.\n{}\n\ufeff  Example: `--hooks ProfilerHook,"
-            u"ExamplesPerSecondHook`\n See official.utils.logs.hooks_helper "
+            u"ExamplesPerSecondHook`\n See utils.logs.hooks_helper "
             u"for details.".format(hook_list_str))
     )
     key_flags.append("hooks")

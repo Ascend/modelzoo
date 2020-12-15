@@ -48,7 +48,7 @@ absl_app.run(main, [__file__, "-h"]
 ```
 
 when `my_module.py` is run it will show the help text for `my_flag`. Because not all flags defined
-in a file are equally important, `official/utils/flags/core.py` (generally imported as flags_core)
+in a file are equally important, `utils/flags/core.py` (generally imported as flags_core)
 provides an abstraction for handling key flag declaration in an easy way through the
 `register_key_flags_in_core()` function, which allows a module to make a single
 `adopt_key_flags(flags_core)` call when using the util flag declaration functions.

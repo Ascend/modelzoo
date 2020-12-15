@@ -20,11 +20,11 @@ check if path '/usr/local/HiAI' or ''/usr/local/Ascend' is existed or not.
 modify '/usr/local/HiAI' to the actual path in scripts/run.sh
 
 ### Train and evaluate model
-[imagenet_main.py](official/r1/resnet/imagenet_main.py) is the Entry Python script.
-[resnet_run_loop.py](official/r1/resnet/resnet_run_loop.py) is the Main Python script.
+[imagenet_main.py](r1/resnet/imagenet_main.py) is the Entry Python script.
+[resnet_run_loop.py](r1/resnet/resnet_run_loop.py) is the Main Python script.
 
 ### Check your rank_table
-default rank_table setting in [configs](official/r1/resnet/configs) is usrd for X86.
+default rank_table setting in [configs](r1/resnet/configs) is usrd for X86.
 if you use aach64, please modify board_id from "0x0000" -->
 
 To train and evaluate the model, issue the following command:
@@ -61,14 +61,14 @@ There are other arguments about models and training process. Use the `--help` or
 #### modify file
 - The npu modify file list as follows:
 - DaVinci npu platform adaptation code,including
-   1.official/r1/resnet/imagenet_main.py 
-   2.official/r1/resnet/resnet_model.py
-   3.official/r1/resnet/resnet_run_loop.py
-   4.official/utils/flags/_base.py
+   1.r1/resnet/imagenet_main.py 
+   2.r1/resnet/resnet_model.py
+   3.r1/resnet/resnet_run_loop.py
+   4.utils/flags/_base.py
 
 #### FileTree Intro
 - Main Dir
-    - ./official/r1/resnet
+    - ./r1/resnet
 - Single NPU Training Shell
     - npu_train_1p_test.sh
 - Multi NPU(8p) Training Shell
