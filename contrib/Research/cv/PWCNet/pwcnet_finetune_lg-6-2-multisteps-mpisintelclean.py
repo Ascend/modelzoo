@@ -79,12 +79,12 @@ nn_opts['epsilon'] = 0.01
 # Set the learning rate schedule. This schedule is for a single GPU using a batch size of 8.
 # Below,we adjust the schedule to the size of the batch and the number of GPUs.
 nn_opts['lr_policy'] = 'multisteps'
-nn_opts['lr_boundaries'] = [40000, 60000, 80000, 100000]
-nn_opts['lr_values'] = [1e-05, 5e-06, 2.5e-06, 1.25e-06, 6.25e-07]
-nn_opts['max_steps'] = 100000
-nn_opts['display_step'] = 1
-nn_opts['snapshot_step'] = 10
-nn_opts['val_steps'] = 10
+nn_opts['lr_boundaries'] = [80000, 120000,160000, 200000]
+nn_opts['lr_values'] = [1e-4, 5e-05, 2.5e-05, 1.25e-05, 6.25e-06]
+# nn_opts['lr_values'] = [1e-05, 5e-06, 2.5e-06, 1.25e-06, 6.25e-07]
+nn_opts['max_steps'] = 200000
+nn_opts['display_step'] = 100
+nn_opts['val_step'] = 1000
 
 # Below,we adjust the schedule to the size of the batch and our number of GPUs (2).
 nn_opts['max_steps'] = int(nn_opts['max_steps'] * 4 / ds_opts['batch_size'])
