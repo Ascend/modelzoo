@@ -1,1 +1,0 @@
-SLOG_PRINT_TO_STDOUT=0 python ../train.py --device_id 0
