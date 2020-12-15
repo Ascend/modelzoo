@@ -5,7 +5,9 @@ export NEW_GE_FE_ID=1
 export GE_AICPU_FLAG=1
 export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
-
+ip=$(hostname -I |awk '{print $1}')
+su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host $ip:22118 --log \"SetLogLevel(0)[error]\" --device 0"
+su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host $ip:22118 --log \"SetLogLevel(0)[error]\" --device 4"
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_8p_job_${currtime}

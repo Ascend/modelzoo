@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 import torch
-from DistributedResnet50.image_classfication import resnet
+from DistributedResnet50.image_classification import resnet
 import torch.onnx
 
 from collections import OrderedDict
