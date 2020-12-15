@@ -89,7 +89,7 @@ def select_foreground_proposals(
 
 
 def select_foreground_proposals_fix_shape(
-    proposals: List[Instances], bg_label: int, gt_masks, sample_targets,
+    proposals: List[Instances], bg_label: int,
 ) -> Tuple[List[Instances], List[torch.Tensor]]:
     """
     Given a list of N Instances (for N images),
@@ -115,7 +115,7 @@ def select_foreground_proposals_fix_shape(
     assert proposals[0].has("gt_classes")
     fg_proposals = []
     fg_selection_masks = []
-    for idx, proposals_per_image in enumerate(proposals):
+    for proposals_per_image in proposals:
         gt_classes = proposals_per_image.gt_classes
         fg_selection_mask = (gt_classes != -1) & (gt_classes != bg_label)
         fix_num = 128 # max 128
@@ -135,13 +135,7 @@ def select_foreground_proposals_fix_shape(
             fg_index_del = fg_index_all[fg_index_index_del]
             fg_selection_mask[fg_index_del.long()] = False
 
-        proposals_per_image = proposals_per_image[fg_selection_mask]
-        mm = sample_targets[idx][fg_selection_mask].long()
-        if isinstance(gt_masks[idx], BitMasks):
-            proposals_per_image.set("gt_masks", BitMasks(gt_masks[idx].tensor.index_select(0, mm)))
-        elif isinstance(gt_masks[idx], PolygonMasks):
-            proposals_per_image.set("gt_masks", gt_masks[idx][mm])
-        fg_proposals.append(proposals_per_image)
+        fg_proposals.append(proposals_per_image[fg_selection_mask])
         fg_selection_masks.append(fg_selection_mask)
     return fg_proposals, fg_selection_masks
 
@@ -332,8 +326,7 @@ class ROIHeads(torch.nn.Module):
 
         num_fg_samples = []
         num_bg_samples = []
-        gt_mask_list = []
-        sample_target_list = []
+
         for proposals_per_image, targets_per_image in zip(proposals, targets):
             has_gt = len(targets_per_image) > 0
             match_quality_matrix = pairwise_iou(
@@ -357,13 +350,8 @@ class ROIHeads(torch.nn.Module):
                 # (by foreground/background, or number of keypoints in the image, etc)
                 # so we essentially index the data twice.
                 for (trg_name, trg_value) in targets_per_image.get_fields().items():
-                    if trg_name == "gt_boxes" and not proposals_per_image.has(trg_name):
+                    if trg_name.startswith("gt_") and not proposals_per_image.has(trg_name):
                         proposals_per_image.set(trg_name, trg_value[sampled_targets])
-                    elif trg_name == "gt_classes" and not proposals_per_image.has(trg_name):
-                        proposals_per_image.set(trg_name, trg_value[sampled_targets])
-                    elif trg_name == "gt_masks":
-                        gt_mask_list.append(trg_value)
-                sample_target_list.append(sampled_targets)
             else:
                 gt_boxes = Boxes(
                     targets_per_image.gt_boxes.tensor.new_zeros((len(sampled_idxs), 4))
@@ -379,7 +367,7 @@ class ROIHeads(torch.nn.Module):
         storage.put_scalar("roi_head/num_fg_samples", np.mean(num_fg_samples))
         storage.put_scalar("roi_head/num_bg_samples", np.mean(num_bg_samples))
 
-        return proposals_with_gt, gt_mask_list, sample_target_list
+        return proposals_with_gt
 
     def forward(
         self,
@@ -736,7 +724,7 @@ class StandardROIHeads(ROIHeads):
         del images
         if self.training:
             assert targets
-            proposals, gt_masks, sample_targets = self.label_and_sample_proposals(proposals, targets)
+            proposals = self.label_and_sample_proposals(proposals, targets)
         del targets
 
         if self.training:
@@ -744,7 +732,7 @@ class StandardROIHeads(ROIHeads):
             # Usually the original proposals used by the box head are used by the mask, keypoint
             # heads. But when `self.train_on_pred_boxes is True`, proposals will contain boxes
             # predicted by the box head.
-            losses.update(self._forward_mask(features, proposals, gt_masks, sample_targets))
+            losses.update(self._forward_mask(features, proposals))
             losses.update(self._forward_keypoint(features, proposals))
             return proposals, losses
         else:
@@ -822,7 +810,7 @@ class StandardROIHeads(ROIHeads):
             return pred_instances
 
     def _forward_mask(
-        self, features: Dict[str, torch.Tensor], instances: List[Instances], gt_masks = None, sample_targets = None
+        self, features: Dict[str, torch.Tensor], instances: List[Instances]
     ) -> Union[Dict[str, torch.Tensor], List[Instances]]:
         """
         Forward logic of the mask prediction branch.
@@ -845,7 +833,7 @@ class StandardROIHeads(ROIHeads):
 
         if self.training:
             # The loss is only defined on positive proposals.
-            proposals, _ = select_foreground_proposals_fix_shape(instances, self.num_classes, gt_masks, sample_targets)
+            proposals, _ = select_foreground_proposals_fix_shape(instances, self.num_classes)
             proposal_boxes = [x.proposal_boxes for x in proposals]
             mask_features = self.mask_pooler(features, proposal_boxes)
             return self.mask_head(mask_features, proposals)
