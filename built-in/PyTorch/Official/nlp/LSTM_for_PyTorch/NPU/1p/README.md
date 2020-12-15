@@ -6,7 +6,7 @@
 	1.安装环境、安装依赖
 	2.数据集放到1p目录下
 	3.修改字段device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
-	4.cd到run_1p.sh文件的目录，执行bash run_1p.sh单卡脚本， 进行单卡训练，如果只是训练可以执行bash run_1p.sh 2
+	4.cd到run_1p.sh文件的目录，执行bash run_1p.sh 2 单卡脚本， 进行单卡训练
 ```
 
 多卡训练流程
@@ -14,7 +14,7 @@
 ```
 	1.安装环境、安装依赖
 	2.数据集放到8p目录下
-	3.cd到run_8p.sh文件的目录，执行bash run_8p.sh单卡脚本， 进行多卡训练，如果只是训练可以执行bash run_8p.sh 2
+	3.cd到run_8p.sh文件的目录，执行bash run_8p.sh 2 多卡脚本， 进行多卡训练
 ```
 
 ### 二、Docker容器训练
