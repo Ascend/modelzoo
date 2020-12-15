@@ -113,9 +113,6 @@ class BitMasks:
         assert tensor.dim() == 3, tensor.size()
         self.image_size = tensor.shape[1:]
         self.tensor = tensor
-        self.image_hwhw = torch.tensor(
-            self.image_size + self.image_size,
-            dtype=torch.float32, device=device)
 
     def to(self, *args: Any, **kwargs: Any) -> "BitMasks":
         return BitMasks(self.tensor.to(*args, **kwargs))
@@ -207,17 +204,14 @@ class BitMasks:
         assert len(boxes) == len(self), "{} != {}".format(len(boxes), len(self))
         device = self.tensor.device
 
-        batch_inds = torch.arange(len(boxes), device=device)
+        batch_inds = torch.arange(len(boxes), device=device).to(dtype=boxes.dtype)[:, None]
+        rois = torch.cat([batch_inds, boxes], dim=1)
         bit_masks = self.tensor.to(dtype=torch.float32)
-        boxes = torch.stack(
-            [boxes[:, 1], boxes[:, 0],
-             boxes[:, 3], boxes[:, 2]], 1)
+        rois = rois.to(device=device)
+
         output = (
-            torch.npu_crop_and_resize(
-                bit_masks[:, None, :, :],
-                boxes.float() / self.image_hwhw, batch_inds,
-                torch.tensor([mask_size, mask_size],
-                device=device, dtype=torch.int32))
+            ROIAlign((mask_size, mask_size), 1.0, 0, aligned=True)
+            .forward(bit_masks[:, None, :, :], rois)
             .squeeze(1)
         )
         output = output >= 0.5

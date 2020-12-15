@@ -12,7 +12,7 @@ nohup python3.7 tools/train_net.py \
         LOSS_SCALE_VALUE 64 \
         MODEL.DEVICE npu:5 \
         SOLVER.IMS_PER_BATCH 2 \
-        SOLVER.MAX_ITER 84000 \
+        SOLVER.MAX_ITER 82000 \
         SEED 1234 \
         MODEL.RPN.NMS_THRESH 0.8 \
         MODEL.ROI_BOX_HEAD.POOLER_SAMPLING_RATIO 2 \

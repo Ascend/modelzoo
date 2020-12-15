@@ -111,8 +111,12 @@ def _distributed_worker(
         raise e
 
     assert num_gpus_per_machine <= torch.npu.device_count()
-    CALCULATE_DEVICE = 'npu:{}'.format(local_rank)
-    torch.npu.set_device(CALCULATE_DEVICE)
+    if args[0].device_ids:
+        device = 'npu:{}'.format(args[0].device_ids[local_rank])
+    else:
+        device = 'npu:{}'.format(local_rank)
+
+    torch.npu.set_device(device)
 
     # synchronize is needed here to prevent a possible timeout after calling init_process_group
     # See: https://github.com/facebookresearch/maskrcnn-benchmark/issues/172
