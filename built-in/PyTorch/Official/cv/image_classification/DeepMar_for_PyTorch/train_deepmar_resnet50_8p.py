@@ -237,6 +237,9 @@ class Config(object):
             'log', 'stderr_{}.txt'.format(time_str()))
         may_mkdir(self.stdout_file)
 
+
+def save_checkpoint(state, filename='checkpoint.path.tar'):
+    torch.save(state, filename)
 def main():
     ### main function ###
     # pdb.set_trace()
@@ -540,6 +543,12 @@ def main_worker(npu, npus_per_node, cfg):
         if (epoch + 1) % cfg.epochs_per_save == 0 or epoch+1 == cfg.total_epochs:
             ckpt_file = os.path.join(cfg.exp_dir, 'model', 'ckpt_epoch%d.pth'%(epoch+1))
             save_ckpt(modules_optims, epoch+1, 0, ckpt_file)
+            save_checkpoint({
+                'epoch': epoch + 1,
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+                'amp': amp.state_dict()
+            })
 
         ##########################
         # test on validation set #
