@@ -22,7 +22,7 @@ config_file='conf/ctc_config.yaml'
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
-train_log_dir=${currentDir}/result/training_1p_job_${currtime}
+train_log_dir=${currentDir}/result/training_8p_job_${currtime}
 mkdir -p ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
@@ -53,7 +53,7 @@ if [ $stage -le 2 ]; then
     --loss_scale 128 \
     --opt_level O2 \
     --conf $config_file \
-    --addr $(hostname -I |awk '{print $1} > ${train_log_dir}/lstm_8p.log 2>&1 &
+    --addr $(hostname -I |awk '{print $1}') > ${train_log_dir}/lstm_8p.log 2>&1 &
     exit 1
 
 fi
