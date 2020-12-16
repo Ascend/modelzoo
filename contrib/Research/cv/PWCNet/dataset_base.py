@@ -526,7 +526,7 @@ class OpticalFlowDataset(object):
         else:
             if image_path:
                 if as_tuple:
-                    return (image1, image2)
+                    return image1, image2
                 else:
                     return np.array([image1, image2])
 

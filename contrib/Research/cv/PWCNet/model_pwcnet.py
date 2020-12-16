@@ -754,7 +754,7 @@ class ModelPWCNet(ModelBase):
                         # Get a batch of val samples and make them conform to the network's requirements
                         if tb_val_loaded is False:
                             x_tb_val, y_tb_val, IDs_tb_val = self.ds.get_samples(
-                                batch_size * self.num_gpus, split='val', simple_IDs=True)
+                                batch_size, split='val', simple_IDs=True)
                             x_tb_val_adapt, _ = self.adapt_x(x_tb_val)
                             # IDs_tb_val = self.ds.simplify_IDs(x_IDs)
                             tb_val_loaded = True
