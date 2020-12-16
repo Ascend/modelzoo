@@ -16,6 +16,7 @@ import logging
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
+import os
 
 from detectron2.utils import comm
 
@@ -96,7 +97,6 @@ def _distributed_worker(
     assert torch.npu.is_available(), \
         "npu is not available. Please check your installation."
     global_rank = machine_rank * num_gpus_per_machine + local_rank
-    import os
     os.environ["RANK"] = str(local_rank)
     os.environ['KERNEL_NAME_ID'] = str(local_rank)
 
