@@ -29,8 +29,8 @@ def proc_node_module(checkpoint,AttrName):
     return new_state_dict
 
 def convert():
-    checkpoint = torch.load("./checkpoint.pth.tar", map_location='cpu')
-    checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
+    checkpoint = torch.load("./checkpoint.path.tar", map_location='cpu')
+    checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
     model = DeepMAR_ResNet50()
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
