@@ -64,6 +64,9 @@ def launch(main_func, num_gpus_per_machine, num_machines=1, machine_rank=0, dist
             logger.warning(
                 "file:// is not a reliable init_method in multi-machine jobs. Prefer tcp://"
             )
+        os.environ['MASTER_ADDR'] = '127.0.0.1'
+        os.environ['MASTER_PORT'] = str(_find_free_port())
+        os.environ["WORLD_SIZE"] = str(world_size)
 
         mp.spawn(
             _distributed_worker,
@@ -94,9 +97,6 @@ def _distributed_worker(
         "npu is not available. Please check your installation."
     global_rank = machine_rank * num_gpus_per_machine + local_rank
     import os
-    os.environ['MASTER_ADDR']='127.0.0.1'
-    os.environ['MASTER_PORT']='59619'
-    os.environ["WORLD_SIZE"] = str(world_size)
     os.environ["RANK"] = str(local_rank)
     os.environ['KERNEL_NAME_ID'] = str(local_rank)
 
@@ -120,7 +120,6 @@ def _distributed_worker(
 
     # synchronize is needed here to prevent a possible timeout after calling init_process_group
     # See: https://github.com/facebookresearch/maskrcnn-benchmark/issues/172
-    comm.synchronize()
 
     # Setup the local process group (which contains ranks within the same machine)
     assert comm._LOCAL_PROCESS_GROUP is None
