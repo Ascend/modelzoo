@@ -15,9 +15,9 @@ cd ModelZoo_GoogleNet_TF_Atlas/ModelZoo_GoogleNet_ACL
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset
+1. Download the ImageNet2012 dataset by yourself
 
-   http://image-net.org/challenges/LSVRC/2012/index#data
+ 
 
 ### 3. Offline Inference
 

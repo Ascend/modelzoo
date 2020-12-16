@@ -15,9 +15,8 @@ cd ModelZoo_MobileNetv2_TF_HARD/ModelZoo_MobileNetv2_ACL
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset
+1. Download the ImageNet2012 dataset by yourself
 
-   http://image-net.org/challenges/LSVRC/2012/index#data
 
 ### 3. Offline Inference
 
