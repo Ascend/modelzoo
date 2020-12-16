@@ -32,6 +32,8 @@ import tensorflow as tf
 import glob
 import cv2
 
+from npu_bridge.estimator import npu_ops
+
 def read_labeled_image_list(data_dir, data_list):
     f = open(data_list, 'r')
     

@@ -45,6 +45,7 @@ from utils.image_reader import ImageReader, prepare_label
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
+
 def get_arguments():
     parser = argparse.ArgumentParser(description="Reproduced ICNet")
     
@@ -109,14 +110,14 @@ class TrainConfig(Config):
 
     # Set pre-trained weights here (You can download weight using `python script/download_weights.py`) 
     # Note that you need to use "bnnomerge" version.
-    model_weight = './model/cityscapes/icnet_cityscapes_train_30k_bnnomerge.npy'
+    model_weight = '/home/model_user4/JeffDing/ICNet-TensorFlow-JeffDing/model/cityscapes/icnet_cityscapes_train_30k_bnnomerge.npy'
     
     # Set hyperparameters here, you can get much more setting in Config Class, see 'utils/config.py' for details.
     LAMBDA1 = 0.16
     LAMBDA2 = 0.4
     LAMBDA3 = 1.0
-    BATCH_SIZE = 8
-    LEARNING_RATE = 5e-4
+    BATCH_SIZE = 1
+    LEARNING_RATE = 5e-4 #default 5e-4
 
 def main():
     """Create the model and start the training."""

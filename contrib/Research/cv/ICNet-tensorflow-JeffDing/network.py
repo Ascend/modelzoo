@@ -346,7 +346,8 @@ class Network(object):
     @layer
     def dropout(self, input, keep_prob, name):
         keep = 1 - self.use_dropout + (self.use_dropout * keep_prob)
-        return tf.nn.dropout(input, keep, name=name)
+        #return tf.nn.dropout(input, keep, name=name)
+        return npu_ops.dropout(input, keep, name=name)
 
     @layer
     def resize_bilinear(self, input, size, name):

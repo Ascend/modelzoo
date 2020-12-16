@@ -30,6 +30,8 @@ import scipy.io as sio
 import numpy as np
 import tensorflow as tf
 
+from npu_bridge.estimator import npu_ops
+
 label_colours = [[128, 64, 128], [244, 35, 231], [69, 69, 69]
                 # 0 = road, 1 = sidewalk, 2 = building
                 ,[102, 102, 156], [190, 153, 153], [153, 153, 153]

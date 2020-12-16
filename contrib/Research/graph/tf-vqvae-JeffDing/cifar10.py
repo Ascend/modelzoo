@@ -11,10 +11,12 @@ from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
 from model import VQVAE, _cifar10_arch, PixelCNN
 
+os.environ['SLOG_PRINT_TO_STDOUT'] = "1"
+
 # The codes are borrowed from
 # https://github.com/tensorflow/models/blob/master/tutorials/image/cifar10/cifar10.py
 # https://github.com/tensorflow/models/blob/master/tutorials/image/cifar10/cifar10_input.py
-DATA_DIR = 'datasets/cifar10'
+DATA_DIR = '/home/model_user4/JeffDing/vqvae-TensorFlow-JeffDing/dataset/cifar10/'
 DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
 def maybe_download_and_extract():
     import sys, tarfile
@@ -166,6 +168,13 @@ def main(config,
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord,sess=sess)
         for step in tqdm(xrange(TRAIN_NUM),dynamic_ncols=True):
+            config = tf.ConfigProto()
+            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+            custom_op.name =  "NpuOptimizer"
+            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
+            custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
             it,loss,_ = sess.run([global_step,net.loss,net.train_op])
 
             if( it % SAVE_PERIOD == 0 ):
@@ -173,6 +182,13 @@ def main(config,
 
             if( it % SUMMARY_PERIOD == 0 ):
                 tqdm.write('[%5d] Loss: %1.3f'%(it,loss))
+                config = tf.ConfigProto()
+                custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+                custom_op.name =  "NpuOptimizer"
+                custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+                config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+                #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
+                custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
                 summary = sess.run(summary_op)
                 summary_writer.add_summary(summary,it)
 
@@ -240,6 +256,12 @@ def test(MODEL,
     try:
         nlls = []
         while not coord.should_stop():
+            config = tf.ConfigProto()
+            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+            custom_op.name =  "NpuOptimizer"
+            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
             nlls.append(
                 sess.run(net.nll,feed_dict={x:sess.run(valid_images)}))
             print('.', end='', flush=True)
@@ -251,6 +273,12 @@ def test(MODEL,
     try:
         nlls = []
         while not coord.should_stop():
+            config = tf.ConfigProto()
+            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+            custom_op.name =  "NpuOptimizer"
+            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
             nlls.append(
                 sess.run(net.nll,feed_dict={x:sess.run(images)}))
             print('.', end='', flush=True)
@@ -309,6 +337,12 @@ def extract_z(MODEL,
         ks = []
         ys = []
         while not coord.should_stop():
+            config = tf.ConfigProto()
+            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+            custom_op.name =  "NpuOptimizer"
+            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
             x,y = sess.run([images,labels])
             k = sess.run(net.k,feed_dict={x_ph:x})
             ks.append(k)
@@ -410,6 +444,12 @@ def train_prior(config,
 
     for step in tqdm(xrange(TRAIN_NUM),dynamic_ncols=True):
         batch_xs, batch_ys = latent.data.train.next_batch(BATCH_SIZE)
+        config = tf.ConfigProto()
+        custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+        custom_op.name =  "NpuOptimizer"
+        custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+        #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
         it,loss,_ = sess.run([global_step,net.loss,net.train_op],feed_dict={net.X:batch_xs,net.h:batch_ys})
 
         if( it % SAVE_PERIOD == 0 ):
@@ -417,11 +457,23 @@ def train_prior(config,
 
         if( it % SUMMARY_PERIOD == 0 ):
             tqdm.write('[%5d] Loss: %1.3f'%(it,loss))
+            config = tf.ConfigProto()
+            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+            custom_op.name =  "NpuOptimizer"
+            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
             summary = sess.run(summary_op,feed_dict={net.X:batch_xs,net.h:batch_ys})
             summary_writer.add_summary(summary,it)
 
         if( it % (SUMMARY_PERIOD * 2) == 0 ):
             sampled_zs,log_probs = net.sample_from_prior(sess,np.arange(10),2)
+            config = tf.ConfigProto()
+            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+            custom_op.name =  "NpuOptimizer"
+            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+            #config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
             sampled_ims = sess.run(vq_net.gen,feed_dict={vq_net.latent:sampled_zs})
             summary_writer.add_summary(
                 sess.run(sample_summary_op,feed_dict={sample_images:sampled_ims}),it)

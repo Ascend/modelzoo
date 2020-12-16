@@ -4,6 +4,8 @@ import tensorflow as tf
 import numpy as np
 from commons.ops import *
 
+from npu_bridge.estimator import npu_ops
+
 def _mnist_arch(d):
     with tf.variable_scope('enc') as enc_param_scope :
         enc_spec = [
