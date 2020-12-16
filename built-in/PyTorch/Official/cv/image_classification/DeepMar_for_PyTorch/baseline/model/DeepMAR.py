@@ -28,27 +28,32 @@ class DeepMAR_ResNet50(nn.Module):
     ):
         super(DeepMAR_ResNet50, self).__init__()
         # init the necessary parameter for netwokr structure
-        if 'num_att' in kwargs:
-            self.num_att = kwargs['num_att'] 
-        else:
-            self.num_att = 35
-        if 'last_conv_stride' in kwargs:
-            self.last_conv_stride = kwargs['last_conv_stride']
-        else:
-            self.last_conv_stride = 2
-        if 'drop_pool5' in kwargs:
-            self.drop_pool5 = kwargs['drop_pool5']
-        else:
-            self.drop_pool5 = True 
-        if 'drop_pool5_rate' in kwargs:
-            self.drop_pool5_rate = kwargs['drop_pool5_rate']
-        else:
-            self.drop_pool5_rate = 0.5
-        if 'pretrained' in kwargs:
-            self.pretrained = kwargs['pretrained'] 
-        else:
-            self.pretrained = True
-
+        # if 'num_att' in kwargs:
+            # self.num_att = kwargs['num_att'] 
+        # else:
+            # self.num_att = 35
+        self.num_att = 35
+        # if 'last_conv_stride' in kwargs:
+            # self.last_conv_stride = kwargs['last_conv_stride']
+        # else:
+            # self.last_conv_stride = 2
+        self.last_conv_stride = 2
+        # if 'drop_pool5' in kwargs:
+            # self.drop_pool5 = kwargs['drop_pool5']
+        # else:
+            # self.drop_pool5 = True
+        self.drop_pool5 = True            
+        # if 'drop_pool5_rate' in kwargs:
+            # self.drop_pool5_rate = kwargs['drop_pool5_rate']
+        # else:
+            # self.drop_pool5_rate = 0.5
+        self.drop_pool5_rate = 0.5
+        # if 'pretrained' in kwargs:
+            # self.pretrained = kwargs['pretrained'] 
+        # else:
+            # self.pretrained = True
+        self.pretrained = False
+        
         self.base = resnet50(pretrained=self.pretrained, last_conv_stride=self.last_conv_stride)
         
         self.classifier = nn.Linear(2048, self.num_att)
@@ -57,9 +62,11 @@ class DeepMAR_ResNet50(nn.Module):
 
     def forward(self, x):
         x = self.base(x)
-        x = F.avg_pool2d(x, x.shape[2:])
+        # x = F.avg_pool2d(x, x.shape[2:])
+        x = F.avg_pool2d(x, (7,7))
         # x = x.view(x.size(0), -1)
-        x = torch.flatten(x, 1)
+        # x = torch.flatten(x, 1)
+        x = x.view(x.size(0), -1)
         if self.drop_pool5:
             x = F.dropout(x, p=self.drop_pool5_rate, training=self.training)
         x = self.classifier(x)
