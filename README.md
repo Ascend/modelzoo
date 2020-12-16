@@ -69,6 +69,7 @@ Thank You!
 	 -Research 
 
 	- [Music_Genre_Classification_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/audio/Music_Genre_Classification_for_MindSpore)
+    - [Gnmt_v2_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/Gnmt_v2_for_MindSpore)
 		
   - PyTorch
 
@@ -117,7 +118,6 @@ Thank You!
 	- [Cars_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Cars_for_TensorFlow)
 	- [Darts_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Darts_for_TensorFlow)
 	- [GraphSAGE_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/gnn/GraphSAGE_for_TensorFlow)
-	- [Gnmt_v2_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/nlp/Gnmt_v2_for_TensorFlow)
 	- [Yuefu_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/nlp/Yuefu_for_TensorFlow)
 	- [DeepFM_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/DeepFM_for_TensorFlow)
 	- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/Wide&Deep_for_TensorFlow)
@@ -126,7 +126,7 @@ Thank You!
 	- [MUZERO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/MUZERO_for_TensorFlow)
 	- [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/PPO_for_TensorFlow)
 	- [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/QMIX_for_TensorFlow)
-	- [Jasper_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/speech/Jasper_for_TensorFlow)
+	- [Jasper_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
 	- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceDetection_for_MindSpore)
 	- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
 	- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceAttribute_for_MindSpore)
