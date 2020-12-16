@@ -2,7 +2,7 @@
 https://github.com/qubvel/efficientnet, 下载对应的ckpt，转成pb模型
 
 ## 2、转om模型
-obs链接：obs://nkxiaolei88/ATC Model/EfficientNet-B8/efficientnet-b8.om
+obs链接：obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/EfficientNet-B8/efficientnet-b8.om
 
 atc转换命令参考：
 ```
