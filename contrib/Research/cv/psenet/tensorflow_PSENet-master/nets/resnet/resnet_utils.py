@@ -40,6 +40,8 @@ implementation is more memory efficient.
 import collections
 import tensorflow as tf
 
+from npu_bridge.estimator import npu_ops
+
 slim = tf.contrib.slim
 
 

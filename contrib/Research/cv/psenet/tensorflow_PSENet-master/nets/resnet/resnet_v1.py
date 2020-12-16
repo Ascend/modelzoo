@@ -61,6 +61,8 @@ from tensorflow.contrib import slim
 
 from . import resnet_utils
 
+from npu_bridge.estimator import npu_ops
+
 resnet_arg_scope = resnet_utils.resnet_arg_scope
 
 
