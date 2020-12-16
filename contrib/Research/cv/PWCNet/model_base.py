@@ -148,19 +148,20 @@ class ModelBase:
 
         # Li Zhongyu: save ck to obs
         # TODO set obs path
-        dir = save_path.split('/')[-2]
-        name = save_path.split('/')[-1]
-        if not mox.file.exists('obs://pwcnet-lxm/log/{0}'.format(dir)):
-            mox.file.make_dirs('obs://pwcnet-lxm/log/{0}'.format(dir))
-        mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-lxm/log/{0}/{1}.data-00000-of-00001'
-                               .format(dir, name))
-        mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-lxm/log/{0}/{1}.meta'.format(dir, name))
-        mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-lxm/log/{0}/{1}.index'.format(dir, name))
+        if save_path is not None:
+            dir = save_path.split('/')[-2]
+            name = save_path.split('/')[-1]
+            if not mox.file.exists('obs://pwcnet-final/log/{0}'.format(dir)):
+                mox.file.make_dirs('obs://pwcnet-final/log/{0}'.format(dir))
+            mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-final/log/{0}/{1}.data-00000-of-00001'
+                                   .format(dir, name))
+            mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-final/log/{0}/{1}.meta'.format(dir, name))
+            mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-final/log/{0}/{1}.index'.format(dir, name))
 
-        mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-lxm/log/{0}/checkpoint'
-                               .format(dir))
-        mox.file.copy_parallel(save_path[0:-len(name)] + 'best_checkpoints', 'obs://pwcnet-lxm/log/{0}/best_checkpoints'
-                               .format(dir))
+            mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-final/log/{0}/checkpoint'
+                                   .format(dir))
+            mox.file.copy_parallel(save_path[0:-len(name)] + 'best_checkpoints', 'obs://pwcnet-final/log/{0}/best_checkpoints'
+                                   .format(dir))
         # Li Zhongyu: save ck to obs
 
         if self.opts['verbose']:

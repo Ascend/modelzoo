@@ -15,9 +15,8 @@ import sys
 from copy import deepcopy
 
 from dataset_base import _DEFAULT_DS_TUNE_OPTIONS
-from dataset_flyingchairs import FlyingChairsDataset
-from dataset_flyingthings3d import FlyingThings3DHalfResDataset
-from dataset_mpisintel import MPISintelDataset
+from dataset_kitti import KITTIDataset
+from dataset_mixer import MixedDataset
 
 from model_pwcnet import ModelPWCNet, _DEFAULT_PWCNET_FINETUNE_OPTIONS
 
@@ -29,10 +28,9 @@ if sys.platform.startswith("win"):
     _DATASET_ROOT = 'E:/datasets/'
 else:
     _DATASET_ROOT = '/cache/'
-_MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
-
-os.makedirs(_MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
+_KITTI15_ROOT = _DATASET_ROOT + 'KITTI15'
+os.makedirs(_KITTI_ROOT)
+mox.file.copy_parallel('obs://pwcnet-final/KITTI15', _KITTI15_ROOT)
 mox.file.copy_parallel('obs://pwcnet-final/pretrained', './pretrained')
 
 gpu_devices = ['/device:CPU:0']
@@ -45,11 +43,13 @@ ds_opts = deepcopy(_DEFAULT_DS_TUNE_OPTIONS)
 ds_opts['in_memory'] = False  # Too many samples to keep in memory at once, so don't preload them
 ds_opts['aug_type'] = 'heavy'  # Apply all supported augmentations
 ds_opts['batch_size'] = batch_size * len(gpu_devices)  # Use a multiple of 8; here, 16 for dual-GPU mode (Titan X & 1080 Ti)
-ds_opts['crop_preproc'] = (384, 768)  # Crop to a smaller input size
+ds_opts['crop_preproc'] = (320, 896)  # Crop to a smaller input size
 
-ds_opts['type'] = 'clean'
-ds = MPISintelDataset(mode='train_with_val', ds_root=_MPISINTEL_ROOT, options=ds_opts)
-
+ds_opts['type'] = 'noc'
+ds1 = KITTIDataset(mode='train_with_val', ds_root=_KITTI15_ROOT, options=ds_opts)
+ds_opts['type'] = 'occ'
+ds2 = KITTIDataset(mode='train_with_val', ds_root=_KITTI15_ROOT, options=ds_opts)
+ds = MixedDataset(mode='train_with_val', datasets=[ds1, ds2], options=ds_opts)
 # Display dataset configuration
 ds.print_config()
 
@@ -57,7 +57,7 @@ ds.print_config()
 nn_opts = deepcopy(_DEFAULT_PWCNET_FINETUNE_OPTIONS)
 nn_opts['verbose'] = True
 nn_opts['ckpt_path'] = './pretrained/pwcnet.ckpt-595000'
-nn_opts['ckpt_dir'] = './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/'
+nn_opts['ckpt_dir'] = './pwcnet-lg-6-2-multisteps-kitti15-finetuned/'
 nn_opts['batch_size'] = ds_opts['batch_size']
 nn_opts['x_shape'] = [2, ds_opts['crop_preproc'][0], ds_opts['crop_preproc'][1], 3]
 nn_opts['y_shape'] = [ds_opts['crop_preproc'][0], ds_opts['crop_preproc'][1], 2]
