@@ -1,3 +1,32 @@
+# Copyright 2018 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
 import numpy as np
 from . import preprocessing
 import tensorflow as tf
@@ -159,7 +188,7 @@ def parse_function(filename, label):
     image = read_rawdata(filename)
     image_decoded = tf.image.decode_jpeg(image, channels=3)
     image_resized = tf.image.resize_images(image_decoded, [224, 224])
-    # 7.3£¬rawÄ¬ÈÏ¸ñÊ½Îªint64£¬Ä¿Ç°resnet50Ö»Ö§³Öint32£¬ÏÂ³ÁÇ°²»Ó°Ïì£¬ÏÂ³Áºó£¬Ã»ÓĞÔö¼Ó¸Ã×ª»»Ëã×Ó£¬Ó°ÏìĞÔÄÜ¿¼ÂÇ¡£    
+    # 7.3ï¼Œrawé»˜è®¤æ ¼å¼ä¸ºint64ï¼Œç›®å‰resnet50åªæ”¯æŒint32ï¼Œä¸‹æ²‰å‰ä¸å½±å“ï¼Œä¸‹æ²‰åï¼Œæ²¡æœ‰å¢åŠ è¯¥è½¬æ¢ç®—å­ï¼Œå½±å“æ€§èƒ½è€ƒè™‘ã€‚    
     label = tf.cast(label, dtype=tf.int32)
     return image_resized, label
 
