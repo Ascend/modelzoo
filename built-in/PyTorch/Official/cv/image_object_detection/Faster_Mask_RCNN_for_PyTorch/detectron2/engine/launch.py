@@ -77,7 +77,6 @@ def launch(main_func, num_gpus_per_machine, num_machines=1, machine_rank=0, dist
         )
     else:
         argsd = dict(zip(args[0].opts[0::2], args[0].opts[1::2]))
-        import os
         os.environ['KERNEL_NAME_ID'] = \
             argsd['MODEL.DEVICE'].split(':')[-1]
         torch.npu.set_device(argsd['MODEL.DEVICE'])
