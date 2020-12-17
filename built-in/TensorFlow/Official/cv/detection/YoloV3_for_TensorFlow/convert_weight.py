@@ -33,7 +33,7 @@ weight_path = './data/darknet_weights/darknet53.conv.74'
 save_path = './data/darknet_weights/darknet53.ckpt'
 anchors = parse_anchors('./data/yolo_anchors.txt')
 
-model = yolov3(80, anchors)
+model = yolov3(num_class, anchors)
 with tf.Session() as sess:
     inputs = tf.placeholder(tf.float32, [1, img_size, img_size, 3])
 
