@@ -45,5 +45,5 @@ export OPTION_PROTO_LIB_PATH=/usr/local/HiAI/runtime/ops/op_proto/built-in/libop
 export OP_PROTOLIB_PATH=/usr/local/HiAI/runtime/ops/op_proto/built-in/libopsproto.so
 
 # !!! ADD YOUR OWN PYTHONPATH
-export PYTHONPATH=/opt/npu/x00429427/ME_CenterFace_To_modelzoo/:${PYTHONPATH}
+export PYTHONPATH=/PATH/TO/CONFIGED/ME_CenterFace_To_modelzoo/:${PYTHONPATH}
 export GE_USE_STATIC_MEMORY=1

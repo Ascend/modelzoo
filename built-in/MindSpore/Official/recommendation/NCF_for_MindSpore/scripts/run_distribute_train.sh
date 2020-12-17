@@ -33,7 +33,7 @@ do
     export DEVICE_ID=$i
     #cd ${current_exec_path}
     python -u ${current_exec_path}/train.py  \
-     --data_path '/home/x00352035/ncf_data' \
+     --data_path '/PATH/TO/CONFIGED' \
      --dataset 'ml-1m'  \
      --train_epochs 50 \
      --output_path './output/' \

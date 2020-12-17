@@ -145,12 +145,12 @@ def ckpt_to_pt(pt, ckpt, out_path):
 if __name__ == "__main__":
     '''
     centerFace model transform: mindspore <=> pytorch
-        e.g., python3 torch_to_ms_mobile.py --ckpt_fn=/opt/npu/x00429427/ME_CenterFace_To_modelzoo/scripts/model_140.ckpt \
-                                --pt_fn=/opt/npu/x00429427/ME_CenterFace/scripts/model_140.pth \
-                                --out_ckpt_fn=/opt/npu/x00429427/ME_CenterFace/scripts/model_test.ckpt
-        or   python3 torch_to_ms_mobile.py --ckpt_fn=/opt/npu/x00429427/ME_CenterFace_To_modelzoo/scripts/model_140.ckpt \
-                                --pt_fn=/opt/npu/x00429427/ME_CenterFace/scripts/model_140.pth \
-                                --out_ckpt_fn=/opt/npu/x00429427/ME_CenterFace/scripts/model_ms2pt.pth \
+        e.g., python3 torch_to_ms_mobile.py --ckpt_fn=/PATH/TO/CONFIGED/ME_CenterFace_To_modelzoo/scripts/model_140.ckpt \
+                                --pt_fn=/PATH/TO/CONFIGED/ME_CenterFace/scripts/model_140.pth \
+                                --out_ckpt_fn=/PATH/TO/CONFIGED/ME_CenterFace/scripts/model_test.ckpt
+        or   python3 torch_to_ms_mobile.py --ckpt_fn=/PATH/TO/CONFIGED/ME_CenterFace_To_modelzoo/scripts/model_140.ckpt \
+                                --pt_fn=/PATH/TO/CONFIGED/ME_CenterFace/scripts/model_140.pth \
+                                --out_ckpt_fn=/PATH/TO/CONFIGED/ME_CenterFace/scripts/model_ms2pt.pth \
                                 --pt2ckpt=0
     '''
     parser = argparse.ArgumentParser(description='')

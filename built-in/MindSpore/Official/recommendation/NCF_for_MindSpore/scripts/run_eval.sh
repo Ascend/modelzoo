@@ -12,4 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-python ./eval.py --data_path '/home/x00352035/ncf_data' --dataset 'ml-1m'  --eval_batch_size 160000 --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path './checkpoint/NCF-5_19418.ckpt' 
+python ./eval.py --data_path '/PATH/TO/CONFIGED' --dataset 'ml-1m'  --eval_batch_size 160000 --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path './checkpoint/NCF-5_19418.ckpt' 

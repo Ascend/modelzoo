@@ -49,7 +49,6 @@ def get_img_id(file_name):
 if __name__ == '__main__': 
     annType = ['segm', 'bbox', 'keypoints']#set iouType to 'segm', 'bbox' or 'keypoints'
     annType = annType[1] # specify type here
-    #cocoGt_file = '/autotest/c00314821/yolov3/data/coco/coco2014/annotations/instances_val2014.json'
      
     # print(list(cocoGt.anns.items())[:10])
     # print(cocoGt.anns[318219])
