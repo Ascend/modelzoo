@@ -13,7 +13,7 @@ python train.py \
     --input_size=512 \
     --batch_size_per_gpu=1 \
     --checkpoint_path=./resnet_v1_50/ \
-    --training_data_path=/data/icdar2015/ >train.log 2>&1
+    --training_data_path=/data/dataset/storage/icdar/ >train.log 2>&1
     #--model_dir=./model_path
 
 end_time=`date +%s`

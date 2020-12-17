@@ -12,6 +12,8 @@ from utils.utils_tool import logger
 from utils.data_provider.data_util import GeneratorEnqueuer
 import tensorflow as tf
 import pyclipper
+from npu_bridge.estimator import npu_ops
+
 
 tf.app.flags.DEFINE_string('training_data_path', None,
                            'training dataset to use')
