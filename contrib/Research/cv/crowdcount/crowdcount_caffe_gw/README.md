@@ -16,6 +16,8 @@
 
 ​	  推理耗时：平均每次耗时 173ms
 
+​	  模型地址：https://gitee.com/guowen001/ascend_-demo_-open_-source/tree/master/crowdCount/count/model
+
 
 ## 环境配置   
 
