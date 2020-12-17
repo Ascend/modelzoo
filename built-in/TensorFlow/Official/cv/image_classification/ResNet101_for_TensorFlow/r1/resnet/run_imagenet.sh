@@ -29,7 +29,7 @@ python3.7 $3/imagenet_main.py \
 --label_smoothing=0.1 \
 --loss_scale=512 \
 --train_epochs=90 \
---eval_only=Falsed \
+--eval_only=False \
 --epochs_between_evals=10 \
 --hooks=ExamplesPerSecondHook,loggingtensorhook,loggingmetrichook \
 --data_dir=/opt/npu/dataset/imagenet_TF_record \

@@ -7,11 +7,11 @@ export HCCL_CONNECT_TIMEOUT=600
 # user env
 export JOB_ID=123456702
 #请根据hccl.json文件实际路径进行配置
-export RANK_TABLE_FILE=/network/ResNext50_for_TensorFlow/hccl.json
-export RANK_SIZE=$2
-export RANK_ID=$1
-export DEVICE_ID=$RANK_ID
-export DEVICE_INDEX=$RANK_ID
+export RANK_TABLE_FILE=/network/ResNext50_for_TensorFlow/hccl_1p.json
+export RANK_SIZE=1
+export RANK_ID=0
+export DEVICE_ID=0
+#export DEVICE_INDEX=$RANK_ID
 
 # profiling env
 export PROFILING_MODE=FALSE

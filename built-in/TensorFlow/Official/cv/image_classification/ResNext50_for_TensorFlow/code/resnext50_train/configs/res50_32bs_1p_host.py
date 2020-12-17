@@ -43,7 +43,7 @@ config = {
     'shard': False,
 
     # ======= basic config ======= # 
-    'mode':'train',                                         # "train","evaluate","train_and_evaluate"
+    'mode':'train',                                         # "train","evaluate"
     'epochs_between_evals': 4,                              #used if mode is "train_and_evaluate"
     'stop_threshold': 80.0,                                 #used if mode is "train_and_evaluate"
     #'data_dir':'/opt/npu/resnet_data_new',
