@@ -175,7 +175,7 @@ def main(args):
         return res
 
 
-    if args.debug_mode:
+    if cfg.DEBUG_MODE:
         trainer.register_hooks([hooks.ShowTraining(trainer.model, trainer.start_iter)])
 
     return trainer.train()
