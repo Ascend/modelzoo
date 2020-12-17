@@ -90,14 +90,14 @@ def valid_shape(*x):
     # npu modified
     if args_input.mode == 'single':
         image.set_shape([args.batch_size, args.img_size[0], args.img_size[1], 3])
-        y_true[0].set_shape([args.batch_size, 13, 13, 3, 86])
-        y_true[1].set_shape([args.batch_size, 26, 26, 3, 86])
-        y_true[2].set_shape([args.batch_size, 52, 52, 3, 86])
+        y_true[0].set_shape([args.batch_size, 13, 13, 3, args.class_num + 5 + 1])
+        y_true[1].set_shape([args.batch_size, 26, 26, 3, args.class_num + 5 + 1])
+        y_true[2].set_shape([args.batch_size, 52, 52, 3, args.class_num + 5 + 1])
     elif args_input.mode == 'multi':
         image.set_shape([args.batch_size, args.img_size[0], args.img_size[1], 3])
-        y_true[0].set_shape([args.batch_size, 19 * 1, 19 * 1, 3, 86])
-        y_true[1].set_shape([args.batch_size, 19 * 2, 19 * 2, 3, 86])
-        y_true[2].set_shape([args.batch_size, 19 * 4, 19 * 4, 3, 86])
+        y_true[0].set_shape([args.batch_size, 19 * 1, 19 * 1, 3, args.class_num + 5 + 1])
+        y_true[1].set_shape([args.batch_size, 19 * 2, 19 * 2, 3, args.class_num + 5 + 1])
+        y_true[2].set_shape([args.batch_size, 19 * 4, 19 * 4, 3, args.class_num + 5 + 1])
 
     gt_box[0].set_shape([args.batch_size, 1, 32, 4])
     gt_box[1].set_shape([args.batch_size, 1, 64, 4])
