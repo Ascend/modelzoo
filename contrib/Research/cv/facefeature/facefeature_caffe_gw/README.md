@@ -17,6 +17,7 @@
  	模型转换得到的离线模型对输入数据的要求：NHWC 1, 112, 112, 3 
 
 ​	 推理耗时：平均每次耗时 5ms
+
 ​	 模型地址：https://gitee.com/guowen001/ascend_-demo_-open_-source/tree/master/faceFeature/facefeature/model
 
 ######  
