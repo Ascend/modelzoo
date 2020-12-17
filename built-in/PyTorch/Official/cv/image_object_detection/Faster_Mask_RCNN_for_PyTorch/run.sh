@@ -6,7 +6,6 @@ su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(2)[disable]\" "
 
 nohup python3.7 tools/train_net.py \
         --config-file configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml \
-        --debug-mode 0\
         AMP 1\
         OPT_LEVEL O2 \
         LOSS_SCALE_VALUE 64 \

@@ -101,7 +101,7 @@ def _distributed_worker(
 
     try:
         dist.init_process_group(
-            backend="hccl", # init_method=dist_url，
+            backend="hccl", # init_method=dist_url,
             world_size=world_size, rank=global_rank
         )
     except Exception as e:
