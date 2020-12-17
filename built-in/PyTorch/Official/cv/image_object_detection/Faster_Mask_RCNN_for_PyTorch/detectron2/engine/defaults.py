@@ -114,8 +114,6 @@ Run on multiple machines:
         default=None,
         nargs=argparse.REMAINDER,
     )
-    parser.add_argument('--debug-mode', default=0, type=int,
-                        help='debug use')
     return parser
 
 
