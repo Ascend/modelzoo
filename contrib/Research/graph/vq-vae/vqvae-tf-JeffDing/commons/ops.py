@@ -1,5 +1,7 @@
 import tensorflow as tf
 
+from npu_bridge.estimator import npu_ops
+
 class Conv2d(object) :
     def __init__(self,name,input_dim,output_dim,k_h=4,k_w=4,d_h=2,d_w=2,
                  stddev=0.02, data_format='NCHW') :
