@@ -7,6 +7,8 @@ tf.app.flags.DEFINE_integer('text_scale', 512, '')
 
 from nets import resnet_v1
 
+from npu_bridge.estimator import npu_ops
+
 FLAGS = tf.app.flags.FLAGS
 
 
