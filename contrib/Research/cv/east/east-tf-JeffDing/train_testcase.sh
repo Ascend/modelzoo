@@ -37,6 +37,6 @@ else
    echo "Run testcase failed!"
 fi
 
-cat train.log >grep loss
+cat train.log |grep loss
 
 echo execution time was `expr $end_time - $start_time` s.
