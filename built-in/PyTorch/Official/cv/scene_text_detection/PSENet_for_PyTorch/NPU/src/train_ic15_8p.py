@@ -173,7 +173,7 @@ def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node
     score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % npu_per_node == 0):
-        output_log = '{epoch}/{n_epoch} | LR: {LR:.5F} | FPS: {fps:.3f} | batch: {batch:.5f} | loss: {lossa.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
+        output_log = '{epoch}/{n_epoch} | LR: {lr:.5f} | FPS: {fps:.3f} | batch: {batch:.5f}s | Loss: {lossa:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
             epoch=epoch + 1,
             n_epoch=args.n_epoch,
             lr=optimizer.param_groups[0]['lr'],
