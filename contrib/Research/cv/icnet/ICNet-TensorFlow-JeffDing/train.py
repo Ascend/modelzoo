@@ -67,14 +67,6 @@ def get_arguments():
     return parser.parse_args()
 
 def get_mask(gt, num_classes, ignore_label):
-    '''
-    less_equal_class = tf.less_equal(gt, num_classes-1)
-    not_equal_ignore = tf.not_equal(gt, ignore_label)
-    mask = tf.logical_and(less_equal_class, not_equal_ignore)
-    indices = tf.squeeze(tf.where(mask), 1)
-    #indices = tf.ones([32041,], dtype=tf.int32)
-
-    '''
     less_equal_class = tf.less_equal(gt, 18)
     not_equal_ignore = tf.not_equal(gt, 255)
     mask = tf.logical_and(less_equal_class, not_equal_ignore)
