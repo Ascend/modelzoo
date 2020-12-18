@@ -1,3 +1,5 @@
+ln -s ${ADEChallenge} ./data/
+
 python3.7 train.py \
 --train-beta-gamma \
 --random-scale \
