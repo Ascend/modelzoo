@@ -157,6 +157,28 @@ python train.py --update-mean-var --train-beta-gamma \
 ### Result (inference with my own data)
 ![](./data/output/my_own_image.png)
 
+## Training on NPU
+In this implement, network.py has been modified to fullfill on Ascend910. Please resume TRAINING_STEPS in utils/config.py：
+```
+INFER_SIZE = [1024, 2048, 3]
+    TRAINING_SIZE = [720, 720]
+    TRAINING_STEPS = 60001
+```
+
+How to start training on NPU, here is the expample of ADE dataset:
+```
+python3.7 train.py \
+--train-beta-gamma \
+--random-scale \
+--random-mirror  \
+--dataset ade20k \
+--filter-scale 2
+```
+or simplely run the shell script:
+```
+train_npu.sh
+```
+
 ## Citation
     @article{zhao2017icnet,
       author = {Hengshuang Zhao and
