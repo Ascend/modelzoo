@@ -316,18 +316,16 @@ def main(npu, npu_per_node, args):
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % npu_per_node == 0):
             if epoch > args.n_epoch - 6:
-                if train_te_acc > best_model['acc'] or train_te_iou > best_model['iou'] or train_loss < best_model[
-                    'loss']:
-                    best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth'
-                    save_checkpoint({
-                        'epoch': epoch + 1,
-                        'state_dict': model.state_dict(),
-                        'lr': args.lr,
-                        'optimizer': optimizer.state_dict(),
-                        'amp': amp.state_dict(),
-                    }, checkpoint='best', filename=best_path)
-                    best_model['acc'] = train_te_acc
-                    best_model['iou'] = train_te_iou
+                best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth'
+                save_checkpoint({
+                    'epoch': epoch + 1,
+                    'state_dict': model.state_dict(),
+                    'lr': args.lr,
+                    'optimizer': optimizer.state_dict(),
+                    'amp': amp.state_dict(),
+                }, checkpoint='best', filename=best_path)
+                best_model['acc'] = train_te_acc
+                best_model['iou'] = train_te_iou
 
 
 def device_id_to_process_device_map(device_list):
