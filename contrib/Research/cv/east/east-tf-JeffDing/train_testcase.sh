@@ -15,7 +15,7 @@ python npu_train.py \
 	--geometry=RBOX \
 	--learning_rate=0.0001 \
 	--num_readers=24 \
-	--max_steps=20 \
+	--max_steps=200 \
 	--save_checkpoint_steps=10 >train.log 2>&1
     #--model_dir=./model_path
 
@@ -36,5 +36,7 @@ if [ `grep -c "$key2" "train.log"` -ne '0' ] ;then   #可以根据需要调整�
 else
    echo "Run testcase failed!"
 fi
+
+cat train.log >grep loss
 
 echo execution time was `expr $end_time - $start_time` s.
