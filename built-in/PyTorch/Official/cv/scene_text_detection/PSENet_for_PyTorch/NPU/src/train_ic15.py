@@ -268,7 +268,6 @@ def main(npu, npu_per_node, args):
         pin_memory=True,
         sampler=train_sampler)
 
-    all_step = len(train_loader)
     print("[npu id:", args.npu, "]", "=> creating model '{}'".format(args.arch))
     if args.arch == "resnet50":
         model = models.resnet50(pretrained=True, num_classes=kernel_num)
@@ -312,12 +311,11 @@ def main(npu, npu_per_node, args):
         adjust_learning_rate(args, optimizer, epoch)
 
         train_loss, train_te_acc, train_ke_acc, train_te_iou, train_ke_iou = train(train_loader, model, dice_loss,
-                                                                                   optimizer, epoch, all_step,
+                                                                                   optimizer, epoch,
                                                                                    args, npu_per_node)
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % npu_per_node == 0):
-            print('\nEpoch: [%d | %d] LR: %f' % (epoch + 1, args.n_epoch, optimizer.param_groups[0]['lr']))
-            if epoch % 20 == 0 or epoch > 500:
+            if epoch > args.n_epoch - 6:
                 if train_te_acc > best_model['acc'] or train_te_iou > best_model['iou'] or train_loss < best_model[
                     'loss']:
                     best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth'
