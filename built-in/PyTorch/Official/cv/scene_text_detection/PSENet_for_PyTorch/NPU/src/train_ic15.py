@@ -123,18 +123,15 @@ def cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metr
     return score_kernel
 
 
-def train(train_loader, model, criterion, optimizer, epoch, all_step,  args, npu_per_node):
+def train(train_loader, model, criterion, optimizer, epoch,  args, npu_per_node):
     model.train()
 
-    batch_time = AverageMeter()
-    data_time = AverageMeter()
     losses = AverageMeter()
     running_metric_text = runningScore(2)
     running_metric_kernel = runningScore(2)
 
-    end = time.time()
+    epoch_time = time.time()
     for batch_idx, (imgs, gt_texts, gt_kernels, training_masks) in enumerate(train_loader):
-        data_time.update(time.time() - end)
         loc = 'npu:{}'.format(args.npu)
         imgs = imgs.to(loc, non_blocking=True)
         gt_texts = gt_texts.to(loc, non_blocking=True)
@@ -171,33 +168,23 @@ def train(train_loader, model, criterion, optimizer, epoch, all_step,  args, npu
             scaled_loss.backward()
         optimizer.step()
 
-        score_text = cal_text_score(texts, gt_texts, training_masks, running_metric_text)
-        score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
-
-        batch_time.update(time.time() - end)
-        end = time.time()
-        if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                                                    and args.rank % npu_per_node == 0):
-            cur_step = epoch * all_step + batch_idx
-            output_log = '({batch}/{size}) cur_step: {cur_step} Batch: {btv:.5f}s {bta:.5f}s | Data: {dtv:.5f}s {dta:.5f}s | Train: {ttv:.5f}s {tta:.5f}s | TOTAL: {total:.0f}min | ETA: {eta:.0f}min | Loss: {lossv:.4f} {lossa:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
-                batch=batch_idx + 1,
-                size=len(train_loader),
-                cur_step=cur_step,
-                btv=batch_time.val,
-                bta=batch_time.avg,
-                dtv=data_time.val,
-                dta=data_time.avg,
-                ttv=batch_time.val - data_time.val,
-                tta=batch_time.avg - data_time.avg,
-                total=batch_time.avg * batch_idx / 60.0,
-                eta=batch_time.avg * (len(train_loader) - batch_idx) / 60.0,
-                lossv=losses.val,
-                lossa=losses.avg,
-                acc=score_text['Mean Acc'],
-                iou_t=score_text['Mean IoU'],
-                iou_k=score_kernel['Mean IoU'])
-            print(output_log)
-            sys.stdout.flush()
+    epoch_time = time.time() - epoch_time
+    score_text = cal_text_score(texts, gt_texts, training_masks, running_metric_text)
+    score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
+    if not args.multiprocessing_distributed or (args.multiprocessing_distributed
+                                                and args.rank % npu_per_node == 0):
+        output_log = '{epoch}/{n_epoch} | LR: {LR:.5F} | FPS: {fps:.3f} | batch: {batch:.5f} | loss: {lossa.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
+            epoch = epoch + 1,
+            n_epoch = args.n_epoch,
+            lr = optimizer.param_groups[0]['lr'],
+            fps = len(train_loader) * args.batch_size / epoch_time,
+            batch = epoch_time / len(train_loader),
+            lossa=losses.avg,
+            acc=score_text['Mean Acc'],
+            iou_t=score_text['Mean IoU'],
+            iou_k=score_kernel['Mean IoU'])
+        print(output_log)
+        sys.stdout.flush()
 
     return (
         losses.avg, score_text['Mean Acc'], score_kernel['Mean Acc'], score_text['Mean IoU'], score_kernel['Mean IoU'])
