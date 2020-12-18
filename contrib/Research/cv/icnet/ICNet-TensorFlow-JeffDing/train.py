@@ -200,24 +200,9 @@ def main():
             
         feed_dict = {step_ph: step}
         if step % cfg.SAVE_PRED_EVERY == 0:
-
-            config = tf.ConfigProto()
-            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-            custom_op.name =  "NpuOptimizer"
-            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-
             loss_value, loss1, loss2, loss3, val_loss_value = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss], feed_dict=feed_dict)
-            
             train_net.save(saver, cfg.SNAPSHOT_DIR, step)
         else:
-            
-            config = tf.ConfigProto()
-            custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-            custom_op.name =  "NpuOptimizer"
-            custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-            
             loss_value, loss1, loss2, loss3, val_loss_value = train_net.sess.run([reduced_loss, loss_sub4, loss_sub24, loss_sub124, val_reduced_loss], feed_dict=feed_dict)  
 
         duration = time.time() - start_time

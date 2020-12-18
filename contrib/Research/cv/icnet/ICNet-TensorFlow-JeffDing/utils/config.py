@@ -3,26 +3,12 @@ import os
 
 class Config(object):
     # Setting dataset directory
-    CITYSCAPES_DATA_DIR = '/data/dataset/storage/cityscapes/'
-    ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
-      
-    ADE20K_eval_list = os.path.join('./data/list/ade20k_val_list.txt')
-    CITYSCAPES_eval_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_val_list.txt')
-    
-    ADE20K_train_list = os.path.join('./data/list/ade20k_train_list.txt')
+    CITYSCAPES_DATA_DIR = '/data/dataset/storage/cityscapes/'      
+    CITYSCAPES_eval_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_val_list.txt')    
     CITYSCAPES_train_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_train_list.txt')
     
     
     IMG_MEAN = np.array((103.939, 116.779, 123.68), dtype=np.float32)
-    
-    ADE20k_param = {'name': 'ade20k',
-                'num_classes': 150, # predict: [0~149] corresponding to label [1~150], ignore class 0 (background) 
-                'ignore_label': 0,
-                'eval_size': [480, 480],
-                'eval_steps': 2000,
-                'eval_list': ADE20K_eval_list,
-                'train_list': ADE20K_train_list,
-                'data_dir': ADE20K_DATA_DIR}
     
     cityscapes_param = {'name': 'cityscapes',
                     'num_classes': 19,
@@ -72,9 +58,7 @@ class Config(object):
     
     def __init__(self, dataset, is_training=False, filter_scale=1, random_scale=False, random_mirror=False):
         print('Setup configurations...')
-        
-        if dataset == 'ade20k':
-            self.param = self.ADE20k_param
+
         elif dataset == 'cityscapes':
             self.param = self.cityscapes_param
         elif dataset == 'others':

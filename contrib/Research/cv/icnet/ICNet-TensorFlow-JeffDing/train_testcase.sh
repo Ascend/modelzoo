@@ -14,7 +14,8 @@ python train.py \
     --train-beta-gamma=False \
     --random-scale=False \
     --random-mirror=False \
-    --dataset=cityscapes >train.log 2>&1
+    --dataset=cityscapes
+    --filter-scale >train.log 2>&1
     #--model_dir=./model_path
 
 end_time=`date +%s`
