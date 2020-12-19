@@ -16,6 +16,7 @@ python npu_train.py \
 	--learning_rate=0.0001 \
 	--num_readers=24 \
 	--max_steps=20 \
+    --pretrained_model_path=./pretrain/resnet_v1_50.ckpt \
 	--save_checkpoint_steps=10 >train.log 2>&1
     #--model_dir=./model_path
 
