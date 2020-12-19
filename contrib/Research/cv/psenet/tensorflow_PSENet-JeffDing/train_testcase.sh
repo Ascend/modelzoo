@@ -12,7 +12,9 @@ python train.py \
     --gpu_list=0 \
     --input_size=512 \
     --batch_size_per_gpu=1 \
-    --checkpoint_path=./resnet_v1_50/ \
+    --checkpoint_path=./checkpoint/ \
+    --pretrained_model_path=./pretrain/resnet_v1_50.ckpt \
+    --max_steps=200 \
     --training_data_path=/data/dataset/storage/icdar/ >train.log 2>&1
     #--model_dir=./model_path
 
