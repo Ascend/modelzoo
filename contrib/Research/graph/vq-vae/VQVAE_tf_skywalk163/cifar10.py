@@ -17,8 +17,8 @@ os.environ['EXPERIMENTAL_DYNAMIC_PARTITION'] = "1"
 # https://github.com/tensorflow/models/blob/master/tutorials/image/cifar10/cifar10_input.py
 DATA_DIR = 'datasets/cifar10'
 # DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
-DATA_URL = 'datasets/cifar10/cifar10-bin.tar.gz'
-
+#DATA_URL = 'datasets/cifar10/cifar10-bin.tar.gz'
+DATA_URL = $CIFAR10
 
 def maybe_download_and_extract():
     import sys
