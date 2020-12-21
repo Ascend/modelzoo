@@ -302,8 +302,8 @@ def extract_z(MODEL,
 
     # >>>>>>> MODEL
     with tf.variable_scope('net'):
-        with tf.variable_scope('params') as params:
-            pass
+        # with tf.variable_scope('params') as params:
+        #     pass
         x_ph = tf.placeholder(tf.float32, [BATCH_SIZE, 32, 32, 3])
         net = VQVAE(None, None, BETA, x_ph, K, D, _cifar10_arch, params, False)
 
@@ -317,6 +317,7 @@ def extract_z(MODEL,
     # custom_op.name =  "NpuOptimizer"
     # custom_op.parameter_map["use_off_line"].b = True #在昇腾AI处理器执行训练
     # config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  #关闭remap开关
+# 目前extract_z这段npu还报错，跑不通。 
 
     sess = tf.Session(config=config)
     # sess.graph.finalize()
@@ -341,7 +342,7 @@ def extract_z(MODEL,
 
             # print('.', end='', flush=True)
             if dctmp % 100 == 0:
-                print(f'{dctmp}.', end='', flush=True)
+                print('dctmp', '.', end='', flush=True)
 
             if dctmp == 2000:
                 break
