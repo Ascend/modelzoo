@@ -1,6 +1,5 @@
 set -x
 export POD_NAME=another0
-export icdar_2015=/data/dataset/storage/icdar/
 
 execpath=${PWD}
 
@@ -9,21 +8,21 @@ rm -rf *.pbtxt
 ulimit -c 0
 
 start_time=`date +%s`
+
 python train.py \
-    --gpu_list=0 \
-    --input_size=512 \
-    --batch_size_per_gpu=1 \
-    --checkpoint_path=./checkpoint/ \
-    --pretrained_model_path=./pretrain/resnet_v1_50.ckpt \
-    --max_steps=20 \
-    --training_data_path=$icdar_2015 >train.log 2>&1
+    --update-mean-var=False \
+    --train-beta-gamma=False \
+    --random-scale=False \
+    --random-mirror=False \
+    --dataset=cityscapes \
+    --filter-scale=1 >train.log 2>&1
     #--model_dir=./model_path
 
 end_time=`date +%s`
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
-key1="\[GEOP\]"  #功能检查字
-key2="total loss"  #性能检查字
-#key3="val_loss"  #精度检查字
+key1="[GEOP]"  #功能检查字
+key2="loss"  #性能检查字
+key3="val_loss"  #精度检查字
 
 if [ `grep -c "$key1" "train.log"` -ne '0' ] ;then   #可以根据需要调整检查逻辑
    echo "Run testcase success!"
@@ -37,6 +36,12 @@ else
    echo "Run testcase failed!"
 fi
 
-cat train.log | grep "total loss"
+if [ `grep -c "$key2" "train.log"` -ne '0' ] ;then   #可以根据需要调整检查逻辑
+   echo "Run testcase success!"
+else
+   echo "Run testcase failed!"
+fi
+
+cat train.log | grep loss
 
 echo execution time was `expr $end_time - $start_time` s.
