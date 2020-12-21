@@ -119,3 +119,4 @@ with tf.Session() as sess:
         # plt.show()
 
     plot()
+    print('SVGD')
