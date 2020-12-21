@@ -134,18 +134,18 @@ def main(argv=None):
     tower_grads = []
     reuse_variables = None
     for i, gpu_id in enumerate(gpus):
-        with tf.device('/gpu:%d' % gpu_id):
-            with tf.name_scope('model_%d' % gpu_id) as scope:
-                iis = input_images_split[i]
-                isms = input_score_maps_split[i]
-                igms = input_geo_maps_split[i]
-                itms = input_training_masks_split[i]
-                total_loss, model_loss = tower_loss(iis, isms, igms, itms, reuse_variables)
-                batch_norm_updates_op = tf.group(*tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope))
-                reuse_variables = True
+        #with tf.device('/gpu:%d' % gpu_id):
+        with tf.name_scope('model_%d' % gpu_id) as scope:
+            iis = input_images_split[i]
+            isms = input_score_maps_split[i]
+            igms = input_geo_maps_split[i]
+            itms = input_training_masks_split[i]
+            total_loss, model_loss = tower_loss(iis, isms, igms, itms, reuse_variables)
+            batch_norm_updates_op = tf.group(*tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope))
+            reuse_variables = True
 
-                grads = opt.compute_gradients(total_loss)
-                tower_grads.append(grads)
+            grads = opt.compute_gradients(total_loss)
+            tower_grads.append(grads)
 
     grads = average_gradients(tower_grads)
     apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
