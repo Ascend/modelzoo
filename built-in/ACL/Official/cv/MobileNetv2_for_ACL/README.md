@@ -9,8 +9,8 @@ This repository provides a script and recipe to Inference the MobileNetv2 model.
 ### 1. Clone the respository
 
 ```shell
-git clone xxx
-cd ModelZoo_MobileNetv2_TF_HARD/ModelZoo_MobileNetv2_ACL
+git clone https://gitee.com/ascend/modelzoo.git
+cd modelzoo/built-in/ACL/Official/cv/MobileNetv2_for_ACL
 ```
 
 ### 2. Download and preprocess the dataset
@@ -27,7 +27,7 @@ cd ModelZoo_MobileNetv2_TF_HARD/ModelZoo_MobileNetv2_ACL
   ```
   export install_path=/usr/local/Ascend
   export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
-  export PYTHONPATH=$ PYTHONPATH:${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
+  export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
   export LD_LIBRARY_PATH=${install_path}/atc/lib64:$LD_LIBRARY_PATH
   export ASCEND_OPP_PATH=${install_path}/opp
   ```
@@ -48,7 +48,7 @@ cd ModelZoo_MobileNetv2_TF_HARD/ModelZoo_MobileNetv2_ACL
 
   ```
   cd scripts
-  ./benchmark_tf.sh --batchSize=1 --modelType=mobilenetv2 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=mobilenet_v2_tf_aipp.om --dataPath=image-1024 --trueValuePath=val_lable.txt
+  bash benchmark_tf.sh --batchSize=1 --modelType=mobilenetv2 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=mobilenet_v2_tf_aipp.om --dataPath=image-1024 --trueValuePath=val_lable.txt
   ```
 
 
