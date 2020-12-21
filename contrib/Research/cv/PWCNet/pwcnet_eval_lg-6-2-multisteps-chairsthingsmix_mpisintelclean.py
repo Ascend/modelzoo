@@ -29,8 +29,9 @@ else:
 _MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
 
 os.makedirs(_MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-lxm/MPI-Sintel-complete', _MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-lxm/pretrained', './pretrained')
+mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
+mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned',
+                       './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
@@ -38,7 +39,7 @@ controller = '/device:CPU:0'
 # More options...
 mode = 'val_notrain'  # 'val_notrain'            # We're doing evaluation using the entire dataset for evaluation
 num_samples = 10  # Number of samples for error analysis
-ckpt_path = './pretrained/pwcnet.ckpt-595000'  # Model to eval
+ckpt_path = './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000'  # Model to eval
 
 # Load the dataset in evaluation mode, starting with the default evaluation options
 ds_opts = deepcopy(_DEFAULT_DS_VAL_OPTIONS)

@@ -46,6 +46,7 @@ ds_opts['batch_size'] = batch_size * len(gpu_devices)  # Use a multiple of 8; he
 ds_opts['crop_preproc'] = (320, 896)  # Crop to a smaller input size
 
 ds_opts['type'] = 'noc'
+ds_opts['val_split'] = 0.06
 ds1 = KITTIDataset(mode='train_with_val', ds_root=_KITTI15_ROOT, options=ds_opts)
 ds_opts['type'] = 'occ'
 ds2 = KITTIDataset(mode='train_with_val', ds_root=_KITTI15_ROOT, options=ds_opts)
