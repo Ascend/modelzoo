@@ -1,30 +1,3 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
-# Copyright 2020 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 """
 This code is based on DrSleep's framework: https://github.com/DrSleep/tensorflow-deeplab-resnet 
 """
@@ -64,6 +37,9 @@ def get_arguments():
     parser.add_argument("--filter-scale", type=int, default=1,
                         help="1 for using pruned model, while 2 for using non-pruned model.",
                         choices=[1, 2])
+    parser.add_argument("--datapath", required=True,
+                        help="")
+
     return parser.parse_args()
 
 def get_mask(gt, num_classes, ignore_label):
@@ -114,8 +90,8 @@ def create_losses(net, label, cfg):
     return loss_sub4, loss_sub24, loss_sub124, reduced_loss
 
 class TrainConfig(Config):
-    def __init__(self, dataset, is_training,  filter_scale=1, random_scale=None, random_mirror=None):
-        Config.__init__(self, dataset, is_training, filter_scale, random_scale, random_mirror)
+    def __init__(self, dataset, is_training,  filter_scale=1, random_scale=None, random_mirror=None, datapath=''):
+        Config.__init__(self, dataset, is_training, filter_scale, random_scale, random_mirror, datapath)
 
     # Set pre-trained weights here (You can download weight using `python script/download_weights.py`) 
     # Note that you need to use "bnnomerge" version.
@@ -143,7 +119,8 @@ def main():
                 is_training=True,
                 random_scale=args.random_scale,
                 random_mirror=args.random_mirror,
-                filter_scale=args.filter_scale)
+                filter_scale=args.filter_scale,
+                datapath=args.datapath)
     cfg.display()
 
     # Setup training network and training samples

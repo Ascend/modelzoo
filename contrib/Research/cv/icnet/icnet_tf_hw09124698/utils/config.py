@@ -30,14 +30,14 @@ import os
 
 class Config(object):
     # Setting dataset directory
-    CITYSCAPES_DATA_DIR = '/data/dataset/storage/cityscapes'
+    #CITYSCAPES_DATA_DIR = '/data/dataset/storage/cityscapes'
     ADE20K_DATA_DIR = './data/ADEChallengeData2016/'
       
     ADE20K_eval_list = os.path.join('./data/list/ade20k_val_list.txt')
-    CITYSCAPES_eval_list = '/data/dataset/storage/cityscapes/list/cityscapes_val_list.txt'
+    #CITYSCAPES_eval_list = os.path.join(CITYSCAPES_DATA_DIR,'list/cityscapes_val_list.txt')
     
     ADE20K_train_list = os.path.join('./data/list/ade20k_train_list.txt')
-    CITYSCAPES_train_list = '/data/dataset/storage/cityscapes/list/cityscapes_train_list.txt'
+    #CITYSCAPES_train_list =  os.path.join(CITYSCAPES_DATA_DIR,'list/cityscapes_train_list.txt')
     
     IMG_MEAN = np.array((103.939, 116.779, 123.68), dtype=np.float32)
     
@@ -55,9 +55,9 @@ class Config(object):
                     'ignore_label': 255,
                     'eval_size': [1025, 2049],
                     'eval_steps': 500,
-                    'eval_list': CITYSCAPES_eval_list,
-                    'train_list': CITYSCAPES_train_list,
-                    'data_dir': CITYSCAPES_DATA_DIR}
+                    'eval_list': '',
+                    'train_list': '',
+                    'data_dir': ''}
     
     model_paths = {'train': './model/cityscapes/icnet_cityscapes_train_30k.npy', 
               'trainval': './model/cityscapes/icnet_cityscapes_trainval_90k.npy',
@@ -96,13 +96,16 @@ class Config(object):
     LAMBDA2 = 0.4
     LAMBDA3 = 1.0
     
-    def __init__(self, dataset, is_training=False, filter_scale=1, random_scale=False, random_mirror=False):
+    def __init__(self, dataset, is_training=False, filter_scale=1, random_scale=False, random_mirror=False, datapath=''):
         print('Setup configurations...')
         
         if dataset == 'ade20k':
             self.param = self.ADE20k_param
         elif dataset == 'cityscapes':
             self.param = self.cityscapes_param
+            self.param['data_dir'] = datapath
+            self.param['eval_list'] = os.path.join(datapath,'list/cityscapes_val_list.txt')
+            self.param['train_list'] = os.path.join(datapath,'list/cityscapes_train_list.txt')
         elif dataset == 'others':
             self.param = self.others_param
 
