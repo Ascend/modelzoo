@@ -98,3 +98,10 @@ Here are some test examples on icdar2015, enjoy the beautiful text boxes!
   + See https://github.com/argman/EAST/issues/120
 
 Please let me know if you encounter any issues(my email boostczc@gmail dot com).
+
+### NPU support
+train run:
+'''sh train_testcase.sh'''
+
+or
+'''python npu_train.py'''
