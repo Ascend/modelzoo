@@ -8,9 +8,10 @@ import tensorflow as tf
 import better_exceptions
 from six.moves import xrange
 import os
+import sys
 os.environ['EXPERIMENTAL_DYNAMIC_PARTITION'] = "1"
 # import tensorflow.compat.v1 as tf
-
+argvs = sys.argv
 
 # The codes are borrowed from
 # https://github.com/tensorflow/models/blob/master/tutorials/image/cifar10/cifar10.py
@@ -18,7 +19,10 @@ os.environ['EXPERIMENTAL_DYNAMIC_PARTITION'] = "1"
 DATA_DIR = 'datasets/cifar10'
 # DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
 #DATA_URL = 'datasets/cifar10/cifar10-bin.tar.gz'
-DATA_URL = $CIFAR10
+if len(argvs) >=2 :
+    DATA_URL = argvs[1]
+else :
+    DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
 
 def maybe_download_and_extract():
     import sys
@@ -334,11 +338,11 @@ def extract_z(MODEL,
             x, y = sess.run([images, labels])
             # k = sess.run(net.k,feed_dict={x_ph:x})
             k = sess.run(net.k, feed_dict={
-                         x_ph: np.random.random((8, 32, 32, 3))})
+                         x_ph: np.random.random((BATCH_SIZE, 32, 32, 3))})
 
             ks.append(k)
             # ys.append(y)
-            ys.append(np.random.randint(0, 9, size=8))
+            ys.append(np.random.randint(0, 9, size=BATCH_SIZE))
 
             # print('.', end='', flush=True)
             if dctmp % 100 == 0:
@@ -484,12 +488,12 @@ def get_default_param():
         'LOG_DIR': './log/cifar10/%s' % (now),
         'MODEL': './log/cifar10/%s/last.ckpt' % (now),
 
-        'TRAIN_NUM': 5,  # Size corresponds to one epoch 250000
-        'BATCH_SIZE': 8,  # 128
+        'TRAIN_NUM': 30,  # Size corresponds to one epoch 250000
+        'BATCH_SIZE': 128,  # 128
 
         'LEARNING_RATE': 0.0002,
         'DECAY_VAL': 1.0,
-        'DECAY_STEPS': 8,  # Half of the training procedure.20000
+        'DECAY_STEPS': 10,  # Half of the training procedure.20000
         'DECAY_STAIRCASE': False,
 
         'BETA': 0.25,
