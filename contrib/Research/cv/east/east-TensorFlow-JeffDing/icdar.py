@@ -12,6 +12,8 @@ from shapely.geometry import Polygon
 
 import tensorflow as tf
 
+from npu_bridge.estimator import npu_ops
+
 from data_util import GeneratorEnqueuer
 
 tf.app.flags.DEFINE_string('training_data_path', '/data/ocr/icdar2015/',
@@ -601,9 +603,6 @@ def generator(input_size=512, batch_size=32,
                 im = cv2.imread(im_fn)
                 # print im_fn
                 h, w, _ = im.shape
-                #file_path, file_name = os.path.split(im_fn)
-                #txt_fn = file_path + '/gt_' + file_name.replace('jpg', 'txt')
-                
                 txt_fn = im_fn.replace(os.path.basename(im_fn).split('.')[1], 'txt')
                 if not os.path.exists(txt_fn):
                     print('text file {} does not exists'.format(txt_fn))
