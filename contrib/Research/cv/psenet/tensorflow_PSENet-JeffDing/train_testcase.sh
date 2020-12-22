@@ -8,7 +8,7 @@ rm -rf *.pbtxt
 ulimit -c 0
 
 start_time=`date +%s`
-python train.py \
+python3.7 train.py \
     --gpu_list=0 \
     --input_size=512 \
     --batch_size_per_gpu=1 \
