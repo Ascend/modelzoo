@@ -370,14 +370,14 @@ class BigGAN(object):
                 if g_loss == None :
                     g_loss = past_g_loss
                 if idx % 10 == 0:
-                    pre duraiton = time.time() - start_time
+                    pre_duraiton = time.time() - start_time
                     duration = time.time() - start_time - save_pre_time
-                    FPS = ((idx - pre_idx)) * 1.0 / duration) * self.batch_size
+                    FPS = (idx - pre_idx) * 1.0 / duration) * self.batch_size
                     save_pre_time = pre_duraiton
                     pre_idx = idx 
-                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss : %.8f, g_loss： %。8“ \
-                        % (epoch, idx, self.iteration, time.time() - start_time, d_loss, g_loss))
-                    log_list.append("Epoch={}, step={}, time={}, d_loss={:.8f}, g_loss={:.8f}\n".format(epoch, idx, time.time() - start_time, d_loss, g_loss))    
+                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss : %.8f, g_loss ：%.8“ \
+                        % (epoch, idx, self.iteration, time.time() - start_time, FPS, d_loss, g_loss))
+                    log_list.append("Epoch={}, step={}, time={}, FPS={}, d_loss={:.8f}, g_loss={:.8f}\n".format(epoch, idx, time.time() - start_time, FPS, d_loss, g_loss))    
 
                 # save training results for every 300 steps
                 if np.mod(idx+1, self.print_freq) == 0:
