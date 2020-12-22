@@ -8,7 +8,7 @@ rm -rf *.pbtxt
 ulimit -c 0
 
 start_time=`date +%s`
-python train.py \
+python3.7 -m train.py \
     --gpu_list=0 \
     --input_size=512 \
     --batch_size_per_gpu=1 \
@@ -21,7 +21,7 @@ python train.py \
 end_time=`date +%s`
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
 key1="\[GEOP\]"  #功能检查字
-key2="total loss"  #性能检查字
+key2="loss"  #性能检查字
 #key3="val_loss"  #精度检查字
 
 if [ `grep -c "$key1" "train.log"` -ne '0' ] ;then   #可以根据需要调整检查逻辑
