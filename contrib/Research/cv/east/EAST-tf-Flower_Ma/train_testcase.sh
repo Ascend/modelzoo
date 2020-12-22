@@ -13,7 +13,7 @@ python3.7 npu_train.py \
 --pretrained_model_path=$resnetv1_50_ckpt >train.log 2>&1
 
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
-key1="[GEOP]"  #功能检查字
+key1="\[GEOP\]"  #功能检查字
 key2="loss"  #性能检查字
 key3="model loss"  #精度检查字
 key4="total loss"  #精度检查字
