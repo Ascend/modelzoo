@@ -84,75 +84,30 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
 #### 训练
 
-- 容器场景
-
-修改`testscript`目录下`Resnext50_*_docker.sh`文件，将对应容器镜像名修改为实际名称。
-
-`Resnext50_1p_docker.sh`脚本文件:
-
-```
-# user testcase
-casecsv="case_resnext50.csv"
-casenum=1
-
-# docker or host
-exectype="docker"
-
-ostype=`uname -m`
-if [ x"${ostype}" = xaarch64 ];
-then
-    # arm
-    dockerImage="ubuntu_arm:18.04"
-else
-    # x86
-    dockerImage="ubuntu:16.04"
-fi
-```
-   
-`Resnext50_8p_docker`脚本文件:
-
-```                   
-# user testcase
-casecsv="case_resnext50.csv"
-casenum=8
-
-# docker or host
-exectype="docker"
-
-ostype=`uname -m`
-if [ x"${ostype}" = xaarch64 ];
-then
-    # arm
-    dockerImage="ubuntu_arm:18.04"
-else
-    # x86
-    dockerImage="ubuntu:16.04"
-fi
-```
-
-执行训练脚本:
-
-1P训练指令（脚本位于`testscript/Resnext50_1p_docker.sh`）
-
-```
-./Resnext50_1p_docker.sh
-```
-
-8P训练指令（脚本位于`testscript/Resnext50_8p_docker.sh`）
-
-```
-./Resnext50_8p_docker.sh
-```
-
 
 - 物理机场景
 
-修改`case_resnext50_host.csv`中，路径为脚本所在的用户实际的绝对路径地址
+
+修改 `ResNext50_for_TensorFlow / bin ` 中 `npu_set_env.sh` 和 `npu_set_env_1p.sh` 文件，根据hccl.json文件实际路径进行配置
 
 ```
-/home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/code/resnext50_train/mains/res50.py
---model_dir=/home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/d_solution/ckpt${DEVICE_ID}
+export RANK_TABLE_FILE=/network/ResNext50_for_TensorFlow/hccl.json
 ```
+
+修改 `ResNext50_for_TensorFlow / testscript` 中 `Resnext50_8p_host.sh` 和 `Resnext50_1p_host.sh` 文件:
+
+根据文件 `npu_set_env.sh` 的实际路径进行配置修改
+
+```
+source /network/ResNext50_for_TensorFlow/bin/npu_set_env.sh $RANK_ID $RANK_SIZE
+```
+
+根据文件 `res50.py` 的实际路径进行配置修改
+
+```
+python3.7 /network/ResNext50_for_TensorFlow/code/resnext50_train/mains/res50.py --config_file=res50_32bs_8p_host --max_train_steps=10000 --iterations_per_loop=1000   --debug=True  --eval=False  --model_dir=./  2>&1 | tee train_$RANK_ID.log &
+```
+
 
 修改`ModelZoo_ResNext50_TF_MTI\code\resnext50_train\configs` 中`res50_32bs_1p_host` 和 `res50_32bs_8p_host`文件:
 
