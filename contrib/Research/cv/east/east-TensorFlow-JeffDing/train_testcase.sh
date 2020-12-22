@@ -8,7 +8,7 @@ rm -rf *.pbtxt
 ulimit -c 0
 
 start_time=`date +%s`
-python3.7 -m npu_train.py \
+python npu_train.py \
     --checkpoint_path=./checkpoint/ \
 	--text_scale=512 \
 	--training_data_path=$icdar2015_train \
