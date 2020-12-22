@@ -177,7 +177,7 @@ def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node
             epoch=epoch + 1,
             n_epoch=args.n_epoch,
             lr=optimizer.param_groups[0]['lr'],
-            fps=len(train_loader) * args.batch_size / epoch_time,
+            fps=npu_per_node * len(train_loader) * args.batch_size / epoch_time,
             batch=epoch_time / len(train_loader),
             lossa=losses.avg,
             acc=score_text['Mean Acc'],
