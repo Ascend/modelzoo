@@ -147,7 +147,7 @@ fi
 
 - 物理机场景
 
-修改`case_resnext50_host.csv`中，路径为脚本所在的绝对路径地址
+修改`case_resnext50_host.csv`中，路径为脚本所在的用户实际的绝对路径地址
 
 ```
 /home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/code/resnext50_train/mains/res50.py
@@ -156,7 +156,7 @@ fi
 
 修改`ModelZoo_ResNext50_TF_MTI\code\resnext50_train\configs` 中`res50_32bs_1p_host` 和 `res50_32bs_8p_host`文件:
 
-配置数据集的绝对路径地址
+配置数据集的绝对路径地址，确保修改为用户数据集所在路径
 
 ```
 'data_url':  'file:///home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/data/resnext50/imagenet_TF',
@@ -169,6 +169,13 @@ fi
 ```
 
 执行训练脚本:
+
+需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `train` , 8p同理。
+
+```
+'mode':'train',                                         # "train","evaluate"
+```
+
 
 1P训练指令（脚本位于`testscript/Resnext50_1p_host.sh`）
 
@@ -185,7 +192,26 @@ fi
 
 #### 推理
 
-在120 epoch训练执行完成后，脚本会自动执行验证流程
+执行推理脚本:
+
+需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate` , 8p同理。
+
+```
+'mode':'evaluate',                                         # "train","evaluate"
+```
+
+1P推理指令（脚本位于`testscript/Resnext50_1p_host.sh`）
+
+```
+./Resnext50_1p_host.sh
+```
+
+8P推理指令（脚本位于`testscript/Resnext50_8p_host.sh`）
+
+```
+./Resnext50_8p_host.sh
+```
+
 
 
 ## 高级
