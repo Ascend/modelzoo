@@ -1,6 +1,5 @@
 set -x
 export POD_NAME=another0
-export icdar_2015=/data/dataset/storage/icdar/
 
 execpath=${PWD}
 
@@ -14,9 +13,9 @@ python train.py \
     --input_size=512 \
     --batch_size_per_gpu=1 \
     --checkpoint_path=./checkpoint/ \
-    --pretrained_model_path=./pretrain/resnet_v1_50.ckpt \
+    --pretrained_model_path=$resnetv1_50_ckpt \
     --max_steps=20 \
-    --training_data_path=$icdar_2015 >train.log 2>&1
+    --training_data_path=$icdar2015_train >train.log 2>&1
     #--model_dir=./model_path
 
 end_time=`date +%s`
