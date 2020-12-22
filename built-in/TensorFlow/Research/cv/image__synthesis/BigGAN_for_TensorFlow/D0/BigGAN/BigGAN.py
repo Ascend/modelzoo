@@ -372,7 +372,7 @@ class BigGAN(object):
                 if idx % 10 == 0:
                     pre_duraiton = time.time() - start_time
                     duration = time.time() - start_time - save_pre_time
-                    FPS = (idx - pre_idx) * 1.0 / duration) * self.batch_size
+                    FPS = ((idx - pre_idx) * 1.0 / duration) * self.batch_size
                     save_pre_time = pre_duraiton
                     pre_idx = idx 
                     print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss: %.8f, g_loss: %.8f" \
