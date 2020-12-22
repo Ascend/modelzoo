@@ -375,7 +375,7 @@ class BigGAN(object):
                     FPS = (idx - pre_idx) * 1.0 / duration) * self.batch_size
                     save_pre_time = pre_duraiton
                     pre_idx = idx 
-                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss : %.8f, g_loss ：%.8“ \
+                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss: %.8f, g_loss: %.8f" \
                         % (epoch, idx, self.iteration, time.time() - start_time, FPS, d_loss, g_loss))
                     log_list.append("Epoch={}, step={}, time={}, FPS={}, d_loss={:.8f}, g_loss={:.8f}\n".format(epoch, idx, time.time() - start_time, FPS, d_loss, g_loss))    
 
