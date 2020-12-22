@@ -333,6 +333,8 @@ class BigGAN(object):
         for epoch in range(start_epoch, self.epoch):
             # get batch data
             log_list = []
+            pre_idx = 0
+            save_pre_time = 0.0000
             for idx in range(start_batch_id, self.iteration):
                 batch_z = np.random.uniform(-1, 1, [self.batch_size, 1, 1, self.z_dim])
 
@@ -368,7 +370,12 @@ class BigGAN(object):
                 if g_loss == None :
                     g_loss = past_g_loss
                 if idx % 10 == 0:
-                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
+                    pre duraiton = time.time() - start_time
+                    duration = time.time() - start_time - save_pre_time
+                    FPS = ((idx - pre_idx)) * 1.0 / duration) * self.batch_size
+                    save_pre_time = pre_duraiton
+                    pre_idx = idx 
+                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss : %.8f, g_loss： %。8“ \
                         % (epoch, idx, self.iteration, time.time() - start_time, d_loss, g_loss))
                     log_list.append("Epoch={}, step={}, time={}, d_loss={:.8f}, g_loss={:.8f}\n".format(epoch, idx, time.time() - start_time, d_loss, g_loss))    
 
