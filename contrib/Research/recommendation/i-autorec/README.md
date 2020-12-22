@@ -8,7 +8,7 @@ Dataset ml-1m can be accessed from [https://dataset-ml-1m.obs.dualstack.cn-north
 Reported ml-1m RMSE from the original paper : 0.831; from this implementation : 0.809.
 
 ```
-python3 main.py
+python3 main.py \
 	--data_url PATH_TO_DATA \
 	--train_url PATH_TO_OUTPUT \
 	--hidden_neuron 1024 \
