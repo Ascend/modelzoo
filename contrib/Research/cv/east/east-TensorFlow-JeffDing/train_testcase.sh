@@ -1,8 +1,6 @@
 set -x
 export POD_NAME=another0
 
-export icdar_2015=/data/dataset/storage/icdar/
-
 execpath=${PWD}
 
 output="./output_base_v2"
@@ -13,12 +11,12 @@ start_time=`date +%s`
 python npu_train.py \
     --checkpoint_path=./checkpoint/ \
 	--text_scale=512 \
-	--training_data_path=$icdar_2015 \
+	--training_data_path=$icdar2015_train \
 	--geometry=RBOX \
 	--learning_rate=0.0001 \
 	--num_readers=24 \
 	--max_steps=20 \
-    --pretrained_model_path=./pretrain/resnet_v1_50.ckpt \
+    --pretrained_model_path=$resnetv1_50_ckpt \
 	--save_checkpoint_steps=10 >train.log 2>&1
     #--model_dir=./model_path
 
