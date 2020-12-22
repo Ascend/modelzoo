@@ -77,7 +77,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
     ├─inceptionv4.py                  # network definition
     └─callback.py                     # eval callback function
   ├─eval.py                           # eval net
-  ├─export.py                         # export checkpoint
+  ├─export.py                         # export checkpoint, surpport .onnx, .air, .mindir convert
   └─train.py                          # train net
   
 ```
@@ -85,7 +85,6 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 ```python
 Major parameters in train.py and config.py are:   
-'ckpt_path'                  # save checkpoint path
 'is_save_on_master'          # save checkpoint only on master device
 'batch_size'                 # input batchsize
 'epoch_size'                 # total epoch numbers
@@ -105,8 +104,6 @@ Major parameters in train.py and config.py are:
 'lr_max'                     # max bound of learning rate
 'warmup_epochs'              # warmup epoch numbers
 'start_epoch'                # number of start epoch range[1, epoch_size]
-'onnx_filename'              # convert onnx file name
-'air_filename'               # convert air file name
 ```
 
 ## [Training process](#contents)
@@ -124,7 +121,7 @@ sh scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_PATH DATA_DIR
 sh scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
 ```
 > Notes: 
-    RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorial/training/en/master/advanced_use/distributed_training_ascend.html)  , and the device_ip can be got as [Link]https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.
+>   RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorial/training/en/master/advanced_use/distributed_training_ascend.html)  , and the device_ip can be got as [Link]https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools. For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size. 
 
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -145,12 +142,12 @@ sh scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
 Training result will be stored in the example path. Checkpoints will be stored at `ckpt_path` by default, and training log  will be redirected to `./log.txt` like followings. 
 
 ``` 
-epoch: 1 step: 1251, loss is 5.7588363
-Epoch time: 739922.160, per step time: 591.465
-epoch: 2 step: 1251, loss is 4.357811
-Epoch time: 521909.146, per step time: 417.194
-epoch: 3 step: 1251, loss is 3.9130688
-Epoch time: 521846.299, per step time: 417.143
+epoch: 1 step: 1251, loss is 5.6833196
+Epoch time: 520274.060, per step time: 415.887
+epoch: 2 step: 1251, loss is 4.093194
+Epoch time: 288520.628, per step time: 230.632
+epoch: 3 step: 1251, loss is 3.6242008
+Epoch time: 288507.506, per step time: 230.622
 ```
 ## [Eval process](#contents)
 
@@ -199,9 +196,9 @@ metric: {'Loss': 0.9849, 'Top1-Acc':0.7985, 'Top5-Acc':0.9460}
 | Optimizer                  | RMSProp                                                      |
 | Loss Function              | SoftmaxCrossEntropyWithLogits                                |
 | Outputs                    | probability                                                  |
-| Loss                       | 1.78                                                         |
+| Loss                       | 0.98486                                                      |
 | Accuracy (8p)              | ACC1[79.85%] ACC5[94.60%]                                    |
-| Total time (8p)            | 51h                                                          |
+| Total time (8p)            | 20h                                                          |
 | Params (M)                 | 153M                                                         |
 | Checkpoint for Fine tuning | 2135M                                                        |
 | Scripts                    | [inceptionv4 script](https://gitlab.huawei.com/mindspore/modelinternal/tree/master/ascend_modelzoo/ModelZoo_InceptionV4_MS_MTI) |
@@ -226,11 +223,11 @@ metric: {'Loss': 0.9849, 'Top1-Acc':0.7985, 'Top5-Acc':0.9460}
 
 | **Ascend** | train performance |
 | :--------: | :---------------: |
-|     1p     |     345 img/s     |
+|     1p     |     556 img/s     |
 
 | **Ascend** | train performance |
 | :--------: | :---------------: |
-|     8p     |    2455 img/s     |
+|     8p     |     4430img/s     |
 
 # [Description of Random Situation](#contents)
 

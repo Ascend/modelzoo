@@ -24,5 +24,6 @@ cd ./train_standalone || exit
 echo  "start training for device id $DEVICE_ID"
 env > env.log
 python -u ../train.py \
+    --device_id=$1 \
     --dataset_path=$DATA_DIR > log.txt 2>&1 &
 cd ../
