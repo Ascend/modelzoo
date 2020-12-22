@@ -1,0 +1,163 @@
+{
+    "graphId": "1",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "20"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "10",
+            "match_times": "10"
+        }
+    }
+}{
+    "graphId": "41",
+    "graph_fusion": {
+        "AABiasaddConvFusion": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "AReduceMeanFusionPass": {
+            "effect_times": "184",
+            "match_times": "187"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "37",
+            "match_times": "40"
+        },
+        "AddNFusionPass": {
+            "effect_times": "0",
+            "match_times": "86"
+        },
+        "ApplyAddOutputPass": {
+            "effect_times": "186",
+            "match_times": "186"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "328",
+            "match_times": "328"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "ConstToAttrStridedSliceFusion": {
+            "effect_times": "2",
+            "match_times": "2"
+        },
+        "ConvBatchnormFusionPass": {
+            "effect_times": "60",
+            "match_times": "60"
+        },
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "6"
+        },
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "63"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "63"
+        },
+        "DreluFusionPass": {
+            "effect_times": "56",
+            "match_times": "56"
+        },
+        "ExtremumGradFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "FusedBatchNormBertFusionPass": {
+            "effect_times": "0",
+            "match_times": "60"
+        },
+        "FusedBatchNormGradFusionPass": {
+            "effect_times": "60",
+            "match_times": "60"
+        },
+        "FusedBatchnormFusionPass": {
+            "effect_times": "60",
+            "match_times": "60"
+        },
+        "GroupConv2DFusionPass": {
+            "effect_times": "0",
+            "match_times": "63"
+        },
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "6"
+        },
+        "MulAddNL2LossFusionPass": {
+            "effect_times": "0",
+            "match_times": "67"
+        },
+        "MulAddNPass": {
+            "effect_times": "0",
+            "match_times": "67"
+        },
+        "MulGradFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "PadFusionPass": {
+            "effect_times": "4",
+            "match_times": "4"
+        },
+        "PaddConv2dFusionPass": {
+            "effect_times": "4",
+            "match_times": "4"
+        },
+        "Pow2SquareFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "6"
+        },
+        "TileConstToAttrFusion": {
+            "effect_times": "2",
+            "match_times": "2"
+        },
+        "ZConcatExt2FusionPass": {
+            "effect_times": "6",
+            "match_times": "6"
+        },
+        "ZConcatv2dFusionPass": {
+            "effect_times": "0",
+            "match_times": "6"
+        },
+        "ZSplitFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "93",
+            "match_times": "93"
+        },
+        "TbeBnupdateEltwiseEltwiseFusionPass": {
+            "effect_times": "16",
+            "match_times": "16"
+        },
+        "TbeBnupdateEltwiseFusionPass": {
+            "effect_times": "40",
+            "match_times": "40"
+        },
+        "TbeEltwiseFusionPass": {
+            "effect_times": "2",
+            "match_times": "2"
+        },
+        "TbeMultiOutputFusionPass": {
+            "effect_times": "8",
+            "match_times": "8"
+        }
+    }
+}
