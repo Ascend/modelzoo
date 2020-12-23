@@ -12,11 +12,7 @@
 
 使用 [FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs) 数据集和 [FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html) 两个数据集进行预训练的模型，之后在Ascend 910平台上在 [MPI Sintel](http://sintel.is.tue.mpg.de/downloads) 数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
 
-<<<<<<< HEAD
-使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行预训练的模型，之后在Ascend 910平台上在[MPI Sintel](http://sintel.is.tue.mpg.de/downloads)数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
-<img src='C:\\Users\\abc\\Pictures\\1.png'>
-=======
->>>>>>> 262ab69a61aaf84459a153156ad9cd133bc0f867
+---
 <table>
     <tr>
         <td></td>
@@ -74,6 +70,8 @@
         <td>multi-steps</td>
     </tr>
 </table>
+
+---
 
 ## Requirements
 - Tensorflow 1.15.0
