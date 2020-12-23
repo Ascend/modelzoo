@@ -63,6 +63,8 @@ parser.add_argument('--batch_size', type=int, default=4,
                     help='the batch size')
 parser.add_argument('--dataset', type=str, default='/cache/',
                     help='the path of dataset')
+parser.add_argument('--data_url', type=str)
+parser.add_argument('--train_url', type=str)
 
 args = parser.parse_args()
 

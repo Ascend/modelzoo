@@ -53,8 +53,10 @@ import argparse
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000',
                     help='the path of checkpoint')
-parser.add_argument('--obs', type=bool, default=False,
-                    help='whether copy ckpt from obs')                    
+parser.add_argument('--obs', type=bool, default=True,
+                    help='whether copy ckpt from obs')
+parser.add_argument('--data_url', type=str)
+parser.add_argument('--train_url', type=str)
 
 args = parser.parse_args()
 
@@ -65,7 +67,7 @@ os.makedirs(_MPISINTEL_ROOT)
 mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
 if args.obs:
     mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned',
-                       './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned')
+                           './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
@@ -108,6 +110,5 @@ nn.print_config()
 
 # ## Evaluate the model
 avg_metric, avg_duration, df = nn.eval(metric_name='EPE', save_preds=True)
-
 
 print(f'Average EPE={avg_metric:.2f}, mean inference time={avg_duration * 1000.:.2f}ms')
