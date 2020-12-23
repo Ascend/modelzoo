@@ -66,7 +66,18 @@ obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/checkpoint
 ```
+
+在GPU上复现的模型在
+```
+obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
+obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.meta
+obs://pwcnet-final/log/gpu-finetuned/checkpoint
+obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.index
+```
+
 OBS已设置为公共读，不需要手动从OBS中下载数据集和checkpoint文件，代码中会从OBS中拷贝到本地。
+
+
 
 ## 训练
 ```
