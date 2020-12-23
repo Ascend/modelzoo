@@ -17,8 +17,9 @@
         <td></td>
         <td >training clean set</td>
         <td >test set</td>
-        <td colspan="5"><center>training details</center></td>
-    </tr>    <tr>
+        <center><td colspan="5"><center>training details</center></td></center>
+    </tr>   
+    <tr>
         <td></td>
         <td>Avg. EPE &#8595;</td>
         <td>Avg. EPE &#8595;</td>
