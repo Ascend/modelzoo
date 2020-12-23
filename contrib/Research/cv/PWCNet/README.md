@@ -2,7 +2,7 @@
 ## 结果
 迁移[PWCNet](https://github.com/philferriere/tfoptflow) 到ascend910平台  
 
-使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行[预训练的模型](http://bit.ly/tfoptflow)，之后在Ascend 910平台上在[MPI Sintel](http://sintel.is.tue.mpg.de/downloads)数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
+使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行预训练的模型，之后在Ascend 910平台上在[MPI Sintel](http://sintel.is.tue.mpg.de/downloads)数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
 <table>
     <tr>
         <td></td>
@@ -93,11 +93,21 @@ PWCNet
 ---
 
 ## 数据准备
-[数据预训练模型]()
-在MPI Sintel上训练好的[模型]()  
-其中squad_v2目录夹为数据  
-albert_base/large_v2为预训练模型  
-output_base/large_v2为微调后的模型  
+数据预训练模型在
+```
+obs://pwcnet-final/pretrained/pwcnet.ckpt-595000.index
+obs://pwcnet-final/pretrained/pwcnet.ckpt-595000.meta
+obs://pwcnet-final/pretrained/pwcnet.ckpt-595000.data-00000-of-00001
+obs://pwcnet-final/pretrained/checkpoint
+```  
+
+在MPI Sintel clean training set上训练好的模型在   
+```
+obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.index
+obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.meta
+obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
+obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/checkpoint
+```
 
 ## 参数解释
    详情可见[Albert](https://github.com/google-research/albert)  
