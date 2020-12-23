@@ -2,7 +2,7 @@
 https://github.com/argman/EAST, 下载对应的ckpt，转成pb模型
 
 ## 2、转om模型
-obs链接：obs://nkxiaolei88/ATC Model/EAST/east_text_detection.om
+obs链接：obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/EAST/east_text_detection.om
 
 ATC转换命令：
 ```
@@ -11,28 +11,15 @@ ATC转换命令：
 
 ## 3、将下载的om文件放在model文件夹
 
-## 4、编译msame推理工具
-参考https://gitee.com/ascend/modelzoo/tree/develop/contrib/msame, 编译出msame推理工具
+## 4、安装dnmetis推理工具
+参考https://gitee.com/ascend/tools/tree/master/dnmetis, 安装离线推理python工具
 
-## 5、性能测试
-使用msame推理工具，参考如下命令，发起推理性能测试： 
-
-./msame --model model/east_text_detection.om --output output/ --loop 100
-```
-[INFO] output data success
-Inference average time: 11.633170 ms
-Inference average time without first time: 11.629354 ms
-[INFO] unload model success, model Id is 1
-[INFO] Execute sample success.
-```
-1Batch，shape:1x448x448x3，不带AIPP，平均推理性能11.63ms
-
-## 6、精度测试：
+## 5、精度测试：
 暂未使用cidar2015数据集进行NPU精度测试
 
-## 7、图片推理：
+## 6、图片推理：
 ### 1）安装依赖
-按照requirements.txt安装python3第三方库依赖，因为画图的lanms组件基于python3.6编译，请务必使用python3.6
+按照requirements.txt安装python3第三方库依赖
 
 ### 2）下载图片
 下载包含英文字符的图片（支持后缀.jpg、.JPEG、.png），存放在image_input目录中\
@@ -52,7 +39,7 @@ Inference average time without first time: 11.629354 ms
 
 ### 3）执行推理
 ```
-bash start_inference.sh
+bash run_inference.sh
 ```
 输出的图片和检测框信息存放在image_output目录
 ```
