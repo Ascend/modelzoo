@@ -50,10 +50,23 @@ import moxing as mox
 import os
 import shutil
 
-if sys.platform.startswith("win"):
-    _DATASET_ROOT = 'E:/datasets/'
-else:
-    _DATASET_ROOT = '/cache/'
+import argparse
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--iterations', type=int, default=200000,
+                    help='the training iterations')
+parser.add_argument('--display', type=int, default=1000,
+                    help='the interval steps to display loss')
+parser.add_argument('--save_path', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/',
+                    help='the path to save checkpoint')
+parser.add_argument('--batch_size', type=int, default=4,
+                    help='the batch size')
+parser.add_argument('--dataset', type=str, default='/cache/',
+                    help='the path of dataset')
+
+args = parser.parse_args()
+
+_DATASET_ROOT = args.dataset
 _MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
 
 os.makedirs(_MPISINTEL_ROOT)
@@ -63,7 +76,7 @@ mox.file.copy_parallel('obs://pwcnet-final/pretrained', './pretrained')
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
 
-batch_size = 4
+batch_size = args.batch_size
 
 ds_opts = deepcopy(_DEFAULT_DS_TUNE_OPTIONS)
 
@@ -81,8 +94,8 @@ ds.print_config()
 # Start from the default options
 nn_opts = deepcopy(_DEFAULT_PWCNET_FINETUNE_OPTIONS)
 nn_opts['verbose'] = True
-nn_opts['ckpt_path'] = './pretrained/pwcnet.ckpt-595000'
-nn_opts['ckpt_dir'] = './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/'
+nn_opts['ckpt_path'] = os.path.join('./pretrained', 'pwcnet.ckpt-595000')
+nn_opts['ckpt_dir'] = args.save_path
 nn_opts['batch_size'] = ds_opts['batch_size']
 nn_opts['x_shape'] = [2, ds_opts['crop_preproc'][0], ds_opts['crop_preproc'][1], 3]
 nn_opts['y_shape'] = [ds_opts['crop_preproc'][0], ds_opts['crop_preproc'][1], 2]
@@ -106,8 +119,8 @@ nn_opts['lr_policy'] = 'multisteps'
 nn_opts['lr_boundaries'] = [80000, 120000, 160000, 200000]
 nn_opts['lr_values'] = [1e-4, 5e-05, 2.5e-05, 1.25e-05, 6.25e-06]
 # nn_opts['lr_values'] = [1e-05, 5e-06, 2.5e-06, 1.25e-06, 6.25e-07]
-nn_opts['max_steps'] = 200000
-nn_opts['display_step'] = 100
+nn_opts['max_steps'] = args.iterations
+nn_opts['display_step'] = args.display
 nn_opts['val_step'] = 1000
 
 # Below,we adjust the schedule to the size of the batch and our number of GPUs (2).

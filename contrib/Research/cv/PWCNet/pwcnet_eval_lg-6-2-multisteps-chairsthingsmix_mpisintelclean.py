@@ -48,10 +48,15 @@ import moxing as mox
 import os
 import shutil
 
-if sys.platform.startswith("win"):
-    _DATASET_ROOT = 'E:/datasets/'
-else:
-    _DATASET_ROOT = '/cache/'
+import argparse
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000',
+                    help='the path of checkpoint')
+
+args = parser.parse_args()
+
+_DATASET_ROOT = '/cache/'
 _MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
 
 os.makedirs(_MPISINTEL_ROOT)
@@ -64,8 +69,7 @@ controller = '/device:CPU:0'
 
 # More options...
 mode = 'val_notrain'  # 'val_notrain'            # We're doing evaluation using the entire dataset for evaluation
-num_samples = 10  # Number of samples for error analysis
-ckpt_path = './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000'  # Model to eval
+ckpt_path = args.ckpt  # Model to eval
 
 # Load the dataset in evaluation mode, starting with the default evaluation options
 ds_opts = deepcopy(_DEFAULT_DS_VAL_OPTIONS)

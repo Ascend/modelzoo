@@ -46,51 +46,7 @@
 - tqdm
 - scikit-learn
 - scipy
-- 
 
-## 项目路径结构
-
-```shell
-PWCNet
-└─ 
-  ├─README.md
-  ├─output_base_v2 基于squadv2微调过的albert base模型路径
-  	├─checkpoint
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-  	└─...
-  ├─output_large_v2 基于squadv2微调过的albert base模型路径
-  	├─checkpoint
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-  	└─...
-  ├─albert_base_v2 albert base的预训练模型
-  	├─30k-clean.model
-  	├─30k-clean.vocab
-  	├─albert_config.json
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-
-  ├─albert_large_v2 albert large的预训练模型
-  	├─30k-clean.model
-  	├─30k-clean.vocab
-  	├─albert_config.json
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-  ├─squad_v2 存放数据目录
-  	├─train-v2.0.json 数据源文件
-  	├─dev-v2.0.json 数据源文件
-  	├─train.tfrecord 根据train-v2.0.json生成的文件
-  	├─dev.tfrecord 根据dev-v2.0.json生成的文件
-  	├─pred_left_file.pkl 根据dev-v2.0.json生成的文件
-
-  ├─squad2_base.sh albert base的启动脚本
-  ├─squad2_large.sh albert large的启动脚本
-```
 
 ---
 
@@ -110,15 +66,16 @@ obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/checkpoint
 ```
-
-## 参数解释
-   详情可见[Albert](https://github.com/google-research/albert)  
  
-## 训练
-```
-python train.py
+# ```
+python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
+       --iterations 200000 (the training iterations)
+       --display 1000 (the interval steps to display loss)
+       --save_path ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/ (the path to save checkpoint)
+       --batch_size 4 (the batch size)
+       --dataset /cache/ (the path of dataset, the dataset will be download to this folder from obs automatically)
 ```
 ## 测试 
 ```
-python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelfinal.py
+python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
 ```
