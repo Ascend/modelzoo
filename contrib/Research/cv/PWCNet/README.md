@@ -11,7 +11,7 @@
         <td></td>
         <td >training clean set</td>
         <td >test set</td>
-        <td colspan="3"> training details </td>
+        <td colspan="5"> training details </td>
     <tr>
     <tr>
         <td></td>
