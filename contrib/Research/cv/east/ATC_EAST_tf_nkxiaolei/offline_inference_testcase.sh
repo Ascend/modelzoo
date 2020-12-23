@@ -2,9 +2,7 @@
 obs_url="obs://modelzoo-train-atc/003_Atc_Models/nkxiaolei/EAST/east_text_detection.om"
 model_path="./model/east_text_detection.om"
 
-if [ ! -f "$model_path" ]; then
 obsutil cp $obs_url ./model -f -r
-fi
 
 python3.7 main.py --model=$model_path 2>&1 |tee inference.log
 
