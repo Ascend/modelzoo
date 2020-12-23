@@ -2,15 +2,34 @@
 ## 结果
 迁移[PWCNet](https://github.com/philferriere/tfoptflow) 到ascend910平台  
 
-使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行[预训练的模型](http://bit.ly/tfoptflow)，之后在Ascend 910平台上在MPI Sintel数据集上训练，分别在MPI Sintel training set和MPI Sintel test set上测试结果如下：
-|  | AEPE  | other metrics |
-| :-----| ----: | :----: |
-| MPI training set (in paper) |   |   |
-| MPI training set (on RTX 2080Ti GPU) | | |
-| MPI training set (on Ascend 910) | | |
-| MPI test set (in paper) | | |
-| MPI test set (on RTX 2080Ti GPU) | | |
-| MPI test set (on Ascend 910) | | |
+使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行[预训练的模型](http://bit.ly/tfoptflow)，之后在Ascend 910平台上在MPI Sintel数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
+<table>
+    <tr>
+        <td></td>
+        <td colspan="2",align="center">training clean set</td>
+        <td colspan="2",align="center">test set</td>
+    <tr>
+    <tr>
+        <td></td>
+        <td>Avg. EPE&#8595;</td>
+        <td>F1&#8595;</td>
+        <td>Avg. EPE&#8595;</td>
+        <td>F1&#8595;</td>
+    <tr>
+    <tr>
+        <td>pretrained model</td>
+    <tr>
+    <tr>
+        <td>in paper</td>
+    <tr>
+    <tr>
+        <td>on RTX 2080Ti GPU</td>
+    <tr>
+    <tr>
+        <td>on Ascend 910</td>
+    <tr>
+
+</table>
 
 ## Requirements
 - Tensorflow 1.15.0
@@ -22,7 +41,7 @@
 - tqdm
 - scikit-learn
 - scipy
-- ···
+- 
 
 ## 项目路径结构
 
@@ -81,23 +100,7 @@ output_base/large_v2为微调后的模型
 
 ## 参数解释
    详情可见[Albert](https://github.com/google-research/albert)  
-  --output_dir 输出的模型路径  
-  --input_dir 训练集目录  
-  --model_dir 预训练模型目录  
-  --do_lower_case 小写  
-  --max_seq_length 最大句子长度  
-  --doc_stride 跨步长度  
-  --max_query_length 最大问题长度  
-  --do_train 训练  
-  --do_predict 预测  
-  --train_batch_size 训练batch size  
-  --predict_batch_size 预测batch size   
-  --learning_rate 学习率  
-  --num_train_epochs 迭代数  
-  --warmup_proportion 训练预热比例  
-  --save_checkpoints_steps 多少批次保存  
-  --n_best_size 预测的个数  
-  --max_answer_length 最大答案长度  
+ 
 ## 训练
 ```
 python train.py
