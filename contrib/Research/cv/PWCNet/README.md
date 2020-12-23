@@ -22,7 +22,7 @@
 - tqdm
 - scikit-learn
 - scipy
-- ...
+- ···
 
 ## 项目路径结构
 
@@ -99,25 +99,10 @@ output_base/large_v2为微调后的模型
   --n_best_size 预测的个数  
   --max_answer_length 最大答案长度  
 ## 训练
-
-albert_base
 ```
-./squad2_base.sh
+python train.py
 ```
-albert_large
+## 测试 
 ```
-./squad2_large.sh
+python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelfinal.py
 ```
-如果只训练则注释掉--do_predict
-训练base用的batch_size为32，训练large的batch_size为16
-## 预测和精度对比
-
-albert_base
-```
-./squad2_base.sh
-```
-albert_large
-```
-./squad2_large.sh
-```
-如果只预测和精度对比注释掉--do_train

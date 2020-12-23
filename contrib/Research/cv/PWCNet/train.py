@@ -3,59 +3,29 @@ import cv2
 import tensorflow as tf
 import numpy as np
 import tensorflow as tf
-import npu_bridge # 导入TFAdapter插件库
+import npu_bridge
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
-# config = tf.ConfigProto()
-# custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
-# custom_op.name = "NpuOptimizer"
-# custom_op.parameter_map["use_off_line"].b = True # 必须显式开启，在昇腾AI处理器执行训练
-# config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显式关闭remap
-#
-#
-# # 首先，创建一个TensorFlow常量，并赋值2
-# const = tf.constant(2.0, name='const')
-# # 两种方式创建变量b和c
-# # 使变量b可以接收任意值。TensorFlow中接收值的方式为占位符(placeholder)，通过tf.placeholder()创建。
-# b = tf.placeholder(tf.float32, [None, 1], name='b')
-# #使用tf.Variable()定义变量，值可变。
-# c = tf.Variable(1.0, dtype=tf.float32, name='c')
-#
-# # 创建operation
-# d = tf.add(b, c, name='d')
-# e = tf.add(c, const, name='e')
-# a = tf.multiply(d, e, name='a')
-#
-# # Tensorflow 的变量必须先初始化，然后才有值
-# # 添加用于初始化变量的节点
-# init_op = tf.global_variables_initializer()
-# # 运行graph需要先调用tf.Session()函数创建一个会话(session)。session就是我们与graph交互的handle。
-# # session
-#
-#
-# with tf.Session(config=config) as sess:
-#     # 2. 运行init operation
-#     print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> start')
-#     sess.run(init_op)
-#     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end')
-#     # tensorflow里对于暂时不进行赋值的元素有一个称呼叫占位符
-#     # feed_dict就是用来赋值的，格式为字典型
-#     a_out = sess.run(a, feed_dict={b: np.arange(0, 10)[:, np.newaxis]})
-#     print("Variable a is {}".format(a_out))
-#
-# print("----------")
-# #np.arange(0, 10)生成一维数组[0 1 2 3 4 5 6 7 8 9]
-# print(np.arange(0, 10))
-# #np.newaxis在这一位置增加一个一维，这一位置指的是np.newaxis所在的位置
-# print(np.arange(0, 10)[:, np.newaxis])
 
 import moxing as mox
 import os
 import shutil
+import argparse
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-print(os.listdir())
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('integers', metavar='N', type=int, nargs='+',
+                    help='an integer for the accumulator')
+parser.add_argument('--iterations', type=int, default=200000, 
+                    help='the training iterations')
+parser.add_argument('--display', type=int, default=1,
+                    help='the interval steps to display loss')
+        
+
+args = parser.parse_args()
+
+
 
 # shutil.rmtree('../../FlyingChairs_subset')
 os.makedirs('./FlyingChairs/')
@@ -150,7 +120,7 @@ nn_opts['lr_policy'] = 'cyclic'
 nn_opts['cyclic_lr_max'] = 5e-04 # Anything higher will generate NaNs
 nn_opts['cyclic_lr_base'] = 1e-05
 nn_opts['cyclic_lr_stepsize'] = 20000
-nn_opts['max_steps'] = 200000
+nn_opts['max_steps'] = args.iterations
 nn_opts['display_step'] = 1
 # Below,we adjust the schedule to the size of the batch and our number of GPUs (2).
 nn_opts['cyclic_lr_stepsize'] /= len(gpu_devices)
