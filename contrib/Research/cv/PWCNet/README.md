@@ -12,7 +12,6 @@
 
 使用 [FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs) 数据集和 [FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html) 两个数据集进行预训练的模型，之后在Ascend 910平台上在 [MPI Sintel](http://sintel.is.tue.mpg.de/downloads) 数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
 
----
 <table>
     <tr>
         <td></td>
@@ -71,7 +70,6 @@
     </tr>
 </table>
 
----
 
 ## Requirements
 - Tensorflow 1.15.0
@@ -84,9 +82,7 @@
 - scikit-learn
 - scipy
 
-
 ---
-
 ## 数据准备
 预训练模型在
 ```
