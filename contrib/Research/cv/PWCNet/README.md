@@ -52,7 +52,7 @@
         <td>4</td>
         <td>200000</td>
         <td>multi-steps</td>
-    <tr>
+    </tr>
     <tr>
         <td>Reproduce on Ascend 910</td>
         <td>1.76</td>
@@ -62,7 +62,7 @@
         <td>4</td>
         <td>200000</td>
         <td>multi-steps</td>
-    <tr>
+    </tr>
 </table>
 
 ## Requirements
