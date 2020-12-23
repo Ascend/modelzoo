@@ -43,8 +43,6 @@ import argparse
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('integers', metavar='N', type=int, nargs='+',
-                    help='an integer for the accumulator')
 parser.add_argument('--iterations', type=int, default=200000, 
                     help='the training iterations')
 parser.add_argument('--display', type=int, default=1,
@@ -149,7 +147,7 @@ nn_opts['cyclic_lr_max'] = 5e-04 # Anything higher will generate NaNs
 nn_opts['cyclic_lr_base'] = 1e-05
 nn_opts['cyclic_lr_stepsize'] = 20000
 nn_opts['max_steps'] = args.iterations
-nn_opts['display_step'] = 1
+nn_opts['display_step'] = args.display
 # Below,we adjust the schedule to the size of the batch and our number of GPUs (2).
 nn_opts['cyclic_lr_stepsize'] /= len(gpu_devices)
 nn_opts['max_steps'] /= len(gpu_devices)

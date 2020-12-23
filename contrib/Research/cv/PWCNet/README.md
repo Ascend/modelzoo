@@ -16,7 +16,7 @@
     <tr>
     <tr>
         <td>pretrained model</td>
-        <td></td>
+        <td>2.60</td>
         <td></td>
     <tr>
     <tr>
@@ -25,7 +25,9 @@
         <td></td>
     <tr>
     <tr>
-        <td>on RTX 2080Ti GPU</td>
+        <td>on TitanXP GPU</td>
+        <td></td>
+        <td></td>
     <tr>
     <tr>
         <td>on Ascend 910</td>
