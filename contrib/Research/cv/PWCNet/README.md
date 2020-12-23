@@ -26,7 +26,7 @@
     <tr>
     <tr>
         <td>on TitanXP GPU</td>
-        <td></td>
+        <td>1.76</td>
         <td></td>
     <tr>
     <tr>
@@ -66,8 +66,10 @@ obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/checkpoint
 ```
- 
-# ```
+OBS已设置为公共读，不需要手动从OBS中下载数据集和checkpoint文件，代码中会从OBS中拷贝到本地。
+
+## 训练
+```
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
        --iterations 200000 (the training iterations)
        --display 1000 (the interval steps to display loss)
@@ -78,4 +80,6 @@ python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
 ## 测试 
 ```
 python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
+       --ckpt (the path of checkpoint)
+       --obs False (optional, if it is True, download checkpoint from obs; if you need test the checkpoint from local dir, you should set it be False)
 ```
