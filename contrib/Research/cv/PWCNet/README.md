@@ -12,7 +12,7 @@
         <td >training clean set</td>
         <td >test set</td>
         <td colspan="5"> training details </td>
-    <tr>
+    </tr>
     <tr>
         <td></td>
         <td>Avg. EPE &#8595;</td>
@@ -22,7 +22,7 @@
         <td>batch size </td>
         <td>iterations </td>
         <td>lr schedule</td>
-    <tr>
+    </tr>
     <tr>
         <td>pretrained model</td>
         <td>2.60</td>
@@ -32,7 +32,7 @@
         <td>16</td>
         <td>1200000</td>
         <td>multi-steps</td>
-    <tr>
+    </tr>
     <tr>
         <td>Report in paper</td>
         <td>1.70</td>
@@ -42,7 +42,7 @@
         <td>4</td>
         <td>Unknown</td>
         <td>multi-steps</td>
-    <tr>
+    </tr>
     <tr>
         <td>Reproduce on GPU</td>
         <td>1.76</td>
