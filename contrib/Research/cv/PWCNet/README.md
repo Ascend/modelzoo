@@ -2,31 +2,34 @@
 ## 结果
 迁移[PWCNet](https://github.com/philferriere/tfoptflow) 到ascend910平台  
 
-使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行[预训练的模型](http://bit.ly/tfoptflow)，之后在Ascend 910平台上在MPI Sintel数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
+使用[FlyingChairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html#flyingchairs)数据集和[FlyThings3d](https://lmb.informatik.uni-freiburg.de/resources/datasets/SceneFlowDatasets.en.html)两个数据集进行[预训练的模型](http://bit.ly/tfoptflow)，之后在Ascend 910平台上在[MPI Sintel](http://sintel.is.tue.mpg.de/downloads)数据集上训练，分别在MPI Sintel training clean set和MPI Sintel test set上测试结果如下：
 <table>
     <tr>
         <td></td>
-        <td colspan="2",align="center">training clean set</td>
-        <td colspan="2",align="center">test set</td>
+        <td >training clean set</td>
+        <td >test set</td>
     <tr>
     <tr>
         <td></td>
         <td>Avg. EPE&#8595;</td>
-        <td>F1&#8595;</td>
         <td>Avg. EPE&#8595;</td>
-        <td>F1&#8595;</td>
     <tr>
     <tr>
         <td>pretrained model</td>
+        <td></td>
+        <td></td>
     <tr>
     <tr>
         <td>in paper</td>
+        <td>1.70</td>
+        <td></td>
     <tr>
     <tr>
         <td>on RTX 2080Ti GPU</td>
     <tr>
     <tr>
         <td>on Ascend 910</td>
+        <td>1.76</td>
     <tr>
 
 </table>
@@ -89,14 +92,12 @@ PWCNet
 
 ---
 
-## 准备数据和模型
-数据预训练模型以及微调后的模型均可以从 
-[百度网盘](https://blank) 提取码: blank  
+## 数据准备
+[数据预训练模型]()
+在MPI Sintel上训练好的[模型]()  
 其中squad_v2目录夹为数据  
 albert_base/large_v2为预训练模型  
 output_base/large_v2为微调后的模型  
-
-
 
 ## 参数解释
    详情可见[Albert](https://github.com/google-research/albert)  
