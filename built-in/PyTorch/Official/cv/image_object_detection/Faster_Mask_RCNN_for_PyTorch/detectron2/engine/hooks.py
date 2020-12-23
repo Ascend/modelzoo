@@ -284,7 +284,7 @@ class AutogradProfiler(HookBase):
 
     def before_step(self):
         if self._enable_predicate(self.trainer):
-            self._profiler = torch.autograd.profiler.profile(use_cuda=self._use_cuda)
+            self._profiler = torch.autograd.profiler.profile(use_npu=self._use_cuda)
             self._profiler.__enter__()
         else:
             self._profiler = None
@@ -517,3 +517,4 @@ class ShowTraining(HookBase):
                   (self.start_iter), 'wb') as file_name:
             torch.save(grad_dict, file_name)
         self.start_iter += 1
+

@@ -180,6 +180,8 @@ class Boxes:
 
     @torch.jit.unused
     def to(self, *args: Any, **kwargs: Any):
+        if len(args) == 1 and args[0] == torch.float16 and self.tensor.dtype == torch.float32:
+            return self
         return Boxes(self.tensor.to(*args, **kwargs))
 
     def area(self) -> torch.Tensor:
@@ -376,3 +378,4 @@ def matched_boxlist_iou(boxes1: Boxes, boxes2: Boxes) -> torch.Tensor:
     inter = wh[:, 0] * wh[:, 1]  # [N]
     iou = inter / (area1 + area2 - inter)  # [N]
     return iou
+

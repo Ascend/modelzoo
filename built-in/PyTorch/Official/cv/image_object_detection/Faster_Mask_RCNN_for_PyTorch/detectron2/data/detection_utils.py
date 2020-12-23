@@ -589,7 +589,10 @@ def build_augmentation(cfg, is_train):
         min_size = cfg.INPUT.MIN_SIZE_TEST
         max_size = cfg.INPUT.MAX_SIZE_TEST
         sample_style = "choice"
-    augmentation = [T.ResizeShortestEdge(min_size, max_size, sample_style)]
+    augmentation = [T.ResizeShortestEdge(min_size,
+                                         max_size,
+                                         sample_style,
+                                         fix_shape=cfg.INPUT.FIX_SHAPE)]
     if is_train:
         augmentation.append(T.RandomFlip())
     return augmentation
@@ -599,3 +602,4 @@ build_transform_gen = build_augmentation
 """
 Alias for backward-compatibility.
 """
+

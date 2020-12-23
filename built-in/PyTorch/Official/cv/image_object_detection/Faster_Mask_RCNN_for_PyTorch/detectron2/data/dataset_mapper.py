@@ -70,7 +70,9 @@ class DatasetMapper:
         keypoint_hflip_indices: Optional[np.ndarray] = None,
         precomputed_proposal_topk: Optional[int] = None,
         recompute_boxes: bool = False,
-        fix_shape: tuple = None
+        fix_shape: tuple = None,
+        amp: int = 0,
+        opt_level: str = "O0"
     ):
         """
         NOTE: this interface is experimental.
@@ -103,6 +105,8 @@ class DatasetMapper:
         self.recompute_boxes        = recompute_boxes
         # fix shape
         self.fix_shape              = fix_shape
+        self.amp                    = amp
+        self.opt_level              = opt_level
         # fmt: on
         logger = logging.getLogger(__name__)
         logger.info("Augmentations used in training: " + str(augmentations))
@@ -124,7 +128,9 @@ class DatasetMapper:
             "instance_mask_format": cfg.INPUT.MASK_FORMAT,
             "use_keypoint": cfg.MODEL.KEYPOINT_ON,
             "recompute_boxes": recompute_boxes,
-            "fix_shape": cfg.INPUT.FIX_SHAPE
+            "fix_shape": cfg.INPUT.FIX_SHAPE,
+            "amp": cfg.AMP,
+            "opt_level": cfg.OPT_LEVEL
         }
         if cfg.MODEL.KEYPOINT_ON:
             ret["keypoint_hflip_indices"] = utils.create_keypoint_hflip_indices(cfg.DATASETS.TRAIN)
@@ -180,6 +186,9 @@ class DatasetMapper:
                         0, batch_shape[-2] - images.shape[-2]]
         padded = F.pad(images, padding_size, value=pad_value)
         batched_imgs = padded.unsqueeze_(0)
+
+        if self.amp and (self.opt_level == "O1" or self.opt_level == "O2"):
+            batched_imgs = batched_imgs.to(torch.float16)
         dataset_dict["image_preprocess"] = batched_imgs.contiguous()
 
         if sem_seg_gt is not None:
@@ -271,3 +280,4 @@ class DatasetMapper:
                                 i.gt_masks.tensor, padding_size, value=False)
                 dataset_dict["instances"] = i
         return dataset_dict
+

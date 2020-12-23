@@ -145,7 +145,9 @@ def inference_on_dataset(model, data_loader, evaluator):
     start_time = time.perf_counter()
     total_compute_time = 0
     with inference_context(model), torch.no_grad():
-        for idx, inputs in enumerate(data_loader):
+        idx = 0
+        while idx < total:
+            inputs = data_loader.next()
             if idx == num_warmup:
                 start_time = time.perf_counter()
                 total_compute_time = 0
@@ -169,6 +171,7 @@ def inference_on_dataset(model, data_loader, evaluator):
                     ),
                     n=5,
                 )
+            idx += len(inputs)
 
     # Measure the time only for this worker (before the synchronization barrier)
     total_time = time.perf_counter() - start_time
@@ -207,3 +210,4 @@ def inference_context(model):
     model.eval()
     yield
     model.train(training_mode)
+

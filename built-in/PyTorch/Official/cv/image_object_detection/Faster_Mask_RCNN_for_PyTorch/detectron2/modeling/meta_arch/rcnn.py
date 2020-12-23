@@ -167,7 +167,7 @@ class GeneralizedRCNN(nn.Module):
             return self.inference(batched_inputs)
         images = self.preprocess_image_v2(batched_inputs)
         if "instances" in batched_inputs[0]:
-            gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
+            gt_instances = [x["instances"] for x in batched_inputs]
         else:
             gt_instances = None
 
@@ -237,10 +237,7 @@ class GeneralizedRCNN(nn.Module):
         images = [x["image_preprocess"] for x in batched_inputs]
         images = torch.cat(images, dim=0)
         image_sizes = [x["image_size"] for x in batched_inputs]
-        if self.amp and (self.opt_level == "O1" or self.opt_level == "O2"):
-            return ImageList(images.half().to(self.device), image_sizes)
-        else:
-            return ImageList(images.to(self.device), image_sizes)
+        return ImageList(images, image_sizes)
 
     @staticmethod
     def _postprocess(instances, batched_inputs, image_sizes):
@@ -317,3 +314,4 @@ class ProposalNetwork(nn.Module):
             r = detector_postprocess(results_per_image, height, width)
             processed_results.append({"proposals": r})
         return processed_results
+
