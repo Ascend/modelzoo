@@ -73,6 +73,9 @@ wideresnet eval  loss=0.75691   acc=0.8159
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1224/142726_fca5413f_8376014.png "屏幕截图.png")
 
 
+精度达标模型
+obs://wideresnet-training/wideresnet/best_model/
+
 ###   **train** 
 加载预训练模型 \
 
