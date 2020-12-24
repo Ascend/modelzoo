@@ -2,19 +2,13 @@ import tensorflow as tf
 import os
 import numpy as np
 import sys
-# import moxing as mox
-# from npu_bridge.estimator import npu_ops
-# from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-# from tensorflow.python.framework import graph_util
-# from tensorflow.python import pywrap_tensorflow
+import moxing as mox
+from npu_bridge.estimator import npu_ops
+from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+from tensorflow.python.framework import graph_util
+from tensorflow.python import pywrap_tensorflow
 
 
-from tensorflow import ConfigProto
-from tensorflow import InteractiveSession
-
-config = ConfigProto()
-config.gpu_options.allow_growth = True
-session = InteractiveSession(config=config)
 
 
 from wideresnet import wide_resnet
@@ -126,64 +120,63 @@ def  validate_flags_or_throw():
 
 def main(_):
 	validate_flags_or_throw()
-	os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-	with tf.device("/gpu:1"): 
-		inputx = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, 32, 32, 3], name="inputx")
-		inputy = tf.placeholder(tf.int64, name="inputy")
 
-		if FLAGS.do_train==True:
-			out = wide_resnet(inputx, FLAGS.do_train, FLAGS.depths, FLAGS.ks)
-			train_op, train_loss, train_val = training_op(out, inputy)
-			images_batch ,labels_batch =  get_train_data(tf_data_list(FLAGS.data_path), FLAGS.batch_size, FLAGS.epoch)
+	inputx = tf.placeholder(tf.float32, shape=[FLAGS.batch_size, 32, 32, 3], name="inputx")
+	inputy = tf.placeholder(tf.int64, name="inputy")
 
-		if FLAGS.do_train==False:
-			out = wide_resnet(inputx, FLAGS.do_train, FLAGS.depths, FLAGS.ks)
-			test_loss, test_acc = evaluation_op(out, inputy)
-			images_batch ,labels_batch =  get_test_data(tf_data_list(FLAGS.data_path), FLAGS.batch_size)
+	if FLAGS.do_train==True:
+		out = wide_resnet(inputx, FLAGS.do_train, FLAGS.depths, FLAGS.ks)
+		train_op, train_loss, train_val = training_op(out, inputy)
+		images_batch ,labels_batch =  get_train_data(tf_data_list(FLAGS.data_path), FLAGS.batch_size, FLAGS.epoch)
 
-		config = tf.ConfigProto(allow_soft_placement=True)
-		# custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
-		# custom_op.name = "NpuOptimizer"
-		# custom_op.parameter_map["use_off_line"].b = True  # 在昇腾AI处理器执行训练
-		# config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 关闭remap开关
-		# config.gpu_options.allow_growth = True
-		sess = tf.Session(config=config)
-		sess.run(tf.global_variables_initializer())
-		saver = tf.train.Saver()
+	if FLAGS.do_train==False:
+		out = wide_resnet(inputx, FLAGS.do_train, FLAGS.depths, FLAGS.ks)
+		test_loss, test_acc = evaluation_op(out, inputy)
+		images_batch ,labels_batch =  get_test_data(tf_data_list(FLAGS.data_path), FLAGS.batch_size)
 
-		if FLAGS.model_path != "None":
-			model = FLAGS.model_path
-			saver.restore(sess, model)
+	config = tf.ConfigProto()
+	custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+	custom_op.name = "NpuOptimizer"
+	custom_op.parameter_map["use_off_line"].b = True  # 在昇腾AI处理器执行训练
+	config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 关闭remap开关
+	config.gpu_options.allow_growth = True
+	sess = tf.Session(config=config)
+	sess.run(tf.global_variables_initializer())
+	saver = tf.train.Saver()
+
+	if FLAGS.model_path != "None":
+		model = FLAGS.model_path
+		saver.restore(sess, model)
 
 
-		try:
-			#训练模块 train
-			if FLAGS.do_train==True:	
-				for epoch in range(FLAGS.epoch):
-					for step in range(int(FLAGS.image_num / FLAGS.batch_size)):
-						x_in, y_in = sess.run([images_batch, labels_batch])
-						_, tra_loss, tra_acc = sess.run([train_op, train_loss, train_val],
-						                            feed_dict={inputx: x_in, inputy: y_in})
-						if (step + 1) % 10 == 0:
-							print('Epoch %d, step %d, train loss = %.4f, train accuracy = %.2f%%' % (
-							epoch + 1, step + 1, tra_loss, tra_acc * 100.0))	
-					checkpoint_path = os.path.join(FLAGS.output_path, "wideresnet.ckpt")
-					saver.save(sess, checkpoint_path)
-			#测试模块 eval
-			if FLAGS.do_train==False:
-				acc = []
-				loss = []
+	try:
+		#训练模块 train
+		if FLAGS.do_train==True:	
+			for epoch in range(FLAGS.epoch):
 				for step in range(int(FLAGS.image_num / FLAGS.batch_size)):
 					x_in, y_in = sess.run([images_batch, labels_batch])
-					test_losss, test_accs = sess.run([test_loss, test_acc], feed_dict={inputx: x_in, inputy: y_in})
-					acc.append(test_accs)
-					loss.append(test_losss)
-				print("wideresnet eval  loss=%.5f   acc=%.4f "%(np.mean(loss),np.mean(acc)))            
-		except tf.errors.OutOfRangeError:
-			print('epoch limit reached')
-		finally:
-			print("Done")
-			sess.close()
+					_, tra_loss, tra_acc = sess.run([train_op, train_loss, train_val],
+					                            feed_dict={inputx: x_in, inputy: y_in})
+					if (step + 1) % 10 == 0:
+						print('Epoch %d, step %d, train loss = %.4f, train accuracy = %.2f%%' % (
+						epoch + 1, step + 1, tra_loss, tra_acc * 100.0))	
+				checkpoint_path = os.path.join(FLAGS.output_path, "wideresnet.ckpt")
+				saver.save(sess, checkpoint_path)
+		#测试模块 eval
+		if FLAGS.do_train==False:
+			acc = []
+			loss = []
+			for step in range(int(FLAGS.image_num / FLAGS.batch_size)):
+				x_in, y_in = sess.run([images_batch, labels_batch])
+				test_losss, test_accs = sess.run([test_loss, test_acc], feed_dict={inputx: x_in, inputy: y_in})
+				acc.append(test_accs)
+				loss.append(test_losss)
+			print("wideresnet eval  loss=%.5f   acc=%.4f "%(np.mean(loss),np.mean(acc)))            
+	except tf.errors.OutOfRangeError:
+		print('epoch limit reached')
+	finally:
+		print("Done")
+		sess.close()
 
 if __name__ == '__main__':
 	tf.app.run()
