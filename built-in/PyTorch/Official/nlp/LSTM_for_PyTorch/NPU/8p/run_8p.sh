@@ -1,8 +1,5 @@
 #!/bin/bash
 
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 4"
-
 #Author: Ruchao Fan
 #2017.11.1     Training acoustic model and decode with phoneme-level bigram
 #2018.4.30     Replace the h5py with ark and simplify the data_loader.py
