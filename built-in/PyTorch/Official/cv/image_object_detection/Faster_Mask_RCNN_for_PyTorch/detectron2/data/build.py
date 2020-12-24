@@ -295,21 +295,20 @@ def build_batch_data_loader(
             batch_sampler=None,
             collate_fn=operator.itemgetter(0),  # don't batch, but yield individual elements
             worker_init_fn=worker_init_reset_seed,
+            pin_memory=True
         )  # yield individual mapped dict
-        return AspectRatioGroupedDataset(data_loader, batch_size)
+        return PreloadLoader(data_loader, device)
     else:
         batch_sampler = torch.utils.data.sampler.BatchSampler(
             sampler, batch_size, drop_last=True
         )  # drop_last so the batch always have the same size
-        data_loader = torch.utils.data.DataLoader(
+        return torch.utils.data.DataLoader(
             dataset,
             num_workers=num_workers,
             batch_sampler=batch_sampler,
             collate_fn=trivial_batch_collator,
             worker_init_fn=worker_init_reset_seed,
-            pin_memory=True
         )
-        return PreloadLoader(data_loader, device)
 
 
 def build_detection_train_loader(cfg, mapper=None):
