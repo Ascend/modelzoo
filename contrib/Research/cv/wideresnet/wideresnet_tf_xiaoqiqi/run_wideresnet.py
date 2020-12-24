@@ -8,9 +8,6 @@ from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from tensorflow.python.framework import graph_util
 from tensorflow.python import pywrap_tensorflow
 
-
-
-
 from wideresnet import wide_resnet
 from  data_utils import get_train_data,get_test_data
 
