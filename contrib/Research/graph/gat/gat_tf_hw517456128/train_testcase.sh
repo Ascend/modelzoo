@@ -12,9 +12,9 @@ python3.7 -m execute_cora.py \
 	--data_url $cora_dataset \
 	--train_url $output \
 	--batch_size 1 \
-	--nb_epochs 10 \
+	--nb_epochs 1 \
 	--lr 0.005 \
-	--l2_coef 0.0005
+	--l2_coef 0.0005 >train.log 2>&1
 
 end_time=`date +%s`
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字

@@ -12,8 +12,8 @@ python3.7 -m main.py \
 	--data_url $ml1m_dataset \
 	--train_url $output \
 	--hidden_neuron 1024 \
-	--train_epoch 10 \
-	--batch_size 256
+	--train_epoch 1 \
+	--batch_size 256 >train.log 2>&1
 
 end_time=`date +%s`
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
