@@ -72,3 +72,15 @@ Or you can simply use the shell script:
 ```
 bash train_npu.sh
 ```
+Log of NPU training:
+```
+2020-12-24 23:11:47.268417: I tf_adapter/kernels/geop_npu.cc:573] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp23_0[ 2741664us]
+INFO:tensorflow:Step #1: rate 0.001000, accuracy 3.00%, cross entropy 4.509356
+I1224 23:11:47.320920 281473027969040 train.py:250] Step #1: rate 0.001000, accuracy 3.00%, cross entropy 4.509356
+2020-12-24 23:11:47.326019: I tf_adapter/kernels/geop_npu.cc:388] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp21_0, num_inputs:7, num_outputs:1
+2020-12-24 23:11:47.326269: I tf_adapter/kernels/geop_npu.cc:260] [GEOP] tf session direct208f13df09267953, graph id: 11 no need to rebuild
+2020-12-24 23:11:47.326757: I tf_adapter/kernels/geop_npu.cc:580] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp21_0 ,tf session: direct208f13df09267953 ,graph id: 11
+[TRACE] GE(10333,python3.7):2020-12-24-23:11:47.326.814 [status:RUNNING] [framework/domi/client/ge_api.cc:385]11044 RunGraphAsync:Run Graph Asynchronously
+2020-12-24 23:11:47.327037: I tf_adapter/kernels/geop_npu.cc:593] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp21_0, ret_status:success ,tf session: direct208f13df09267953 ,graph id: 11 [0 ms]
+
+```
