@@ -2,7 +2,7 @@ import tensorflow as tf
 import os
 import numpy as np
 import sys
-import moxing as mox
+
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from tensorflow.python.framework import graph_util
