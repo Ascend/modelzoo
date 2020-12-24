@@ -41,7 +41,9 @@ WIDERESNET
   	├─wideresnet.index
   	├─wideresnet.meta
   	└─...
-  ├─wideresnet.py xception网络架构
+  ├─wideresnet.py wideresnet网络架构
+  ├─data_utils.py 数据处理
+  ├─preprocess.py 数据预处理
   ├─run_wideresnet.py 进行train和eval的一些逻辑操作
   ├─train_1p.sh 模型的启动脚本
   ├─test_1p.sh 模型的启动测试脚本
@@ -59,7 +61,7 @@ https://drive.google.com/drive/folders/1ypQKsJaCl6Qw8E2mFKGBfud73MAQRhHG?usp=sha
 经过预训练精度情况 
 wideresnet eval  loss=0.92785   acc=0.7695   
 
-obs://xception-training/MA-model_arts_xception-11-27-13-23/model/  
+obs://wideresnet-training/wideresnet/pre_training_model/
 
 ### 训练过程及结果
 epoch=10
