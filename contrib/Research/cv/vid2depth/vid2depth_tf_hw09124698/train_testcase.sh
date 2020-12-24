@@ -5,9 +5,9 @@ execpath=${PWD}
 rm -rf *.pbtxt
 ulimit -c 0
 unzip outdata.zip
-
+tee  train.log
 python3 train.py --data_dir ./outdata/ --seq_length 3 --reconstr_weight 0.85 --smooth_weight 0.05 --ssim_weight 0.15 --icp_weight 0 --checkpoint_dir ./checkpoints
-#结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
+
 key1="\[GEOP\]"  #功能检查字
 
 
