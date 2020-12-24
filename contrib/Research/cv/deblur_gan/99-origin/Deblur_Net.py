@@ -1,31 +1,3 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
-# Copyright 2020 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import tensorflow as tf
 from ops import *
 import numpy as np
@@ -176,15 +148,13 @@ class Deblur_Net():
         d_loss_real = - tf.reduce_mean(self.real_prob)
         d_loss_fake = tf.reduce_mean(self.fake_prob)
 
-        l2_loss = tf.reduce_mean(tf.reduce_sum(tf.square(label - self.gene_img), axis = [1, 2, 3]))
         if self.mode == 'train':
             self.vgg_net = Vgg19(self.vgg_path)
             self.vgg_net.build(tf.concat([label, self.gene_img], axis = 0))
             self.content_loss = tf.reduce_mean(tf.reduce_sum(tf.square(self.vgg_net.relu3_3[self.batch_size:] - self.vgg_net.relu3_3[:self.batch_size]), axis = 3))
 
             self.D_loss = d_loss_real + d_loss_fake + 10.0 * GP_loss
-            # self.G_loss = - d_loss_fake + 100.0 * self.content_loss
-            self.G_loss = 100 * l2_loss
+            self.G_loss = - d_loss_fake + 100.0 * self.content_loss
 
             t_vars = tf.trainable_variables()
             G_vars = [var for var in t_vars if 'generator' in var.name]

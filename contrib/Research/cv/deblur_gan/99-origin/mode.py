@@ -1,45 +1,13 @@
-# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ============================================================================
-# Copyright 2020 Huawei Technologies Co., Ltd
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import os
 import tensorflow as tf
 from PIL import Image
 import numpy as np
 import time
 import util
+from skimage.measure import compare_ssim as ssim
 import data
 
 def train(args, model, sess, saver):
-    """
-    Train model
-    args  : training parameters
-    model :
-    """
     if args.fine_tuning :
         saver.restore(sess, args.pre_trained_model)
         print("saved model is loaded for fine-tuning!")
@@ -48,7 +16,7 @@ def train(args, model, sess, saver):
     num_imgs = len(os.listdir(args.train_Sharp_path))
 
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter(args.logdir,sess.graph)
+    train_writer = tf.summary.FileWriter('./logs',sess.graph)
     if args.test_with_train:
         f = open("valid_logs.txt", 'w')
 
@@ -58,10 +26,13 @@ def train(args, model, sess, saver):
     if args.in_memory:
         blur_imgs = util.image_loader(args.train_Blur_path, args.load_X, args.load_Y)
         sharp_imgs = util.image_loader(args.train_Sharp_path, args.load_X, args.load_Y)
+        # lr_hr_ds, n_data = data.load_train_dataset(args.train_Sharp_path, args.train_Blur_path, args.ext, args.batch_size)
         while epoch < args.max_epoch:
             random_index = np.random.permutation(len(blur_imgs))
+            #  next_element = lr_hr_ds.get_next()
             for k in range(step):
                 s_time = time.time()
+                # blur_batch, sharp_batch = sess.run(next_element)
                 blur_batch, sharp_batch = util.batch_gen(blur_imgs, sharp_imgs, args.patch_size, args.batch_size, random_index, k, args.augmentation)
 
                 for t in range(args.critic_updates):
@@ -79,8 +50,9 @@ def train(args, model, sess, saver):
                 print("%d training epoch completed" % epoch)
                 print("D_loss : %0.4f, \t G_loss : %0.4f"%(D_loss, G_loss))
                 print("Elpased time : %0.4f"%(e_time - s_time))
-            if ((epoch + 1) % args.model_save_freq ==0):
+            if ((epoch) % args.model_save_freq ==0):
                 saver.save(sess, './model/DeblurrGAN', global_step = epoch, write_meta_graph = False)
+
             epoch += 1
 
         saver.save(sess, './model/DeblurrGAN_last', write_meta_graph = False)
@@ -118,7 +90,9 @@ def train(args, model, sess, saver):
     if args.test_with_train:
         f.close()
 
+
 def test(args, model, sess, saver, file, step = -1, loading = False):
+
     if loading:
         saver.restore(sess, args.pre_trained_model)
         print("saved model is loaded for test!")
@@ -146,6 +120,7 @@ def test(args, model, sess, saver, file, step = -1, loading = False):
 
             PSNR_list.append(psnr)
             ssim_list.append(ssim)
+
     else:
 
         sess.run(model.data_loader.init_op['val_init'])
@@ -174,6 +149,8 @@ def test(args, model, sess, saver, file, step = -1, loading = False):
     else :
         file.write("%d-epoch step PSNR : %0.4f SSIM : %0.4f \n"%(step, mean_PSNR, mean_ssim))
 
+
+
 def test_only(args, model, sess, saver):
 
     saver.restore(sess,args.pre_trained_model)
@@ -190,7 +167,7 @@ def test_only(args, model, sess, saver):
             blur = np.expand_dims(ele, axis = 0)
 
             if args.chop_forward:
-                output = util.(blur, args.chop_size, sess, model, args.chop_shave)
+                output = util.recursive_forwarding(blur, args.chop_size, sess, model, args.chop_shave)
                 output = Image.fromarray(output[0])
 
             else:
@@ -209,3 +186,4 @@ def test_only(args, model, sess, saver):
             output = Image.fromarray(output[0])
             split_name = blur_img_name[i].split('.')
             output.save(os.path.join(args.result_path, '%s_sharp.png'%(''.join(map(str, split_name[:-1])))))
+
