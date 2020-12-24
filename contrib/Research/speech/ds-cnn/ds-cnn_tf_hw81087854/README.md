@@ -54,3 +54,20 @@ python label_wav.py --wav <audio file> --graph Pretrained_models/DNN/DNN_S.pb
 
 A quick guide on quantizing the KWS neural network models is [here](Deployment/Quant_guide.md). 
 The example code for running a DNN model on a Cortex-M development board is also provided [here](Deployment). 
+
+## Train on NPU
+Because of the issue : [Issue](https://gitee.com/ascend/modelzoo/issues/I2AMF2?from=project-issue)
+Modify the input_data.py:
+```
+ background_add = tf.add(background_mul, sliced_foreground)
+ background_clamp = background_add
+ #background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
+```
+Train on NPU:
+```
+python3.7 train.py --model_architecture dnn --model_size_info 128 128 128
+```
+Or you can simply use the shell script:
+```
+bash train_npu.sh
+```
