@@ -57,6 +57,7 @@ The example code for running a DNN model on a Cortex-M development board is also
 
 ## Train on NPU
 Because of the issue : [Issue](https://gitee.com/ascend/modelzoo/issues/I2AMF2?from=project-issue)
+
 Modify the input_data.py:
 ```
  background_add = tf.add(background_mul, sliced_foreground)
