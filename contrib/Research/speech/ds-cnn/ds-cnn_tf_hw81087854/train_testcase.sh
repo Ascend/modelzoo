@@ -1,3 +1,4 @@
+export EXPERIMENTAL_DYNAMIC_PARTITION=1
 python3.7 train.py --model_architecture dnn --model_size_info 128 128 128
 
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
