@@ -78,8 +78,8 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
-parser.add_argument('--pretrained', dest='pretrained', action='store_true',
-                    help='use pre-trained model')
+parser.add_argument('--pretrain', default='', type=str, metavar='PATH',
+                    help='path to pretrain model')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -117,6 +117,8 @@ parser.add_argument('--loss-scale', default=64., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+parser.add_argument('--class-nums', default=10, type=int, help='class-nums only for pretrain')
+
 
 warnings.filterwarnings('ignore')
 best_acc1 = 0
@@ -264,6 +266,18 @@ def main_worker(gpu, ngpus_per_node, args):
             print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
+
+    if args.pretrain:
+        if not os.path.isfile(args.pretrain):
+            print("no chechpoint found at {}".format(args.pretrain))
+
+        print("loading checkpoint '{}'".format(args.pretrain))
+        checkpoint = torch.load(args.pretrain, map_location=args.device)
+        model.load_state_dict(checkpoint['state_dict'])
+        print("loaded checkpoint '{}'".format(args.pretrain))
+
+        # modify the class number of last fc/Linear layer
+        model.classifier[1] = nn.Linear(model.classifier[1].in_features, args.class_nums)
 
     cudnn.benchmark = True
 
