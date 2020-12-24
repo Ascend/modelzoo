@@ -103,12 +103,10 @@ python    run_wideresnet.py  --model_path ./model_save/wideresnet.ckpt  --data_p
  learning_rate------------学习率\
 
 ### 说明
-由于imagenet数据较大，制作难度大，所以在制作过程中将imagenet分为24个tfrecord文件，放入同一文件夹内 \
-
 	filepath = tf_data_path 
 	tf_data_list = [] 
 	file_list = os.listdir(filepath) 
 	for i in file_list: 
 		tf_data_list.append(os.path.join(filepath,i)) 
 	return tf_data_list  
-以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
+以上代码主要功能就是将所有数据集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
