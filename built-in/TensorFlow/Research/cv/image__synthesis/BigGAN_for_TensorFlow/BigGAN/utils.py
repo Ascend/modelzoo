@@ -1,3 +1,4 @@
+import aaa
 import scipy.misc
 import numpy as np
 import os
