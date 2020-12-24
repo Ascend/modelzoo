@@ -246,6 +246,7 @@ configs/config.py: record_path
 --num_inputs                      number of features of dataset. default : 39
 --batch_size                      mini-batch size ,default: 128 
 --n_epoches                       initial learning rate,default: 0.06
+--line_per_sample                 number of samples per line,make sure that it is divisible by batch_size
 ```
 
 

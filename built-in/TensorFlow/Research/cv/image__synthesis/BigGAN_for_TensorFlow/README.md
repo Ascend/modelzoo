@@ -14,25 +14,21 @@ Simple Tensorflow implementation of ["Large Scale GAN Training for High Fidelity
 
 ```
 ├── dataset
-   └── YOUR_DATASET_NAME
+   └── train
        ├── xxx.jpg (name, format doesn't matter)
        ├── yyy.png
        └── ...
 ```
 ### train
-* python main.py --phase train --dataset celebA-HQ --gan_type hinge
+单P训练
+cd scripts;bash run_npu_1p.sh
+
+8P训练
+cd scripts;bash run_npu_8p.sh
 
 ### test
-* python main.py --phase test --dataset celebA-HQ --gan_type hinge
 
-## Architecture
-<img src = './assets/architecture.png' width = '600px'> 
+验证
 
-### 128x128
-<img src = './assets/128.png' width = '600px'> 
 
-### 256x256
-<img src = './assets/256.png' width = '600px'> 
-
-### 512x512
-<img src = './assets/512.png' width = '600px'> 
+cd scripts;bash eval.sh 

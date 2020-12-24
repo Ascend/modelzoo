@@ -413,7 +413,7 @@ class BigGAN(object):
             self.model_name, self.dataset_name, self.gan_type, self.img_size, self.z_dim, self.sn)
 
     def save(self, checkpoint_dir, step):
-        checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
+        #checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
 
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
@@ -423,7 +423,7 @@ class BigGAN(object):
     def load(self, checkpoint_dir):
         import re
         print(" [*] Reading checkpoints...")
-        checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
+        #checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
 
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
