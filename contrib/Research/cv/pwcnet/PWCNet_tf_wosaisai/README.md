@@ -114,17 +114,44 @@ OBS已设置为公共读，不需要手动从OBS中下载数据集和checkpoint�
 
 
 ## 训练
+### 参数说明
+```
+--iterations 训练的iteration个数
+--display 训练过程中打印loss的迭代间隔数
+--save_path 保存checkpoint的文件夹路径
+--batch_size 训练的batch_size大小
+--dataset 数据集文件夹路径，数据集将自动从公共读的OBS下载到本地该文件夹下
+```
+
+### 运行命令
 ```
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
-       --iterations 200000 (the training iterations)
-       --display 1000 (the interval steps to display loss)
-       --save_path ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/ (the path to save checkpoint)
-       --batch_size 4 (the batch size)
-       --dataset /cache/ (the path of dataset, the dataset will be download to this folder from obs automatically)
+       --iterations 200000
+       --display 1000 
+       --save_path ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/
+       --batch_size 4 
+       --dataset /cache/ 
 ```
 ## 测试 
+### 参数说明
+```
+--dataset 数据集文件夹路径，数据集将自动从公共读的OBS下载到本地该文件夹下
+--ckpt 需要测试的checkpoint的路径
+--obs 可选项，如果为True，代码中会自动从公共读的OBS中下载训练好的checkpoint到本地pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned文件夹下，如果需要测试本地的checkpoint，需要把该参数设置为False
+```
+
+### 运行命令
+#### 测试OBS中训练好的模型
 ```
 python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
-       --ckpt (the path of checkpoint)
-       --obs False (optional, if it is True, download checkpoint from obs; if you need test the checkpoint from local dir, you should set it be False)
+       --dataset /cache/
+       --ckpt ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000
+       --obs True
+```
+#### 测试本地模型
+```
+python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
+       --dataset /cache/
+       --ckpt <local checkpoint path>
+       --obs False
 ```

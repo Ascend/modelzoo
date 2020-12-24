@@ -55,13 +55,14 @@ parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpis
                     help='the path of checkpoint')
 parser.add_argument('--obs', type=bool, default=True,
                     help='whether copy ckpt from obs')
+parser.add_argument('--dataset', type=str, default='/cache/')
 parser.add_argument('--data_url', type=str)
 parser.add_argument('--train_url', type=str)
 
 args = parser.parse_args()
 
-_DATASET_ROOT = '/cache/'
-_MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
+_DATASET_ROOT = args.dataset
+_MPISINTEL_ROOT = os.path.join(_DATASET_ROOT, 'MPI-Sintel-complete')
 
 os.makedirs(_MPISINTEL_ROOT)
 mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
