@@ -591,7 +591,8 @@ def build_augmentation(cfg, is_train):
         sample_style = "choice"
     augmentation = [T.ResizeShortestEdge(min_size,
                                          max_size,
-                                         sample_style)]
+                                         sample_style,
+                                         fix_shape=cfg.INPUT.FIX_SHAPE))]
     if is_train:
         augmentation.append(T.RandomFlip())
     return augmentation
