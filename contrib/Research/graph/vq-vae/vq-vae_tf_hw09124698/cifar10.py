@@ -31,6 +31,7 @@ import os
 #os.environ['SLOG_PRINT_TO_STDOUT']="0"
 #os.environ['DUMP_GE_GRAPH']="2"
 os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
+os.system("pip install better_exceptions")
 import better_exceptions
 import tensorflow as tf
 import numpy as np
