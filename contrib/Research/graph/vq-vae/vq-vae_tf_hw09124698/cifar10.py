@@ -94,9 +94,9 @@ def read_cifar10(filename_queue):
 def get_image(train=True,num_epochs=None):
     #maybe_download_and_extract()
     if train:
-        filenames = [os.path.join(DATA_DIR, 'data_batch_%d.bin' % i) for i in xrange(1, 6)]
+        filenames = [os.path.join(DATA_DIR, 'data_batch_%d' % i) for i in xrange(1, 6)]
     else:
-        filenames = [os.path.join(DATA_DIR,  'test_batch.bin')]
+        filenames = [os.path.join(DATA_DIR,  'test_batch')]
     filename_queue = tf.train.string_input_producer(filenames,num_epochs=num_epochs)
     read_input = read_cifar10(filename_queue)
     return tf.cast(read_input.uint8image, tf.float32) / 255.0, tf.reshape(read_input.label,[])
