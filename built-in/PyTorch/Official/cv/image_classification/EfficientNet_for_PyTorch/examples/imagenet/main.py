@@ -70,6 +70,10 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
+parser.add_argument('--pretrained_weight', default='', type=str, metavar='PATH',
+                    help='path to pretrained weight')
+parser.add_argument('--num_classes', default=1000, type=int,
+                    help='number of class')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -164,7 +168,7 @@ def main_worker(npu, nnpus_per_node, args):
     # create model
     if 'efficientnet' in args.arch:  # NEW
         if args.pretrained:
-            model = EfficientNet.from_pretrained(args.arch, advprop=args.advprop)
+            model = EfficientNet.from_pretrained(args.arch, advprop=args.advprop, weights_path=args.pretrained_weight, num_classes=args.num_classes)
             print("=> using pre-trained model '{}'".format(args.arch))
         else:
             print("=> creating model '{}'".format(args.arch))
