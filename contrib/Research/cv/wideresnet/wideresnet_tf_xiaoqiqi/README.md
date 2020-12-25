@@ -67,7 +67,7 @@ obs://wideresnet-training/wideresnet/pre_training_model/
 epoch=10
 batch_size=32
 lr=0.00016
-耗费5小时
+耗费4小时
 
 wideresnet eval  loss=0.75691   acc=0.8159 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1224/145251_2557cddd_8376014.png "屏幕截图.png")
