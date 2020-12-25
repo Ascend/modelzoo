@@ -145,7 +145,7 @@ def inference_on_dataset(model, data_loader, evaluator, device):
     start_time = time.perf_counter()
     total_compute_time = 0
     with inference_context(model), torch.no_grad():
-        for idxs, inputs in enumerate(data_loader):
+        for idx, inputs in enumerate(data_loader):
             for d in inputs:
                 d["image_preprocess"] = d["image_preprocess"].to(device)
             if idx == num_warmup:

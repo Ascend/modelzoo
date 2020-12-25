@@ -361,7 +361,7 @@ def build_detection_train_loader(cfg, mapper=None):
         sampler = RepeatFactorTrainingSampler(repeat_factors)
     else:
         raise ValueError("Unknown training sampler: {}".format(sampler_name))
-    return build_batch_data_loader(
+    data_loader = build_batch_data_loader(
         dataset,
         sampler,
         cfg.SOLVER.IMS_PER_BATCH,
@@ -369,6 +369,7 @@ def build_detection_train_loader(cfg, mapper=None):
         aspect_ratio_grouping=cfg.DATALOADER.ASPECT_RATIO_GROUPING,
         num_workers=cfg.DATALOADER.NUM_WORKERS,
     )
+    return PreloadLoader(data_loader, cfg.MODEL.DEVICE)
 
 
 def build_detection_test_loader(cfg, dataset_name, mapper=None):
