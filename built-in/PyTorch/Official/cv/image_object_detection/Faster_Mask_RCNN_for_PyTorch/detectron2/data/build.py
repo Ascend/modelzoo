@@ -297,18 +297,20 @@ def build_batch_data_loader(
             worker_init_fn=worker_init_reset_seed,
             pin_memory=True
         )  # yield individual mapped dict
-        return PreloadLoader(data_loader, device)
+        return AspectRatioGroupedDataset(data_loader, batch_size, device)
     else:
         batch_sampler = torch.utils.data.sampler.BatchSampler(
             sampler, batch_size, drop_last=True
         )  # drop_last so the batch always have the same size
-        return torch.utils.data.DataLoader(
+        data_loader = torch.utils.data.DataLoader(
             dataset,
             num_workers=num_workers,
             batch_sampler=batch_sampler,
             collate_fn=trivial_batch_collator,
             worker_init_fn=worker_init_reset_seed,
+            pin_memory=True
         )
+        return PreloadLoader(data_loader, device)
 
 
 def build_detection_train_loader(cfg, mapper=None):
@@ -406,15 +408,12 @@ def build_detection_test_loader(cfg, dataset_name, mapper=None):
     # standard when reporting inference time in papers.
     batch_sampler = torch.utils.data.sampler.BatchSampler(sampler, 1, drop_last=False)
 
-    data_loader = torch.utils.data.DataLoader(
+    return torch.utils.data.DataLoader(
         dataset,
         num_workers=cfg.DATALOADER.NUM_WORKERS,
         batch_sampler=batch_sampler,
-        collate_fn=trivial_batch_collator,
-        worker_init_fn=worker_init_reset_seed,
-        pin_memory=True
+        collate_fn=trivial_batch_collator
     )
-    return PreloadLoader(data_loader, cfg.MODEL.DEVICE)
 
 
 def trivial_batch_collator(batch):
@@ -426,4 +425,3 @@ def trivial_batch_collator(batch):
 
 def worker_init_reset_seed(worker_id):
     seed_all_rng(np.random.randint(2 ** 31) + worker_id)
-

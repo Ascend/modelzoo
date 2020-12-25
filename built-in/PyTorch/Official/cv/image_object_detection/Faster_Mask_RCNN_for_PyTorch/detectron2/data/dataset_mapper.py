@@ -280,4 +280,3 @@ class DatasetMapper:
                                 i.gt_masks.tensor, padding_size, value=False)
                 dataset_dict["instances"] = i
         return dataset_dict
-

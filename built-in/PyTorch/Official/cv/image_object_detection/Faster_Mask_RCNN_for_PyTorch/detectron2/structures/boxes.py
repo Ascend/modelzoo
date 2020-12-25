@@ -378,4 +378,3 @@ def matched_boxlist_iou(boxes1: Boxes, boxes2: Boxes) -> torch.Tensor:
     inter = wh[:, 0] * wh[:, 1]  # [N]
     iou = inter / (area1 + area2 - inter)  # [N]
     return iou
-
