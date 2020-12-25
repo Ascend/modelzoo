@@ -84,3 +84,6 @@ I1224 23:11:47.320920 281473027969040 train.py:250] Step #1: rate 0.001000, accu
 2020-12-24 23:11:47.327037: I tf_adapter/kernels/geop_npu.cc:593] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp21_0, ret_status:success ,tf session: direct208f13df09267953 ,graph id: 11 [0 ms]
 
 ```
+
+Accuracy contract of CPU and NPU(200 steps):
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1225/201833_4c137a8f_8432352.png "屏幕截图.png")
