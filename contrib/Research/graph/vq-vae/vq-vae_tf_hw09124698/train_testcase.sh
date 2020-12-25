@@ -17,3 +17,4 @@ if [ `grep -c "$key1" "train.log"` -ne '0' ] && [ `grep -c "vq Loss" "train.log"
 else
    echo "Run testcase failed!"
 fi
+cat train.log
