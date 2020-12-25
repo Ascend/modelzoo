@@ -25,13 +25,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
 from six.moves import xrange
 import better_exceptions
 import tensorflow as tf
 import numpy as np
 from commons.ops import *
-
 
 def _mnist_arch(d):
     with tf.variable_scope('enc') as enc_param_scope :
@@ -199,6 +197,8 @@ class VQVAE():
 
         save_vars = {('train/'+'/'.join(var.name.split('/')[1:])).split(':')[0] : var for var in
                      tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,param_scope.name) }
+        #for name,var in save_vars.items():
+        #    print(name,var)
 
         self.saver = tf.train.Saver(var_list=save_vars,max_to_keep = 3)
 
@@ -334,12 +334,11 @@ if __name__ == "__main__":
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-
     sess = tf.Session(config=config)
     sess.graph.finalize()
     sess.run(init_op)
 
-    print(sess.run(net.train_op,feed_dict={x:np.random.random((10,32,32,3))}))
+    #print(sess.run(net.train_op,feed_dict={x:np.random.random((10,32,32,3))}))
     sampled,log_prob = pixelcnn.sample_from_prior(sess,np.arange(10),1)
     print(sampled[0], np.exp(log_prob[0]))
 
