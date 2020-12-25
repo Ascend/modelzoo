@@ -1,8 +1,5 @@
 #!/bin/bash
 
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 4"
-
 #Author: Ruchao Fan
 #2017.11.1     Training acoustic model and decode with phoneme-level bigram
 #2018.4.30     Replace the h5py with ark and simplify the data_loader.py
@@ -22,7 +19,7 @@ config_file='conf/ctc_config.yaml'
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
-train_log_dir=${currentDir}/result/training_1p_job_${currtime}
+train_log_dir=${currentDir}/result/training_8p_job_${currtime}
 mkdir -p ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
@@ -53,7 +50,7 @@ if [ $stage -le 2 ]; then
     --loss_scale 128 \
     --opt_level O2 \
     --conf $config_file \
-    --addr $(hostname -I |awk '{print $1} > ${train_log_dir}/lstm_8p.log 2>&1 &
+    --addr $(hostname -I |awk '{print $1}') > ${train_log_dir}/lstm_8p.log 2>&1 &
     exit 1
 
 fi

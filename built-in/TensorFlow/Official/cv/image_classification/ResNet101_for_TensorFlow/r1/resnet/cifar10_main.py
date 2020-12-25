@@ -26,10 +26,10 @@ from absl import logging
 from six.moves import range
 import tensorflow as tf
 
-from official.r1.resnet import resnet_model
-from official.r1.resnet import resnet_run_loop
-from official.utils.flags import core as flags_core
-from official.utils.logs import logger
+from r1.resnet import resnet_model
+from r1.resnet import resnet_run_loop
+from utils.flags import core as flags_core
+from utils.logs import logger
 
 HEIGHT = 32
 WIDTH = 32

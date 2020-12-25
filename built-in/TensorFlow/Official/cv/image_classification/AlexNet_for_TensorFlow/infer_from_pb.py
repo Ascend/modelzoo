@@ -177,11 +177,6 @@ def image_process(image_path, label_file):
             images_count = images_count + 1
             img = img.eval()
             imagelist.append(img)
-
-            encoded_image = tf.image.encode_jpeg(img)
-            with tf.gfile.GFile('./image_name.jpg', 'wb') as f:
-                f.write(encoded_image.eval())
-
             tf.reset_default_graph()
 
             ###labels

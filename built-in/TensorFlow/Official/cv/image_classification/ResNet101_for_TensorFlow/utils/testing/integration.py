@@ -27,7 +27,7 @@ import tempfile
 from absl import flags
 from absl.testing import flagsaver
 
-from official.utils.flags import core as flags_core
+from utils.flags import core as flags_core
 
 
 @flagsaver.flagsaver

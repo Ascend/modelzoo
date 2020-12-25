@@ -16,8 +16,8 @@
 
 # Presubmit script that runs tests and lint under local environment.
 # Make sure that tensorflow and pylint is installed.
-# usage: models >: ./official/utils/testing/scripts/presubmit.sh
-# usage: models >: ./official/utils/testing/scripts/presubmit.sh lint py2_test py3_test
+# usage: models >: ./utils/testing/scripts/presubmit.sh
+# usage: models >: ./utils/testing/scripts/presubmit.sh lint py2_test py3_test
 set +x
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,7 +32,7 @@ py_test() {
 
   echo "===========Running Python test============"
 
-  for test_file in `find official/ -name '*test.py' -print`
+  for test_file in `find ./ -name '*test.py' -print`
   do
     echo "####=======Testing ${test_file}=======####"
     ${PY_BINARY} "${test_file}"

@@ -18,7 +18,6 @@ network config setting, will be used in main.py
 from easydict import EasyDict as edict
 
 config_ascend = edict({
-    'ckpt_path': '/data/ckpts',
     'is_save_on_master': False,
 
     'batch_size': 128,
@@ -41,8 +40,5 @@ config_ascend = edict({
     'lr_end': 0.000004,
     'lr_max': 0.4,
     'warmup_epochs': 1,
-    'start_epoch': 1,
-
-    'onnx_filename': 'inceptionv4.onnx',
-    'air_filename': 'inceptionv4.air'
+    'start_epoch': 1
 })

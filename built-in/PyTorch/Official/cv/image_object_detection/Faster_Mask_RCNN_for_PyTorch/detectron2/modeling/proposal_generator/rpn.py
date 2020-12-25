@@ -422,7 +422,7 @@ class RPN(nn.Module):
 
         valid_mask = gt_labels >= 0 # already fixed, the num be RPN.BATCH_SIZE_PER_IMAGE(256)*num_images
         objectness_loss = F.binary_cross_entropy_with_logits(
-            cat(pred_objectness_logits, dim=1),
+            cat(pred_objectness_logits, dim=1).float(),
             gt_labels.float(),
             reduction="none",
         )
@@ -470,12 +470,12 @@ class RPN(nn.Module):
         # Transpose the Hi*Wi*A dimension to the middle:
         pred_objectness_logits = [
             # (N, A, Hi, Wi) -> (N, Hi, Wi, A) -> (N, Hi*Wi*A)
-            score.permute(0, 2, 3, 1).flatten(1)
+            score.npu_format_cast(0).permute(0, 2, 3, 1).flatten(1)
             for score in pred_objectness_logits
         ]
         pred_anchor_deltas = [
             # (N, A*B, Hi, Wi) -> (N, A, B, Hi, Wi) -> (N, Hi, Wi, A, B) -> (N, Hi*Wi*A, B)
-            x.view(x.shape[0], -1, self.anchor_generator.box_dim, x.shape[-2], x.shape[-1])
+            x.npu_format_cast(0).view(x.shape[0], -1, self.anchor_generator.box_dim, x.shape[-2], x.shape[-1])
             .permute(0, 3, 4, 1, 2)
             .flatten(1, -2)
             for x in pred_anchor_deltas

@@ -26,8 +26,8 @@ Example usage:
 ```
 from absl import app as absl_app
 
-from official.utils.logs import hooks_helper
-from official.utils.logs import logger
+from utils.logs import hooks_helper
+from utils.logs import logger
 
 def model_main(flags_obj):
   estimator = ...

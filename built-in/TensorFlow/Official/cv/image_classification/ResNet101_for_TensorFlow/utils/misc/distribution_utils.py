@@ -26,7 +26,7 @@ import string
 from absl import logging
 import tensorflow.compat.v2 as tf
 
-from official.utils.misc import tpu_lib
+from utils.misc import tpu_lib
 
 
 def _collective_communication(all_reduce_alg):

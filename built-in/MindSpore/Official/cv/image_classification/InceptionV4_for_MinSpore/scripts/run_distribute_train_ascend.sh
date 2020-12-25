@@ -43,6 +43,7 @@ do
 
     env > env.log
     taskset -c $cmdopt python -u ../train.py \
+    --device_id $i \
     --dataset_path=$DATA_DIR > log.txt 2>&1 &
     cd ../
 done

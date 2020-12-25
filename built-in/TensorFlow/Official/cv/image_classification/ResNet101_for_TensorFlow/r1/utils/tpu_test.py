@@ -17,7 +17,7 @@
 import numpy as np
 import tensorflow as tf
 
-from official.r1.utils import tpu as tpu_utils
+from r1.utils import tpu as tpu_utils
 
 
 TEST_CASES = [

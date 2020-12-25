@@ -75,7 +75,7 @@ nas:
             gt_num: 576
             batch_size: 32
             num_workers: 12
-            dataset_file: "/data/2019_mdc_lane/c00523047/mass_storage/culane/CULane/dataset.py"
+            dataset_file: "/PATH/TO/CONFIGED/dataset.py"
             dataset_format: CULane
         train:
             with_aug: False
@@ -137,7 +137,7 @@ fully_train:
             batch_size: 32
             num_workers: 12
             dataset_format: CULane
-            dataset_root: "/data/2019_mdc_lane/c00523047/mass_storage/culane/CULane/dataset.py"
+            dataset_root: "/PATH/TO/CONFIGED/dataset.py"
         train:
             with_aug: False
             shuffle: True

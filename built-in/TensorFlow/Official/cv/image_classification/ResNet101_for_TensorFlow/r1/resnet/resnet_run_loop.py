@@ -55,14 +55,14 @@ tf.compat.v1.logging.info('setting random_seed: %d', SEED)
 
 ############## npu modify end ###############
 
-from official.r1.resnet import imagenet_preprocessing
-from official.r1.resnet import resnet_model
-from official.r1.utils import export
-from official.utils.flags import core as flags_core
-from official.utils.logs import hooks_helper
-from official.utils.logs import logger
-from official.utils.misc import distribution_utils
-from official.utils.misc import model_helpers
+from r1.resnet import imagenet_preprocessing
+from r1.resnet import resnet_model
+from r1.utils import export
+from utils.flags import core as flags_core
+from utils.logs import hooks_helper
+from utils.logs import logger
+from utils.misc import distribution_utils
+from utils.misc import model_helpers
 
 
 ################################################################################

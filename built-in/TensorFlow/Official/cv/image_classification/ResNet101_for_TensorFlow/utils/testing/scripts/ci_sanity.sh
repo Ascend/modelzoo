@@ -16,7 +16,7 @@
 
 # Sanity check script that runs tests and lint under local environment.
 # Make sure that tensorflow and pylint is installed.
-# usage: models >: ./official/utils/testing/scripts/ci_sanity.sh do_pylint --incremental
+# usage: models >: ./utils/testing/scripts/ci_sanity.sh do_pylint --incremental
 set +x
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -47,7 +47,7 @@ do_pylint() {
         return 0
     fi
 
-    PYLINTRC_FILE="official/utils/testing/pylint.rcfile"
+    PYLINTRC_FILE="utils/testing/pylint.rcfile"
 
     if [[ ! -f "${PYLINTRC_FILE}" ]]; then
         die "ERROR: Cannot find pylint rc file at ${PYLINTRC_FILE}"

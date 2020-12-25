@@ -9,8 +9,8 @@ This repository provides a script and recipe to Inference the Yolov3 model.
 ### 1. Clone the respository
 
 ```shell
-git clone xxx
-cd ModelZoo_YOLOv3_TF_Atlas/ModelZoo_YOLOv3_ACL
+git clone https://gitee.com/ascend/modelzoo.git
+cd modelzoo/built-in/ACL/Official/cv/YOLOv3_for_ACL
 ```
 
 ### 2. Download and preprocess the dataset
@@ -76,7 +76,7 @@ To compare with official implement, for example, we use [get_coco_dataset.sh](ht
   ```
   export install_path=/usr/local/Ascend
   export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
-  export PYTHONPATH=$ PYTHONPATH:${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
+  export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
   export LD_LIBRARY_PATH=${install_path}/atc/lib64:$LD_LIBRARY_PATH
   export ASCEND_OPP_PATH=${install_path}/opp
   ```
@@ -97,7 +97,7 @@ To compare with official implement, for example, we use [get_coco_dataset.sh](ht
 
   ```
   cd scripts
-  ./benchmark_tf.sh --batchSize=1 --modelType=yolov3 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=yolov3_tf_aipp.om --trueValuePath=instants_val2014.json --imgInfoFile=coco2014_minival.txt --classNamePath=coco.names 
+  bash benchmark_tf.sh --batchSize=1 --modelType=yolov3 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=yolov3_tf_aipp.om --trueValuePath=instants_val2014.json --imgInfoFile=coco2014_minival.txt --classNamePath=coco.names 
   ```
 
 

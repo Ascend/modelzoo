@@ -21,7 +21,7 @@ from __future__ import print_function
 from absl import flags
 import tensorflow as tf
 
-from official.utils.flags._conventions import help_wrap
+from utils.flags._conventions import help_wrap
 
 
 def define_distribution(worker_hosts=True, task_index=True):

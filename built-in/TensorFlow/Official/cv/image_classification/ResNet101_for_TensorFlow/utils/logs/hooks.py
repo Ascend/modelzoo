@@ -23,7 +23,7 @@ from hccl.manage.api import get_rank_size
 
 import tensorflow as tf  # pylint: disable=g-bad-import-order
 
-from official.utils.logs import logger
+from utils.logs import logger
 import time
 import os
 class ExamplesPerSecondHook(tf.estimator.SessionRunHook):

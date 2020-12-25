@@ -27,8 +27,8 @@ import pandas as pd
 import tensorflow as tf
 # pylint: enable=wrong-import-order
 
-from official.r1.utils.data import file_io
-from official.utils.misc import keras_utils
+from r1.utils.data import file_io
+from utils.misc import keras_utils
 
 
 _RAW_ROW = "raw_row"

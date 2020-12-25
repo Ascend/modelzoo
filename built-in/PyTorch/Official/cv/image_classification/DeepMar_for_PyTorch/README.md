@@ -16,8 +16,7 @@
 	1.安装环境
 	2.修改多P脚本中字段"save_dir"为当前磁盘的数据集路径
 	3.修改run_8p.sh字段"addr"为当前主机ip地址
-	4.修改字段device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
-	5.cd到run_8p.sh文件的目录，执行bash run_8p.sh等多卡脚本， 进行多卡训练	
+	4.cd到run_8p.sh文件的目录，执行bash run_8p.sh等多卡脚本， 进行多卡训练	
 ```
 
 ### 二、Docker容器训练
@@ -31,7 +30,7 @@
 2.执行docker_start.sh后带三个参数：步骤1生成的REPOSITORY:TAG；数据集路径；模型执行路径；比如：
 
 ```
-    ./docker_start.sh pytorch:b020 /train/imagenet /home/Densenet121
+    ./docker_start.sh pytorch:b020 /train/peta /home/DeepMar
 ```
 
 3.执行步骤一训练流程（环境安装除外）

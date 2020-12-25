@@ -20,8 +20,8 @@
 python test_npu.py \
 	--long_size 2240 \
 	--npu 1\
-	--resume "/home/z00524916/deploy/PSENet/8p/best/npu8pbatch64lr4_0.3401_0.9416_0.8407_0.9017_521.pth"\ #修改待测试模型文件
-	--data_dir '/home/z00524916/data/ICDAR/Challenge/' \ #修改数据集目录
+	--resume "/PATH/TO/CONFIGED/deploy/PSENet/8p/best/npu8pbatch64lr4_0.3401_0.9416_0.8407_0.9017_521.pth"\ #修改待测试模型文件
+	--data_dir '/PATH/TO/CONFIGED/data/ICDAR/Challenge/' \ #修改数据集目录
 	--output_file 'npu8p64r4521' #修改输出文件名
 ```
 

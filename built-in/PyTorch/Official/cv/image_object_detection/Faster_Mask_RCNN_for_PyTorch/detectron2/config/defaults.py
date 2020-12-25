@@ -626,6 +626,9 @@ _C.OPT_LEVEL = "O0"
 # Adjust the loss during training
 _C.LOSS_SCALE_VALUE = 64
 
+# Set to 0 to disable
+_C.DEBUG_MODE = 0
+
 # global config is for quick hack purposes.
 # You can set them in command line or config files,
 # and access it with:

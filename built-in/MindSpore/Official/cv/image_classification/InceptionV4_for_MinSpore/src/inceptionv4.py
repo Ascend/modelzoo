@@ -4,54 +4,29 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
-""" 
+# 
+"""
     @author: ADSL007 from ustc
     mindspore version of inception v4 described in http://arxiv.org/abs/1602.07261.
 
 """
 import mindspore.nn as nn
-from mindspore import Tensor
 from mindspore.ops import operations as P
 from mindspore.common.initializer import Initializer
-import numpy as np
-
-
-class avginitializer(Initializer):
-    """
-    Initialize the weight to 1/m*n,  (m, n) is the shape of kernel.
-    """
-    def __init__(self):
-        super(avginitializer, self).__init__()
-
-    def _initialize(self, arr):
-        arr[:] = 0
-        for i in range(arr.shape[0]):
-            for j in range(arr.shape[2]):
-                for k in range(arr.shape[3]):
-                    arr[i][i][j][k] = 1/(arr.shape[2]*arr.shape[3])
 
 
 class Avgpool(nn.Cell):
-    """
-    Average pooling for temporal data.
-
-    Using a custom initializer to turn conv2d into avgpool2d. The weights won't be trained.
-
-    """
+    '''Avgpool'''
     def __init__(self, channel, kernel_size, stride=1, pad_mode='same'):
         super(Avgpool, self).__init__()
-        self.init = avginitializer()
-        self.conv = nn.Conv2d(channel, channel, kernel_size,
-                              stride=stride, pad_mode=pad_mode, weight_init=self.init)
-        self.conv.set_train(False)
+        self.conv = nn.AvgPool2d(kernel_size=3, stride=1, pad_mode='same')
 
     def construct(self, x):
         x = self.conv(x)
@@ -62,16 +37,16 @@ class Conv2d(nn.Cell):
     """
     Set the default configuration for Conv2dBnAct
     """
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, pad_mode='valid', padding=0, 
-                                    has_bias=False, weight_init="XavierUniform", bias_init='zeros'):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, pad_mode='valid', padding=0,
+                 has_bias=False, weight_init="XavierUniform", bias_init='zeros'):
         super(Conv2d, self).__init__()
-        self.conv = nn.Conv2dBnAct(in_channels, out_channels, kernel_size, stride=stride, pad_mode=pad_mode, padding=padding,
-                                    weight_init=weight_init, bias_init=bias_init, has_bias=has_bias, has_bn=True, activation="relu")
+        self.conv = nn.Conv2dBnAct(in_channels, out_channels, kernel_size, stride=stride, pad_mode=pad_mode,
+                                   padding=padding, weight_init=weight_init, bias_init=bias_init, has_bias=has_bias,
+                                   has_bn=True, activation="relu")
 
     def construct(self, x):
         x = self.conv(x)
         return x
-
 
 class Stem(nn.Cell):
     """
@@ -94,15 +69,15 @@ class Stem(nn.Cell):
 
         self.mixed_4a_branch_0 = nn.SequentialCell([
             Conv2d(160, 64, 1, stride=1, padding=0, has_bias=False),
-            Conv2d(64, 96, 3, stride=1, padding=0,  pad_mode='valid', has_bias=False)]
-        )
+            Conv2d(64, 96, 3, stride=1, padding=0, pad_mode='valid', has_bias=False)])
+
         self.mixed_4a_branch_1 = nn.SequentialCell([
             Conv2d(160, 64, 1, stride=1, padding=0, has_bias=False),
-            Conv2d(64, 64, (1, 7), pad_mode='same', stride=1,
-                   has_bias=False), 
+            Conv2d(64, 64, (1, 7), pad_mode='same', stride=1, has_bias=False),
             Conv2d(64, 64, (7, 1), pad_mode='same', stride=1, has_bias=False),
-            Conv2d(64, 96, 3, stride=1, padding=0,  pad_mode='valid', has_bias=False)]
-        )
+            Conv2d(64, 96, 3, stride=1, padding=0, pad_mode='valid', has_bias=False)])
+
+
 
         self.mixed_5a_branch_0 = Conv2d(
             192, 192, 3, stride=2, padding=0, has_bias=False)
@@ -112,6 +87,7 @@ class Stem(nn.Cell):
         self.concat2 = P.Concat(1)
 
     def construct(self, x):
+        """construct"""
         x = self.conv2d_1a_3x3(x)  # 149 x 149 x 32
         x = self.conv2d_2a_3x3(x)  # 147 x 147 x 32
         x = self.conv2d_2b_3x3(x)  # 147 x 147 x 64
@@ -129,26 +105,26 @@ class Stem(nn.Cell):
         x = self.concat2((x0, x1))  # 35 x 35 x 384
         return x
 
-
-class Inception_A(nn.Cell):
+class InceptionA(nn.Cell):
+    """InceptionA"""
     def __init__(self, in_channels):
-        super(Inception_A, self).__init__()
+        super(InceptionA, self).__init__()
         self.branch_0 = Conv2d(
             in_channels, 96, 1, stride=1, padding=0, has_bias=False)
         self.branch_1 = nn.SequentialCell([
             Conv2d(in_channels, 64, 1, stride=1, padding=0, has_bias=False),
-            Conv2d(64, 96, 3, stride=1, pad_mode='pad', padding=1, has_bias=False)]
-        )
+            Conv2d(64, 96, 3, stride=1, pad_mode='pad', padding=1, has_bias=False)])
+
         self.branch_2 = nn.SequentialCell([
             Conv2d(in_channels, 64, 1, stride=1, padding=0, has_bias=False),
             Conv2d(64, 96, 3, stride=1, pad_mode='pad',
                    padding=1, has_bias=False),
-            Conv2d(96, 96, 3, stride=1, pad_mode='pad', padding=1, has_bias=False), ]
-        )
+            Conv2d(96, 96, 3, stride=1, pad_mode='pad', padding=1, has_bias=False)])
+
         self.branch_3 = nn.SequentialCell([
             Avgpool(384, kernel_size=3, stride=1, pad_mode='same'),
-            Conv2d(384, 96, 1, stride=1, padding=0, has_bias=False)]
-        )
+            Conv2d(384, 96, 1, stride=1, padding=0, has_bias=False)])
+
         self.concat = P.Concat(1)
 
     def construct(self, x):
@@ -159,10 +135,10 @@ class Inception_A(nn.Cell):
         x4 = self.concat((x0, x1, x2, x3))
         return x4
 
-
-class Inception_B(nn.Cell):
+class InceptionB(nn.Cell):
+    """InceptionB"""
     def __init__(self, in_channels):
-        super(Inception_B, self).__init__()
+        super(InceptionB, self).__init__()
         self.branch_0 = Conv2d(in_channels, 384, 1,
                                stride=1, padding=0, has_bias=False)
         self.branch_1 = nn.SequentialCell([
@@ -196,10 +172,10 @@ class Inception_B(nn.Cell):
         x4 = self.concat((x0, x1, x2, x3))
         return x4
 
-
-class Reduction_A(nn.Cell):
+class ReductionA(nn.Cell):
+    """ReductionA"""
     def __init__(self, in_channels, k, l, m, n):
-        super(Reduction_A, self).__init__()
+        super(ReductionA, self).__init__()
         self.branch_0 = Conv2d(in_channels, n, 3, stride=2, padding=0)
         self.branch_1 = nn.SequentialCell([
             Conv2d(in_channels, k, 1, stride=1, padding=0, has_bias=False),
@@ -217,10 +193,10 @@ class Reduction_A(nn.Cell):
         x3 = self.concat((x0, x1, x2))
         return x3         # 17 x 17 x 1024
 
-
-class Reduction_B(nn.Cell):
+class ReductionB(nn.Cell):
+    """ReductionB"""
     def __init__(self, in_channels):
-        super(Reduction_B, self).__init__()
+        super(ReductionB, self).__init__()
         self.branch_0 = nn.SequentialCell([
             Conv2d(in_channels, 192, 1, stride=1, padding=0, has_bias=False),
             Conv2d(192, 192, 3, stride=2, padding=0, has_bias=False),
@@ -243,10 +219,10 @@ class Reduction_B(nn.Cell):
         x3 = self.concat((x0, x1, x2))
         return x3     # 8 x 8 x 1536
 
-
-class Inception_C(nn.Cell):
+class InceptionC(nn.Cell):
+    """InceptionC"""
     def __init__(self, in_channels):
-        super(Inception_C, self).__init__()
+        super(InceptionC, self).__init__()
         self.branch_0 = Conv2d(in_channels, 256, 1,
                                stride=1, padding=0, has_bias=False)
 
@@ -278,6 +254,7 @@ class Inception_C(nn.Cell):
         self.concat2 = P.Concat(1)
 
     def construct(self, x):
+        """construct"""
         x0 = self.branch_0(x)
         x1 = self.branch_1(x)
         x1_1 = self.branch_1_1(x1)
@@ -289,7 +266,6 @@ class Inception_C(nn.Cell):
         x2 = self.concat1((x2_1, x2_2))
         x3 = self.branch_3(x)
         return self.concat2((x0, x1, x2, x3))  # 8 x 8 x 1536
-
 
 class Inceptionv4(nn.Cell):
     """
@@ -303,14 +279,14 @@ class Inceptionv4(nn.Cell):
         super(Inceptionv4, self).__init__()
         blocks = []
         blocks.append(Stem(in_channels))
-        for i in range(4):
-            blocks.append(Inception_A(384))
-        blocks.append(Reduction_A(384, k, l, m, n))
-        for i in range(7):
-            blocks.append(Inception_B(1024))
-        blocks.append(Reduction_B(1024))
-        for i in range(3):
-            blocks.append(Inception_C(1536))
+        for _ in range(4):
+            blocks.append(InceptionA(384))
+        blocks.append(ReductionA(384, k, l, m, n))
+        for _ in range(7):
+            blocks.append(InceptionB(1024))
+        blocks.append(ReductionB(1024))
+        for _ in range(3):
+            blocks.append(InceptionC(1536))
         self.features = nn.SequentialCell(blocks)
 
         self.avgpool = P.ReduceMean(keep_dims=False)

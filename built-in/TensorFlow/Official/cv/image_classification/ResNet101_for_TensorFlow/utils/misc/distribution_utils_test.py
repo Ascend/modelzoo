@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import tensorflow.compat.v2 as tf
 
-from official.utils.misc import distribution_utils
+from utils.misc import distribution_utils
 
 
 class GetDistributionStrategyTest(tf.test.TestCase):

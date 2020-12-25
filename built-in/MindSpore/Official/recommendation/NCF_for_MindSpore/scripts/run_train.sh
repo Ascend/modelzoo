@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-# python ./train.py --data_path '/home/x00352035/ncf_data' --dataset 'ml-20m'  --train_epochs 5 --batch_size 1048576 --output_path './output/' --loss_file_name 'loss.log' --checkpoint_path './checkpoint/' 
-python ./train.py --data_path '/home/x00352035/ncf_data' --dataset 'ml-1m'  --train_epochs 20 --batch_size 256 --output_path './output/' --loss_file_name 'loss.log' --checkpoint_path './checkpoint/' 
+# python ./train.py --data_path '/PATH/TO/CONFIGED' --dataset 'ml-20m'  --train_epochs 5 --batch_size 1048576 --output_path './output/' --loss_file_name 'loss.log' --checkpoint_path './checkpoint/' 
+python ./train.py --data_path '/PATH/TO/CONFIGED' --dataset 'ml-1m'  --train_epochs 20 --batch_size 256 --output_path './output/' --loss_file_name 'loss.log' --checkpoint_path './checkpoint/' 

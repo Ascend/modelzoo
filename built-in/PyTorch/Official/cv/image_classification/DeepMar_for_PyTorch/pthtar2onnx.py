@@ -16,7 +16,7 @@ import torch
 import torch.onnx
 
 from collections import OrderedDict
-from densenet_0_2_2 import densenet121
+from baseline.model.DeepMAR import DeepMAR_ResNet50
 
 def proc_node_module(checkpoint,AttrName):
     new_state_dict = OrderedDict()
@@ -27,17 +27,18 @@ def proc_node_module(checkpoint,AttrName):
             name = k[0:]
         new_state_dict[name] = v
     return new_state_dict
+
 def convert():
-    checkpoint = torch.load("./Densenet121_Checkpoint.pth.tar", map_location='cpu')
-    checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
-    model = densenet121(pretrained=false)
+    checkpoint = torch.load("./checkpoint.path.tar", map_location='cpu')
+    checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
+    model = DeepMAR_ResNet50()
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     print(model)
 
     input_names = ["actual_input_1"]
     output_names = ["output1"]
-    dummy_input = torch.randn(16,3,224,224)
-    torch.onnx.export(model,dummy_input,"densenet121_bs16.onnx", input_names = input_names, output_names = output_names, opset_version=11)
+    dummy_input = torch.randn(10,3,224,224)
+    torch.onnx.export(model,dummy_input,"DeepMar_npu.onnx", input_names = input_names, output_names = output_names, opset_version=11)
 if __name__ == "__main__":
     convert()

@@ -20,8 +20,8 @@ from __future__ import print_function
 
 import tensorflow as tf  # pylint: disable=g-bad-import-order
 
-from official.utils.misc import keras_utils
-from official.utils.misc import model_helpers
+from utils.misc import keras_utils
+from utils.misc import model_helpers
 
 
 class PastStopThresholdTest(tf.test.TestCase):

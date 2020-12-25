@@ -1,4 +1,4 @@
-
+#!/bin/bash
 #clean slog
 rm -rf /var/log/npu/slog/host-0/*.log
 rm -rf /var/log/npu/slog/device-*/*.log
@@ -8,7 +8,7 @@ MAIN_PATH=$(dirname $(readlink -f $0))
 
 # set env
 # set env
-export PYTHONPATH=$PYTHONPTH:$MAIN_PATH/../../../
+#export PYTHONPATH=$PYTHONPTH:$MAIN_PATH/../../../
 
 RANK_SIZE=$1
 RANK_TABLE_FILE=./configs/${RANK_SIZE}p.json

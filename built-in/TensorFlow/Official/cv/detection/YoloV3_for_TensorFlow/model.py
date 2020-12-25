@@ -331,11 +331,8 @@ class yolov3(object):
         # loss_part
         ############
         # mix_up weight
-        # mix_w = y_true[..., self.class_num+5]
         # [N, 13, 13, 3, 1]
-        # mix_w = y_true[..., -1:]
-        mix_w = y_true[..., 85:]
-        # mix_w = tf.expand_dims(mix_w, -1)
+        mix_w = y_true[..., args.class_num + 5:]
         # shape: [N, 13, 13, 3, 1]
         xy_loss = tf.reduce_sum(tf.square(true_xy - pred_xy) * object_mask * box_loss_scale * mix_w) / N
         wh_loss = tf.reduce_sum(tf.square(true_tw_th - pred_tw_th) * object_mask * box_loss_scale * mix_w) / N

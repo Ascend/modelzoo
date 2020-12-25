@@ -123,18 +123,15 @@ def cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metr
     return score_kernel
 
 
-def train(train_loader, model, criterion, optimizer, epoch, all_step,  args, npu_per_node):
+def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node):
     model.train()
 
-    batch_time = AverageMeter()
-    data_time = AverageMeter()
     losses = AverageMeter()
     running_metric_text = runningScore(2)
     running_metric_kernel = runningScore(2)
 
-    end = time.time()
+    epoch_time = time.time()
     for batch_idx, (imgs, gt_texts, gt_kernels, training_masks) in enumerate(train_loader):
-        data_time.update(time.time() - end)
         loc = 'npu:{}'.format(args.npu)
         imgs = imgs.to(loc, non_blocking=True)
         gt_texts = gt_texts.to(loc, non_blocking=True)
@@ -171,33 +168,23 @@ def train(train_loader, model, criterion, optimizer, epoch, all_step,  args, npu
             scaled_loss.backward()
         optimizer.step()
 
-        score_text = cal_text_score(texts, gt_texts, training_masks, running_metric_text)
-        score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
-
-        batch_time.update(time.time() - end)
-        end = time.time()
-        if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                                                    and args.rank % npu_per_node == 0):
-            cur_step = epoch * all_step + batch_idx
-            output_log = '({batch}/{size}) cur_step: {cur_step} Batch: {btv:.5f}s {bta:.5f}s | Data: {dtv:.5f}s {dta:.5f}s | Train: {ttv:.5f}s {tta:.5f}s | TOTAL: {total:.0f}min | ETA: {eta:.0f}min | Loss: {lossv:.4f} {lossa:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
-                batch=batch_idx + 1,
-                size=len(train_loader),
-                cur_step=cur_step,
-                btv=batch_time.val,
-                bta=batch_time.avg,
-                dtv=data_time.val,
-                dta=data_time.avg,
-                ttv=batch_time.val - data_time.val,
-                tta=batch_time.avg - data_time.avg,
-                total=batch_time.avg * batch_idx / 60.0,
-                eta=batch_time.avg * (len(train_loader) - batch_idx) / 60.0,
-                lossv=losses.val,
-                lossa=losses.avg,
-                acc=score_text['Mean Acc'],
-                iou_t=score_text['Mean IoU'],
-                iou_k=score_kernel['Mean IoU'])
-            print(output_log)
-            sys.stdout.flush()
+    epoch_time = time.time() - epoch_time
+    score_text = cal_text_score(texts, gt_texts, training_masks, running_metric_text)
+    score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
+    if not args.multiprocessing_distributed or (args.multiprocessing_distributed
+                                                and args.rank % npu_per_node == 0):
+        output_log = '{epoch}/{n_epoch} | LR: {lr:.5f} | FPS: {fps:.3f} | batch: {batch:.5f}s | Loss: {lossa:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
+            epoch=epoch + 1,
+            n_epoch=args.n_epoch,
+            lr=optimizer.param_groups[0]['lr'],
+            fps=npu_per_node * len(train_loader) * args.batch_size / epoch_time,
+            batch=epoch_time / len(train_loader),
+            lossa=losses.avg,
+            acc=score_text['Mean Acc'],
+            iou_t=score_text['Mean IoU'],
+            iou_k=score_kernel['Mean IoU'])
+        print(output_log)
+        sys.stdout.flush()
 
     return (
         losses.avg, score_text['Mean Acc'], score_kernel['Mean Acc'], score_text['Mean IoU'], score_kernel['Mean IoU'])
@@ -285,7 +272,6 @@ def main(npu, npu_per_node, args):
         pin_memory=True,
         sampler=train_sampler)
 
-    all_step = len(train_loader)
     print("[npu id:", args.npu, "]", "=> creating model '{}'".format(args.arch))
     if args.arch == "resnet50":
         model = models.resnet50(pretrained=True, num_classes=kernel_num)
@@ -329,24 +315,21 @@ def main(npu, npu_per_node, args):
         adjust_learning_rate(args, optimizer, epoch)
 
         train_loss, train_te_acc, train_ke_acc, train_te_iou, train_ke_iou = train(train_loader, model, dice_loss,
-                                                                                   optimizer, epoch, all_step,
+                                                                                   optimizer, epoch,
                                                                                    args, npu_per_node)
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % npu_per_node == 0):
-            print('\nEpoch: [%d | %d] LR: %f' % (epoch + 1, args.n_epoch, optimizer.param_groups[0]['lr']))
-            if epoch % 20 == 0 or epoch > 500:
-                if train_te_acc > best_model['acc'] or train_te_iou > best_model['iou'] or train_loss < best_model[
-                    'loss']:
-                    best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth'
-                    save_checkpoint({
-                        'epoch': epoch + 1,
-                        'state_dict': model.state_dict(),
-                        'lr': args.lr,
-                        'optimizer': optimizer.state_dict(),
-                        'amp': amp.state_dict(),
-                    }, checkpoint='best', filename=best_path)
-                    best_model['acc'] = train_te_acc
-                    best_model['iou'] = train_te_iou
+            if epoch > args.n_epoch - 6:
+                best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth'
+                save_checkpoint({
+                    'epoch': epoch + 1,
+                    'state_dict': model.state_dict(),
+                    'lr': args.lr,
+                    'optimizer': optimizer.state_dict(),
+                    'amp': amp.state_dict(),
+                }, checkpoint='best', filename=best_path)
+                best_model['acc'] = train_te_acc
+                best_model['iou'] = train_te_iou
 
 
 def device_id_to_process_device_map(device_list):

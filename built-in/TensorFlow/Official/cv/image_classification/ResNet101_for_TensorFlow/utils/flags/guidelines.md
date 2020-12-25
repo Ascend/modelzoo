@@ -3,14 +3,14 @@
 1. **All common flags must be incorporated in the models.**
 
    Common flags (i.e. batch_size, model_dir, etc.) are provided by various flag definition functions,
-   and channeled through `official.utils.flags.core`. For instance to define common supervised
+   and channeled through `utils.flags.core`. For instance to define common supervised
    learning parameters one could use the following code:
 
    ```$xslt
    from absl import app as absl_app
    from absl import flags
 
-   from official.utils.flags import core as flags_core
+   from utils.flags import core as flags_core
 
 
    def define_flags():
