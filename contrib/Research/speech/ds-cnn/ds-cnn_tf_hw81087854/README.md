@@ -85,5 +85,5 @@ I1224 23:11:47.320920 281473027969040 train.py:250] Step #1: rate 0.001000, accu
 
 ```
 
-Accuracy contract of CPU and NPU(200 steps):\
+Contrast of accuracy of CPU and NPU(200 steps):\
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1225/201833_4c137a8f_8432352.png "屏幕截图.png")
