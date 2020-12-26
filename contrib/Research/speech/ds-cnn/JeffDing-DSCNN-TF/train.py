@@ -89,7 +89,6 @@ from tensorflow.python.platform import gfile
 from tensorflow.contrib import slim as slim 
 
 from npu_bridge.estimator import npu_ops
-from npu_bridge.estimator.npu import npu_scope
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
 os.environ["EXPERIMENTAL_DYNAMIC_PARTITION"]="1"
@@ -101,11 +100,7 @@ def main(_):
   # We want to see all the logging messages for this tutorial.
   tf.logging.set_verbosity(tf.logging.INFO)
 
-  # Start a new TensorFlow session.
-  with npu_scope.without_npu_compile_scope():
-        config = tf.train.shuffle_batch
-        config = tf.train.string_input_producer
-        
+  # Start a new TensorFlow session.     
   config = tf.ConfigProto()
   custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
   custom_op.name =  "NpuOptimizer"

@@ -359,24 +359,25 @@ class AudioProcessor(object):
     scaled_foreground = tf.multiply(wav_decoder.audio,
                                     self.foreground_volume_placeholder_)
     # Shift the sample's start position, and pad any gaps with zeros.
-    self.time_shift_padding_placeholder_ = tf.placeholder(tf.int32, [2, 2])
-    self.time_shift_offset_placeholder_ = tf.placeholder(tf.int32, [2])
-    padded_foreground = tf.pad(
-        scaled_foreground,
-        self.time_shift_padding_placeholder_,
-        mode='CONSTANT')
-    sliced_foreground = tf.slice(padded_foreground,
-                                 self.time_shift_offset_placeholder_,
-                                 [desired_samples, -1])
+    with npu_scope.without_npu_compile_scope():
+        self.time_shift_padding_placeholder_ = tf.placeholder(tf.int32, [2, 2])
+        self.time_shift_offset_placeholder_ = tf.placeholder(tf.int32, [2])
+        padded_foreground = tf.pad(
+            scaled_foreground,
+            self.time_shift_padding_placeholder_,
+            mode='CONSTANT')
+        sliced_foreground = tf.slice(padded_foreground,
+                                     self.time_shift_offset_placeholder_,
+                                     [desired_samples, -1])
     # Mix in background noise.
     self.background_data_placeholder_ = tf.placeholder(tf.float32,
                                                        [desired_samples, 1])
     self.background_volume_placeholder_ = tf.placeholder(tf.float32, [])
     background_mul = tf.multiply(self.background_data_placeholder_,
                                  self.background_volume_placeholder_)
-    with npu_scope.without_npu_compile_scope():
-        background_add = tf.add(background_mul, sliced_foreground)
-    background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
+    background_add = tf.add(background_mul, sliced_foreground)
+    with npu_scope.without_npu_compile_scope(): 
+        background_clamp = tf.clip_by_value(background_add, -1.0, 1.0)
     # Run the spectrogram and MFCC ops to get a 2D 'fingerprint' of the audio.
     spectrogram = contrib_audio.audio_spectrogram(
         background_clamp,
