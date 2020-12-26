@@ -1,5 +1,4 @@
 #!/bin/bash
-#sdasdsadada
 
 rm -rf /var/log/npu/slog/*
 #rm -rf /var/log/npu/profiling/*

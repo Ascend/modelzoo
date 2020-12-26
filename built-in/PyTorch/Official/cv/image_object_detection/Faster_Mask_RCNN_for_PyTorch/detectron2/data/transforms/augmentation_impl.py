@@ -142,7 +142,8 @@ class ResizeShortestEdge(Augmentation):
     """
 
     def __init__(
-        self, short_edge_length, max_size=sys.maxsize, sample_style="range", interp=Image.BILINEAR
+        self, short_edge_length, max_size=sys.maxsize, sample_style="range", 
+        interp=Image.BILINEAR, fix_shape=None
     ):
         """
         Args:
@@ -154,7 +155,7 @@ class ResizeShortestEdge(Augmentation):
         """
         super().__init__()
         assert sample_style in ["range", "choice"], sample_style
-
+        self.fix_shape = fix_shape
         self.is_range = sample_style == "range"
         if isinstance(short_edge_length, int):
             short_edge_length = (short_edge_length, short_edge_length)
@@ -179,10 +180,20 @@ class ResizeShortestEdge(Augmentation):
             newh, neww = size, scale * w
         else:
             newh, neww = scale * h, size
-        if max(newh, neww) > self.max_size:
-            scale = self.max_size * 1.0 / max(newh, neww)
-            newh = newh * scale
-            neww = neww * scale
+
+        if self.fix_shape is None:
+            self.fix_shape = [self.max_size, self.max_size]
+        TH = self.fix_shape[1]
+        TW = self.fix_shape[0]
+        h_temp, w_temp = newh, neww
+        if h_temp > TH or w_temp > TW:
+            h_wise = TH / h_temp < TW / w_temp
+            if h_wise:
+                scale = TH * 1.0 / h_temp
+                newh, neww = TH, scale * w_temp
+            else:
+                scale = TW * 1.0 / w_temp
+                newh, neww = scale * h_temp, TW
         neww = int(neww + 0.5)
         newh = int(newh + 0.5)
         return ResizeTransform(h, w, newh, neww, self.interp)

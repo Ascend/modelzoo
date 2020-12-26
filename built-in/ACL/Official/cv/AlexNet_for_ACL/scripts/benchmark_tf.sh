@@ -1,4 +1,3 @@
-#asdasd
 #!/bin/bash
 #set -x
 cur_dir=`pwd`

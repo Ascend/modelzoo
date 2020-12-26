@@ -17,6 +17,7 @@ import logging
 import numpy as np
 import pickle
 import random
+import torch
 import torch.utils.data as data
 
 from detectron2.utils.serialize import PicklableWrapper
@@ -125,6 +126,36 @@ class DatasetFromList(data.Dataset):
             return self._lst[idx]
 
 
+class PreloadLoader(object):
+    def __init__(self,
+                 loader,
+                 device
+                 ):
+        self.device = device
+        self.loader = iter(loader)
+        self.stream = torch.npu.Stream()
+        self.preload()
+    def __len__(self):
+        return len(self.loader)
+
+    def preload(self):
+        try:
+            self.next_data = next(self.loader)
+        except StopIteration:
+            self.next_data = None
+            return
+        with torch.npu.stream(self.stream):
+            for d in self.next_data:
+                d['image_preprocess'] = d['image_preprocess'].to(self.device, non_blocking=True)
+                if "instances" in d:
+                    d['instances'] = d['instances'].to(self.device, non_blocking=True)
+    def next(self):
+        torch.npu.current_stream().wait_stream(self.stream)
+        data=self.next_data
+        self.preload()
+        return data
+
+
 class AspectRatioGroupedDataset(data.IterableDataset):
     """
     Batch data that have similar aspect ratio together.
@@ -138,7 +169,7 @@ class AspectRatioGroupedDataset(data.IterableDataset):
     all with similar aspect ratios.
     """
 
-    def __init__(self, dataset, batch_size):
+    def __init__(self, dataset, batch_size,device):
         """
         Args:
             dataset: an iterable. Each element must be a dict with keys
@@ -148,12 +179,16 @@ class AspectRatioGroupedDataset(data.IterableDataset):
         self.dataset = dataset
         self.batch_size = batch_size
         self._buckets = [[] for _ in range(2)]
+        self.device = device
         # Hard-coded two aspect ratio groups: w > h and w < h.
         # Can add support for more aspect ratio groups, but doesn't seem useful
 
     def __iter__(self):
         for d in self.dataset:
             w, h = d["width"], d["height"]
+            d["image_preprocess"] = d["image_preprocess"].to(self.device)
+            if "instances" in d:
+                d['instances'] = d['instances'].to(self.device)
             bucket_id = 0 if w > h else 1
             bucket = self._buckets[bucket_id]
             bucket.append(d)

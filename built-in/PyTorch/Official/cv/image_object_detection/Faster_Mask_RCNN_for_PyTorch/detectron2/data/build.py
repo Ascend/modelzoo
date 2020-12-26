@@ -28,7 +28,7 @@ from detectron2.utils.env import seed_all_rng
 from detectron2.utils.logger import log_first_n
 
 from .catalog import DatasetCatalog, MetadataCatalog
-from .common import AspectRatioGroupedDataset, DatasetFromList, MapDataset
+from .common import AspectRatioGroupedDataset, DatasetFromList, MapDataset, PreloadLoader
 from .dataset_mapper import DatasetMapper
 from .detection_utils import check_metadata_consistency
 from .samplers import InferenceSampler, RepeatFactorTrainingSampler, TrainingSampler
@@ -260,7 +260,8 @@ def get_detection_dataset_dicts(
 
 
 def build_batch_data_loader(
-    dataset, sampler, total_batch_size, *, aspect_ratio_grouping=False, num_workers=0
+    dataset, sampler, total_batch_size, device, *,
+    aspect_ratio_grouping=False, num_workers=0
 ):
     """
     Build a batched dataloader for training.
@@ -294,19 +295,22 @@ def build_batch_data_loader(
             batch_sampler=None,
             collate_fn=operator.itemgetter(0),  # don't batch, but yield individual elements
             worker_init_fn=worker_init_reset_seed,
+            pin_memory=True
         )  # yield individual mapped dict
-        return AspectRatioGroupedDataset(data_loader, batch_size)
+        return AspectRatioGroupedDataset(data_loader, batch_size, device)
     else:
         batch_sampler = torch.utils.data.sampler.BatchSampler(
             sampler, batch_size, drop_last=True
         )  # drop_last so the batch always have the same size
-        return torch.utils.data.DataLoader(
+        data_loader = torch.utils.data.DataLoader(
             dataset,
             num_workers=num_workers,
             batch_sampler=batch_sampler,
             collate_fn=trivial_batch_collator,
             worker_init_fn=worker_init_reset_seed,
+            pin_memory=True
         )
+        return PreloadLoader(data_loader, device)
 
 
 def build_detection_train_loader(cfg, mapper=None):
@@ -361,10 +365,10 @@ def build_detection_train_loader(cfg, mapper=None):
         dataset,
         sampler,
         cfg.SOLVER.IMS_PER_BATCH,
+        cfg.MODEL.DEVICE,
         aspect_ratio_grouping=cfg.DATALOADER.ASPECT_RATIO_GROUPING,
         num_workers=cfg.DATALOADER.NUM_WORKERS,
     )
-
 
 def build_detection_test_loader(cfg, dataset_name, mapper=None):
     """
@@ -403,13 +407,12 @@ def build_detection_test_loader(cfg, dataset_name, mapper=None):
     # standard when reporting inference time in papers.
     batch_sampler = torch.utils.data.sampler.BatchSampler(sampler, 1, drop_last=False)
 
-    data_loader = torch.utils.data.DataLoader(
+    return torch.utils.data.DataLoader(
         dataset,
         num_workers=cfg.DATALOADER.NUM_WORKERS,
         batch_sampler=batch_sampler,
-        collate_fn=trivial_batch_collator,
+        collate_fn=trivial_batch_collator
     )
-    return data_loader
 
 
 def trivial_batch_collator(batch):
