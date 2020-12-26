@@ -140,7 +140,7 @@ def main(_):
 	config.gpu_options.allow_growth = True
 	sess = tf.Session(config=config)
 	sess.run(tf.global_variables_initializer())
-	saver = tf.train.Saver()
+	saver = tf.train.Saver(max_to_keep=100)
 
 	if FLAGS.model_path != "None":
 		model = FLAGS.model_path
