@@ -28,10 +28,10 @@
 from __future__ import print_function
 from six.moves import xrange
 import os
-os.environ['SLOG_PRINT_TO_STDOUT']="1"
-os.environ['GLOBAL_LOG_LEVEL']="1"
+#os.environ['SLOG_PRINT_TO_STDOUT']="1"
+#os.environ['GLOBAL_LOG_LEVEL']="1"
 #os.environ['DUMP_GE_GRAPH']="2"
-os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
+#os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
 os.system("pip3 install better_exceptions")
 import better_exceptions
 import tensorflow as tf
