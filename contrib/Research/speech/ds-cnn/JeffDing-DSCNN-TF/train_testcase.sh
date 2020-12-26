@@ -8,7 +8,7 @@ rm -rf *.pbtxt
 ulimit -c 0
 
 start_time=`date +%s`
-python3.7 train.py >train.log 2>&1
+python3.7 train.py --how_many_training_steps=100,200 >train.log 2>&1
     #--model_dir=./model_path
 
 end_time=`date +%s`
