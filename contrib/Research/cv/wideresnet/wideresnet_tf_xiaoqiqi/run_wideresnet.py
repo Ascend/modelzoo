@@ -71,7 +71,8 @@ def training_op( log,label):
     correct = tf.nn.in_top_k(log, label, 1)
     accuracy = tf.reduce_mean(tf.cast(correct, "float"))
     #optimizer
-    optimizer = tf.train.GradientDescentOptimizer(FLAGS.learning_rate)
+    #optimizer = tf.train.GradientDescentOptimizer(FLAGS.learning_rate)
+    optimizer = tf.contrib.opt.MomentumWOptimizer(0.000005,FLAGS.learning_rate,0.9)
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
         op = optimizer.minimize(loss)
