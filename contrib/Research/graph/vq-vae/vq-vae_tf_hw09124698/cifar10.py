@@ -233,7 +233,7 @@ def extract_z(MODEL,
               D,
               **kwargs):
     # >>>>>>> DATASET
-    
+    tf.reset_default_graph()
     image,label = get_image()
     with npu_scope.without_npu_compile_scope():
         images,labels = tf.train.batch(
@@ -308,6 +308,7 @@ def train_prior(config,
                 SUMMARY_PERIOD,
                 SAVE_PERIOD,
                 **kwargs):
+    tf.reset_default_graph()            
     np.random.seed(RANDOM_SEED)
     tf.set_random_seed(RANDOM_SEED)
     LOG_DIR = os.path.join(os.path.dirname(MODEL),'pixelcnn_6')
@@ -394,8 +395,6 @@ def train_prior(config,
     net.save(sess,LOG_DIR)
 
 def get_default_param():
-    from datetime import datetime
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return {
         'LOG_DIR':'./log/cifar10/a',
         'MODEL' : './log/cifar10/a/last.ckpt',
@@ -431,15 +430,13 @@ if __name__ == "__main__":
         return [[k, str(w)] for k, w in config.items()]
     config.as_matrix = as_matrix
     
-    if (args.mode == "main"):
-        main(config=config,**config)
-    elif (args.mode == "extract_z"):
-        extract_z(**config)
-    elif (args.mode == "train_prior"):
-        config['TRAIN_NUM'] = 10
-        config['LEARNING_RATE'] = 0.001
-        config['DECAY_VAL'] = 0.5
-        config['DECAY_STEPS'] = 100000
-        train_prior(config=config,**config)
+
+    main(config=config,**config)
+    extract_z(**config)
+    config['TRAIN_NUM'] = 10
+    config['LEARNING_RATE'] = 0.001
+    config['DECAY_VAL'] = 0.5
+    config['DECAY_STEPS'] = 100000
+    train_prior(config=config,**config)
 
     #test(MODEL='models/cifar10/last.ckpt',**config)
