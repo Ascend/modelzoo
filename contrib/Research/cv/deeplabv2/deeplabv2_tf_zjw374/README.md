@@ -1,18 +1,18 @@
-## deeplab v2
+### deeplab v2
 
-## 概述
+### 概述
 迁移deeplabv2到ascend910平台上使用NPU运行，并将结果与原论文进行对比
 | Accuracy | Paper | Ours  |
 |----------|-------|-------|
 | mIoU     | 0.715 | 0.744 |
 
-## Requirements
+### Requirements
 
 1.Tensorflow 1.15
 
 2.Ascend910
 
-## 代码及路径解释
+### 代码及路径解释
 ```
 deeplabv2
 └─
@@ -48,23 +48,23 @@ deeplabv2
   ├─network.py 搭建网络结构
   
 ```
-## 数据集和预训练模型
+### 数据集和预训练模型
 
 数据集：
 
 预训练模型：
 
-## 训练过程及结果
+### 训练过程及结果
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1226/215613_87d9d711_8310380.png "屏幕截图.png")
 
-## 执行训练
+### 执行训练
 
 python main.py 
 
 加载预训练模型后，共计耗时2个小时左右
 
-## 执行验证
+### 执行验证
 
 python main.py --option test
 
