@@ -14,7 +14,7 @@
 	},
    "dataset_config":{
         "dataset_channel_num":1,
-        "dir_path_list":["../datasets/jasper/input_0_54_fp32","../datasets/jasper/input_reshape_54_fp32"],
+        "dir_path_list":["../datasets/jasper/input_0","../datasets/jasper/input_reshape"],
         "frame_rate":0,
         "input_width":[4096],
         "input_height":[4096],

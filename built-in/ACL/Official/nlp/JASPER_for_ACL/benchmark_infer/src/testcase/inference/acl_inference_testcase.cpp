@@ -808,7 +808,7 @@ case_end:
 
     uint32_t channelNum = inference_json_cfg_tbl.inferCfg.channelNum;
 
-    multi_inputs_Inference_engine *Infer = new new multi_inputs_Inference_engine[deviceNum * channelNum];
+    multi_inputs_Inference_engine *Infer = new multi_inputs_Inference_engine[deviceNum * channelNum];
     Config *cfg = new Config[deviceNum * channelNum];
 
     DIR *op = nullptr;

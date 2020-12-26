@@ -53,12 +53,12 @@ file(GLOB_RECURSE src_files
 	"./venc_api/*"
 )
 
-add_executable(bert_infer   
+add_executable(benchmark   
         main.cpp
         ${src_files}
 )      
 
-target_link_libraries(bert_infer acl_dvpp ascendcl pthread avformat avcodec avutil swscale swresample opencv_highgui opencv_core)
+target_link_libraries(benchmark acl_dvpp ascendcl pthread avformat avcodec avutil swscale swresample opencv_highgui opencv_core)
 
-install(TARGETS bert_infer DESTINATION ${CMAKE_OUTPUT_DIR})
+install(TARGETS benchmark DESTINATION ${CMAKE_OUTPUT_DIR})
 
