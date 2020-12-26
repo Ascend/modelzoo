@@ -258,7 +258,7 @@ class ROIPooler(nn.Module):
             inds_mask = (level_assignments == level)
             inds_num = inds_mask.sum().item()
             if inds_num != 0:
-                temp = pooler(x[level], pooler_fmt_boxes)
+                temp = pooler(x[level], pooler_fmt_boxes).npu_format_cast(0)
                 if dtype == torch.float16:
                     output = torch.where(
                         inds_mask[:, None, None, None].repeat(
