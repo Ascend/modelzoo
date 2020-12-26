@@ -44,7 +44,6 @@ from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--mode',type=str,help='', default='main')
 parser.add_argument('--dataset',type=str,help='', default='')
 args = parser.parse_args()
 # The codes are borrowed from

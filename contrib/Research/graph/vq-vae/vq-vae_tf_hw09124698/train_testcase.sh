@@ -5,9 +5,7 @@ execpath=${PWD}
 rm -rf *.pbtxt
 ulimit -c 0
 
-python3 cifar10.py --mode main --dataset $CIFAR10 > train.log 2>&1
-python3 cifar10.py --mode extract_z --dataset $CIFAR10 >> train.log 2>&1
-python3 cifar10.py --mode train_prior --dataset $CIFAR10 >> train.log 2>&1
+python3 cifar10.py --dataset $CIFAR10 > train.log 2>&1
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
 key1="\[GEOP\]"  #功能检查字
 
