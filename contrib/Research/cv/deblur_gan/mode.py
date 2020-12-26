@@ -32,14 +32,10 @@ from PIL import Image
 import numpy as np
 import time
 import util
+from skimage.measure import compare_ssim as ssim
 import data
 
 def train(args, model, sess, saver):
-    """
-    Train model
-    args  : training parameters
-    model :
-    """
     if args.fine_tuning :
         saver.restore(sess, args.pre_trained_model)
         print("saved model is loaded for fine-tuning!")
@@ -62,13 +58,10 @@ def train(args, model, sess, saver):
             random_index = np.random.permutation(len(blur_imgs))
             for k in range(step):
                 s_time = time.time()
-                blur_batch, sharp_batch = util.batch_gen(blur_imgs, sharp_imgs, args.patch_size, args.batch_size, random_index, k, args.augmentation)
-
-                for t in range(args.critic_updates):
-                    _, D_loss = sess.run([model.D_train, model.D_loss], feed_dict = {model.blur : blur_batch, model.sharp : sharp_batch, model.epoch : epoch})
-
-                _, G_loss = sess.run([model.G_train, model.G_loss], feed_dict = {model.blur : blur_batch, model.sharp : sharp_batch, model.epoch : epoch})
-
+                blur_batch, sharp_batch = util.batch_gen(blur_imgs, sharp_imgs,
+                    args.patch_size, args.batch_size, random_index, k, args.augmentation)
+                _, G_loss = sess.run([model.G_train, model.G_loss], feed_dict =
+                    {model.blur : blur_batch, model.sharp : sharp_batch, model.epoch : epoch})
                 e_time = time.time()
 
             if epoch % args.log_freq == 0:
@@ -77,13 +70,15 @@ def train(args, model, sess, saver):
                 if args.test_with_train:
                     test(args, model, sess, saver, f, epoch, loading = False)
                 print("%d training epoch completed" % epoch)
-                print("D_loss : %0.4f, \t G_loss : %0.4f"%(D_loss, G_loss))
+                print("G_loss : %0.4f"%(G_loss))
                 print("Elpased time : %0.4f"%(e_time - s_time))
             if ((epoch + 1) % args.model_save_freq ==0):
-                saver.save(sess, './model/DeblurrGAN', global_step = epoch, write_meta_graph = False)
+                saver.save(sess, os.path.join(args.model_path, 'DeblurGAN'), global_step = epoch,
+                    write_meta_graph = False)
+
             epoch += 1
 
-        saver.save(sess, './model/DeblurrGAN_last', write_meta_graph = False)
+        saver.save(sess, os.path.join(args.model_path, 'DeblurGAN_last'), write_meta_graph = False)
 
     else:
         while epoch < args.max_epoch:
@@ -108,17 +103,21 @@ def train(args, model, sess, saver):
                 print("%d training epoch completed" % epoch)
                 print("D_loss : %0.4f, \t G_loss : %0.4f"%(D_loss, G_loss))
                 print("Elpased time : %0.4f"%(e_time - s_time))
-            if ((epoch) % args.model_save_freq ==0):
-                saver.save(sess, './model/DeblurrGAN', global_step = epoch, write_meta_graph = False)
+            if ((epoch + 1) % args.model_save_freq ==0):
+                saver.save(sess, os.path.join(args.model_path, 'DeblurGAN'), global_step = epoch,
+                    write_meta_graph = False)
 
             epoch += 1
 
-        saver.save(sess, './model/DeblurrGAN_last', global_step = epoch, write_meta_graph = False)
+        saver.save(sess, os.path.join(args.model_path, 'DeblurGAN_last'), global_step = epoch,
+            write_meta_graph = False)
 
     if args.test_with_train:
         f.close()
 
+
 def test(args, model, sess, saver, file, step = -1, loading = False):
+
     if loading:
         saver.restore(sess, args.pre_trained_model)
         print("saved model is loaded for test!")
@@ -138,7 +137,8 @@ def test(args, model, sess, saver, file, step = -1, loading = False):
         for i, ele in enumerate(blur_imgs):
             blur = np.expand_dims(ele, axis = 0)
             sharp = np.expand_dims(sharp_imgs[i], axis = 0)
-            output, psnr, ssim = sess.run([model.output, model.PSNR, model.ssim], feed_dict = {model.blur : blur, model.sharp : sharp})
+            output, psnr, ssim = sess.run([model.output, model.PSNR, model.ssim],
+                feed_dict = {model.blur : blur, model.sharp : sharp})
             if args.save_test_result:
                 output = Image.fromarray(output[0])
                 split_name = blur_img_name[i].split('.')
@@ -146,6 +146,7 @@ def test(args, model, sess, saver, file, step = -1, loading = False):
 
             PSNR_list.append(psnr)
             ssim_list.append(ssim)
+
     else:
 
         sess.run(model.data_loader.init_op['val_init'])
@@ -174,6 +175,7 @@ def test(args, model, sess, saver, file, step = -1, loading = False):
     else :
         file.write("%d-epoch step PSNR : %0.4f SSIM : %0.4f \n"%(step, mean_PSNR, mean_ssim))
 
+
 def test_only(args, model, sess, saver):
 
     saver.restore(sess,args.pre_trained_model)
@@ -190,7 +192,7 @@ def test_only(args, model, sess, saver):
             blur = np.expand_dims(ele, axis = 0)
 
             if args.chop_forward:
-                output = util.(blur, args.chop_size, sess, model, args.chop_shave)
+                output = util.recursive_forwarding(blur, args.chop_size, sess, model, args.chop_shave)
                 output = Image.fromarray(output[0])
 
             else:

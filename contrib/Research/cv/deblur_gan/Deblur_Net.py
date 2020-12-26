@@ -1,3 +1,31 @@
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import tensorflow as tf
 from ops import *
 import numpy as np
@@ -25,14 +53,16 @@ class Deblur_Net():
         self.decay_step = args.decay_step
 
     def down_scaling_feature(self, name, x, n_feats):
-        x = Conv(name = name + 'conv', x = x, filter_size = 3, in_filters = n_feats, out_filters = n_feats * 2, strides = 2, padding = 'SAME')
+        x = Conv(name = name + 'conv', x = x, filter_size = 3, in_filters = n_feats,
+            out_filters = n_feats * 2, strides = 2, padding = 'SAME')
         x = instance_norm(name = name + 'instance_norm', x = x, dim = n_feats * 2)
         x = tf.nn.relu(x)
 
         return x
 
     def up_scaling_feature(self, name, x, n_feats):
-        x = Conv_transpose(name = name + 'deconv', x = x, filter_size = 3, in_filters = n_feats, out_filters = n_feats // 2, fraction = 2, padding = 'SAME')
+        x = Conv_transpose(name = name + 'deconv', x = x, filter_size = 3, in_filters = n_feats,
+            out_filters = n_feats // 2, fraction = 2, padding = 'SAME')
         x = instance_norm(name = name + 'instance_norm', x = x, dim = n_feats // 2)
         x = tf.nn.relu(x)
 
@@ -43,12 +73,14 @@ class Deblur_Net():
         _res = x
 
         x = tf.pad(x, [[0,0],[1,1],[1,1],[0,0]], mode = 'REFLECT')
-        x = Conv(name = name + 'conv1', x = x, filter_size = 3, in_filters = n_feats, out_filters = n_feats, strides = 1, padding = 'VALID')
+        x = Conv(name = name + 'conv1', x = x, filter_size = 3, in_filters = n_feats,
+            out_filters = n_feats, strides = 1, padding = 'VALID')
         x = instance_norm(name = name + 'instance_norm1', x = x, dim = n_feats)
         x = tf.nn.relu(x)
 
         x = tf.pad(x, [[0,0],[1,1],[1,1],[0,0]], mode = 'REFLECT')
-        x = Conv(name = name + 'conv2', x = x, filter_size = 3, in_filters = n_feats, out_filters = n_feats, strides = 1, padding = 'VALID')
+        x = Conv(name = name + 'conv2', x = x, filter_size = 3, in_filters = n_feats,
+            out_filters = n_feats, strides = 1, padding = 'VALID')
         x = instance_norm(name = name + 'instance_norm2', x = x, dim = n_feats)
 
         x = x + _res
@@ -60,7 +92,8 @@ class Deblur_Net():
         with tf.variable_scope(name_or_scope = name, reuse = reuse):
             _res = x
             x = tf.pad(x, [[0,0],[3,3],[3,3],[0,0]], mode = 'REFLECT')
-            x = Conv(name = 'conv1', x = x, filter_size = 7, in_filters = self.channel, out_filters = self.n_feats, strides = 1, padding = 'VALID')
+            x = Conv(name = 'conv1', x = x, filter_size = 7, in_filters = self.channel,
+                out_filters = self.n_feats, strides = 1, padding = 'VALID')
             x = instance_norm(name = 'inst_norm1', x = x, dim = self.n_feats)
             x = tf.nn.relu(x)
 
@@ -68,13 +101,16 @@ class Deblur_Net():
                 x = self.down_scaling_feature(name = 'down_%02d'%i, x = x, n_feats = self.n_feats * (i + 1))
 
             for i in range(self.gen_resblocks):
-                x = self.res_block(name = 'res_%02d'%i, x = x, n_feats = self.n_feats * (2 ** self.num_of_down_scale))
+                x = self.res_block(name = 'res_%02d'%i, x = x, n_feats =
+                    self.n_feats * (2 ** self.num_of_down_scale))
 
             for i in range(self.num_of_down_scale):
-                x = self.up_scaling_feature(name = 'up_%02d'%i, x = x, n_feats = self.n_feats * (2 ** (self.num_of_down_scale - i)))
+                x = self.up_scaling_feature(name = 'up_%02d'%i, x = x,
+                    n_feats = self.n_feats * (2 ** (self.num_of_down_scale - i)))
 
             x = tf.pad(x, [[0,0],[3,3],[3,3],[0,0]], mode = 'REFLECT')
-            x = Conv(name = 'conv_last', x = x, filter_size = 7, in_filters = self.n_feats, out_filters = self.channel, strides = 1, padding = 'VALID')
+            x = Conv(name = 'conv_last', x = x, filter_size = 7, in_filters = self.n_feats,
+                out_filters = self.channel, strides = 1, padding = 'VALID')
             x = tf.nn.tanh(x)
             x = x + _res
             x = tf.clip_by_value(x, -1.0, 1.0)
@@ -84,7 +120,8 @@ class Deblur_Net():
     def discriminator(self, x, reuse = False, name = 'discriminator'):
 
         with tf.variable_scope(name_or_scope = name, reuse = reuse):
-            x = Conv(name = 'conv1', x = x, filter_size = 4, in_filters = self.channel, out_filters = self.n_feats, strides = 2, padding = "SAME")
+            x = Conv(name = 'conv1', x = x, filter_size = 4, in_filters = self.channel,
+                out_filters = self.n_feats, strides = 2, padding = "SAME")
             x = instance_norm(name = 'inst_norm1', x = x, dim = self.n_feats)
             x = tf.nn.leaky_relu(x)
 
@@ -94,17 +131,20 @@ class Deblur_Net():
             for i in range(self.discrim_blocks):
                 prev = n
                 n = min(2 ** (i+1), 8)
-                x = Conv(name = 'conv%02d'%i, x = x, filter_size = 4, in_filters = self.n_feats * prev, out_filters = self.n_feats * n, strides = 2, padding = "SAME")
+                x = Conv(name = 'conv%02d'%i, x = x, filter_size = 4, in_filters = self.n_feats * prev,
+                    out_filters = self.n_feats * n, strides = 2, padding = "SAME")
                 x = instance_norm(name = 'instance_norm%02d'%i, x = x, dim = self.n_feats * n)
                 x = tf.nn.leaky_relu(x)
 
             prev = n
             n = min(2**self.discrim_blocks, 8)
-            x = Conv(name = 'conv_d1', x = x, filter_size = 4, in_filters = self.n_feats * prev, out_filters = self.n_feats * n, strides = 1, padding = "SAME")
+            x = Conv(name = 'conv_d1', x = x, filter_size = 4, in_filters = self.n_feats * prev,
+                out_filters = self.n_feats * n, strides = 1, padding = "SAME")
             x = instance_norm(name = 'instance_norm_d1', x = x, dim = self.n_feats * n)
             x = tf.nn.leaky_relu(x)
 
-            x = Conv(name = 'conv_d2', x = x, filter_size = 4, in_filters = self.n_feats * n, out_filters = 1, strides = 1, padding = "SAME")
+            x = Conv(name = 'conv_d2', x = x, filter_size = 4, in_filters = self.n_feats * n,
+                out_filters = 1, strides = 1, padding = "SAME")
             x = tf.nn.sigmoid(x)
 
             return x
@@ -113,8 +153,10 @@ class Deblur_Net():
     def build_graph(self):
 
         if self.in_memory:
-            self.blur = tf.placeholder(name = "blur", shape = [None, None, None, self.channel], dtype = tf.float32)
-            self.sharp = tf.placeholder(name = "sharp", shape = [None, None, None, self.channel], dtype = tf.float32)
+            self.blur = tf.placeholder(name = "blur", shape = [None, None, None, self.channel],
+                dtype = tf.float32)
+            self.sharp = tf.placeholder(name = "sharp", shape = [None, None, None, self.channel],
+                dtype = tf.float32)
 
             x = self.blur
             label = self.sharp
@@ -124,7 +166,8 @@ class Deblur_Net():
 
             if self.mode == 'test_only':
                 x = self.data_loader.next_batch
-                label = tf.placeholder(name = 'dummy', shape = [None, None, None, self.channel], dtype = tf.float32)
+                label = tf.placeholder(name = 'dummy', shape = [None, None, None, self.channel],
+                    dtype = tf.float32)
 
             elif self.mode == 'train' or self.mode == 'test':
                 x = self.data_loader.next_batch[0]
@@ -143,24 +186,29 @@ class Deblur_Net():
 
         interpolated_input = epsilon * label + (1 - epsilon) * self.gene_img
         gradient = tf.gradients(self.discriminator(interpolated_input, reuse = True), [interpolated_input])[0]
-        GP_loss = tf.reduce_mean(tf.square(tf.sqrt(tf.reduce_mean(tf.square(gradient), axis = [1, 2, 3])) - 1))
+        GP_loss = tf.reduce_mean(tf.square(tf.sqrt(tf.reduce_mean(tf.square(gradient),
+            axis = [1, 2, 3])) - 1))
 
         d_loss_real = - tf.reduce_mean(self.real_prob)
         d_loss_fake = tf.reduce_mean(self.fake_prob)
 
+        l2_loss = tf.reduce_mean(tf.reduce_sum(tf.square(label - self.gene_img), axis = [1, 2, 3]))
         if self.mode == 'train':
             self.vgg_net = Vgg19(self.vgg_path)
             self.vgg_net.build(tf.concat([label, self.gene_img], axis = 0))
-            self.content_loss = tf.reduce_mean(tf.reduce_sum(tf.square(self.vgg_net.relu3_3[self.batch_size:] - self.vgg_net.relu3_3[:self.batch_size]), axis = 3))
+            self.content_loss = tf.reduce_mean(tf.reduce_sum(tf.square(self.vgg_net.relu3_3[self.batch_size:] -
+                self.vgg_net.relu3_3[:self.batch_size]), axis = 3))
 
             self.D_loss = d_loss_real + d_loss_fake + 10.0 * GP_loss
-            self.G_loss = - d_loss_fake + 100.0 * self.content_loss
+            # self.G_loss = - d_loss_fake + 100.0 * self.content_loss
+            self.G_loss = 100 * l2_loss
 
             t_vars = tf.trainable_variables()
             G_vars = [var for var in t_vars if 'generator' in var.name]
             D_vars = [var for var in t_vars if 'discriminator' in var.name]
 
-            lr = tf.minimum(self.learning_rate, tf.abs(2 * self.learning_rate - (self.learning_rate * tf.cast(self.epoch, tf.float32) / self.decay_step)))
+            lr = tf.minimum(self.learning_rate, tf.abs(2 * self.learning_rate -
+                (self.learning_rate * tf.cast(self.epoch, tf.float32) / self.decay_step)))
             self.D_train = tf.train.AdamOptimizer(learning_rate = lr).minimize(self.D_loss, var_list = D_vars)
             self.G_train = tf.train.AdamOptimizer(learning_rate = lr).minimize(self.G_loss, var_list = G_vars)
 

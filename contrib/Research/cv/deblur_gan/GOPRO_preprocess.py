@@ -1,8 +1,16 @@
-
-# coding: utf-8
-
-# In[1]:
-
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import os
 import subprocess
@@ -10,10 +18,6 @@ import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser()
-
-
-# In[ ]:
-
 
 def str2bool(v):
     return v.lower() in ('true')
@@ -30,7 +34,7 @@ if not os.path.exists(os.path.join(args.output_path, 'train')):
     os.mkdir(os.path.join(args.output_path, 'train'))
     os.mkdir(os.path.join(args.output_path, 'train/sharp'))
     os.mkdir(os.path.join(args.output_path, 'train/blur'))
-    
+
 if not os.path.exists(os.path.join(args.output_path, 'test')):
     os.mkdir(os.path.join(args.output_path, 'test'))
     os.mkdir(os.path.join(args.output_path, 'test/sharp'))
@@ -46,9 +50,9 @@ for direc in sorted(os.listdir(GOPRO_train_path)):
     if args.is_gamma:
         blur = os.path.join(os.path.join(GOPRO_train_path, direc), 'blur_gamma')
     else:
-        blur = os.path.join(os.path.join(GOPRO_train_path, direc), 'blur')    
+        blur = os.path.join(os.path.join(GOPRO_train_path, direc), 'blur')
     sharp = os.path.join(os.path.join(GOPRO_train_path, direc), 'sharp')
-    
+
     sharp_imgs = sorted(os.listdir(sharp))
     for i, img in enumerate(sorted(os.listdir(blur))):
         train_blur.append(os.path.join(blur, img))
@@ -70,9 +74,9 @@ for direc in sorted(os.listdir(GOPRO_test_path)):
     if args.is_gamma:
         blur = os.path.join(os.path.join(GOPRO_test_path, direc), 'blur_gamma')
     else:
-        blur = os.path.join(os.path.join(GOPRO_test_path, direc), 'blur')    
+        blur = os.path.join(os.path.join(GOPRO_test_path, direc), 'blur')
     sharp = os.path.join(os.path.join(GOPRO_test_path, direc), 'sharp')
-    
+
     sharp_imgs = sorted(os.listdir(sharp))
     for i, img in enumerate(sorted(os.listdir(blur))):
         test_blur.append(os.path.join(blur, img))
@@ -85,6 +89,3 @@ random_index = np.random.permutation(len(test_blur))[:args.test_num]
 for index in random_index:
     subprocess.call(['cp', test_blur[index], os.path.join(args.output_path, 'test/blur/%s'%('_'.join(test_blur[index].split('/')[-3:])))])
     subprocess.call(['cp', test_sharp[index], os.path.join(args.output_path, 'test/sharp/%s'%('_'.join(test_sharp[index].split('/')[-3:])))])
-    
-    
-
