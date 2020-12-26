@@ -8,7 +8,7 @@ rm -rf *.pbtxt
 ulimit -c 0
 
 start_time=`date +%s`
-python train.py --model_architecture dnn --model_size_info 128 128 128 >train.log 2>&1
+python3.7 train.py >train.log 2>&1
     #--model_dir=./model_path
 
 end_time=`date +%s`
