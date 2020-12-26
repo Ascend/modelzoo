@@ -71,7 +71,7 @@ The processed training data set and test data set are as follows(including train
 
 You can also generate the datasets by your own :
 
-[Raw GoPro training](https://drive.google.com/file/d/1H0PIXvJH4c40pk7ou6nAwoxuR4Qh_Sa2/view)
+[Raw GoPro Datasets](https://drive.google.com/file/d/1H0PIXvJH4c40pk7ou6nAwoxuR4Qh_Sa2/view)
 
 Use follwoingg scripts to preprocess the datasets:
 
@@ -109,7 +109,7 @@ You can use the processed datasets in [Processed GOPRO Datasets](https://e-share
 python main.py --train_Sharp_path ./GOPRO/path/sharp --train_Blur_path ./GOPRO/path/blur
 ```
 
-## 3. Test model
+### 3. Test model
 1) Download pre-trained model.
 [pre_trained_model](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu5u8kTXHTZTQfDuJQnf4elxsdd6lpzgKfvxm+Q6kGzw+WTlFqsPdaIm+6xbrYbPNuLYQjRmPdlWZ4IivLVC6+tg+FXOMUi/DSO/XM3s+fqz38coKqth6GgorMyFjzdAYYTq00xcdfa8Og6WafcHP0GyUgNoigo475AAReEqDDfmSVAhAUhvyyDhPwmLZWAOAK6HZ3yIZKb1H/BAW5y/EqQpQUVArr4KhGjZkGlKEUkTlzf8fXc5og4qAWoSztixra1eI94+Zi/dKRpC7WG+O7vf9lhCltRIRkKyipYDwN16X5NULiRa5UfopxiufNlmput5DsXxdZ5iG+ctGqqh2Gkv)
 
