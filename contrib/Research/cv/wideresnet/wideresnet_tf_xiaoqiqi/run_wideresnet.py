@@ -159,7 +159,7 @@ def main(_):
 						print('Epoch %d, step %d, train loss = %.4f, train accuracy = %.2f%%' % (
 						epoch + 1, step + 1, tra_loss, tra_acc * 100.0))	
 				checkpoint_path = os.path.join(FLAGS.output_path, "wideresnet.ckpt")
-				saver.save(sess, checkpoint_path)
+				saver.save(sess, checkpoint_path ,global_step = epoch)
 		#测试模块 eval
 		if FLAGS.do_train==False:
 			acc = []
