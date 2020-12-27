@@ -68,7 +68,7 @@ y_test = y[300:]
 
 
 def network(inputs, labels, scope):
-    '''network'''
+    """network"""
     net = inputs
     # See /derivations/bayesian_classification.pdf for mathematical details.
     with tf.variable_scope(scope):
@@ -83,7 +83,7 @@ def network(inputs, labels, scope):
 
 
 def make_gradient_optimizer():
-    '''make gradient optimizer'''
+    """make gradient optimizer"""
     return tf.train.AdamOptimizer(learning_rate=0.001)
 
 
@@ -125,6 +125,7 @@ with tf.Session() as sess:
 
     # plot
     def plot():
+        """plot"""
         fig = plt.figure(figsize=(5, 5))
         ax = fig.add_subplot(111)
         x0_grid, x1_grid = np.linspace(-7, 7, 50), np.linspace(-7, 7, 50)
