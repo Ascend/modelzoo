@@ -16,6 +16,8 @@ from __future__ import absolute_import, division, print_function
 import sys
 from copy import deepcopy
 import pandas as pd
+import sys
+sys.path.append('../')
 
 from dataset_base import _DEFAULT_DS_VAL_OPTIONS
 from dataset_mpisintel import MPISintelDataset
@@ -82,50 +84,40 @@ nn_opts['flow_pred_lvl'] = 2
 nn_opts['adapt_info'] = (1, 436, 1024, 2)
 
 # Instantiate the model in evaluation mode and display the model configuration
-nn = ModelPWCNet(mode=mode, options=nn_opts, dataset=ds)
+#nn = ModelPWCNet(mode=mode, options=nn_opts, dataset=ds)
 
 import tensorflow as tf
 from tensorflow.python.tools import freeze_graph
 from npu_bridge.estimator import npu_ops 
 
-# 导入网络模型文件
-import alexnet
+
+nn = ModelPWCNet(mode=mode, options=nn_opts, dataset=ds)
+
+x_tnsr = tf.placeholder(nn_opts['x_dtype'], [1] + nn_opts['x_shape'], 'x_tnsr')
+y_tnsr = tf.placeholder(nn_opts['y_dtype'], [1] + nn_opts['y_shape'], 'y_tnsr')
+
 # 指定checkpoint路径
 ckpt_path = "/opt/npu/model_ckpt/alexnet/model_8p/model.ckpt-0"
 
-def main(): 
-    tf.reset_default_graph()
-    # 定义网络的输入节点
-    inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="input")
-    # 调用网络模型生成推理图
-    logits = alexnet.inference(inputs, version="he_uniform",
-                                  num_classes=1000, is_training=False)
-    # 定义网络的输出节点
-    predict_class = tf.argmax(logits, axis=1, output_type=tf.int32, name="output")
-    with tf.Session() as sess:
-        #保存图，在./pb_model文件夹中生成model.pb文件
-        # model.pb文件将作为input_graph给到接下来的freeze_graph函数
-        tf.train.write_graph(sess.graph_def, './pb_model', 'model.pb')    # 通过write_graph生成模型文件
-        freeze_graph.freeze_graph(
-		        input_graph='./pb_model/model.pb',   # 传入write_graph生成的模型文件
-		        input_saver='',
-		        input_binary=False, 
-		        input_checkpoint=ckpt_path,  # 传入训练生成的checkpoint文件
-		        output_node_names='output',  # 与定义的推理网络输出节点保持一致
-		        restore_op_name='save/restore_all',
-		        filename_tensor_name='save/Const:0',
-		        output_graph='./pb_model/alexnet.pb',   # 改为需要生成的推理网络的名称
-		        clear_devices=False,
-		        initializer_nodes='')
-    print("done")
+# 调用网络模型生成推理图
+flow_pred_tnsr, flow_pyr_tnsr = nn.nn(x_tnsr)
+one = tf.constant(1)
+output = tf.multiply(flow_pred_tnsr, one, name='output')
 
-if __name__ == '__main__': 
-    main()
 
-freeze_graph的关键参数解释，其他参数保持默认：
-input_graph：模型文件，通过write_graph生成的模型文件。
-input_binary：配合input_graph用，为true时，input_graph为二进制，为false时，input_graph为文件。默认值是False。
-input_checkpoint：checkpoint文件地址。
-output_node_names：输出节点的名字，有多个时用逗号分开。
-output_graph：用来保存转换后的模型输出文件，即pb文件的保存地址。
-运行之后，./pb_model/文件夹中就会出现alexnet.pb文件，这是我们转换后的用于推理的pb图文件。
+with tf.Session() as sess:
+    #保存图，在./pb_model文件夹中生成model.pb文件
+    # model.pb文件将作为input_graph给到接下来的freeze_graph函数
+    tf.train.write_graph(sess.graph_def, './pb_model', 'model.pb')    # 通过write_graph生成模型文件
+    freeze_graph.freeze_graph(
+            input_graph='./pb_model/model.pb',   # 传入write_graph生成的模型文件
+            input_saver='',
+            input_binary=False, 
+            input_checkpoint=ckpt_path,  # 传入训练生成的checkpoint文件
+            output_node_names='output',  # 与定义的推理网络输出节点保持一致
+            restore_op_name='save/restore_all',
+            filename_tensor_name='save/Const:0',
+            output_graph='./pb_model/pwcnet.pb',   # 改为需要生成的推理网络的名称
+            clear_devices=False,
+            initializer_nodes='')
+print("done")
