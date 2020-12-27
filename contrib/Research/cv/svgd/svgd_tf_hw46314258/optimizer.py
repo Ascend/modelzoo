@@ -33,6 +33,7 @@ from tensorflow.contrib.distributions import percentile
 
 
 class SVGD(object):
+    '''svgd'''
     def __init__(self, grads_list, vars_list, make_gradient_optimizer, median_heuristic=True):
         self.grads_list = grads_list
         self.vars_list = vars_list
@@ -47,7 +48,7 @@ class SVGD(object):
         #       https://stackoverflow.com/questions/37009647
         #               /compute-pairwise-distance-in-a-batch-without-replicating-tensor-in-tensorflow
         stacked_vars = tf.stack(flatvars_list)
-        norm = tf.reduce_sum(stacked_vars*stacked_vars, 1)
+        norm = tf.reduce_sum(stacked_vars * stacked_vars, 1)
         norm = tf.reshape(norm, [-1, 1])
         pairwise_dists = norm - 2 * tf.matmul(stacked_vars, tf.transpose(stacked_vars)) + tf.transpose(norm)
 
@@ -72,6 +73,7 @@ class SVGD(object):
         return Kxy, dxkxy
 
     def build_optimizer(self):
+        '''build optimizer'''
         flatgrads_list, flatvars_list = [], []
 
         for grads, vars in zip(self.grads_list, self.vars_list):
@@ -126,6 +128,7 @@ class SVGD(object):
 
     @staticmethod
     def var_shape(var):
+        ‘’‘shape of variable’‘’
         out = var.get_shape().as_list()
         assert all(isinstance(a, int) for a in out), \
             'shape function assumes that shape is fully known'
@@ -141,6 +144,7 @@ class Ensemble(object):
         self.update_op = self.build_optimizer()
 
     def build_optimizer(self):
+        '''build optimizer'''
         # optimizer
         update_ops = []
         for grads, vars in zip(self.grads_list, self.vars_list):
@@ -160,7 +164,7 @@ class AdagradOptimizer(object):
         v_update_ops = []
         for gv in gvs:
             g, v = gv
-            historical_grad = tf.Variable(tf.zeros_like(g), trainable=False)
+            historical_grad = tf.Variable(tf.zeros_like(g), trainable = False)
             alpha = tf.Variable(0.0, trainable=False)
             historical_grad_update_op = historical_grad.assign(alpha*historical_grad+(1.-alpha)*g**2)
             with tf.control_dependencies([historical_grad_update_op]):
