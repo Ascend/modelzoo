@@ -128,7 +128,7 @@ class SVGD(object):
 
     @staticmethod
     def var_shape(var):
-        ‘’‘shape of variable’‘’
+        '''shape of variable'''
         out = var.get_shape().as_list()
         assert all(isinstance(a, int) for a in out), \
             'shape function assumes that shape is fully known'
