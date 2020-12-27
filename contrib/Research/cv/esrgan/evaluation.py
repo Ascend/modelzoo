@@ -73,8 +73,7 @@ def _convert_input_type_range(img):
     elif img_type == np.uint8:
         img /= 255.
     else:
-        raise TypeError('The img type should be np.float32 or np.uint8, '
-                        f'but got {img_type}')
+        raise TypeError('The img type should be np.float32 or np.uint8')
     return img
 
 

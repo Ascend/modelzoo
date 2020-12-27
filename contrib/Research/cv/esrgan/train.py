@@ -175,7 +175,20 @@ def main():
         tf.float32,
         shape=[None, FLAGS.HR_image_size, FLAGS.HR_image_size, FLAGS.channel],
         name='HR_input')
-
+    # load data
+    if FLAGS.save_data:
+        log(logflag, 'Data process : Data processing start', 'info')
+        HR_train, LR_train = load_and_save_data(FLAGS, logflag)
+        log(logflag,
+            'Data process : Data loading and data processing are completed',
+            'info')
+    else:
+        log(logflag, 'Data process : Data loading start', 'info')
+        HR_train, LR_train = load_npz_data(FLAGS)
+        log(
+            logflag,
+            'Data process : Loading existing data is completed. {} images are loaded'
+            .format(len(HR_train)), 'info')
     # build Generator and Discriminator
     network = Network(FLAGS, LR_data, HR_data)
     gen_out = network.generator()

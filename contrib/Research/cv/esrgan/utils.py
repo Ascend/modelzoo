@@ -1,4 +1,3 @@
-
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,8 +38,6 @@ import random
 
 def log(logflag, message, level='info'):
     """logging to stdout and logfile if flag is true"""
-    print(message, flush=True)
-
     if logflag:
         if level == 'info':
             logging.info(message)
