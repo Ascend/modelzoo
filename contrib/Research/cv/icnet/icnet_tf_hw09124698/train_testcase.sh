@@ -15,3 +15,4 @@ if [ `grep -c "$key1" "train.log"` -ne '0' ] && [ `grep -c "total loss" "train.l
 else
    echo "Run testcase failed!"
 fi
+cat train.log
