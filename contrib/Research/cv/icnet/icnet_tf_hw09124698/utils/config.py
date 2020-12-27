@@ -104,8 +104,8 @@ class Config(object):
         elif dataset == 'cityscapes':
             self.param = self.cityscapes_param
             self.param['data_dir'] = datapath
-            self.param['eval_list'] = os.path.join(datapath,'list/cityscapes_val_list.txt')
-            self.param['train_list'] = os.path.join(datapath,'list/cityscapes_train_list.txt')
+            self.param['eval_list'] = './list/cityscapes_val_list.txt'
+            self.param['train_list'] = './list/cityscapes_train_list.txt'
         elif dataset == 'others':
             self.param = self.others_param
 
