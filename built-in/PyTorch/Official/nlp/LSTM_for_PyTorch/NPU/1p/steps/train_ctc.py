@@ -26,6 +26,7 @@ import random
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
+import apex
 from torch.utils.tensorboard import SummaryWriter
 
 sys.path.append('./')
@@ -46,6 +47,12 @@ parser.add_argument('--loss_scale', default=128., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt_level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+
+MAX = 2147483647
+def _gen_seeds(shape):
+    return np.random.uniform(1, MAX, size=shape).astype(np.float32)
+seed_shape = (32 * 1024 * 12, )
+
 
 def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, optimizer=None, print_every=20,
               is_training=True):
@@ -76,13 +83,12 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
         out_len, batch_size, _ = out.size()
         input_sizes_npu = (input_sizes_npu * out_len).long()
         loss = loss_fn(out, targets_npu, input_sizes_npu, target_sizes_npu)
-
         prob, index = torch.max(out, dim=-1)
-        index = index.transpose(0, 1).cpu()
         loss /= batch_size
-        input_sizes = input_sizes_npu.cpu()
         cur_loss += loss.item()
         total_loss += loss.item()
+        index = index.cpu().transpose(0, 1)
+        input_sizes = input_sizes_npu.cpu()
 
         if is_training:
             optimizer.zero_grad()
@@ -191,7 +197,11 @@ def main(args, conf):
             layer_param.append(None)
         cnn_param["layer"].append(layer_param)
 
-    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out)
+    seed = _gen_seeds(seed_shape)
+    seed = torch.from_numpy(seed)
+    seed = seed.to(device)
+    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out
+                      seed=seed)
 
     num_params = 0
     for name, param in model.named_parameters():
