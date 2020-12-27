@@ -200,7 +200,7 @@ def main(args, conf):
     seed = _gen_seeds(seed_shape)
     seed = torch.from_numpy(seed)
     seed = seed.to(device)
-    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out
+    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out,
                       seed=seed)
 
     num_params = 0
