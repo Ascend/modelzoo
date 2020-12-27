@@ -200,7 +200,7 @@ def main(args, conf):
     seed = _gen_seeds(seed_shape)
     seed = torch.from_numpy(seed)
     seed = seed.to(device)
-    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out,
+    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out
                       seed=seed)
 
     num_params = 0
@@ -224,7 +224,8 @@ def main(args, conf):
     print(params)
 
     loss_fn = nn.CTCLoss(reduction='sum').to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+    optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
 
     model = model.to(device)
     if args.opt_level:

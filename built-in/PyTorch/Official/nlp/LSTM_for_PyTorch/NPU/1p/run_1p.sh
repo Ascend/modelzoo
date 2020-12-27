@@ -7,7 +7,6 @@ source pt_set_env.sh
 #2019.12.20    Update to pytorch1.2 and python3.7
 
 device_id=0
-export PTCOPY_ENABLE=1
 
 . path.sh
 stage=0
