@@ -96,8 +96,9 @@ class Network(object):
         config.gpu_options.allow_growth = True
         custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name =  "NpuOptimizer"
-        custom_op.parameter_map["use_off_line"].b = True #在昇腾AI处理器执行训练
-        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  #关闭remap开关
+        custom_op.parameter_map["mix_compile_mode"].b =  True
+        custom_op.parameter_map["use_off_line"].b = True
+        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF 
         custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
         global_init = tf.global_variables_initializer()
         local_init = tf.local_variables_initializer()

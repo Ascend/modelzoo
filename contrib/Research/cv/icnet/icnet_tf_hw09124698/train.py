@@ -1,9 +1,36 @@
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 This code is based on DrSleep's framework: https://github.com/DrSleep/tensorflow-deeplab-resnet 
 """
 import argparse
 import os
-os.environ['SLOG_PRINT_TO_STDOUT']="1"
+#os.environ['SLOG_PRINT_TO_STDOUT']="0"
 #os.environ['DUMP_GE_GRAPH']="2"
 #os.environ['PRINT_MODEL']="1"
 #os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
@@ -19,6 +46,8 @@ from utils.visualize import decode_labels
 from utils.image_reader import ImageReader, prepare_label
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+from npu_bridge.estimator.npu import npu_scope
+from tensorflow.python.compat import compat
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Reproduced ICNet")
@@ -46,15 +75,9 @@ def get_mask(gt, num_classes, ignore_label):
     less_equal_class = tf.less_equal(gt, num_classes-1)
     not_equal_ignore = tf.not_equal(gt, ignore_label)
     mask = tf.logical_and(less_equal_class, not_equal_ignore)
-    mask = tf.Session().run(mask)
-    for i in range(len(mask)):
-        for j in range(len(mask[i].shape)):
-            if mask[i][j] == True:
-                mask[i][j] = 1
-            else:
-                mask[i][j] = 0
-    indices = mask.astype(np.int32)
-    #indices = tf.squeeze(tf.where(mask), 1)
+    with npu_scope.without_npu_compile_scope():
+        mask = tf.where(mask)
+    indices = tf.squeeze(mask, 1)
 
     return indices
 
@@ -125,16 +148,18 @@ def main():
 
     # Setup training network and training samples
     train_reader = ImageReader(cfg=cfg, mode='train')
-    train_net = ICNet_BN(image_reader=train_reader, 
-                            cfg=cfg, mode='train')
+    with compat.forward_compatibility_horizon(2019, 5, 1):
+        train_net = ICNet_BN(image_reader=train_reader, 
+                                cfg=cfg, mode='train')
 
     loss_sub4, loss_sub24, loss_sub124, reduced_loss = create_losses(train_net, train_net.labels, cfg)
 
     # Setup validation network and validation samples
     with tf.variable_scope('', reuse=True):
         val_reader = ImageReader(cfg, mode='eval')
-        val_net = ICNet_BN(image_reader=val_reader, 
-                            cfg=cfg, mode='train')
+        with compat.forward_compatibility_horizon(2019, 5, 1):
+            val_net = ICNet_BN(image_reader=val_reader, 
+                                cfg=cfg, mode='train')
 
         val_loss_sub4, val_loss_sub24, val_loss_sub124, val_reduced_loss = create_losses(val_net, val_net.labels, cfg)
 
