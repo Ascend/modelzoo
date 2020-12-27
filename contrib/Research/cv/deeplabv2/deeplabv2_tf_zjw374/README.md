@@ -48,11 +48,11 @@ deeplabv2
   ├─network.py 搭建网络结构
   
 ```
-### 数据集和预训练模型
+### 数据集和预训练模型：
 
-数据集：
+数据集：PASCAL VOC 2012 dataset. 链接：http://host.robots.ox.ac.uk/pascal/VOC/
 
-预训练模型：
+预训练模型：deeplab_resnet.ckpt 链接：https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU
 
 ### 训练过程及结果
 
@@ -64,10 +64,43 @@ python main.py
 
 加载预训练模型后，共计耗时2个小时左右
 
+主要参数注释：
+```
+num_steps: how many iterations to train
+
+save_interval: how many steps to save the model
+
+random_seed: random seed for tensorflow
+
+weight_decay: l2 regularization parameter
+
+learning_rate: initial learning rate
+
+power: parameter for poly learning rate
+
+momentum: momentum
+
+encoder_name: name of pre-trained model, res101, res50 or deeplab
+
+pretrain_file: the initial pre-trained model file for transfer learning
+
+data_list: training data list file
+```
+
 ### 执行验证
 
 python main.py --option test
 
 加载NPU训练的模型，共计耗时一个半小时左右
+
+主要参数注释：
+```
+valid_step: checkpoint number for testing/validation
+
+valid_num_steps: = number of testing/validation samples
+
+valid_data_list: testing/validation data list file
+```
+
 
 
