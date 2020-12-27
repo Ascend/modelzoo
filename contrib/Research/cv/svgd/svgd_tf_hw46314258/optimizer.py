@@ -33,7 +33,7 @@ from tensorflow.contrib.distributions import percentile
 
 
 class SVGD(object):
-    '''svgd'''
+    """svgd"""
     def __init__(self, grads_list, vars_list, make_gradient_optimizer, median_heuristic=True):
         self.grads_list = grads_list
         self.vars_list = vars_list
@@ -73,7 +73,7 @@ class SVGD(object):
         return Kxy, dxkxy
 
     def build_optimizer(self):
-        '''build optimizer'''
+        """build optimizer"""
         flatgrads_list, flatvars_list = [], []
 
         for grads, vars in zip(self.grads_list, self.vars_list):
@@ -144,7 +144,7 @@ class Ensemble(object):
         self.update_op = self.build_optimizer()
 
     def build_optimizer(self):
-        '''build optimizer'''
+        """build optimizer"""
         # optimizer
         update_ops = []
         for grads, vars in zip(self.grads_list, self.vars_list):
@@ -155,6 +155,7 @@ class Ensemble(object):
 
 
 class AdagradOptimizer(object):
+    """Adagrad Optimizer"""
     def __init__(self, learning_rate=1e-3, alpha=0.9, fudge_factor=1e-6):
         self.learning_rate = tf.constant(learning_rate)
         self.alpha = alpha
@@ -165,7 +166,7 @@ class AdagradOptimizer(object):
         for gv in gvs:
             g, v = gv
             historical_grad = tf.Variable(tf.zeros_like(g), trainable = False)
-            alpha = tf.Variable(0.0, trainable=False)
+            alpha = tf.Variable(0.0, trainable = False)
             historical_grad_update_op = historical_grad.assign(alpha*historical_grad+(1.-alpha)*g**2)
             with tf.control_dependencies([historical_grad_update_op]):
                 adj_grad = tf.div(g, self.fudge_factor + tf.sqrt(historical_grad))
