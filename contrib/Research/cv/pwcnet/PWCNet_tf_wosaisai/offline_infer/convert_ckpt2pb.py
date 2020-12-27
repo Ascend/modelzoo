@@ -88,7 +88,7 @@ nn_opts['adapt_info'] = (1, 436, 1024, 2)
 
 import tensorflow as tf
 from tensorflow.python.tools import freeze_graph
-from npu_bridge.estimator import npu_ops 
+from npu_bridge.estimator import npu_ops
 
 
 nn = ModelPWCNet(mode=mode, options=nn_opts, dataset=ds)
@@ -99,7 +99,6 @@ y_tnsr = tf.placeholder(nn_opts['y_dtype'], [1] + nn_opts['y_shape'], 'y_tnsr')
 # 指定checkpoint路径
 ckpt_path = "/opt/npu/model_ckpt/alexnet/model_8p/model.ckpt-0"
 
-# 调用网络模型生成推理图
 flow_pred_tnsr, flow_pyr_tnsr = nn.nn(x_tnsr)
 one = tf.constant(1)
 output = tf.multiply(flow_pred_tnsr, one, name='output')

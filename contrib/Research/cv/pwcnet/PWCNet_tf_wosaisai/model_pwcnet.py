@@ -225,6 +225,7 @@ _DEFAULT_PWCNET_TEST_OPTIONS = {
     'use_res_cx': False,
 }
 
+
 # from ref_model import PWCNet
 
 
@@ -270,10 +271,10 @@ class ModelPWCNet(ModelBase):
         """
         if self.opts['verbose']:
             print("Building model...")
-        assert(self.num_gpus <= 1)
+        assert (self.num_gpus <= 1)
 
         # Build the backbone neural nets and collect the output tensors
-        #with tf.device(self.opts['controller']): #debug
+        # with tf.device(self.opts['controller']): #debug
         self.flow_pred_tnsr, self.flow_pyr_tnsr = self.nn(self.x_tnsr)
         print(self.flow_pred_tnsr, self.flow_pyr_tnsr)
 
@@ -325,7 +326,7 @@ class ModelPWCNet(ModelBase):
                 loss = loss_unreg
             else:
                 loss_reg = self.opts['gamma'] * \
-                    tf.reduce_sum([tf.nn.l2_loss(var) for var in tf.trainable_variables()])
+                           tf.reduce_sum([tf.nn.l2_loss(var) for var in tf.trainable_variables()])
                 loss = loss_unreg + loss_reg
 
             # Evaluate model performance on this tower
@@ -421,10 +422,10 @@ class ModelPWCNet(ModelBase):
         x_adapt /= 255.
 
         # Make sure the image dimensions are multiples of 2**pyramid_levels, pad them if they're not
-        _, pad_h = divmod(x_adapt.shape[2], 2**self.opts['pyr_lvls'])
+        _, pad_h = divmod(x_adapt.shape[2], 2 ** self.opts['pyr_lvls'])
         if pad_h != 0:
             pad_h = 2 ** self.opts['pyr_lvls'] - pad_h
-        _, pad_w = divmod(x_adapt.shape[3], 2**self.opts['pyr_lvls'])
+        _, pad_w = divmod(x_adapt.shape[3], 2 ** self.opts['pyr_lvls'])
         if pad_w != 0:
             pad_w = 2 ** self.opts['pyr_lvls'] - pad_w
         x_adapt_info = None
@@ -456,10 +457,10 @@ class ModelPWCNet(ModelBase):
         y_adapt = np.array(y, dtype=np.float32) if isinstance(y, list) else y  # list[(H,W,2)] -> (batch_size,H,W,2)
 
         # Make sure the flow dimensions are multiples of 2**pyramid_levels, pad them if they're not
-        _, pad_h = divmod(y.shape[1], 2**self.opts['pyr_lvls'])
+        _, pad_h = divmod(y.shape[1], 2 ** self.opts['pyr_lvls'])
         if pad_h != 0:
             pad_h = 2 ** self.opts['pyr_lvls'] - pad_h
-        _, pad_w = divmod(y.shape[2], 2**self.opts['pyr_lvls'])
+        _, pad_w = divmod(y.shape[2], 2 ** self.opts['pyr_lvls'])
         if pad_w != 0:
             pad_w = 2 ** self.opts['pyr_lvls'] - pad_w
         y_adapt_info = None
@@ -670,7 +671,7 @@ class ModelPWCNet(ModelBase):
                     x, y, _ = self.sess.run(train_next_batch)
                 else:
                     x, y, _ = self.ds.next_batch(batch_size * self.num_gpus, split='train')
-                    
+
                 # print('>>>>>>>>>>>>>before adapt>>>>>>>>>')
                 x_adapt, _ = self.adapt_x(x)
                 y_adapt, _ = self.adapt_y(y)
@@ -905,7 +906,7 @@ class ModelPWCNet(ModelBase):
                     df.loc[idx] = (ID, metric, duration, flow_mag_avg, flow_mag_max)
                     if save_preds:
                         flow_write(y_hat, y_hat_path)
-                        info=f"{metric_name}={metric:.2f}"
+                        info = f"{metric_name}={metric:.2f}"
                         flow_write_as_png(y_hat, y_hat_path.replace('.flo', '.png'), info=info)
                     idx += 1
 
@@ -1108,7 +1109,7 @@ class ModelPWCNet(ModelBase):
         Ref Caffee code:
             https://github.com/NVlabs/PWC-Net/blob/438ca897ae77e08f419ddce5f0d7fa63b0a27a77/Caffe/model/train.prototxt#L314-L1141
         """
-        assert(1 <= self.opts['pyr_lvls'] <= 6)
+        assert (1 <= self.opts['pyr_lvls'] <= 6)
         if self.dbg:
             print(f"Building feature pyramids (c11,c21) ... (c1{self.opts['pyr_lvls']},c2{self.opts['pyr_lvls']})")
         # Make the feature pyramids 1-based for better readability down the line
@@ -1588,7 +1589,7 @@ class ModelPWCNet(ModelBase):
                     upfeat, flow = self.predict_flow(corr, None, None, None, lvl)
                 else:
                     # Warp level of Image1's using the upsampled flow
-                    scaler = 20. / 2**lvl  # scaler values are 0.625, 1.25, 2.5, 5.0
+                    scaler = 20. / 2 ** lvl  # scaler values are 0.625, 1.25, 2.5, 5.0
                     warp = self.warp(c2[lvl], up_flow * scaler, lvl)
 
                     # Compute the cost volume
@@ -1614,7 +1615,7 @@ class ModelPWCNet(ModelBase):
                     flow_pyr.append(flow)
 
                     # Upsample the predicted flow (final output) to match the size of the images
-                    scaler = 2**self.opts['flow_pred_lvl']
+                    scaler = 2 ** self.opts['flow_pred_lvl']
                     if self.dbg:
                         print(f'Upsampling {flow.op.name} by {scaler} in each dimension.')
                     size = (lvl_height * scaler, lvl_width * scaler)
