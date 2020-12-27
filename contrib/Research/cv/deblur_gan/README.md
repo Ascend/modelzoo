@@ -10,6 +10,9 @@ This repository provides a script and recipe to train the DeblurGAN model. The c
 * [Setup](#setup)
   * [Requirements](#requirements)
 * [Quick start guide](#quick-start-guide)
+  * [Train using GOPRO dataset](#train)
+  * [Test model](#test)
+  * [Model format conversion](#frozen_model)
 * [Advanced](#advanced)
   * [Command line arguments](#command-line-arguments)
   * [Training process](#training-process)
@@ -31,7 +34,7 @@ The DeblurGAN network takes blurry image as an input and procude the correspondi
 The model we use is Conditional Wasserstein GAN with Gradient Penalty + Perceptual loss based on VGG-19 activations. Such architecture also gives good results on other image-to-image translation problems (super resolution, colorization, inpainting, dehazing etc.)
 
 <p align="center">
-  <img height="120" src="images/architecture.png">
+  <img height="360" src="images/architecture.png">
 </p>
 
 ### Default configuration
@@ -92,13 +95,13 @@ The following section lists the requirements to start training the DeblurGAN mod
 
 ## Quick Start Guide
 
-### 1. Clone the respository
+### Clone the respository
 
 ```shell
 git clone xxx
 ```
 
-### 2. Train using GOPRO dataset
+### Train using GOPRO dataset
 1) Download the pre-processed GOPRO datasets
 You can use the processed datasets in [Processed GOPRO Datasets](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu6aox8UoQcF77bZeyFadx6Qu3OYGeYxMxbOcIduJI4YPIUcta9tWioo/cl6uZ4EA3GxoNtLpTNlhYZVPrr958IF5Pme0JjgtZeWNQbze+Afhz6vhZW/f3IAowLGDziQgdkT9w7pgDFiJ6vqot9N8HsvlFhCjigsi0/ZjOeK89XAzOojy+V5/pt0ciRRYlrq7A3IxNAdeUrJl0AHkLvG3z3tUz1X/ZvEzDwhyFJwvBXoUeZMeldZI3myldU87ZSQxFBXyNS/7WxNBK1JqbDl8hLxJXEhEfVWtkV7UMV94iIu0t2mr4e8wiNW0QiKU7Oq+sE=)
 
@@ -109,7 +112,7 @@ You can use the processed datasets in [Processed GOPRO Datasets](https://e-share
 python main.py --train_Sharp_path ./GOPRO/path/sharp --train_Blur_path ./GOPRO/path/blur
 ```
 
-### 3. Test model
+### Test model
 1) Download pre-trained model.
 [pre_trained_model](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu5u8kTXHTZTQfDuJQnf4elxsdd6lpzgKfvxm+Q6kGzw+WTlFqsPdaIm+6xbrYbPNuLYQjRmPdlWZ4IivLVC6+tg+FXOMUi/DSO/XM3s+fqz38coKqth6GgorMyFjzdAYYTq00xcdfa8Og6WafcHP0GyUgNoigo475AAReEqDDfmSVAhAUhvyyDhPwmLZWAOAK6HZ3yIZKb1H/BAW5y/EqQpQUVArr4KhGjZkGlKEUkTlzf8fXc5og4qAWoSztixra1eI94+Zi/dKRpC7WG+O7vf9lhCltRIRkKyipYDwN16X5NULiRa5UfopxiufNlmput5DsXxdZ5iG+ctGqqh2Gkv)
 
@@ -125,6 +128,11 @@ python main.py --mode test_only --pre_trained_model ./path/to/model --test_Blur_
 python main.py --mode test_only --pre_trained_model ./path/to/model --test_Blur_path ./path/to/own/images --in_memory True --chop_forward True
 ```
 
+### 4. Model format conversion
+You can use ckpt2pb script to convert checkpoint to pb format froze model:
+```
+python ckpt2pb.py --model_path --ckpt_path --result_path
+```
 ## Advanced
 ### Commmand-line options
 

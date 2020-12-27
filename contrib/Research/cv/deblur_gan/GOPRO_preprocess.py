@@ -19,14 +19,16 @@ import numpy as np
 
 parser = argparse.ArgumentParser()
 
+
 def str2bool(v):
     return v.lower() in ('true')
 
-parser.add_argument("--GOPRO_path", type = str, default = './GOPRO')
-parser.add_argument("--output_path", type = str, default = './output')
-parser.add_argument("--train_num", type = int, default = 1000)
-parser.add_argument("--test_num", type = int, default = 10)
-parser.add_argument("--is_gamma", type = str2bool, default = False)
+
+parser.add_argument("--GOPRO_path", type=str, default='./GOPRO')
+parser.add_argument("--output_path", type=str, default='./output')
+parser.add_argument("--train_num", type=int, default=1000)
+parser.add_argument("--test_num", type=int, default=10)
+parser.add_argument("--is_gamma", type=str2bool, default=False)
 
 args = parser.parse_args()
 
@@ -48,7 +50,8 @@ train_sharp = []
 
 for direc in sorted(os.listdir(GOPRO_train_path)):
     if args.is_gamma:
-        blur = os.path.join(os.path.join(GOPRO_train_path, direc), 'blur_gamma')
+        blur = os.path.join(os.path.join(GOPRO_train_path, direc),
+                            'blur_gamma')
     else:
         blur = os.path.join(os.path.join(GOPRO_train_path, direc), 'blur')
     sharp = os.path.join(os.path.join(GOPRO_train_path, direc), 'sharp')
@@ -63,9 +66,18 @@ train_sharp = np.asarray(train_sharp)
 random_index = np.random.permutation(len(train_blur))[:args.train_num]
 
 for index in random_index:
-    subprocess.call(['cp', train_blur[index], os.path.join(args.output_path, 'train/blur/%s'%('_'.join(train_blur[index].split('/')[-3:])))])
-    subprocess.call(['cp', train_sharp[index], os.path.join(args.output_path, 'train/sharp/%s'%('_'.join(train_sharp[index].split('/')[-3:])))])
-
+    subprocess.call([
+        'cp', train_blur[index],
+        os.path.join(
+            args.output_path,
+            'train/blur/%s' % ('_'.join(train_blur[index].split('/')[-3:])))
+    ])
+    subprocess.call([
+        'cp', train_sharp[index],
+        os.path.join(
+            args.output_path,
+            'train/sharp/%s' % ('_'.join(train_sharp[index].split('/')[-3:])))
+    ])
 
 test_blur = []
 test_sharp = []
@@ -87,5 +99,15 @@ test_sharp = np.asarray(test_sharp)
 random_index = np.random.permutation(len(test_blur))[:args.test_num]
 
 for index in random_index:
-    subprocess.call(['cp', test_blur[index], os.path.join(args.output_path, 'test/blur/%s'%('_'.join(test_blur[index].split('/')[-3:])))])
-    subprocess.call(['cp', test_sharp[index], os.path.join(args.output_path, 'test/sharp/%s'%('_'.join(test_sharp[index].split('/')[-3:])))])
+    subprocess.call([
+        'cp', test_blur[index],
+        os.path.join(
+            args.output_path,
+            'test/blur/%s' % ('_'.join(test_blur[index].split('/')[-3:])))
+    ])
+    subprocess.call([
+        'cp', test_sharp[index],
+        os.path.join(
+            args.output_path,
+            'test/sharp/%s' % ('_'.join(test_sharp[index].split('/')[-3:])))
+    ])

@@ -32,7 +32,6 @@ import tensorflow as tf
 import numpy as np
 import time
 import inspect
-
 '''
 I modified the source code from https://github.com/machrisaa/tensorflow-vgg/blob/master/vgg19.py
 to use generally VGG19 pre-trained model
@@ -43,6 +42,7 @@ to use generally VGG19 pre-trained model
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 
+
 class Vgg19:
     def __init__(self, vgg19_npy_path=None):
         if vgg19_npy_path is None:
@@ -52,7 +52,9 @@ class Vgg19:
             vgg19_npy_path = path
             print(vgg19_npy_path)
 
-        self.data_dict = np.load(vgg19_npy_path, allow_pickle=True, encoding='latin1').item()
+        self.data_dict = np.load(vgg19_npy_path,
+                                 allow_pickle=True,
+                                 encoding='latin1').item()
         print("npy file loaded")
 
     def build(self, rgb):
@@ -67,12 +69,15 @@ class Vgg19:
         rgb_scaled = ((rgb + 1) * 255.0) / 2.0
 
         # Convert RGB to BGR
-        red, green, blue = tf.split(axis=3, num_or_size_splits=3, value = rgb_scaled)
-        bgr = tf.concat(axis=3, values=[
-            blue - VGG_MEAN[0],
-            green - VGG_MEAN[1],
-            red - VGG_MEAN[2],
-        ])
+        red, green, blue = tf.split(axis=3,
+                                    num_or_size_splits=3,
+                                    value=rgb_scaled)
+        bgr = tf.concat(axis=3,
+                        values=[
+                            blue - VGG_MEAN[0],
+                            green - VGG_MEAN[1],
+                            red - VGG_MEAN[2],
+                        ])
 
         self.conv1_1 = self.conv_layer(bgr, "conv1_1")
         self.relu1_1 = self.relu_layer(self.conv1_1, "relu1_1")
@@ -119,13 +124,21 @@ class Vgg19:
         print(("build model finished: %ds" % (time.time() - start_time)))
 
     def avg_pool(self, bottom, name):
-        return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+        return tf.nn.avg_pool(bottom,
+                              ksize=[1, 2, 2, 1],
+                              strides=[1, 2, 2, 1],
+                              padding='SAME',
+                              name=name)
 
     def max_pool(self, bottom, name):
-        return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
+        return tf.nn.max_pool(bottom,
+                              ksize=[1, 2, 2, 1],
+                              strides=[1, 2, 2, 1],
+                              padding='SAME',
+                              name=name)
 
     def relu_layer(self, bottom, name):
-        return tf.nn.relu(bottom, name = name)
+        return tf.nn.relu(bottom, name=name)
 
     def conv_layer(self, bottom, name):
         with tf.variable_scope(name):
@@ -159,4 +172,3 @@ class Vgg19:
 
     def get_fc_weight(self, name):
         return tf.constant(self.data_dict[name][0], name="weights")
-
