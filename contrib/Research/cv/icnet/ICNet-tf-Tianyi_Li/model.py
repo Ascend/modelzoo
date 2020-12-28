@@ -3,10 +3,8 @@ from network import Network
 from utils.image_reader import _infer_preprocess
 from utils.visualize import decode_labels
 
-############################################### Tianyi Li #######################################################
 from npu_bridge.estimator import npu_ops 
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig 
-################################################ Tianyi Li ######################################################
 
 class ICNet(Network):
     def __init__(self, cfg, mode, image_reader=None):
@@ -56,14 +54,13 @@ class ICNet(Network):
         return output
 
     def predict(self, image):
-        ########################## Tianyi Li #########################
+        '''
         config = tf.ConfigProto()
         custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name =  "NpuOptimizer"
         custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-        # config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
-        ########################## Tianyi Li #########################
+        '''
         return self.sess.run(self.output, feed_dict={self.img_placeholder: image})
 
     def setup(self):
@@ -352,16 +349,18 @@ class ICNet_BN(Network):
         return output
 
     def predict(self, image):
-        ########################## Tianyi Li #########################
+        '''
         config = tf.ConfigProto()
         custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name =  "NpuOptimizer"
         custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-        # config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"]) #分布式添加
-        ########################## Tianyi Li #########################
+        '''
         return self.sess.run(self.output, feed_dict={self.img_placeholder: image})
 
+    # from tensorflow.python.compat import compat
+    # with compat.forward_compatibility_horizon(2019, 05, 01):
+    
     def setup(self):
         (self.feed('data')
              .interp(s_factor=0.5, name='data_sub2')
@@ -651,3 +650,4 @@ class ICNet_BN(Network):
 
         (self.feed('sub24_sum_interp')
              .conv(1, 1, self.cfg.param['num_classes'], 1, 1, biased=True, relu=False, name='sub24_out'))
+        
