@@ -1,653 +1,373 @@
+import numpy as np
 import tensorflow as tf
-from network import Network
-from utils.image_reader import _infer_preprocess
-from utils.visualize import decode_labels
+import os
 
-from npu_bridge.estimator import npu_ops 
+from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig 
 
-class ICNet(Network):
-    def __init__(self, cfg, mode, image_reader=None):
-        self.cfg = cfg
-        self.mode = mode
+from npu_bridge.estimator.npu import npu_scope
 
-        if mode == 'train':
-            self.images, self.labels = image_reader.next_image, image_reader.next_label    
-        
-            super().__init__(inputs={'data': self.images}, cfg=self.cfg)
-
-        elif mode == 'eval':
-            self.images, self.labels = image_reader.next_image, image_reader.next_label    
-        
-            super().__init__(inputs={'data': self.images}, cfg=self.cfg)
-            
-            self.output = self.get_output_node()
-
-        elif mode == 'inference':
-            # Create placeholder and pre-process here.
-            self.img_placeholder = tf.placeholder(dtype=tf.float32, shape=cfg.INFER_SIZE)
-            self.images, self.o_shape, self.n_shape = _infer_preprocess(self.img_placeholder)
-            
-            super().__init__(inputs={'data': self.images}, cfg=self.cfg)
-
-            self.output = self.get_output_node()
-
-    def get_output_node(self):
-        if self.mode == 'inference':
-            # Get logits from final layer
-            logits = self.layers['conv6_cls']
-
-            # Upscale the logits and decode prediction to get final result.
-            logits_up = tf.image.resize_bilinear(logits, size=self.n_shape, align_corners=True)
-            logits_up = tf.image.crop_to_bounding_box(logits_up, 0, 0, self.o_shape[0], self.o_shape[1])
-
-            output_classes = tf.argmax(logits_up, axis=3)
-            output = decode_labels(output_classes, self.o_shape, self.cfg.param['num_classes'])
-
-        elif self.mode == 'eval':
-            logits = self.layers['conv6_cls']
-
-            logits_up = tf.image.resize_bilinear(logits, size=tf.shape(self.labels)[1:3], align_corners=True)
-            output = tf.argmax(logits_up, axis=3)
-            output = tf.expand_dims(output, axis=3)
-
-        return output
-
-    def predict(self, image):
-        '''
-        config = tf.ConfigProto()
-        custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-        custom_op.name =  "NpuOptimizer"
-        custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-        '''
-        return self.sess.run(self.output, feed_dict={self.img_placeholder: image})
-
-    def setup(self):
-        (self.feed('data')
-             .interp(s_factor=0.5, name='data_sub2')
-             .conv(3, 3, 32, 2, 2, biased=True, padding='SAME', relu=True, name='conv1_1_3x3_s2')
-             .conv(3, 3, 32, 1, 1, biased=True, padding='SAME', relu=True, name='conv1_2_3x3')
-             .conv(3, 3, 64, 1, 1, biased=True, padding='SAME', relu=True, name='conv1_3_3x3')
-             .zero_padding(paddings=1, name='padding0')
-             .max_pool(3, 3, 2, 2, name='pool1_3x3_s2')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=False, name='conv2_1_1x1_proj'))
-
-        (self.feed('pool1_3x3_s2')
-             .conv(1, 1, 32, 1, 1, biased=True, relu=True, name='conv2_1_1x1_reduce')
-             .zero_padding(paddings=1, name='padding1')
-             .conv(3, 3, 32, 1, 1, biased=True, relu=True, name='conv2_1_3x3')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=False, name='conv2_1_1x1_increase'))
-
-        (self.feed('conv2_1_1x1_proj',
-                   'conv2_1_1x1_increase')
-             .add(name='conv2_1')
-             .relu(name='conv2_1/relu')
-             .conv(1, 1, 32, 1, 1, biased=True, relu=True, name='conv2_2_1x1_reduce')
-             .zero_padding(paddings=1, name='padding2')
-             .conv(3, 3, 32, 1, 1, biased=True, relu=True, name='conv2_2_3x3')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=False, name='conv2_2_1x1_increase'))
-
-        (self.feed('conv2_1/relu',
-                   'conv2_2_1x1_increase')
-             .add(name='conv2_2')
-             .relu(name='conv2_2/relu')
-             .conv(1, 1, 32, 1, 1, biased=True, relu=True, name='conv2_3_1x1_reduce')
-             .zero_padding(paddings=1, name='padding3')
-             .conv(3, 3, 32, 1, 1, biased=True, relu=True, name='conv2_3_3x3')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=False, name='conv2_3_1x1_increase'))
-
-        (self.feed('conv2_2/relu',
-                   'conv2_3_1x1_increase')
-             .add(name='conv2_3')
-             .relu(name='conv2_3/relu')
-             .conv(1, 1, 256, 2, 2, biased=True, relu=False, name='conv3_1_1x1_proj'))
-
-        (self.feed('conv2_3/relu')
-             .conv(1, 1, 64, 2, 2, biased=True, relu=True, name='conv3_1_1x1_reduce')
-             .zero_padding(paddings=1, name='padding4')
-             .conv(3, 3, 64, 1, 1, biased=True, relu=True, name='conv3_1_3x3')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=False, name='conv3_1_1x1_increase'))
-
-        (self.feed('conv3_1_1x1_proj',
-                   'conv3_1_1x1_increase')
-             .add(name='conv3_1')
-             .relu(name='conv3_1/relu')
-             .interp(s_factor=0.5, name='conv3_1_sub4')
-             .conv(1, 1, 64, 1, 1, biased=True, relu=True, name='conv3_2_1x1_reduce')
-             .zero_padding(paddings=1, name='padding5')
-             .conv(3, 3, 64, 1, 1, biased=True, relu=True, name='conv3_2_3x3')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=False, name='conv3_2_1x1_increase'))
-
-        (self.feed('conv3_1_sub4',
-                   'conv3_2_1x1_increase')
-             .add(name='conv3_2')
-             .relu(name='conv3_2/relu')
-             .conv(1, 1, 64, 1, 1, biased=True, relu=True, name='conv3_3_1x1_reduce')
-             .zero_padding(paddings=1, name='padding6')
-             .conv(3, 3, 64, 1, 1, biased=True, relu=True, name='conv3_3_3x3')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=False, name='conv3_3_1x1_increase'))
-
-        (self.feed('conv3_2/relu',
-                   'conv3_3_1x1_increase')
-             .add(name='conv3_3')
-             .relu(name='conv3_3/relu')
-             .conv(1, 1, 64, 1, 1, biased=True, relu=True, name='conv3_4_1x1_reduce')
-             .zero_padding(paddings=1, name='padding7')
-             .conv(3, 3, 64, 1, 1, biased=True, relu=True, name='conv3_4_3x3')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=False, name='conv3_4_1x1_increase'))
-
-        (self.feed('conv3_3/relu',
-                   'conv3_4_1x1_increase')
-             .add(name='conv3_4')
-             .relu(name='conv3_4/relu')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_1_1x1_proj'))
-
-        (self.feed('conv3_4/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=True, name='conv4_1_1x1_reduce')
-             .zero_padding(paddings=2, name='padding8')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=True, name='conv4_1_3x3')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_1_1x1_increase'))
-
-        (self.feed('conv4_1_1x1_proj',
-                   'conv4_1_1x1_increase')
-             .add(name='conv4_1')
-             .relu(name='conv4_1/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=True, name='conv4_2_1x1_reduce')
-             .zero_padding(paddings=2, name='padding9')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=True, name='conv4_2_3x3')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_2_1x1_increase'))
-
-        (self.feed('conv4_1/relu',
-                   'conv4_2_1x1_increase')
-             .add(name='conv4_2')
-             .relu(name='conv4_2/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=True, name='conv4_3_1x1_reduce')
-             .zero_padding(paddings=2, name='padding10')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=True, name='conv4_3_3x3')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_3_1x1_increase'))
-
-        (self.feed('conv4_2/relu',
-                   'conv4_3_1x1_increase')
-             .add(name='conv4_3')
-             .relu(name='conv4_3/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=True, name='conv4_4_1x1_reduce')
-             .zero_padding(paddings=2, name='padding11')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=True, name='conv4_4_3x3')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_4_1x1_increase'))
-
-        (self.feed('conv4_3/relu',
-                   'conv4_4_1x1_increase')
-             .add(name='conv4_4')
-             .relu(name='conv4_4/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=True, name='conv4_5_1x1_reduce')
-             .zero_padding(paddings=2, name='padding12')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=True, name='conv4_5_3x3')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_5_1x1_increase'))
-
-        (self.feed('conv4_4/relu',
-                   'conv4_5_1x1_increase')
-             .add(name='conv4_5')
-             .relu(name='conv4_5/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=True, name='conv4_6_1x1_reduce')
-             .zero_padding(paddings=2, name='padding13')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=True, name='conv4_6_3x3')
-             .conv(1, 1, 512, 1, 1, biased=True, relu=False, name='conv4_6_1x1_increase'))
-
-        (self.feed('conv4_5/relu',
-                   'conv4_6_1x1_increase')
-             .add(name='conv4_6')
-             .relu(name='conv4_6/relu')
-             .conv(1, 1, 1024, 1, 1, biased=True, relu=False, name='conv5_1_1x1_proj'))
-
-        (self.feed('conv4_6/relu')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=True, name='conv5_1_1x1_reduce')
-             .zero_padding(paddings=4, name='padding14')
-             .atrous_conv(3, 3, 256, 4, biased=True, relu=True, name='conv5_1_3x3')
-             .conv(1, 1, 1024, 1, 1, biased=True, relu=False, name='conv5_1_1x1_increase'))
-
-        (self.feed('conv5_1_1x1_proj',
-                   'conv5_1_1x1_increase')
-             .add(name='conv5_1')
-             .relu(name='conv5_1/relu')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=True, name='conv5_2_1x1_reduce')
-             .zero_padding(paddings=4, name='padding15')
-             .atrous_conv(3, 3, 256, 4, biased=True, relu=True, name='conv5_2_3x3')
-             .conv(1, 1, 1024, 1, 1, biased=True, relu=False, name='conv5_2_1x1_increase'))
-
-        (self.feed('conv5_1/relu',
-                   'conv5_2_1x1_increase')
-             .add(name='conv5_2')
-             .relu(name='conv5_2/relu')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=True, name='conv5_3_1x1_reduce')
-             .zero_padding(paddings=4, name='padding16')
-             .atrous_conv(3, 3, 256, 4, biased=True, relu=True, name='conv5_3_3x3')
-             .conv(1, 1, 1024, 1, 1, biased=True, relu=False, name='conv5_3_1x1_increase'))
-
-        (self.feed('conv5_2/relu',
-                   'conv5_3_1x1_increase')
-             .add(name='conv5_3')
-             .relu(name='conv5_3/relu'))
-
-        shape = self.layers['conv5_3/relu'].get_shape().as_list()[1:3]
-        h, w = shape
-
-        if self.mode == 'eval' and self.cfg.dataset == 'cityscapes': # Change to same configuration as original prototxt
-            (self.feed('conv5_3/relu')
-                .avg_pool(33, 65, 33, 65, name='conv5_3_pool1')
-                .resize_bilinear(shape, name='conv5_3_pool1_interp'))
-
-            (self.feed('conv5_3/relu')
-                .avg_pool(17, 33, 16, 32, name='conv5_3_pool2')
-                .resize_bilinear(shape, name='conv5_3_pool2_interp'))
-
-            (self.feed('conv5_3/relu')
-                .avg_pool(13, 25, 10, 20, name='conv5_3_pool3')
-                .resize_bilinear(shape, name='conv5_3_pool3_interp'))
-
-            (self.feed('conv5_3/relu')
-                .avg_pool(8, 15, 5, 10, name='conv5_3_pool6')
-                .resize_bilinear(shape, name='conv5_3_pool6_interp'))
-        else:       # In inference phase, we support different size of images as input.
-            (self.feed('conv5_3/relu')
-                .avg_pool(h, w, h, w, name='conv5_3_pool1')
-                .resize_bilinear(shape, name='conv5_3_pool1_interp'))
-
-            (self.feed('conv5_3/relu')
-                .avg_pool(h/2, w/2, h/2, w/2, name='conv5_3_pool2')
-                .resize_bilinear(shape, name='conv5_3_pool2_interp'))
-
-            (self.feed('conv5_3/relu')
-                .avg_pool(h/3, w/3, h/3, w/3, name='conv5_3_pool3')
-                .resize_bilinear(shape, name='conv5_3_pool3_interp'))
-
-            (self.feed('conv5_3/relu')
-                .avg_pool(h/6, w/6, h/6, w/6, name='conv5_3_pool6')
-                .resize_bilinear(shape, name='conv5_3_pool6_interp'))
-
-        (self.feed('conv5_3/relu',
-                   'conv5_3_pool6_interp',
-                   'conv5_3_pool3_interp',
-                   'conv5_3_pool2_interp',
-                   'conv5_3_pool1_interp')
-             .add(name='conv5_3_sum')
-             .conv(1, 1, 256, 1, 1, biased=True, relu=True, name='conv5_4_k1')
-             .interp(z_factor=2.0, name='conv5_4_interp')
-             .zero_padding(paddings=2, name='padding17')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=False, name='conv_sub4'))
-
-        (self.feed('conv3_1/relu')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=False, name='conv3_1_sub2_proj'))
-
-        (self.feed('conv_sub4',
-                   'conv3_1_sub2_proj')
-             .add(name='sub24_sum')
-             .relu(name='sub24_sum/relu')
-             .interp(z_factor=2.0, name='sub24_sum_interp')
-             .zero_padding(paddings=2, name='padding18')
-             .atrous_conv(3, 3, 128, 2, biased=True, relu=False, name='conv_sub2'))
-
-        (self.feed('data')
-             .conv(3, 3, 32, 2, 2, biased=True, padding='SAME', relu=True, name='conv1_sub1')
-             .conv(3, 3, 32, 2, 2, biased=True, padding='SAME', relu=True, name='conv2_sub1')
-             .conv(3, 3, 64, 2, 2, biased=True, padding='SAME', relu=True, name='conv3_sub1')
-             .conv(1, 1, 128, 1, 1, biased=True, relu=False, name='conv3_sub1_proj'))
-
-        (self.feed('conv_sub2',
-                   'conv3_sub1_proj')
-             .add(name='sub12_sum')
-             .relu(name='sub12_sum/relu')
-             .interp(z_factor=2.0, name='sub12_sum_interp')
-             .conv(1, 1, self.cfg.param['num_classes'], 1, 1, biased=True, relu=False, name='conv6_cls'))
-
-
-class ICNet_BN(Network):
-    def __init__(self, cfg, mode, image_reader=None):
-        self.cfg = cfg
-        self.mode = mode
-
-        if mode == 'train':
-            self.images, self.labels = image_reader.next_image, image_reader.next_label    
-        
-            super().__init__(inputs={'data': self.images}, cfg=self.cfg)
-
-        elif mode == 'eval':
-            self.images, self.labels = image_reader.next_image, image_reader.next_label    
-        
-            super().__init__(inputs={'data': self.images}, cfg=self.cfg)
-            
-            self.output = self.get_output_node()
-
-        elif mode == 'inference':
-            # Create placeholder and pre-process here.
-            self.img_placeholder = tf.placeholder(dtype=tf.float32, shape=cfg.INFER_SIZE)
-            self.images, self.o_shape, self.n_shape = _infer_preprocess(self.img_placeholder)
-            
-            super().__init__(inputs={'data': self.images}, cfg=self.cfg)
-
-            self.output = self.get_output_node()
-
-    def get_output_node(self):
-        if self.mode == 'inference':
-            # Get logits from final layer
-            logits = self.layers['conv6_cls']
-
-            # Upscale the logits and decode prediction to get final result.
-            logits_up = tf.image.resize_bilinear(logits, size=self.n_shape, align_corners=True)
-            logits_up = tf.image.crop_to_bounding_box(logits_up, 0, 0, self.o_shape[0], self.o_shape[1])
-
-            output_classes = tf.argmax(logits_up, axis=3)
-            output = decode_labels(output_classes, self.o_shape, self.cfg.param['num_classes'])
-
-        elif self.mode == 'eval':
-            logits = self.layers['conv6_cls']
-
-            logits_up = tf.image.resize_bilinear(logits, size=tf.shape(self.labels)[1:3], align_corners=True)
-            output = tf.argmax(logits_up, axis=3)
-            output = tf.expand_dims(output, axis=3)
-
-        return output
-
-    def predict(self, image):
-        '''
-        config = tf.ConfigProto()
-        custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-        custom_op.name =  "NpuOptimizer"
-        custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-        '''
-        return self.sess.run(self.output, feed_dict={self.img_placeholder: image})
-
-    # from tensorflow.python.compat import compat
-    # with compat.forward_compatibility_horizon(2019, 05, 01):
     
-    def setup(self):
-        (self.feed('data')
-             .interp(s_factor=0.5, name='data_sub2')
-             .conv(3, 3, 32, 2, 2, biased=False, padding='SAME', relu=False, name='conv1_1_3x3_s2')
-             .batch_normalization(relu=True, name='conv1_1_3x3_s2_bn')
-             .conv(3, 3, 32, 1, 1, biased=False, padding='SAME', relu=False, name='conv1_2_3x3')
-             .batch_normalization(relu=True, name='conv1_2_3x3_bn')
-             .conv(3, 3, 64, 1, 1, biased=False, padding='SAME', relu=False, name='conv1_3_3x3')
-             .batch_normalization(relu=True, name='conv1_3_3x3_bn')
-             .zero_padding(paddings=1, name='padding0')
-             .max_pool(3, 3, 2, 2, name='pool1_3x3_s2')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv2_1_1x1_proj')
-             .batch_normalization(relu=False, name='conv2_1_1x1_proj_bn'))
+DEFAULT_PADDING = 'VALID'
+DEFAULT_DATAFORMAT = 'NHWC'
+layer_name = []
+BN_param_map = {'scale':    'gamma',
+                'offset':   'beta',
+                'variance': 'moving_variance',
+                'mean':     'moving_mean'}
+                
+def layer(op):
+    '''Decorator for composable network layers.'''
+    def layer_decorated(self, *args, **kwargs):
+        # Automatically set a name if not provided.
+        name = kwargs.setdefault('name', self.get_unique_name(op.__name__))
+        # Figure out the layer inputs.
+        if len(self.terminals) == 0:
+            raise RuntimeError('No input variables found for layer %s.' % name)
+        elif len(self.terminals) == 1:
+            layer_input = self.terminals[0]
+        else:
+            layer_input = list(self.terminals)
+        # Perform the operation and get the output.
+        layer_output = op(self, layer_input, *args, **kwargs)
+        # Add to layer LUT.
+        self.layers[name] = layer_output
+        layer_name.append(name)
+        # This output is now the input for the next layer.
+        self.feed(layer_output)
+        # Return self for chained calls.
+        return self
 
-        (self.feed('pool1_3x3_s2')
-             .conv(1, 1, 32, 1, 1, biased=False, relu=False, name='conv2_1_1x1_reduce')
-             .batch_normalization(relu=True, name='conv2_1_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding1')
-             .conv(3, 3, 32, 1, 1, biased=False, relu=False, name='conv2_1_3x3')
-             .batch_normalization(relu=True, name='conv2_1_3x3_bn')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv2_1_1x1_increase')
-             .batch_normalization(relu=False, name='conv2_1_1x1_increase_bn'))
-
-        (self.feed('conv2_1_1x1_proj_bn',
-                   'conv2_1_1x1_increase_bn')
-             .add(name='conv2_1')
-             .relu(name='conv2_1/relu')
-             .conv(1, 1, 32, 1, 1, biased=False, relu=False, name='conv2_2_1x1_reduce')
-             .batch_normalization(relu=True, name='conv2_2_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding2')
-             .conv(3, 3, 32, 1, 1, biased=False, relu=False, name='conv2_2_3x3')
-             .batch_normalization(relu=True, name='conv2_2_3x3_bn')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv2_2_1x1_increase')
-             .batch_normalization(relu=False, name='conv2_2_1x1_increase_bn'))
-
-        (self.feed('conv2_1/relu',
-                   'conv2_2_1x1_increase_bn')
-             .add(name='conv2_2')
-             .relu(name='conv2_2/relu')
-             .conv(1, 1, 32, 1, 1, biased=False, relu=False, name='conv2_3_1x1_reduce')
-             .batch_normalization(relu=True, name='conv2_3_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding3')
-             .conv(3, 3, 32, 1, 1, biased=False, relu=False, name='conv2_3_3x3')
-             .batch_normalization(relu=True, name='conv2_3_3x3_bn')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv2_3_1x1_increase')
-             .batch_normalization(relu=False, name='conv2_3_1x1_increase_bn'))
-
-        (self.feed('conv2_2/relu',
-                   'conv2_3_1x1_increase_bn')
-             .add(name='conv2_3')
-             .relu(name='conv2_3/relu')
-             .conv(1, 1, 256, 2, 2, biased=False, relu=False, name='conv3_1_1x1_proj')
-             .batch_normalization(relu=False, name='conv3_1_1x1_proj_bn'))
-
-        (self.feed('conv2_3/relu')
-             .conv(1, 1, 64, 2, 2, biased=False, relu=False, name='conv3_1_1x1_reduce')
-             .batch_normalization(relu=True, name='conv3_1_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding4')
-             .conv(3, 3, 64, 1, 1, biased=False, relu=False, name='conv3_1_3x3')
-             .batch_normalization(relu=True, name='conv3_1_3x3_bn')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv3_1_1x1_increase')
-             .batch_normalization(relu=False, name='conv3_1_1x1_increase_bn'))
-
-        (self.feed('conv3_1_1x1_proj_bn',
-                   'conv3_1_1x1_increase_bn')
-             .add(name='conv3_1')
-             .relu(name='conv3_1/relu')
-             .interp(s_factor=0.5, name='conv3_1_sub4')
-             .conv(1, 1, 64, 1, 1, biased=False, relu=False, name='conv3_2_1x1_reduce')
-             .batch_normalization(relu=True, name='conv3_2_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding5')
-             .conv(3, 3, 64, 1, 1, biased=False, relu=False, name='conv3_2_3x3')
-             .batch_normalization(relu=True, name='conv3_2_3x3_bn')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv3_2_1x1_increase')
-             .batch_normalization(relu=False, name='conv3_2_1x1_increase_bn'))
-
-        (self.feed('conv3_1_sub4',
-                   'conv3_2_1x1_increase_bn')
-             .add(name='conv3_2')
-             .relu(name='conv3_2/relu')
-             .conv(1, 1, 64, 1, 1, biased=False, relu=False, name='conv3_3_1x1_reduce')
-             .batch_normalization(relu=True, name='conv3_3_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding6')
-             .conv(3, 3, 64, 1, 1, biased=False, relu=False, name='conv3_3_3x3')
-             .batch_normalization(relu=True, name='conv3_3_3x3_bn')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv3_3_1x1_increase')
-             .batch_normalization(relu=False, name='conv3_3_1x1_increase_bn'))
+    return layer_decorated
 
 
-        (self.feed('conv3_2/relu',
-                   'conv3_3_1x1_increase_bn')
-             .add(name='conv3_3')
-             .relu(name='conv3_3/relu')
-             .conv(1, 1, 64, 1, 1, biased=False, relu=False, name='conv3_4_1x1_reduce')
-             .batch_normalization(relu=True, name='conv3_4_1x1_reduce_bn')
-             .zero_padding(paddings=1, name='padding7')
-             .conv(3, 3, 64, 1, 1, biased=False, relu=False, name='conv3_4_3x3')
-             .batch_normalization(relu=True, name='conv3_4_3x3_bn')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv3_4_1x1_increase')
-             .batch_normalization(relu=False, name='conv3_4_1x1_increase_bn'))
-
-        (self.feed('conv3_3/relu',
-                   'conv3_4_1x1_increase_bn')
-             .add(name='conv3_4')
-             .relu(name='conv3_4/relu')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_1_1x1_proj')
-             .batch_normalization(relu=False, name='conv4_1_1x1_proj_bn'))
-
-        (self.feed('conv3_4/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv4_1_1x1_reduce')
-             .batch_normalization(relu=True, name='conv4_1_1x1_reduce_bn')
-             .zero_padding(paddings=2, name='padding8')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv4_1_3x3')
-             .batch_normalization(relu=True, name='conv4_1_3x3_bn')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_1_1x1_increase')
-             .batch_normalization(relu=False, name='conv4_1_1x1_increase_bn'))
-
-        (self.feed('conv4_1_1x1_proj_bn',
-                   'conv4_1_1x1_increase_bn')
-             .add(name='conv4_1')
-             .relu(name='conv4_1/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv4_2_1x1_reduce')
-             .batch_normalization(relu=True, name='conv4_2_1x1_reduce_bn')
-             .zero_padding(paddings=2, name='padding9')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv4_2_3x3')
-             .batch_normalization(relu=True, name='conv4_2_3x3_bn')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_2_1x1_increase')
-             .batch_normalization(relu=False, name='conv4_2_1x1_increase_bn'))
-
-        (self.feed('conv4_1/relu',
-                   'conv4_2_1x1_increase_bn')
-             .add(name='conv4_2')
-             .relu(name='conv4_2/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv4_3_1x1_reduce')
-             .batch_normalization(relu=True, name='conv4_3_1x1_reduce_bn')
-             .zero_padding(paddings=2, name='padding10')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv4_3_3x3')
-             .batch_normalization(relu=True, name='conv4_3_3x3_bn')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_3_1x1_increase')
-             .batch_normalization(relu=False, name='conv4_3_1x1_increase_bn'))
-
-        (self.feed('conv4_2/relu',
-                   'conv4_3_1x1_increase_bn')
-             .add(name='conv4_3')
-             .relu(name='conv4_3/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv4_4_1x1_reduce')
-             .batch_normalization(relu=True, name='conv4_4_1x1_reduce_bn')
-             .zero_padding(paddings=2, name='padding11')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv4_4_3x3')
-             .batch_normalization(relu=True, name='conv4_4_3x3_bn')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_4_1x1_increase')
-             .batch_normalization(relu=False, name='conv4_4_1x1_increase_bn'))
-
-        (self.feed('conv4_3/relu',
-                   'conv4_4_1x1_increase_bn')
-             .add(name='conv4_4')
-             .relu(name='conv4_4/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv4_5_1x1_reduce')
-             .batch_normalization(relu=True, name='conv4_5_1x1_reduce_bn')
-             .zero_padding(paddings=2, name='padding12')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv4_5_3x3')
-             .batch_normalization(relu=True, name='conv4_5_3x3_bn')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_5_1x1_increase')
-             .batch_normalization(relu=False, name='conv4_5_1x1_increase_bn'))
-
-        (self.feed('conv4_4/relu',
-                   'conv4_5_1x1_increase_bn')
-             .add(name='conv4_5')
-             .relu(name='conv4_5/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv4_6_1x1_reduce')
-             .batch_normalization(relu=True, name='conv4_6_1x1_reduce_bn')
-             .zero_padding(paddings=2, name='padding13')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv4_6_3x3')
-             .batch_normalization(relu=True, name='conv4_6_3x3_bn')
-             .conv(1, 1, 512, 1, 1, biased=False, relu=False, name='conv4_6_1x1_increase')
-             .batch_normalization(relu=False, name='conv4_6_1x1_increase_bn'))
-
-        (self.feed('conv4_5/relu',
-                   'conv4_6_1x1_increase_bn')
-             .add(name='conv4_6')
-             .relu(name='conv4_6/relu')
-             .conv(1, 1, 1024, 1, 1, biased=False, relu=False, name='conv5_1_1x1_proj')
-             .batch_normalization(relu=False, name='conv5_1_1x1_proj_bn'))
-
-        (self.feed('conv4_6/relu')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv5_1_1x1_reduce')
-             .batch_normalization(relu=True, name='conv5_1_1x1_reduce_bn')
-             .zero_padding(paddings=4, name='padding14')
-             .atrous_conv(3, 3, 256, 4, biased=False, relu=False, name='conv5_1_3x3')
-             .batch_normalization(relu=True, name='conv5_1_3x3_bn')
-             .conv(1, 1, 1024, 1, 1, biased=False, relu=False, name='conv5_1_1x1_increase')
-             .batch_normalization(relu=False, name='conv5_1_1x1_increase_bn'))
-
-        (self.feed('conv5_1_1x1_proj_bn',
-                   'conv5_1_1x1_increase_bn')
-             .add(name='conv5_1')
-             .relu(name='conv5_1/relu')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv5_2_1x1_reduce')
-             .batch_normalization(relu=True, name='conv5_2_1x1_reduce_bn')
-             .zero_padding(paddings=4, name='padding15')
-             .atrous_conv(3, 3, 256, 4, biased=False, relu=False, name='conv5_2_3x3')
-             .batch_normalization(relu=True, name='conv5_2_3x3_bn')
-             .conv(1, 1, 1024, 1, 1, biased=False, relu=False, name='conv5_2_1x1_increase')
-             .batch_normalization(relu=False, name='conv5_2_1x1_increase_bn'))
-
-        (self.feed('conv5_1/relu',
-                   'conv5_2_1x1_increase_bn')
-             .add(name='conv5_2')
-             .relu(name='conv5_2/relu')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv5_3_1x1_reduce')
-             .batch_normalization(relu=True, name='conv5_3_1x1_reduce_bn')
-             .zero_padding(paddings=4, name='padding16')
-             .atrous_conv(3, 3, 256, 4, biased=False, relu=False, name='conv5_3_3x3')
-             .batch_normalization(relu=True, name='conv5_3_3x3_bn')
-             .conv(1, 1, 1024, 1, 1, biased=False, relu=False, name='conv5_3_1x1_increase')
-             .batch_normalization(relu=False, name='conv5_3_1x1_increase_bn'))
-
-        (self.feed('conv5_2/relu',
-                   'conv5_3_1x1_increase_bn')
-             .add(name='conv5_3')
-             .relu(name='conv5_3/relu'))
-
-        shape = self.layers['conv5_3/relu'].get_shape().as_list()[1:3]
-        h, w = shape
-
-        (self.feed('conv5_3/relu')
-             .avg_pool(h, w, h, w, name='conv5_3_pool1')
-             .resize_bilinear(shape, name='conv5_3_pool1_interp'))
-
-        (self.feed('conv5_3/relu')
-             .avg_pool(h/2, w/2, h/2, w/2, name='conv5_3_pool2')
-             .resize_bilinear(shape, name='conv5_3_pool2_interp'))
-
-        (self.feed('conv5_3/relu')
-             .avg_pool(h/3, w/3, h/3, w/3, name='conv5_3_pool3')
-             .resize_bilinear(shape, name='conv5_3_pool3_interp'))
-
-        (self.feed('conv5_3/relu')
-             .avg_pool(h/4, w/4, h/4, w/4, name='conv5_3_pool6')
-             .resize_bilinear(shape, name='conv5_3_pool6_interp'))
-
-        (self.feed('conv5_3/relu',
-                   'conv5_3_pool6_interp',
-                   'conv5_3_pool3_interp',
-                   'conv5_3_pool2_interp',
-                   'conv5_3_pool1_interp')
-             .add(name='conv5_3_sum')
-             .conv(1, 1, 256, 1, 1, biased=False, relu=False, name='conv5_4_k1')
-             .batch_normalization(relu=True, name='conv5_4_k1_bn')
-             .interp(z_factor=2.0, name='conv5_4_interp')
-             .zero_padding(paddings=2, name='padding17')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv_sub4')
-             .batch_normalization(relu=False, name='conv_sub4_bn'))
-
-        (self.feed('conv3_1/relu')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv3_1_sub2_proj')
-             .batch_normalization(relu=False, name='conv3_1_sub2_proj_bn'))
-
-        (self.feed('conv_sub4_bn',
-                   'conv3_1_sub2_proj_bn')
-             .add(name='sub24_sum')
-             .relu(name='sub24_sum/relu')
-             .interp(z_factor=2.0, name='sub24_sum_interp')
-             .zero_padding(paddings=2, name='padding18')
-             .atrous_conv(3, 3, 128, 2, biased=False, relu=False, name='conv_sub2')
-             .batch_normalization(relu=False, name='conv_sub2_bn'))
-
-        (self.feed('data')
-             .conv(3, 3, 32, 2, 2, biased=False, padding='SAME', relu=False, name='conv1_sub1')
-             .batch_normalization(relu=True, name='conv1_sub1_bn')
-             .conv(3, 3, 32, 2, 2, biased=False, padding='SAME', relu=False, name='conv2_sub1')
-             .batch_normalization(relu=True, name='conv2_sub1_bn')
-             .conv(3, 3, 64, 2, 2, biased=False, padding='SAME', relu=False, name='conv3_sub1')
-             .batch_normalization(relu=True, name='conv3_sub1_bn')
-             .conv(1, 1, 128, 1, 1, biased=False, relu=False, name='conv3_sub1_proj')
-             .batch_normalization(relu=False, name='conv3_sub1_proj_bn'))
-
-        (self.feed('conv_sub2_bn',
-                   'conv3_sub1_proj_bn')
-             .add(name='sub12_sum')
-             .relu(name='sub12_sum/relu')
-             .interp(z_factor=2.0, name='sub12_sum_interp')
-             .conv(1, 1, self.cfg.param['num_classes'], 1, 1, biased=True, relu=False, name='conv6_cls'))
-
-        (self.feed('conv5_4_interp')
-             .conv(1, 1, self.cfg.param['num_classes'], 1, 1, biased=True, relu=False, name='sub4_out'))
-
-        (self.feed('sub24_sum_interp')
-             .conv(1, 1, self.cfg.param['num_classes'], 1, 1, biased=True, relu=False, name='sub24_out'))
+class Network(object):
+    def __init__(self, inputs, cfg, trainable=True):
+        # The input nodes for this network
+        self.inputs = inputs
+        # The current list of terminal nodes
+        self.terminals = []
+        # Mapping from layer names to layers
+        self.layers = dict(inputs)
         
+        self.trainable = trainable
+
+        # Switch variable for dropout
+        self.use_dropout = tf.placeholder_with_default(tf.constant(1.0),
+                                                       shape=[],
+                                                       name='use_dropout')
+        self.filter_scale = cfg.filter_scale
+
+        # If true, the resulting variables are set as trainable
+        self.is_training = cfg.is_training
+
+        self.setup()
+
+    def setup(self, is_training):
+        '''Construct the network. '''
+        raise NotImplementedError('Must be implemented by the subclass.')
+    
+    def create_session(self):
+        
+        '''
+        # yuan lai code
+        # Set up tf session and initialize variables.
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        
+        global_init = tf.global_variables_initializer()
+        local_init = tf.local_variables_initializer()
+        
+
+        self.sess = tf.Session(config=config)
+        self.sess.run([global_init, local_init])
+        
+        '''
+        
+        #from npu_bridge.estimator import npu_ops
+        #from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+        
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        
+        global_init = tf.global_variables_initializer()
+        local_init = tf.local_variables_initializer()
+        
+        custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+        custom_op.name =  "NpuOptimizer"
+        custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
+        custom_op.parameter_map["mix_compile_mode"].b =  True
+        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+
+        self.sess = tf.Session(config=config)
+        self.sess.run([global_init, local_init])
+                
+        
+    def restore(self, data_path, var_list=None):
+        if data_path.endswith('.npy'):
+            self.load_npy(data_path, self.sess)
+        else:
+            loader = tf.train.Saver(var_list=tf.global_variables())
+            loader.restore(self.sess, data_path)
+        
+        print('Restore from {}'.format(data_path))
+    
+    def save(self, saver, save_dir, step):
+        model_name = 'model.ckpt'
+        checkpoint_path = os.path.join(save_dir, model_name)
+        
+        if not os.path.exists(save_dir):
+           os.makedirs(save_dir)
+
+        saver.save(self.sess, checkpoint_path, global_step=step)
+        print('The checkpoint has been created, step: {}'.format(step))
+
+    ## Restore from .npy
+    def load_npy(self, data_path, session, ignore_missing=False):
+        '''Load network weights.
+        data_path: The path to the numpy-serialized network weights
+        session: The current TensorFlow session
+        ignore_missing: If true, serialized weights for missing layers are ignored.
+        '''
+        data_dict = np.load(data_path, encoding='latin1', allow_pickle=True).item()# Tianyi Li
+        for op_name in data_dict:
+            with tf.variable_scope(op_name, reuse=True):
+                for param_name, data in data_dict[op_name].items():
+                    try:
+                        if 'bn' in op_name:
+                            param_name = BN_param_map[param_name]
+
+                        var = tf.get_variable(param_name)
+                        session.run(var.assign(data))
+                    except ValueError:
+                        if not ignore_missing:
+                            raise
+
+    def feed(self, *args):
+        '''Set the input(s) for the next operation by replacing the terminal nodes.
+        The arguments can be either layer names or the actual layers.
+        '''
+        assert len(args) != 0
+        self.terminals = []
+        for fed_layer in args:
+            if isinstance(fed_layer, str):
+                try:
+                    fed_layer = self.layers[fed_layer]
+                except KeyError:
+                    raise KeyError('Unknown layer name fed: %s' % fed_layer)
+            self.terminals.append(fed_layer)
+        return self
+
+    def get_output(self):
+        '''Returns the current network output.'''
+        return self.terminals[1]
+        #return self.terminals[-1]
+
+    def get_unique_name(self, prefix):
+        '''Returns an index-suffixed unique name for the given prefix.
+        This is used for auto-generating layer names based on the type-prefix.
+        '''
+        ident = sum(t.startswith(prefix) for t, _ in self.layers.items()) + 1
+        return '%s_%d' % (prefix, ident)
+
+    def make_var(self, name, shape):
+        '''Creates a new TensorFlow variable.'''
+        return tf.get_variable(name, shape, trainable=self.trainable)
+
+    def get_layer_name(self):
+        return layer_name
+    def validate_padding(self, padding):
+        '''Verifies that the padding is one of the supported ones.'''
+        assert padding in ('SAME', 'VALID')
+    @layer
+    def zero_padding(self, input, paddings, name):
+        pad_mat = np.array([[0,0], [paddings, paddings], [paddings, paddings], [0, 0]])
+        return tf.pad(input, paddings=pad_mat, name=name)
+
+    @layer
+    def conv(self,
+             input,
+             k_h,
+             k_w,
+             c_o,
+             s_h,
+             s_w,
+             name,
+             relu=True,
+             padding=DEFAULT_PADDING,
+             group=1,
+             biased=True):
+        # Verify that the padding is acceptable
+        self.validate_padding(padding)
+        # Get the number of channels in the input
+        c_i = input.get_shape()[-1]
+
+        if 'out' not in name and 'cls' not in name:
+            c_o *= self.filter_scale
+
+        convolve = lambda i, k: tf.nn.conv2d(i, k, [1, s_h, s_w, 1], padding=padding,data_format=DEFAULT_DATAFORMAT)
+        with tf.variable_scope(name) as scope:
+            kernel = self.make_var('weights', shape=[k_h, k_w, c_i, c_o])
+            output = convolve(input, kernel)
+
+            if biased:
+                biases = self.make_var('biases', [c_o])
+                output = tf.nn.bias_add(output, biases)
+            if relu:
+                output = tf.nn.relu(output, name=scope.name)
+            return output
+
+    @layer
+    def atrous_conv(self,
+                    input,
+                    k_h,
+                    k_w,
+                    c_o,
+                    dilation,
+                    name,
+                    relu=True,
+                    padding=DEFAULT_PADDING,
+                    group=1,
+                    biased=True):
+        # Verify that the padding is acceptable
+        self.validate_padding(padding)
+        # Get the number of channels in the input
+        c_i = input.get_shape()[-1]
+        c_o *= self.filter_scale
+
+        convolve = lambda i, k: tf.nn.atrous_conv2d(i, k, dilation, padding=padding)
+        with tf.variable_scope(name) as scope:
+            kernel = self.make_var('weights', shape=[k_h, k_w, c_i, c_o])
+            output = convolve(input, kernel)
+
+            if biased:
+                biases = self.make_var('biases', [c_o])
+                output = tf.nn.bias_add(output, biases)
+            if relu:
+                output = tf.nn.relu(output, name=scope.name)
+            return output
+
+    @layer
+    def relu(self, input, name):
+        return tf.nn.relu(input, name=name)
+
+    @layer
+    def max_pool(self, input, k_h, k_w, s_h, s_w, name, padding=DEFAULT_PADDING):
+        self.validate_padding(padding)
+        return tf.nn.max_pool(input,
+                              ksize=[1, k_h, k_w, 1],
+                              strides=[1, s_h, s_w, 1],
+                              padding=padding,
+                              name=name,
+                              data_format=DEFAULT_DATAFORMAT)
+
+    @layer
+    def avg_pool(self, input, k_h, k_w, s_h, s_w, name, padding=DEFAULT_PADDING):
+        self.validate_padding(padding)
+
+        output = tf.nn.avg_pool(input,
+                              ksize=[1, k_h, k_w, 1],
+                              strides=[1, s_h, s_w, 1],
+                              padding=padding,
+                              name=name,
+                              data_format=DEFAULT_DATAFORMAT)
+        return output
+
+    @layer
+    def lrn(self, input, radius, alpha, beta, name, bias=1.0):
+        return tf.nn.local_response_normalization(input,
+                                                  depth_radius=radius,
+                                                  alpha=alpha,
+                                                  beta=beta,
+                                                  bias=bias,
+                                                  name=name)
+
+    @layer
+    def concat(self, inputs, axis, name):
+        return tf.concat(axis=axis, values=inputs, name=name)
+
+    @layer
+    def add(self, inputs, name):
+        inputs[0] = tf.image.resize_bilinear(inputs[0], size=tf.shape(inputs[1])[1:3])
+        
+        return tf.add_n(inputs, name=name)
+
+    @layer
+    def fc(self, input, num_out, name, relu=True):
+        with tf.variable_scope(name) as scope:
+            input_shape = input.get_shape()
+            if input_shape.ndims == 4:
+                # The input is spatial. Vectorize it first.
+                dim = 1
+                for d in input_shape[1:].as_list():
+                    dim *= d
+                print("test input：", input)
+                tf.print(input,[input.shape])
+                print("test input shape ：", input.shape)
+                print("test dim ：", dim)
+                feed_in = tf.reshape(input, [-1, dim]) # yuanlai code
+                
+            else:
+                feed_in, dim = (input, input_shape[-1].value)
+            weights = self.make_var('weights', shape=[dim, num_out])
+            biases = self.make_var('biases', [num_out])
+            op = tf.nn.relu_layer if relu else tf.nn.xw_plus_b
+            fc = op(feed_in, weights, biases, name=scope.name)
+            return fc
+
+    @layer
+    def softmax(self, input, name):
+        input_shape = map(lambda v: v.value, input.get_shape())
+        if len(input_shape) > 2:
+            # For certain models (like NiN), the singleton spatial dimensions
+            # need to be explicitly squeezed, since they're not broadcast-able
+            # in TensorFlow's NHWC ordering (unlike Caffe's NCHW).
+            if input_shape[1] == 1 and input_shape[2] == 1:
+                input = tf.squeeze(input, squeeze_dims=[1, 2])
+            else:        return tf.nn.softmax(input, name)
+    
+    
+    
+    @layer
+    def batch_normalization(self, input, name, scale_offset=True, relu=False):
+        
+        from tensorflow.python.compat import compat
+        with compat.forward_compatibility_horizon(2019, 5, 1):
+            output = tf.layers.batch_normalization(
+                        input,
+                        momentum=0.95,
+                        epsilon=1e-5,
+                        training=self.is_training,
+                        name=name
+                    )
+
+        if relu:
+            output = tf.nn.relu(output)
+
+        return output
+
+
+    @layer
+    def dropout(self, input, keep_prob, name):
+        keep = 1 - self.use_dropout + (self.use_dropout * keep_prob)
+        #return tf.nn.dropout(input, keep, name=name) # yuanlai code
+        return npu_ops.dropout(input, keep, name=name) #test youhua
+
+    @layer
+    def resize_bilinear(self, input, size, name):
+        return tf.image.resize_bilinear(input, size=size, align_corners=True, name=name)
+
+    @layer
+    def interp(self, input, s_factor=1, z_factor=1, name=None):
+        ori_h, ori_w = input.get_shape().as_list()[1:3]
+        # shrink
+        ori_h = (ori_h - 1) * s_factor + 1
+        ori_w = (ori_w - 1) * s_factor + 1
+
+        # zoom
+        ori_h = ori_h + (ori_h - 1) * (z_factor - 1)
+        ori_w = ori_w + (ori_w - 1) * (z_factor - 1)
+        resize_shape = [int(ori_h), int(ori_w)]
+
+        return tf.image.resize_bilinear(input, size=resize_shape, align_corners=True, name=name)
