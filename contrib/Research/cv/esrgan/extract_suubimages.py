@@ -72,7 +72,7 @@ def scandir(dir_path, suffix=None, recursive=False, full_path=False):
                     yield return_path
             else:
                 if recursive:
-                    yield _scandir(entry.path,
+                    yield from _scandir(entry.path,
                                         suffix=suffix,
                                         recursive=recursive)
                 else:
