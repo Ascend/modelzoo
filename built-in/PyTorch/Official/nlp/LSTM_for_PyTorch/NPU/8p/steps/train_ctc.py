@@ -29,6 +29,8 @@ from torch.utils.tensorboard import SummaryWriter
 import torch.npu
 import torch.multiprocessing
 import torch.distributed as dist
+import numpy as np
+import apex
 from apex import amp
 
 sys.path.append('./')
@@ -57,7 +59,7 @@ parser.add_argument('--dist_url', default='tcp://224.66.41.62:23456', type=str,
                     help='url used to set up distributed training')
 parser.add_argument('--dist_backend', default='nccl', type=str,
                     help='distributed backend')
-                    
+
 parser.add_argument('--use_npu', default=True, type=str, help='use npu to train the model')
 parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
 parser.add_argument('--device', default='npu', type=str, help='npu or gpu')
@@ -71,6 +73,15 @@ parser.add_argument('--opt_level', default='O2', type=str,
 parser.add_argument('--addr', default='90.88.145.42', type=str, help='master addr')
 
 warnings.filterwarnings('ignore')
+
+MAX = 2147483647
+
+
+def _gen_seeds(shape):
+    return np.random.uniform(1, MAX, size=shape).astype(np.float32)
+
+
+seed_shape = (32 * 1024 * 12,)
 
 
 def device_id_to_process_device_map(device_list):
@@ -112,14 +123,14 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
         out = model(inputs_npu)
         out_len, batch_size, _ = out.size()
         input_sizes_npu = (input_sizes_npu * out_len).long()
-        loss = loss_fn(out, targets_npu, input_sizes_npu, target_sizes_npu)
 
+        loss = loss_fn(out, targets_npu, input_sizes_npu, target_sizes_npu)
         prob, index = torch.max(out, dim=-1)
-        index = index.transpose(0, 1).cpu()
         loss /= batch_size
-        input_sizes = input_sizes_npu.cpu()
         cur_loss += loss.item()
         total_loss += loss.item()
+        index = index.cpu().transpose(0, 1)
+        input_sizes = input_sizes_npu.cpu()
 
         if is_training:
             optimizer.zero_grad()
@@ -130,7 +141,7 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
                 loss.backward()
             optimizer.step()
             batch_errs, batch_tokens = model.module.compute_wer(index.numpy(), input_sizes.numpy(), targets.numpy(),
-                                                         target_sizes.numpy())
+                                                                target_sizes.numpy())
             total_errs += batch_errs
             total_tokens += batch_tokens
             batch_time += (time.time() - end)
@@ -138,17 +149,18 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
             # sum_writer.add_scalar('Accuary/train/total_wer', total_errs / total_tokens, global_step)
         else:
             batch_errs, batch_tokens = model.module.compute_wer(index.numpy(), input_sizes.numpy(), targets.numpy(),
-                                                         target_sizes.numpy())
+                                                                target_sizes.numpy())
             total_errs += batch_errs
             total_tokens += batch_tokens
             # sum_writer.add_scalar('Accuary/valid/total_loss', total_loss / (i+1), global_step)
             # sum_writer.add_scalar('Accuary/valid/total_wer', total_errs / total_tokens, global_step)
 
         if is_training:
-            print('Epoch: [%d] [%d / %d], Time %.6f Data %.6f, total_loss = %.5f, total_wer = %.5f'
-                  % (epoch_id, i+1, steps_per_epoch, batch_time / (i+1), data_time / (i+1), total_loss / (i+1),
-                     total_errs / total_tokens ))
+            print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, Train_time %.6fs, total_loss = %.5f, total_wer = %.5f'
+                  % (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1),
+                     batch_time / (i + 1) - data_time / (i + 1), total_loss / (i + 1), total_errs / total_tokens))
         end = time.time()
+
     average_loss = total_loss / (i + 1)
     training = "Train" if is_training else "Valid"
     print("Epoch %d %s done, total_loss: %.4f, total_wer: %.4f" % (
@@ -194,28 +206,28 @@ def main(conf):
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     args.process_device_map = device_id_to_process_device_map(args.device_list)
     if args.device == 'npu':
-        # ngpus_per_node = torch.npu.device_count()
-        ngpus_per_node = len(args.process_device_map)
+        # npus_per_node = torch.npu.device_count()
+        npus_per_node = len(args.process_device_map)
     else:
-        ngpus_per_node = torch.cuda.device_count()
+        npus_per_node = torch.cuda.device_count()
     if args.multiprocessing_distributed:
-        # Since we have ngpus_per_node processes per node, the total world_size
+        # Since we have npus_per_node processes per node, the total world_size
         # needs to be adjusted accordingly
-        args.world_size = ngpus_per_node * args.world_size
+        args.world_size = npus_per_node * args.world_size
         # Use torch.multiprocessing.spawn to launch distributed processes: the
         # main_worker process function
         # The child process uses the environment variables of the parent process,
         # we have to set KERNEL_NAME_ID for every proc
         if args.device == 'npu':
-            torch.multiprocessing.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args, opts))
+            torch.multiprocessing.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, args, opts))
         else:
-            torch.multiprocessing.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, argsm, opts))
+            torch.multiprocessing.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, argsm, opts))
     else:
         # Simply call main_worker function
-        main_worker(args.device, ngpus_per_node, args, opts)
+        main_worker(args.device, npus_per_node, args, opts)
 
 
-def main_worker(dev, ngpus_per_node, args, opts):
+def main_worker(dev, npus_per_node, args, opts):
     device_id = args.process_device_map[dev]
     if args.distributed:
         if args.dist_url == "env://" and args.rank == -1:
@@ -223,7 +235,7 @@ def main_worker(dev, ngpus_per_node, args, opts):
         if args.multiprocessing_distributed:
             # For multiprocessing distributed training, rank needs to be the
             # global rank among all the processes
-            args.rank = args.rank * ngpus_per_node + dev
+            args.rank = args.rank * npus_per_node + dev
 
         if args.device == 'npu':
             dist.init_process_group(backend=args.dist_backend,  # init_method=args.dist_url,
@@ -236,8 +248,8 @@ def main_worker(dev, ngpus_per_node, args, opts):
     if args.use_npu:
         torch.npu.set_device(loc)
 
-    opts.batch_size = int(opts.batch_size / ngpus_per_node)
-    args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
+    opts.batch_size = int(opts.batch_size / npus_per_node)
+    args.workers = int((args.workers + npus_per_node - 1) / npus_per_node)
 
     print("[npu id:", device_id, "]", "===============main_worker()=================")
     print("[npu id:", device_id, "]", args)
@@ -300,7 +312,11 @@ def main_worker(dev, ngpus_per_node, args, opts):
             layer_param.append(None)
         cnn_param["layer"].append(layer_param)
 
-    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out)
+    seed = _gen_seeds(seed_shape)
+    seed = torch.from_numpy(seed)
+    seed = seed.to(device)
+    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out,
+                      seed=seed)
 
     num_params = 0
     for name, param in model.named_parameters():
@@ -323,8 +339,8 @@ def main_worker(dev, ngpus_per_node, args, opts):
     print(params)
 
     loss_fn = nn.CTCLoss(reduction='sum').to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
-
+    # optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+    optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
     model = model.to(device)
     if args.opt_level:
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
@@ -415,8 +431,11 @@ def main_worker(dev, ngpus_per_node, args, opts):
     best_path = os.path.join(save_dir, 'ctc_best_model.pth')
     params['epoch'] = count
 
-    torch.save(CTC_Model.save_package(model.module, optimizer=optimizer, epoch=params, loss_results=loss_results,
-                                      dev_loss_results=dev_loss_results, dev_cer_results=dev_cer_results), best_path)
+    if not args.multiprocessing_distributed or \
+            (args.multiprocessing_distributed and args.rank % npus_per_node == 0):
+        torch.save(CTC_Model.save_package(model.module, optimizer=optimizer, epoch=params, loss_results=loss_results,
+                                          dev_loss_results=dev_loss_results, dev_cer_results=dev_cer_results),
+                   best_path)
 
 
 if __name__ == '__main__':

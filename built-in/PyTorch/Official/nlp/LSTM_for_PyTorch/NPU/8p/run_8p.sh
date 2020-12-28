@@ -5,7 +5,6 @@
 #2018.4.30     Replace the h5py with ark and simplify the data_loader.py
 #2019.12.20    Update to pytorch1.2 and python3.7
 source pt_set_env.sh
-export PTCOPY_ENABLE=1
 
 . path.sh
 
