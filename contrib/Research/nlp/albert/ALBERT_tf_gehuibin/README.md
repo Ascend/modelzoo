@@ -7,7 +7,7 @@
 | :-----| ----: | :----: |
 | albert_base(Ascend) | **82.4**| **79.4**|
 | albert_base(论文) | 82.1 | 79.3 |
-| albert_large(Ascend) | **84.4** | **81.6** |
+| albert_large(Ascend) | **85.5** | **82.5** |
 | albert_large(论文) | 84.9 | 81.8 |
 
 ## Requirements
