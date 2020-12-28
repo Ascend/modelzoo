@@ -30,4 +30,5 @@ if [ `grep -c "$key1" "train.log"` -ne '0' ] && [ `grep -c "$key2" "train.log"` 
 else
    echo "Run testcase failed!"
 fi
+cat train.log
 echo execution time was `expr $end_time - $start_time` s.
