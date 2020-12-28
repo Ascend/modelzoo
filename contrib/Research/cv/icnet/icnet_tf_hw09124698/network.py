@@ -30,6 +30,7 @@ import tensorflow as tf
 import os
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+from tensorflow.python.compat import compat
 DEFAULT_PADDING = 'VALID'
 DEFAULT_DATAFORMAT = 'NHWC'
 layer_name = []
@@ -325,13 +326,15 @@ class Network(object):
 
     @layer
     def batch_normalization(self, input, name, scale_offset=True, relu=False):
-        output = tf.layers.batch_normalization(
-                    input,
-                    momentum=0.95,
-                    epsilon=1e-5,
-                    training=self.is_training,
-                    name=name
-                )
+        
+        with compat.forward_compatibility_horizon(2019, 5, 1):
+            output = tf.layers.batch_normalization(
+                        input,
+                        momentum=0.95,
+                        epsilon=1e-5,
+                        training=self.is_training,
+                        name=name
+                    )
 
         if relu:
             output = tf.nn.relu(output)

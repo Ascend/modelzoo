@@ -47,7 +47,7 @@ from utils.image_reader import ImageReader, prepare_label
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from npu_bridge.estimator.npu import npu_scope
-from tensorflow.python.compat import compat
+
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Reproduced ICNet")
@@ -148,18 +148,18 @@ def main():
 
     # Setup training network and training samples
     train_reader = ImageReader(cfg=cfg, mode='train')
-    with compat.forward_compatibility_horizon(2019, 5, 1):
-        train_net = ICNet_BN(image_reader=train_reader, 
-                                cfg=cfg, mode='train')
+    
+    train_net = ICNet_BN(image_reader=train_reader, 
+                            cfg=cfg, mode='train')
 
     loss_sub4, loss_sub24, loss_sub124, reduced_loss = create_losses(train_net, train_net.labels, cfg)
 
     # Setup validation network and validation samples
     with tf.variable_scope('', reuse=True):
         val_reader = ImageReader(cfg, mode='eval')
-        with compat.forward_compatibility_horizon(2019, 5, 1):
-            val_net = ICNet_BN(image_reader=val_reader, 
-                                cfg=cfg, mode='train')
+
+        val_net = ICNet_BN(image_reader=val_reader, 
+                            cfg=cfg, mode='train')
 
         val_loss_sub4, val_loss_sub24, val_loss_sub124, val_reduced_loss = create_losses(val_net, val_net.labels, cfg)
 
