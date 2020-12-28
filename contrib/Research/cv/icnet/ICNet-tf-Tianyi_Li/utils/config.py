@@ -10,11 +10,11 @@ class Config(object):
       
     ADE20K_eval_list = os.path.join('./data/list/ade20k_val_list.txt')
     # CITYSCAPES_eval_list = os.path.join('./data/list/cityscapes_val_list.txt')# Tianyi Li
-    CITYSCAPES_eval_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_val_list.txt')
+    CITYSCAPES_eval_list = os.path.join('./data/list/cityscapes_val_list.txt')
     
     ADE20K_train_list = os.path.join('./data/list/ade20k_train_list.txt')
     # CITYSCAPES_train_list = os.path.join('./data/list/cityscapes_train_list.txt')# Tianyi Li
-    CITYSCAPES_train_list = os.path.join('/data/dataset/storage/cityscapes/list/cityscapes_train_list.txt')
+    CITYSCAPES_train_list = os.path.join('./data/list/cityscapes_train_list.txt')
     
     
     IMG_MEAN = np.array((103.939, 116.779, 123.68), dtype=np.float32)
