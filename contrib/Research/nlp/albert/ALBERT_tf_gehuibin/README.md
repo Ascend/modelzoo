@@ -5,9 +5,9 @@
 使用的是albert_v2版本的预训练模型
 |  | F1| EM |
 | :-----| ----: | :----: |
-| albert_base(Ascend) | 82.4| 79.4|
+| albert_base(Ascend) | **82.4**| **79.4**|
 | albert_base(论文) | 82.1 | 79.3 |
-| albert_large(Ascend) | 84.4 | 81.6 |
+| albert_large(Ascend) | **84.4** | **81.6** |
 | albert_large(论文) | 84.9 | 81.8 |
 
 ## Requirements
