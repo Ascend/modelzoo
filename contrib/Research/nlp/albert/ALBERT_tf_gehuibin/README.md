@@ -100,7 +100,7 @@ albert_large
 ./squad2_large.sh
 ```
 如果只训练则注释掉--do_predict
-训练base用的batch_size为32，训练large的batch_size为16
+训练base用的batch_size为32，训练large的batch_size为16,训练large的learning rate为1.5e-5
 ## 预测和精度对比
 
 albert_base
