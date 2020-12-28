@@ -63,7 +63,7 @@ albert
 
 ## 准备数据和模型
 数据预训练模型以及微调后的模型均可以从 
-[百度网盘](https://pan.baidu.com/s/1GV4hASW5iyND4DO75uBMBQ) 提取码: 4k8y
+[百度网盘](https://pan.baidu.com/s/1m3HQcZlCJ3Pak7PpXiTIpg) 提取码: 6gqi
 其中squad_v2目录夹为数据  
 albert_base/large_v2为预训练模型  
 output_base/large_v2为微调后的模型  
