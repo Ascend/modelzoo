@@ -59,7 +59,7 @@ parser.add_argument('--dist_url', default='tcp://224.66.41.62:23456', type=str,
                     help='url used to set up distributed training')
 parser.add_argument('--dist_backend', default='nccl', type=str,
                     help='distributed backend')
-                    
+
 parser.add_argument('--use_npu', default=True, type=str, help='use npu to train the model')
 parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
 parser.add_argument('--device', default='npu', type=str, help='npu or gpu')
@@ -75,9 +75,13 @@ parser.add_argument('--addr', default='90.88.145.42', type=str, help='master add
 warnings.filterwarnings('ignore')
 
 MAX = 2147483647
+
+
 def _gen_seeds(shape):
     return np.random.uniform(1, MAX, size=shape).astype(np.float32)
-seed_shape = (32 * 1024 * 12, )
+
+
+seed_shape = (32 * 1024 * 12,)
 
 
 def device_id_to_process_device_map(device_list):
@@ -137,7 +141,7 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
                 loss.backward()
             optimizer.step()
             batch_errs, batch_tokens = model.module.compute_wer(index.numpy(), input_sizes.numpy(), targets.numpy(),
-                                                         target_sizes.numpy())
+                                                                target_sizes.numpy())
             total_errs += batch_errs
             total_tokens += batch_tokens
             batch_time += (time.time() - end)
@@ -145,17 +149,18 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
             # sum_writer.add_scalar('Accuary/train/total_wer', total_errs / total_tokens, global_step)
         else:
             batch_errs, batch_tokens = model.module.compute_wer(index.numpy(), input_sizes.numpy(), targets.numpy(),
-                                                         target_sizes.numpy())
+                                                                target_sizes.numpy())
             total_errs += batch_errs
             total_tokens += batch_tokens
             # sum_writer.add_scalar('Accuary/valid/total_loss', total_loss / (i+1), global_step)
             # sum_writer.add_scalar('Accuary/valid/total_wer', total_errs / total_tokens, global_step)
 
         if is_training:
-            print('Epoch: [%d] [%d / %d], Time %.6f Data %.6f, total_loss = %.5f, total_wer = %.5f'
-                  % (epoch_id, i+1, steps_per_epoch, batch_time / (i+1), data_time / (i+1), total_loss / (i+1),
-                     total_errs / total_tokens ))
+            print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, Train_time %.6fs, total_loss = %.5f, total_wer = %.5f'
+                  % (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1),
+                     batch_time / (i + 1) - data_time / (i + 1), total_loss / (i + 1), total_errs / total_tokens))
         end = time.time()
+
     average_loss = total_loss / (i + 1)
     training = "Train" if is_training else "Valid"
     print("Epoch %d %s done, total_loss: %.4f, total_wer: %.4f" % (
@@ -334,7 +339,7 @@ def main_worker(dev, npus_per_node, args, opts):
     print(params)
 
     loss_fn = nn.CTCLoss(reduction='sum').to(device)
-    #optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
     optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
     model = model.to(device)
     if args.opt_level:
@@ -425,11 +430,12 @@ def main_worker(dev, npus_per_node, args, opts):
         os.makedirs(save_dir)
     best_path = os.path.join(save_dir, 'ctc_best_model.pth')
     params['epoch'] = count
-    
-    if not  args.multiprocessing_distributed or \
+
+    if not args.multiprocessing_distributed or \
             (args.multiprocessing_distributed and args.rank % npus_per_node == 0):
         torch.save(CTC_Model.save_package(model.module, optimizer=optimizer, epoch=params, loss_results=loss_results,
-                                      dev_loss_results=dev_loss_results, dev_cer_results=dev_cer_results), best_path)
+                                          dev_loss_results=dev_loss_results, dev_cer_results=dev_cer_results),
+                   best_path)
 
 
 if __name__ == '__main__':

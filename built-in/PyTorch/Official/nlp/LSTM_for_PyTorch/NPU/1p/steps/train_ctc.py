@@ -115,9 +115,9 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
             # sum_writer.add_scalar('Accuary/valid/total_wer', total_errs / total_tokens, global_step)
 
         if is_training:
-            print('Epoch: [%d] [%d / %d], Time %.6f s Data %.6f s, total_loss = %.5f, total_wer = %.5f' %
-                  (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1), total_loss / (i + 1),
-                   total_errs / total_tokens))
+            print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, Train_time %.6fs, total_loss = %.5f, total_wer = %.5f'
+                  % (epoch_id, i + 1, steps_per_epoch, batch_time / (i+1), data_time / (i+1),
+                     batch_time / (i+1) - data_time / (i+1), total_loss / (i+1), total_errs / total_tokens ))
         end = time.time()
 
     average_loss = total_loss / (i + 1)
