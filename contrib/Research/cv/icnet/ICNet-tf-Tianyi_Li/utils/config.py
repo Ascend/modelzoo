@@ -57,14 +57,10 @@ class Config(object):
     ## You can modify following lines to train different training configurations.
     INFER_SIZE = [1024, 2048, 3] 
     TRAINING_SIZE = [720, 720] 
-    ############################ Tianyi Li ##################################
-    TRAINING_STEPS = 3  # 原代码为60001
-    ############################ Tianyi Li ##################################
+    TRAINING_STEPS = 3  # yuanlia code 60001
     
     N_WORKERS = 48
-    ############################ Tianyi Li ##################################
-    BATCH_SIZE = 16 # 原代码为16
-    ############################ Tianyi Li ##################################
+    BATCH_SIZE = 16 # yuanlai code 16
     LEARNING_RATE = 1e-4
     MOMENTUM = 0.9
     POWER = 0.9
