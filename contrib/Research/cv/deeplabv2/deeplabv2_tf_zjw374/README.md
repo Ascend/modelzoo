@@ -28,7 +28,7 @@ deeplabv2
         ├─val.txt
         ├─test.txt
   	└─...
-  ├─model 用于存放预训练模型 obs//deeplab-zjw/dataset/pretraind_model/deeplab_resnet.ckpt
+  ├─pretrained_model 用于存放预训练模型 obs//deeplab-zjw/dataset/pretraind_model/deeplab_resnet.ckpt
   	├─deeplab_resnet.ckpt
   	└─...
   ├─trained_model 用于存放训练后的模型文件
