@@ -26,7 +26,7 @@
 
 Jasper NPU训练代码参考：
 
-[FineTuning代码参考](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/JASPER_for_TensorFlow)
+[FineTuning代码参考](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
 
 获取在线推理的数据集目录下的文件，拷贝到./datasets/目录下
 
@@ -132,7 +132,7 @@ json脚本中，涉及om_path_list，dir_path_list，result_path_list，json文�
 cd output
 python3.7.5 jasper_online_inference.py
 
-支持一下参数:
+支持以下参数:
 --model_path	pb模型的路径，默认值为../model/jasper_infer_float32.pb
 --data_dir		原始dev.json文件的目录，默认值为：../datasets
 --output_dir	预处理后的jasper	bin文件的输出目录../datasets
