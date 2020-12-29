@@ -222,7 +222,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = densenet121()(pretrained=True)
+        model = densenet121(pretrained=True)
     else:
         print("=> creating model '{}'".format(args.arch))
         model = densenet121()
