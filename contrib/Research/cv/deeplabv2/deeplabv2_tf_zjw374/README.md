@@ -28,16 +28,21 @@ deeplabv2
         ├─val.txt
         ├─test.txt
   	└─...
+  ├─img_data 用于存放图片数据集 obs//deeplab-zjw/dataset/
+        ├─SegmentationClassAug
+        ├─SegmentationClass
+        ├─JPEGImages
+  	└─...
   ├─pretrained_model 用于存放预训练模型 obs//deeplab-zjw/dataset/pretraind_model/deeplab_resnet.ckpt
   	├─deeplab_resnet.ckpt
   	└─...
-  ├─trained_model 用于存放训练后的模型文件
+  ├─utils 用于存放训练后的模型文件
   	├─checkpoint
         ├─image_reader.py
         ├─label_utils.py
         ├─write_to_log.py 
   	└─...
-  ├─utils 用于存放数据预处理文件
+  ├─trained_model 用于存放数据预处理文件
   	├─__init__.py
         ├─model.ckpt-2000.data-00000-of-00001
         ├─model.ckpt-2000.index
