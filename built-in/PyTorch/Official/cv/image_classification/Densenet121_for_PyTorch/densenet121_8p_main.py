@@ -82,6 +82,8 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
+parser.add_argument('--fine-tuning', action='store_true',
+                    help='use fine-tuning model')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -220,7 +222,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = densenet121()(pretrained=True)
+        model = densenet121(pretrained=True)
     else:
         print("=> creating model '{}'".format(args.arch))
         model = densenet121()
