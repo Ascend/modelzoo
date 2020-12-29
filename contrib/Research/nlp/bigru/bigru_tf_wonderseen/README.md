@@ -6,19 +6,21 @@
 
 ## 二、模型介绍
 
-本仓库是经典的RNNsearch机器翻译模型，按照[iwslt 2015 leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。
+本仓库是经典的RNNsearch机器翻译模型，模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。按照[iwslt 2015 leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。
 
-鉴于原文没有说明在这个测试集上的表现，且原作者没有公开官方代码，本仓库主要借鉴：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。由于NPU暂时不支持dynamic shape特性和部分资源算子，此仓库已经改写为静态shape版本。
+鉴于原文没有说明在这个测试集上的表现，且原作者没有公开官方代码，本仓库主要借鉴：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。
+
+NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态shape的版本。
 
 ## 三、训练与测试
 
-### 执行预处理
+### （1）执行预处理
 
-主要依赖subword-NMT进行文本的预处理。
+文本的预处理主要依赖subword-NMT，按照以下流程：
 
-1. 下载En-De数据集
+1. 下载De-En翻译数据集。
 
-   下载WMT17上的预处理平行语料：[链接](http://data.statmt.org/wmt17/translation-task/preprocessed/de-en/)
+   预处理平行语料和测试集：[链接](http://data.statmt.org/wmt17/translation-task/preprocessed/de-en/)
 
    - 训练集
 
@@ -45,15 +47,30 @@
 3. 生成BPE operations
 
    ```shell
-   python subword-nmt/learn_joint_bpe_and_vocab.py --input corpus.tc.de corpus.tc.en -s 32000 -o bpe32k --write-vocabulary vocab.de vocab.en
+   python subword-nmt/learn_joint_bpe_and_vocab.py \
+   --input corpus.tc.de corpus.tc.en \
+   -s 32000 \
+   -o bpe32k \
+   --write-vocabulary vocab.de vocab.en
    ```
 
-4. 对训练集、验证集进行BPE分词
+4. 对训练集、测试集进行BPE分词
 
    ```shell
-   python subword-nmt/apply_bpe.py --vocabulary vocab.de --vocabulary-threshold 50 -c bpe32k corpus.tc.de corpus.tc.32k.de
-   python subword-nmt/apply_bpe.py --vocabulary vocab.en --vocabulary-threshold 50 -c bpe32k corpus.tc.en corpus.tc.32k.en
-   python subword-nmt/apply_bpe.py --vocabulary vocab.de --vocabulary-threshold 50 -c bpe32k < newstest2015.tc.de > newstest2015.tc.32k.de
+   python subword-nmt/apply_bpe.py \
+   --vocabulary vocab.de \
+   --vocabulary-threshold 50 \
+   -c bpe32k < corpus.tc.de > corpus.tc.32k.de
+   
+   python subword-nmt/apply_bpe.py \
+   --vocabulary vocab.en \
+   --vocabulary-threshold 50 \
+   -c bpe32k < corpus.tc.en > corpus.tc.32k.en
+   
+   python subword-nmt/apply_bpe.py \
+   --vocabulary vocab.de \
+   --vocabulary-threshold 50 \
+   -c bpe32k < newstest2015.tc.de > newstest2015.tc.32k.de
    ```
 
 5. 对训练集进行shuffle预处理（可选）
@@ -62,15 +79,17 @@
    python thumt/scripts/shuffle_corpus.py --corpus corpus.tc.32k.de corpus.tc.32k.en --suffix shuf
    ```
 
-### 执行训练
+6. 经过以上预处理后的语料和词表，请统一转移至/thumt/data/。
+
+### （2）执行训练
 
 ```shell
 . train_beta.sh
 ```
 
-训练保存的模型位于/bi-gru/train/。
+训练保存的模型位于train/。
 
-### 执行测试
+### （3）执行测试
 
 ```
 . validate_beta.sh
@@ -80,7 +99,7 @@
 
 ## 四、下载
 
-提供训练好的checkpoint(model.ckpt-263002，BLEU值为26.7624)，请放到bi-gru/train/路径下：
+提供训练好的checkpoint (model.ckpt-263002，BLEU值为26.7624)，请放到 train/ 路径下：
 
 百度云：[链接](https://pan.baidu.com/s/1-z7CX7F_FujKHrSdzfvs6g )
 提取码：zal9 
@@ -120,11 +139,7 @@
 - book release：[beam-size=12, BLEU-27.25](https://books.google.com/books?id=KIOrDwAAQBAJ&pg=PA66&lpg=PA66&dq=newstest2015+rnnsearch&source=bl&ots=vzXUqjeYW_&sig=ACfU3U04ka_Rq-RCUeh5Ghd3BmIvCOhjgg&hl=zh-CN&sa=X&ved=2ahUKEwiZuISf7PLtAhVDwFkKHek3D4kQ6AEwCHoECAcQAg#v=onepage&q=newstest2015%20rnnsearch&f=false)
 - google release：[beam-size=12, BLEU-20.5](https://google.github.io/seq2seq/results/)
 
-
-
-
-
-## MSAME推理
+## 七、MSAME离线推理
 
 按照wiki编译好MSAME工具后，运行：
 
@@ -141,4 +156,3 @@ Golden Translation at: msame/golden/references/
 BiGRU Translation at: msame/output_offline/
 BLEU = 26.759709157237165
 ```
-
