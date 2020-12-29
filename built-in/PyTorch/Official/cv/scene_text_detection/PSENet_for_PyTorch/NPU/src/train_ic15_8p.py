@@ -31,6 +31,7 @@ import torch.npu
 import torch.utils.data.distributed
 from apex import amp
 
+from combined_sgd_v2 import CombinedSGD
 import models
 from data_loader import IC15Loader
 from metrics import runningScore
@@ -131,6 +132,7 @@ def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node
     running_metric_kernel = runningScore(2)
 
     epoch_time = time.time()
+    batch_time = time.time()
     for batch_idx, (imgs, gt_texts, gt_kernels, training_masks) in enumerate(train_loader):
         loc = 'npu:{}'.format(args.npu)
         imgs = imgs.to(loc, non_blocking=True)
@@ -139,8 +141,8 @@ def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node
         training_masks = training_masks.to(loc, non_blocking=True)
 
         outputs = model(imgs)
-        texts = outputs[:, 0, :, :]
-        kernels = outputs[:, 1:, :, :]
+        texts = torch.index_select(outputs, 1, torch.tensor([0]).to(loc)).squeeze()
+        kernels = torch.index_select(outputs, 1, torch.tensor([1, 2, 3, 4, 5, 6]).to(loc))
 
         selected_masks = ohem_batch(texts, gt_texts, training_masks)
         selected_masks = selected_masks.to(loc, non_blocking=True)
@@ -154,8 +156,8 @@ def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node
         selected_masks = torch.from_numpy(selected_masks).float()
         selected_masks = selected_masks.to(loc, non_blocking=True)
         for i in range(6):
-            kernel_i = kernels[:, i, :, :]
-            gt_kernel_i = gt_kernels[:, i, :, :]
+            kernel_i = torch.index_select(kernels, 1, torch.tensor([i]).to(loc)).squeeze()
+            gt_kernel_i = torch.index_select(gt_kernels, 1, torch.tensor([i]).to(loc)).squeeze()
             loss_kernel_i = criterion(kernel_i, gt_kernel_i, selected_masks)
             loss_kernels.append(loss_kernel_i)
         loss_kernel = sum(loss_kernels) / len(loss_kernels)
@@ -167,10 +169,24 @@ def train(train_loader, model, criterion, optimizer, epoch,   args, npu_per_node
         with amp.scale_loss(loss, optimizer) as scaled_loss:
             scaled_loss.backward()
         optimizer.step()
-
+        score_text = cal_text_score(texts, gt_texts, training_masks, running_metric_text)
+        score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
+        if not args.multiprocessing_distributed or (args.multiprocessing_distributed 
+                                                    and args.rank % npu_per_node == 0):
+            batch_time = time.time() - batch_time
+            output_log = '(epoch: {epoch:0>3d} {batch:0>2d}/{size}) | FPS: {fps:5.3f} | Loss : {lossv:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
+                epoch=epoch + 1,
+                batch=batch_idx + 1,
+                size=len(train_loader),
+                fps=npu_per_node * args.batch_size / batch_time,
+                lossv=losses.val,
+                acc=score_text['Mean Acc'],
+                iou_t=score_text['Mean IoU'],
+                iou_k=score_kernel['Mean IoU'])
+            batch_time = time.time()
+            print(output_log)
     epoch_time = time.time() - epoch_time
-    score_text = cal_text_score(texts, gt_texts, training_masks, running_metric_text)
-    score_kernel = cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metric_kernel)
+
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % npu_per_node == 0):
         output_log = '{epoch}/{n_epoch} | LR: {lr:.5f} | FPS: {fps:.3f} | batch: {batch:.5f}s | Loss: {lossa:.4f} | Acc_t: {acc: .4f} | IOU_t: {iou_t: .4f} | IOU_k: {iou_k: .4f}'.format(
@@ -282,14 +298,18 @@ def main(npu, npu_per_node, args):
 
     model = model.to(loc)
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.99, weight_decay=5e-4)
+    if args.combine_sgd:
+        optimizer = CombinedSGD(model.parameters(), lr=args.lr, momentum=0.99, weight_decay=5e-4, combine_grad=True)
+    else:
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.99, weight_decay=5e-4)
 
     model, optimizer = amp.initialize(model, optimizer,
                                       opt_level=args.opt_level,
                                       keep_batchnorm_fp32=args.keep_batchnorm_fp32,
-                                      loss_scale=args.loss_scale)
+                                      loss_scale=args.loss_scale,
+                                      combine_grad=args.combine_grad)
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.npu], broadcast_buffers=False)
-    title = 'icdar2015'
+
     if args.pretrain:
         print('Using pretrained model.')
         assert os.path.isfile(args.pretrain), 'Error: no checkpoint directory found!'
@@ -320,7 +340,7 @@ def main(npu, npu_per_node, args):
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % npu_per_node == 0):
             if epoch > args.n_epoch - 6:
-                best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth'
+                best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth.tar'
                 save_checkpoint({
                     'epoch': epoch + 1,
                     'state_dict': model.state_dict(),
@@ -395,6 +415,10 @@ if __name__ == '__main__':
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--remark', default='', type=str,
                         help='remark. ')
+    parser.add_argument('--combine_grad', action='store_true',
+                        help='whether to combine grad in apex')
+    parser.add_argument('--combine_sgd', action='store_true',
+                        help='whether to use combined sgd instead of sgd')
 
     args = parser.parse_args()
 

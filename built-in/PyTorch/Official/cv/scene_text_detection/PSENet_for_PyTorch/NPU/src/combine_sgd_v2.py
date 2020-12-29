@@ -90,18 +90,18 @@ class CombinedSGD(torch.optim.SGD):
             if hasattr(self, "_amp_stash"):
                 stash = self._amp_stash
                 if hasattr(stash, "all_fp32_params"):
-                    if len(stash.grads_combined_list) == 0:
+                    if len(stash.grads_list) == 0:
                         raise RuntimeError("When use CombinedSGD, Apex O1 need to use combine_grad=True module!")
-                    self.split_combined_tensors(stash.grads_combined_list[-1])
+                    self.split_combined_tensors(stash.grads_list[-1])
                     self.init_combine = True
                 elif hasattr(stash, "all_fp32_from_fp16_params"):
-                    if len(stash.grads_combined_list) == 0:
+                    if len(stash.grads_list) == 0:
                         raise RuntimeError("When use CombinedSGD, Apex O2 need to usecombine_grad=True module!")
                     if stash.grads_combined_list[1] is not None:
-                        if stash.grads_combined_list[2] is None:
-                            self.split_combined_tensors(stash.grads_combined_list[1])
+                        if stash.grads_list[2] is None:
+                            self.split_combined_tensors(stash.grads_list[1])
                         else:
-                            self.split_combined_tensors(stash.grads_combined_list[1], self.grads_combined_list[2])
+                            self.split_combined_tensors(stash.grads_list[1], self.grads_list[2])
                             self.opt_level_O2_has_bn = True
                     else:
                         raise RuntimeError("Inapproperiate network which only have batchnorm layers!")
