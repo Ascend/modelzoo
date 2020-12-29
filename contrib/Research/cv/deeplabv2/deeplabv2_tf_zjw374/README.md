@@ -56,8 +56,10 @@ deeplabv2
 ### 数据集和预训练模型：
 
 数据集：PASCAL VOC 2012 dataset. 链接：http://host.robots.ox.ac.uk/pascal/VOC/
+                                OBS桶地址：obs//deeplab-zjw/dataset/
 
 预训练模型：deeplab_resnet.ckpt 链接：https://drive.google.com/drive/folders/0B_rootXHuswsZ0E4Mjh1ZU5xZVU
+                                OBS桶地址：obs//deeplab-zjw/dataset/pretraind_model/
 
 ### 训练过程及结果
 
