@@ -97,7 +97,7 @@ class CombinedSGD(torch.optim.SGD):
                 elif hasattr(stash, "all_fp32_from_fp16_params"):
                     if len(stash.grads_list) == 0:
                         raise RuntimeError("When use CombinedSGD, Apex O2 need to usecombine_grad=True module!")
-                    if stash.grads_combined_list[1] is not None:
+                    if stash.grads_list[1] is not None:
                         if stash.grads_list[2] is None:
                             self.split_combined_tensors(stash.grads_list[1])
                         else:
