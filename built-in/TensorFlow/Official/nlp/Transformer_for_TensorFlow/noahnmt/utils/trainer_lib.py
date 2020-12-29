@@ -101,6 +101,11 @@ def create_session_config(log_device_placement=False,
   custom_op.parameter_map["enable_auto_mix_precision"].b=False
   # Autotune
   custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes(os.getenv("FLAG_AUTOTUNE"))
+  # DataDump
+  custom_op.parameter_map["enable_dump"].b = "True" == os.getenv("FLAG_ENABLE_DUMP")
+  custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(os.getenv("DUMP_PATH"))
+  custom_op.parameter_map["dump_step"].s = tf.compat.as_bytes(os.getenv("DUMP_STEP"))
+  custom_op.parameter_map["sump_mode"].s = tf.compat.as_bytes(os.getenv("DUMP_MODE"))
 
   if RANK_SIZE > 1:
     custom_op.parameter_map["hcom_parallel"].b = True
