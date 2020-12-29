@@ -9,14 +9,14 @@ export PTCOPY_ENABLE=1
 /usr/local/Ascend/driver/tools/msnpureport -e disable
 
 nohup python3.7 tools/train_net.py \
-        --config-file configs/COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_1x.yaml \
+        --config-file configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml \
         --device-ids 6 7\
         --num-gpus 2\
         AMP 1\
         OPT_LEVEL O2 \
         LOSS_SCALE_VALUE 64 \
-        SOLVER.IMS_PER_BATCH 4 \
-        SOLVER.MAX_ITER 77000 \
+        SOLVER.IMS_PER_BATCH 16 \
+        SOLVER.MAX_ITER 41000 \
         SEED 1234 \
         MODEL.RPN.NMS_THRESH 0.8 \
         MODEL.ROI_BOX_HEAD.POOLER_SAMPLING_RATIO 2 \
