@@ -19,10 +19,10 @@ deeplabv2
   ├─README.md
   ├─LICENSE  
   ├─dataset 用于存放训练集，验证集，测试集的标签
-  	├─train.txt
-       ├─val.txt
-       ├─test.txt
-  	└─...
+   ├─train.txt
+   ├─val.txt
+   ├─test.txt
+   └─...
   ├─testcase 用于存放自测试用例标签
   	├─train.txt
         ├─val.txt
