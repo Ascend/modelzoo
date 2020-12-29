@@ -115,9 +115,9 @@ class CombinedSGD(torch.optim.SGD):
                             lst_grad.append(param.grad)
                             lst_weight.append(param)
                     if len(lst_grad) > 0:
-                        self.combine_grad.append(combine_tensor(lst_grad, True))
-                        self.combine_weight.append(combine_tensor(lst_weight, True))
-                        self.combined_momentum.append(torch.zeros_like(self.combine_grad[-1]))
+                        self.combined_grad.append(combine_tensor(lst_grad, True))
+                        self.combined_weight.append(combine_tensor(lst_weight, True))
+                        self.combined_momentum.append(torch.zeros_like(self.combined_grad[-1]))
                         self.init_combine = True
 
     def step_combined(self, weight_decay, momentum, dampening, nesterov, lr, combined_grad, combined_weight, combined_momentum):
