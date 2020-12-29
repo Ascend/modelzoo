@@ -3,7 +3,8 @@ from concurrent import futures
 import sys
 
 class Multicpu(object):
-
+    """
+    """
     def __init__(self, cpu_num, thread_num):
         self.cpu_num    = cpu_num
         self.thread_num = thread_num
@@ -23,8 +24,19 @@ class Multicpu(object):
         for i in range(self.cpu_num):
             process_bar.append(0)
 
-        result_queue = cpu_pool.map(_multi_thread,
-            [[func, self.cpu_num, self.thread_num,job_queue[index[i][0]:index[i][1]+1], timeout, process_bar, i] for i in range(len(index))])
+        result_queue = cpu_pool.map(
+            _multi_thread,
+            [
+                [
+                    func,
+                    self.cpu_num,
+                    self.thread_num,
+                    job_queue[index[i][0]:index[i][1]+1],
+                    timeout,
+                    process_bar,
+                    i
+                ] for i in range(len(index))
+            ])
 
         result = []
         for rl in result_queue:
@@ -34,13 +46,17 @@ class Multicpu(object):
 
 
 def _func(argv):
-    argv[2][argv[3]] = round((argv[4]*100.0/argv[5]), 2)
-    sys.stdout.write(str(argv[2])+' ||'+'->'+"\r")    
+    """
+    """
+    argv[2][argv[3]] = round((argv[4] * 100.0 / argv[5]), 2)
+    sys.stdout.write(str(argv[2]) + ' ||' + '->' + "\r")    
     sys.stdout.flush()
     return argv[0](argv[1])
 
 
 def _multi_thread(argv):
+    """
+    """
     thread_num = argv[2]
     if getLen(argv[3]) < thread_num:
         thread_num = argv[3]
@@ -55,9 +71,7 @@ def _multi_thread(argv):
 
     # else 
     thread_pool = futures.ThreadPoolExecutor(max_workers=thread_num)
-
     result = thread_pool.map(_func, func_argvs, timeout=argv[4])
-    
     return [r for r in result]
 
 
@@ -70,7 +84,7 @@ def get_index(job_queue, split_num):
         split_num = job_num
     each_num = job_num / split_num
     
-    index = [[i*each_num, i*each_num+each_num-1] for i in range(split_num)]
+    index = [[i * each_num, i * each_num + each_num - 1] for i in range(split_num)]
     
     residual_num = job_num % split_num
     for i in range(residual_num):
@@ -81,12 +95,15 @@ def get_index(job_queue, split_num):
 
 
 def getLen(_list):
+    """
+    """
     if _list is None:
         return 0
     return len(_list)
     
 
 def multi_cpu(func, job_queue, cpu_num=1, thread_num=1, timeout=None):
+    """
+    """
     multicpu_instance = Multicpu(cpu_num, thread_num)
-
     return multicpu_instance._multi_cpu(func, job_queue, timeout) 
