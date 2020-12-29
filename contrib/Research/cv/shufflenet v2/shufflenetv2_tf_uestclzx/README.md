@@ -46,6 +46,7 @@ shufflenetv2
 
 预训练模型：checkpoint 桶地址：obs://zjw-shufflenet/data/pretrained-model
 
+![桶配置](https://images.gitee.com/uploads/images/2020/1229/211943_07b96269_8511959.png "屏幕截图.png")
 ## 训练过程及打印结果
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1229/170252_b439bc45_8310380.png "屏幕截图.png")
 
