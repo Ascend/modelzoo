@@ -6,7 +6,7 @@
 
 ## 二、模型介绍
 
-本仓库是经典的RNNsearch机器翻译模型，按照[leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。
+本仓库是经典的RNNsearch机器翻译模型，按照[iwslt 2015 leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。
 
 鉴于原文没有说明在这个测试集上的表现，且原作者没有公开官方代码，本仓库主要借鉴：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。由于NPU暂时不支持dynamic shape特性和部分资源算子，此仓库已经改写为静态shape版本。
 
@@ -114,7 +114,8 @@
 - static-GPU：根据dynamic-GPU重写的静态shape、且保证能在NPU上打通的版本
 - static-NPU：根据dynamic-GPU重写的静态shape、且能在NPU上稳定训练的版本
 
-此外，由于28.53这个性能没有具体的出处和细节，为了确定dynamic-GPU-27.54作为模板是否合适，我们又对比了其他BiGRU（RNNsearch）复现版本在iwslt 2015 German-English的性能，全网只有2个results：
+另外，iwslt2015 German-English dev set始终没有在原始论文中出现过，其性能BLEU-28.53所使用的语料、词表大小、模型大小等均没有任何说明。
+为了确定dynamic-GPU-27.54作为模板是否合适，可参考对比其他BiGRU（RNNsearch）复现版本在iwslt 2015 German-English的精度结果：
 
 - book release：[beam-size=12, BLEU-27.25](https://books.google.com/books?id=KIOrDwAAQBAJ&pg=PA66&lpg=PA66&dq=newstest2015+rnnsearch&source=bl&ots=vzXUqjeYW_&sig=ACfU3U04ka_Rq-RCUeh5Ghd3BmIvCOhjgg&hl=zh-CN&sa=X&ved=2ahUKEwiZuISf7PLtAhVDwFkKHek3D4kQ6AEwCHoECAcQAg#v=onepage&q=newstest2015%20rnnsearch&f=false)
 - google release：[beam-size=12, BLEU-20.5](https://google.github.io/seq2seq/results/)
@@ -125,7 +126,7 @@
 
 ## MSAME推理
 
-安装号MSAME工具后，运行：
+按照wiki编译好MSAME工具后，运行：
 
 ```shell
 cd msame
