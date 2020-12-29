@@ -16,7 +16,7 @@ python3.7 -m run_squad_v2 \
   --do_predict \
   --train_batch_size=16 \
   --predict_batch_size=8 \
-  --learning_rate=3e-5 \
+  --learning_rate=1.5e-5 \
   --num_train_epochs=2.0 \
   --warmup_proportion=.1 \
   --save_checkpoints_steps=500 \

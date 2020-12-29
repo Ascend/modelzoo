@@ -5,9 +5,9 @@
 使用的是albert_v2版本的预训练模型
 |  | F1| EM |
 | :-----| ----: | :----: |
-| albert_base(Ascend) | 82.4| 79.4|
+| albert_base(Ascend) | **82.4**| **79.4**|
 | albert_base(论文) | 82.1 | 79.3 |
-| albert_large(Ascend) | 84.4 | 81.6 |
+| albert_large(Ascend) | **85.5** | **82.5** |
 | albert_large(论文) | 84.9 | 81.8 |
 
 ## Requirements
@@ -63,7 +63,7 @@ albert
 
 ## 准备数据和模型
 数据预训练模型以及微调后的模型均可以从 
-[百度网盘](https://pan.baidu.com/s/16gib5liqMXD7c7rXJ5LEsQ) 提取码: 9k39  
+[百度网盘](https://pan.baidu.com/s/1m3HQcZlCJ3Pak7PpXiTIpg) 提取码: 6gqi
 其中squad_v2目录夹为数据  
 albert_base/large_v2为预训练模型  
 output_base/large_v2为微调后的模型  
@@ -100,7 +100,7 @@ albert_large
 ./squad2_large.sh
 ```
 如果只训练则注释掉--do_predict
-训练base用的batch_size为32，训练large的batch_size为16
+训练base用的batch_size为32，训练large的batch_size为16,训练large的learning rate为1.5e-5
 ## 预测和精度对比
 
 albert_base
