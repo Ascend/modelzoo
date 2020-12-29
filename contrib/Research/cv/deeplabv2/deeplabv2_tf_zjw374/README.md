@@ -24,30 +24,30 @@ deeplabv2
    ├─test.txt
    └─...
   ├─testcase 用于存放自测试用例标签
-  	├─train.txt
-        ├─val.txt
-        ├─test.txt
-  	└─...
+   ├─train.txt
+   ├─val.txt
+   ├─test.txt
+   └─...
   ├─img_data 用于存放图片数据集 obs//deeplab-zjw/dataset/
-        ├─SegmentationClassAug
-        ├─SegmentationClass
-        ├─JPEGImages
-  	└─...
+   ├─SegmentationClassAug
+   ├─SegmentationClass
+   ├─JPEGImages
+   └─...
   ├─pretrained_model 用于存放预训练模型 obs//deeplab-zjw/dataset/pretraind_model/deeplab_resnet.ckpt
-  	├─deeplab_resnet.ckpt
-  	└─...
+   ├─deeplab_resnet.ckpt
+   └─...
   ├─utils 用于存放训练后的模型文件
-  	├─checkpoint
-        ├─image_reader.py
-        ├─label_utils.py
-        ├─write_to_log.py 
-  	└─...
+   ├─checkpoint
+   ├─image_reader.py
+   ├─label_utils.py
+   ├─write_to_log.py 
+   └─...
   ├─trained_model 用于存放数据预处理文件
-  	├─__init__.py
-        ├─model.ckpt-2000.data-00000-of-00001
-        ├─model.ckpt-2000.index
-        ├─model.ckpt-2000.meta
-  	└─...
+   ├─__init__.py
+   ├─model.ckpt-2000.data-00000-of-00001
+   ├─model.ckpt-2000.index
+   ├─model.ckpt-2000.meta
+   └─...
   ├─main.py 执行主函数代码
   ├─model.py 定义模型train，eval过程的逻辑操作
   ├─network.py 搭建网络结构
