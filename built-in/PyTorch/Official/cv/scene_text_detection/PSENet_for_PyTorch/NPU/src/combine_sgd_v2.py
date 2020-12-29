@@ -6,7 +6,7 @@ def combine_tensor(list_of_tensor, copy_back=True):
     total_numel = 0
     for tensor in list_of_tensor:
         total_numel += tensor.storage().size()
-    combine_tensor = torch.zeros(total_numel).npu().to(list_of_tensor[0].dtype)
+    combined_tensor = torch.zeros(total_numel).npu().to(list_of_tensor[0].dtype)
 
     idx = 0
 
@@ -14,15 +14,15 @@ def combine_tensor(list_of_tensor, copy_back=True):
         for tensor in list_of_tensor:
             temp = tensor.clone()
             temp.copy_(tensor)
-            change_data_ptr(tensor, combine_tensor, idx)
+            change_data_ptr(tensor, combined_tensor, idx)
             temp_data = tensor.data
             temp_data.copy_(temp)
             idx += temp.storage().size()
     else:
         for tensor in list_of_tensor:
-            change_data_ptr(tensor, combine_tensor, idx)
-            idx += temp.storage().size()
-    return combine_tensor
+            change_data_ptr(tensor, combined_tensor, idx)
+            idx += tensor.storage().size()
+    return combined_tensor
 
 def recombine_tensor(size, combined_tensor, index=0):
     temp_grad = torch.zeros(size).npu().to(combined_tensor.dtype)
@@ -33,6 +33,7 @@ def recombine_tensor(size, combined_tensor, index=0):
 class CombinedSGD(torch.optim.SGD):
     def __init__(self, params, lr, momentum=0, dampening=0,
                  weight_decay=0, nesterov=False, combine_grad=True):
+        super(CombinedSGD, self).__init__(params, lr, momentum, dampening, weight_decay, nesterov)
         self.combined = combine_grad
         self.init_combine = False
         self.first_init = True
@@ -40,7 +41,6 @@ class CombinedSGD(torch.optim.SGD):
         self.combined_grad = []
         self.combined_weight = []
         self.combined_momentum = []
-        super(CombinedSGD, self).__init__(params, lr, momentum, dampening, weight_decay, nesterov)
 
     def split_combined_tensors(self, input_combined_grad_1, input_combined_grad_2=None):
         if len(self.combined_weight) > 0:
@@ -69,9 +69,9 @@ class CombinedSGD(torch.optim.SGD):
             self.combined_weight.append(combine_tensor(ord_param_list, copy_back=True))
 
             if self.first_init:
-                self,combined_momentum.append(tensor.zeros_like(self.combined_grad[-1]))
+                self.combined_momentum.append(tensor.zeros_like(self.combined_grad[-1]))
             else:
-                self,combined_momentum.append(self.combined_grad[-1].clone())
+                self.combined_momentum.append(self.combined_grad[-1].clone())
 
             index_ops += size_ops
 
@@ -80,9 +80,9 @@ class CombinedSGD(torch.optim.SGD):
                 self.combined_weight.append(combine_tensor(spe_param_list, copy_back=True))
 
                 if self.first_init:
-                    self,combined_momentum.append(tensor.zeros_like(self.combined_grad[-1]))
+                    self.combined_momentum.append(tensor.zeros_like(self.combined_grad[-1]))
                 else:
-                    self,combined_momentum.append(self.combined_grad[-1].clone())
+                    self.combined_momentum.append(self.combined_grad[-1].clone())
                 index_bn += size_bn
 
     def _init_combined(self):
@@ -101,7 +101,7 @@ class CombinedSGD(torch.optim.SGD):
                         if stash.grads_list[2] is None:
                             self.split_combined_tensors(stash.grads_list[1])
                         else:
-                            self.split_combined_tensors(stash.grads_list[1], self.grads_list[2])
+                            self.split_combined_tensors(stash.grads_list[1], stash.grads_list[2])
                             self.opt_level_O2_has_bn = True
                     else:
                         raise RuntimeError("Inapproperiate network which only have batchnorm layers!")
@@ -178,5 +178,6 @@ class CombinedSGD(torch.optim.SGD):
                             d_p = buf
     
                     p.add_(d_p, alpha=-group['lr'])
+            idx += 1
 
         return loss
