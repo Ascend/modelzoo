@@ -16,6 +16,9 @@ fi
 DEVICE_INDEX=$(( DEVICE_ID))
 export DEVICE_INDEX=${DEVICE_INDEX}
 
+# Autotune
+export FLAG_AUTOTUNE="" #"RL,GA"
+
 #mkdir exec path
 mkdir -p ${currentDir}/result/8p/${device_id}
 cd ${currentDir}/result/8p/${device_id}

@@ -1,4 +1,6 @@
 
+# Autotune
+export FLAG_AUTOTUNE="" #"RL,GA"
 
 cd transformer_p1
 sh -x transformer_main_p1.sh >log 2>&1 &

@@ -99,7 +99,9 @@ def create_session_config(log_device_placement=False,
   custom_op.parameter_map["use_off_line"].b = True
   custom_op.parameter_map["enable_data_pre_proc"].b = True
   custom_op.parameter_map["enable_auto_mix_precision"].b=False
-  
+  # Autotune
+  custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes(os.getenv("FLAG_AUTOTUNE"))
+
   if RANK_SIZE > 1:
     custom_op.parameter_map["hcom_parallel"].b = True
 
