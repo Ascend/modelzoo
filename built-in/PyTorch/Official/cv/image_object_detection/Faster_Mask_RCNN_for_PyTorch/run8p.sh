@@ -10,7 +10,7 @@ export PTCOPY_ENABLE=1
 
 nohup python3.7 tools/train_net.py \
         --config-file configs/COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml \
-	--device-ids 0 1 2 3 4 5 6 7 \
+        --device-ids 0 1 2 3 4 5 6 7 \
         --num-gpus 8\
         AMP 1\
         OPT_LEVEL O2 \
