@@ -69,7 +69,7 @@ class CombinedSGD(torch.optim.SGD):
             self.combined_weight.append(combine_tensor(ord_param_list, copy_back=True))
 
             if self.first_init:
-                self.combined_momentum.append(tensor.zeros_like(self.combined_grad[-1]))
+                self.combined_momentum.append(torch.zeros_like(self.combined_grad[-1]))
             else:
                 self.combined_momentum.append(self.combined_grad[-1].clone())
 
@@ -80,7 +80,7 @@ class CombinedSGD(torch.optim.SGD):
                 self.combined_weight.append(combine_tensor(spe_param_list, copy_back=True))
 
                 if self.first_init:
-                    self.combined_momentum.append(tensor.zeros_like(self.combined_grad[-1]))
+                    self.combined_momentum.append(torch.zeros_like(self.combined_grad[-1]))
                 else:
                     self.combined_momentum.append(self.combined_grad[-1].clone())
                 index_bn += size_bn
