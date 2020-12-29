@@ -6,13 +6,39 @@
 
 ## 二、模型介绍
 
-本仓库是经典的RNNsearch机器翻译模型，模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。按照[iwslt 2015 leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。
+RNNsearch是经典的机器翻译模型，模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。按照[iwslt 2015 leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。
 
-鉴于原文没有说明在这个测试集上的表现，且原作者没有公开官方代码，本仓库主要借鉴：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。
+本仓库负责将BiGRU从tensorflow迁移至Ascend910，对标的精度是iwslt 2015 German-English test set BLEU值。鉴于原论文作者没有公开官方代码，文中也没有纰漏在该数据集上的细节，本仓库主要借鉴了科研单位复现的版本：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态shape的版本。
 
-NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态shape的版本。
+## 三、文件结构
 
-## 三、训练与测试
+```shell
+bigru
+└─ 
+  ├─README.md
+  ├─train.sh	训练脚本
+  ├─validate.sh	测试脚本
+  ├─thumt 		存放bigru所有代码的文件夹
+  	└─...
+  ├─train 		存放训练模型的默认文件夹
+  	├─eval 		存放模型测试结果的默认文件夹
+  	├─checkpoint
+  	├─model.ckpt-*.data-00000-of-00001
+  	├─model.ckpt-*.index
+  	├─model.ckpt-*.meta
+  	└─...
+  ├─msame 		负责msame离线推理的文件夹
+  	├─ckpt2pb.sh				将ckpt模型冻结成pb模型
+  	├─pb2om.sh					将pb模型转为om模型
+  	├─transform_ckpt_to_om.sh 	整合ckpt2pb.sh和pb2om.sh脚本
+  	├─process_phrase_1.sh 		输入bin文件给om模型，保存推理结果
+  	├─process_phrase_2.sh 		验证推理精度
+  	├─run_msame_testing.sh		以上离线推理所有步骤的一脚启动脚本
+  	├─msame						编译好的msame推理工具
+  	└─...
+```
+
+## 四、训练与测试
 
 ### （1）执行预处理
 
@@ -97,7 +123,7 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 
 如果同时加载training model和inference model，会导致单卡NPU显存溢出，所以训练过程需要训练人员手动在另一块NPU卡上执行validate或者指定时间间隔自动执行validate，来得到最新模型的BLEU值。
 
-## 四、下载
+## 五、下载
 
 提供训练好的checkpoint (model.ckpt-263002，BLEU值为26.7624)，请放到 train/ 路径下：
 
@@ -105,7 +131,8 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 
 提取码：zal9 
 
-## 五、性能
+
+## 六、性能
 
 本仓库建模采用静态shape，这意味着每个GRU模块都将输入文本padding到固定的最长序列长度，再执行计算。这潜在地造成训练速度的降低。
 
@@ -116,7 +143,7 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 
 训练需要运行30w step，这代表在NPU上需要训练约合9天时间（2020.12.27降低为约合5天）。
 
-## 六、精度
+## 七、精度
 
 测试数据为iwslt2015 German-English test set，这里讨论的均是iwslt 2015 German-English test set的BLEU精度，如下表：
 
@@ -139,7 +166,7 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 - book release：[beam-size=12, BLEU-27.25](https://books.google.com/books?id=KIOrDwAAQBAJ&pg=PA66&lpg=PA66&dq=newstest2015+rnnsearch&source=bl&ots=vzXUqjeYW_&sig=ACfU3U04ka_Rq-RCUeh5Ghd3BmIvCOhjgg&hl=zh-CN&sa=X&ved=2ahUKEwiZuISf7PLtAhVDwFkKHek3D4kQ6AEwCHoECAcQAg#v=onepage&q=newstest2015%20rnnsearch&f=false)
 - google release：[beam-size=12, BLEU-20.5](https://google.github.io/seq2seq/results/)
 
-## 七、MSAME离线推理
+## 八、MSAME离线推理
 
 按照wiki编译好MSAME工具后，运行：
 
