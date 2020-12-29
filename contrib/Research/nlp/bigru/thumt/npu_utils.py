@@ -2,7 +2,6 @@ import tensorflow as tf
 
 NPU_MACHINE = True
 if NPU_MACHINE:
-    # 导入TFAdapter插件库
     import npu_bridge 
     from npu_bridge.estimator import npu_ops
     from npu_bridge.estimator.npu.npu_optimizer import NPUDistributedOptimizer
@@ -13,9 +12,9 @@ if NPU_MACHINE:
         config = tf.ConfigProto()
         custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name = "NpuOptimizer"
-        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision") # 对conv2d和matmulv2不支持
-        custom_op.parameter_map["use_off_line"].b = True # 必须显式关闭remap式开启，在昇腾AI处理器执行训练
-        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显式关闭remap
+        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision") # necessary for supporting conv2d and matmulv2
+        custom_op.parameter_map["use_off_line"].b = True
+        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF 
         return config
  
     def init_npu():
@@ -27,9 +26,9 @@ if NPU_MACHINE:
         config = tf.ConfigProto()
         custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name = "NpuOptimizer"
-        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision") # 对conv2d和matmulv2不支持
-        custom_op.parameter_map["use_off_line"].b = True # 必须显式开启，在昇腾AI处理器执行训练
-        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显式关闭remap
+        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision") # necessary for supporting conv2d and matmulv2
+        custom_op.parameter_map["use_off_line"].b = True
+        config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
         init_sess = tf.Session(config=config)
 
         npu_init = npu_ops.initialize_system()  
@@ -48,8 +47,10 @@ def restore_from_save(checkpoint_file=None):
         (assignment_map, initialized_variable_names) = get_assignment_map_from_checkpoint(tvars, checkpoint_file)
         tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
 
+
 def table_initiailization():
     return tf.tables_initializer()
+
 
 # TF session config
 def old_session_config(params, distribute=None):
@@ -68,6 +69,7 @@ def old_session_config(params, distribute=None):
 
     return config
 
+
 def cpu_tensor_test(ts, feed_dict=None):
     with tf.Session() as sess:
         sess.run(tf.tables_initializer())
@@ -78,6 +80,7 @@ def cpu_tensor_test(ts, feed_dict=None):
             output = sess.run(ts, feed_dict=feed_dict)  
         print(output)
         return output
+
 
 def npu_tensor_test(ts):
     with tf.Session(config=npu_config()) as sess:
