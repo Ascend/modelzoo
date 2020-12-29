@@ -102,8 +102,8 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 提供训练好的checkpoint (model.ckpt-263002，BLEU值为26.7624)，请放到 train/ 路径下：
 
 百度云：[链接](https://pan.baidu.com/s/1-z7CX7F_FujKHrSdzfvs6g )
-提取码：zal9 
 
+提取码：zal9 
 
 ## 五、性能
 
@@ -118,7 +118,7 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 
 ## 六、精度
 
-测试数据为iwslt2015 German-English dev set，这里讨论的均是iwslt 2015 German-English dev set的BLEU精度，如下表：
+测试数据为iwslt2015 German-English test set，这里讨论的均是iwslt 2015 German-English test set的BLEU精度，如下表：
 
 |             | original-GPU | dynamic-GPU | static-GPU | static-NPU |
 | ----------- | ------------ | ----------- | ---------- | ---------- |
@@ -133,8 +133,8 @@ NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态s
 - static-GPU：根据dynamic-GPU重写的静态shape、且保证能在NPU上打通的版本
 - static-NPU：根据dynamic-GPU重写的静态shape、且能在NPU上稳定训练的版本
 
-另外，iwslt2015 German-English dev set始终没有在原始论文中出现过，其性能BLEU-28.53所使用的语料、词表大小、模型大小等均没有任何说明。
-为了确定dynamic-GPU-27.54作为模板是否合适，可参考对比其他BiGRU（RNNsearch）复现版本在iwslt 2015 German-English的精度结果：
+另外，iwslt2015 German-English test set始终没有在原始论文中出现过，其性能BLEU-28.53所使用的语料、词表大小、模型大小等均没有任何说明。
+为了确定dynamic-GPU-27.54 作为模板是否合适，可参考对比其他BiGRU（RNNsearch）复现版本在iwslt 2015 German-English的精度结果：
 
 - book release：[beam-size=12, BLEU-27.25](https://books.google.com/books?id=KIOrDwAAQBAJ&pg=PA66&lpg=PA66&dq=newstest2015+rnnsearch&source=bl&ots=vzXUqjeYW_&sig=ACfU3U04ka_Rq-RCUeh5Ghd3BmIvCOhjgg&hl=zh-CN&sa=X&ved=2ahUKEwiZuISf7PLtAhVDwFkKHek3D4kQ6AEwCHoECAcQAg#v=onepage&q=newstest2015%20rnnsearch&f=false)
 - google release：[beam-size=12, BLEU-20.5](https://google.github.io/seq2seq/results/)
