@@ -51,12 +51,15 @@ shufflenetv2
 
 ## 执行训练
 
+```
 python train.py
 
+```
 预计耗时30h
 
 ## 执行验证
 
+```
 python eval.py
-
+```
 预计耗时30min
