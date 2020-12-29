@@ -160,15 +160,31 @@ bigru
 - static-GPU：根据dynamic-GPU重写的静态shape、且保证能在NPU上打通的版本
 - static-NPU：根据dynamic-GPU重写的静态shape、且能在NPU上稳定训练的版本
 
-另外，iwslt2015 German-English test set始终没有在原始论文中出现过，其性能BLEU-28.53所使用的语料、词表大小、模型大小等均没有任何说明。
-为了确定dynamic-GPU-27.54 作为模板是否合适，可参考对比其他BiGRU（RNNsearch）复现版本在iwslt 2015 German-English的精度结果：
+另外，iwslt2015 German-English test set始终没有在原始论文中出现过，其性能BLEU-28.53所使用的语料、词表大小、模型大小等均没有任何说明。为了确定dynamic-GPU-27.54 作为模板是否合适，可参考对比其他BiGRU（RNNsearch）复现版本在iwslt 2015 German-English的精度结果：
 
 - book release：[beam-size=12, BLEU-27.25](https://books.google.com/books?id=KIOrDwAAQBAJ&pg=PA66&lpg=PA66&dq=newstest2015+rnnsearch&source=bl&ots=vzXUqjeYW_&sig=ACfU3U04ka_Rq-RCUeh5Ghd3BmIvCOhjgg&hl=zh-CN&sa=X&ved=2ahUKEwiZuISf7PLtAhVDwFkKHek3D4kQ6AEwCHoECAcQAg#v=onepage&q=newstest2015%20rnnsearch&f=false)
 - google release：[beam-size=12, BLEU-20.5](https://google.github.io/seq2seq/results/)
 
 ## 八、MSAME离线推理
 
-按照wiki编译好MSAME工具后，运行：
+### （1）按照wiki编译好MSAME工具
+
+### （2）修改ckpt成所指定的ckpt
+
+```shell
+vi thumt/bin/ckpt2pb.py +301
+```
+
+修改：
+
+```python
+            ...
+            ckpt_path = "bi-gru/train/model.ckpt-263002"# 263002改成所要测试的ckpt名字
+            with tf.Session() as sess:
+            ...
+```
+
+### （3）推理验证
 
 ```shell
 cd msame
