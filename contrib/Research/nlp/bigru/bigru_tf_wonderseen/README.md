@@ -80,7 +80,7 @@
 
 ## 四、下载
 
-下载checkpoint放到bi-gru/train/路径下：
+提供训练好的checkpoint(model.ckpt-263002，BLEU值为26.7624)，请放到bi-gru/train/路径下：
 
 百度云：[链接](https://pan.baidu.com/s/1-z7CX7F_FujKHrSdzfvs6g )
 提取码：zal9 
