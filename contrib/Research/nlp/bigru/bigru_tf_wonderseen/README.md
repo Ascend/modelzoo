@@ -8,7 +8,7 @@
 
 RNNsearch是经典的机器翻译模型，模型出自[Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)。按照[iwslt 2015 leaderboard](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)中的名称，也可将其简称为BiGRU。
 
-本仓库负责将BiGRU从tensorflow迁移至Ascend910，对标的精度是iwslt 2015 German-English test set BLEU值。鉴于原论文作者没有公开官方代码，文中也没有纰漏在该数据集上的细节，本仓库主要借鉴了科研单位复现的版本：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态shape的版本。
+本仓库负责将BiGRU从tensorflow迁移至Ascend910，精度指标是 [iwslt 2015 German-English test set BLEU](https://paperswithcode.com/sota/machine-translation-on-iwslt2015-german?p=pervasive-attention-2d-convolutional-neural-1)。鉴于原论文作者没有公开官方代码，文中也没有纰漏在该数据集上的细节，本仓库主要借鉴了科研单位复现的版本：[清华大学复现的RNNsearch仓库](https://github.com/THUNLP-MT/THUMT/tree/tensorflow)。NPU算子暂时不支持dynamic shape特性，此仓库是已经改写为静态shape的版本。
 
 ## 三、文件结构
 
