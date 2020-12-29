@@ -1,7 +1,7 @@
 # Shape Robust Text Detection with Progressive Scale Expansion Network
 
 ## 准备数据集
-1. 下载并解压训练集和测试集数据
+1. 下载并解压训练集和测试集图片数据
 2. 按顺序对文件夹进行组织
 ```
 ./data_dir
