@@ -95,7 +95,7 @@ def device_id_to_process_device_map(device_list):
     return process_device_map
 
 
-def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, optimizer=None, print_every=20,
+def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, opts, sum_writer, optimizer=None, print_every=20,
               is_training=True):
     if is_training:
         model.train()
@@ -384,10 +384,10 @@ def main_worker(dev, npus_per_node, args, opts):
 
         print("Start training epoch: %d, learning_rate: %.5f" % (count, learning_rate))
 
-        train_acc, loss = run_epoch(count, model, train_loader, loss_fn, device, args, sum_writer, optimizer=optimizer,
-                                    print_every=opts.verbose_step, is_training=True)
+        train_acc, loss = run_epoch(count, model, train_loader, loss_fn, device, args, opts, sum_writer,
+                                    optimizer=optimizer, print_every=opts.verbose_step, is_training=True)
         loss_results.append(loss)
-        acc, dev_loss = run_epoch(count, model, dev_loader, loss_fn, device, args, sum_writer, optimizer=None,
+        acc, dev_loss = run_epoch(count, model, dev_loader, loss_fn, device, args, opts, sum_writer, optimizer=None,
                                   print_every=opts.verbose_step, is_training=False)
         print("loss on dev set is %.4f" % dev_loss)
         dev_loss_results.append(dev_loss)
