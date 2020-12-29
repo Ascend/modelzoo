@@ -12,6 +12,7 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 from torch.utils.data import Dataset
+import apex
 
 
 def seed_everything():
@@ -36,7 +37,8 @@ def device_id_to_process_device_map(device_list):
 def get_optimizer(config, model):
     optimizer = None
     if config.TRAIN.OPTIMIZER == "adadelta":
-        optimizer = torch.optim.Adadelta(
+        # optimizer = torch.optim.Adadelta(
+        optimizer = apex.optimizers.NpuFusedAdadelta(
             filter(lambda p: p.requires_grad, model.parameters())
         )
     return optimizer
