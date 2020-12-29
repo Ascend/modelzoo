@@ -147,7 +147,7 @@ def densenet121(pretrained=False, **kwargs):
         # has keys 'norm.1', 'relu.1', 'conv.1', 'norm.2', 'relu.2', 'conv.2'.
         # They are also in the checkpoints in model_urls. This pattern is used
         # to find such keys.
-        model.load_state_dict('./checkpoint.pth.tar')
+        model.load_state_dict(torch.load('checkpoint.pth.tar'))
     return model
 
 
