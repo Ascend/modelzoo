@@ -62,25 +62,9 @@ msame
 ./convert_bin.sh
 ```
 
+转换完成后，执行以下命令完成推理以及精度测量
 
-albert_base
 ```
-./squad2_base.sh
+./run.sh
 ```
-albert_large
-```
-./squad2_large.sh
-```
-如果只训练则注释掉--do_predict
-训练base用的batch_size为32，训练large的batch_size为16,训练large的learning rate为1.5e-5
-## 预测和精度对比
-
-albert_base
-```
-./squad2_base.sh
-```
-albert_large
-```
-./squad2_large.sh
-```
-如果只预测和精度对比注释掉--do_train
+run.sh中包含有几个命令
