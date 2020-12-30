@@ -1,6 +1,7 @@
 # ALBERT msame 推理
 ## 概述
-推理后的结果精度基本和训练的模型保持一致，具体推理详细见wiki [输入链接说明](https://gitee.com/ascend/modelzoo/wikis/Albert-squad%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86%E6%A1%88%E4%BE%8B?sort_id=3269923)
+推理后的结果精度基本和训练的模型保持一致，具体推理详细见wiki [Albert-squad离线推理案例
+](https://gitee.com/ascend/modelzoo/wikis/Albert-squad%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86%E6%A1%88%E4%BE%8B?sort_id=3269923)
 |  | F1| EM |
 | :-----| ----: | :----: |
 | albert_base(Ascend) | **82.4**| **79.4**|
