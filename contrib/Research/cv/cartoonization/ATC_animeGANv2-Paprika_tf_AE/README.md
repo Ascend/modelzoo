@@ -62,4 +62,4 @@ Batch: 1, shape: 256 * 256 * 3，平均推理性能 2032.050222ms
 
 推理效果
 
-![44](C:\Users\83395\Desktop\新建文件夹\44.jpg)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/182312_ceaca12b_8113712.jpeg "44.jpg")
