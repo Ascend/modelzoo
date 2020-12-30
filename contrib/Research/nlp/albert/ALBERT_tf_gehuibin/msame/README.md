@@ -104,10 +104,18 @@ python3.7 evaluate.py --input_dir=$input_dir \
 
 测得的结果如下：
 albert base的推理速度：
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/112859_52ca3260_8144926.png "sbase.png")
+
 albert base的推理精度：
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/112924_a0fffc0b_8144926.png "jbase.png")
+
 albert large的推理速度：
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/112947_dc22f7f3_8144926.png "slarge.png")
+
 albert large的推理精度
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/113008_f0c53721_8144926.png "jlarge.png")
+
