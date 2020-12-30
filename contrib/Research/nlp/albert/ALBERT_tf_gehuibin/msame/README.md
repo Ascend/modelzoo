@@ -122,6 +122,5 @@ albert large的推理精度
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/113008_f0c53721_8144926.png "jlarge.png")
 
 
-以及推理后的结果均可以在链接中下载
-
+上述模型转换以及推理后的结果后的均可以在链接中下载[百度云链接](https://pan.baidu.com/s/1Wx2CtrutYPhR2pY2HL7ejg) 提取码: 8g4u
 
