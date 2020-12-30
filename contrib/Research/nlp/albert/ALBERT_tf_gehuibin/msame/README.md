@@ -119,3 +119,6 @@ albert large的推理精度
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/113008_f0c53721_8144926.png "jlarge.png")
 
+上述的转换后的.bin文件以及推理后的结果均可以在链接中下载
+
+
