@@ -13,36 +13,35 @@
 ## 代码路径解释
 
 ```shell
-albert
+msame
 └─ 
   ├─README.md
-  ├─output_base_v2 基于squadv2微调过的albert base模型路径
-  	├─checkpoint
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
+  ├─input_ids .bin格式输入文件夹
+  	├─00000.bin
   	└─...
-  ├─output_large_v2 基于squadv2微调过的albert base模型路径
-  	├─checkpoint
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
+  ├─input_mask .bin格式输入文件夹
+  	├─00000.bin
   	└─...
-  ├─albert_base_v2 albert base的预训练模型
-  	├─30k-clean.model
-  	├─30k-clean.vocab
-  	├─albert_config.json
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
-
-  ├─albert_large_v2 albert large的预训练模型
-  	├─30k-clean.model
-  	├─30k-clean.vocab
-  	├─albert_config.json
-  	├─model.ckpt-best.data-00000-of-00001
-  	├─model.ckpt-best.index
-  	├─model.ckpt-best.meta
+  ├─p_masks .bin格式输入文件夹
+  	├─00000.bin
+  	└─...
+  ├─segment_ids .bin格式输入文件夹
+  	├─00000.bin
+  	└─...
+  ├─pb_albert_base_v2 albert base推理结果文件夹
+  	├─model.pb
+  	├─albert.pb
+  	├─albert.om
+        ├─output 推理后的结果
+  	    ├─00000.txt
+  	    └─...
+  ├─pb_albert_large_v2 albert large推理结果文件夹
+  	├─model.pb
+  	├─albert.pb
+  	├─albert.om
+        ├─output 推理后的结果
+  	    ├─00000.txt
+  	    └─...
   ├─squad_v2 存放数据目录
   	├─train-v2.0.json 数据源文件
   	├─dev-v2.0.json 数据源文件
@@ -50,13 +49,13 @@ albert
   	├─dev.tfrecord 根据dev-v2.0.json生成的文件
   	├─pred_left_file.pkl 根据dev-v2.0.json生成的文件
 
-  ├─squad2_base.sh albert base的启动脚本
-  ├─squad2_large.sh albert large的启动脚本
+  ├─run.sh 启动脚本
 ```
 
 ---
 
 ## 准备数据和模型
+
 数据预训练模型以及微调后的模型均可以从 
 [百度网盘](https://pan.baidu.com/s/1m3HQcZlCJ3Pak7PpXiTIpg) 提取码: 6gqi
 其中squad_v2目录夹为数据  
