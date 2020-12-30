@@ -3,6 +3,9 @@ export POD_NAME=another0
 
 execpath=${PWD}
 ulimit -c 0
+#安装第三方库
+pip install better_exceptions
+#运行程序
 python3.7 cifar10.py > train.log 2>&1
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
 key1="\[GEOP\]"  #功能检查字
