@@ -63,23 +63,3 @@ def convert():
 if __name__ == "__main__":
     convert()
 
-
-
-#path = "/data/m00536736/modelzoo/OCR/datasets/IIIT5K/testdata.mat"
-#testfile = io.loadmat(path)
-#testdata = testfile['testdata'][0]
-#
-#for i in range(100):
-#    tmp = testdata[i]
-#    print("image name :", tmp[0])
-#    print("image label : ", tmp[1])
-#    print("first 5 word from 50  lexicon : ",tmp[2][:5])
-#    print("first 5 word from 1k  lexicon : ",tmp[3][:5])
-#
-#
-#np.save('/data/m00536736/modelzoo/OCR/crnn_smoke/data/test/iiit5k/testdata.npy',testdata)
-#
-
-
-
-

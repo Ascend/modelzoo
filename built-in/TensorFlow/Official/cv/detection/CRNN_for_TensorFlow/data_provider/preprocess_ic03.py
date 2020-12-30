@@ -71,23 +71,3 @@ def filter():
 
 if __name__=="__main__":
     filter()
-
-
-#path="/data/m00536736/modelzoo/OCR/datasets/2003/SceneTrialTest/annotation.txt"
-#ann_file = open(path,'r')
-#
-#annotation_list = [line.strip("\n") for line in ann_file.readlines()]
-#ann_file.close()
-#
-#abn_list = get_abnormal_list(annotation_list)
-#
-#path="/data/m00536736/modelzoo/OCR/datasets/2003/SceneTrialTest/processed_annotation.txt"
-#
-#clean_list = [line for line in annotation_list if line not in abn_list]
-#print("number of annotation after filtering :{}".format(len(clean_list)))
-
-
-#with open(path,'w') as f:
-#    for line in clean_list:
-#        line = line +'\n'
-#        f.write(line)
