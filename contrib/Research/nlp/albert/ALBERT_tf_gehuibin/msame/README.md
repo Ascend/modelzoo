@@ -56,34 +56,12 @@ msame
 
 ## 准备数据和模型
 
-数据预训练模型以及微调后的模型均可以从 
-[百度网盘](https://pan.baidu.com/s/1m3HQcZlCJ3Pak7PpXiTIpg) 提取码: 6gqi
-其中squad_v2目录夹为数据  
-albert_base/large_v2为预训练模型  
-output_base/large_v2为微调后的模型  
+首先需要把输入的数据都转换为.bin格式的数据
 
+```
+./convert_bin.sh
+```
 
-
-## 参数解释
-   详情可见[Albert](https://github.com/google-research/albert)  
-  --output_dir 输出的模型路径  
-  --input_dir 训练集目录  
-  --model_dir 预训练模型目录  
-  --do_lower_case 小写  
-  --max_seq_length 最大句子长度  
-  --doc_stride 跨步长度  
-  --max_query_length 最大问题长度  
-  --do_train 训练  
-  --do_predict 预测  
-  --train_batch_size 训练batch size  
-  --predict_batch_size 预测batch size   
-  --learning_rate 学习率  
-  --num_train_epochs 迭代数  
-  --warmup_proportion 训练预热比例  
-  --save_checkpoints_steps 多少批次保存  
-  --n_best_size 预测的个数  
-  --max_answer_length 最大答案长度  
-## 训练
 
 albert_base
 ```
