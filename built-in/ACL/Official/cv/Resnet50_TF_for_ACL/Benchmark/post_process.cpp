@@ -105,7 +105,7 @@ aclError SaveBinPostprocess()
                 outputFile = fopen((resultFolder + "/" + "davinci_" + inputFileName + "_"  + "output" + std::to_string(i) + ".bin").c_str(), "wb");
             }
             
-            if (NULL == outputFile) {
+            if (outputFile == nullptr) {
                 aclrtFreeHost(outHostData);
                 return 1;
             }

@@ -18,9 +18,9 @@
 #include "infer_engine.h"
 #include "acl/acl_mdl.h"
 #include "acl/acl_rt.h"
+#include "acl/ops/acl_dvpp.h"
 #include <functional>
 #include <algorithm>
-#include "acl/ops/acl_dvpp.h"
 using namespace std;
 
 std::unordered_map<std::string, long long> dvppTime;
@@ -41,6 +41,10 @@ acldvppChannelDesc *dvpp_channel_desc = nullptr;
 std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> imgSizes;
 
 #define RESIZE_MIN 256
+#define NUM_2 2
+#define NUM_3 3
+#define NUM_16 16
+#define NUM_128 128
 
 uint32_t resizedWidth;
 uint32_t resizedHeight;
@@ -51,11 +55,11 @@ uint32_t resizedOutputBufferSize;
 void getImgResizeShape()
 {
     if (ACL_FORMAT_NCHW == cfg.inputInfo[0].Format) {
-        resizedHeight = cfg.inputInfo[0].dims[2];
-        resizedWidth = cfg.inputInfo[0].dims[3];
+        resizedHeight = cfg.inputInfo[0].dims[NUM_2];
+        resizedWidth = cfg.inputInfo[0].dims[NUM_3];
     } else if (ACL_FORMAT_NHWC == cfg.inputInfo[0].Format) {
         resizedHeight = cfg.inputInfo[0].dims[1];
-        resizedWidth = cfg.inputInfo[0].dims[2];
+        resizedWidth = cfg.inputInfo[0].dims[NUM_2];
     }
     return;
 }
@@ -112,8 +116,8 @@ aclError LoadModel()
     ret = aclrtMalloc(&(cfg.weightMem_ptr), weightsize, ACL_MEM_MALLOC_HUGE_ONLY);
     CHECK_ACL_RET("alloc weight_ptr failed", ret);
 
-    ret = aclmdlLoadFromMemWithMem(cfg.modelData_ptr, modelSize, &modelId, cfg.devMem_ptr,
-        memSize, cfg.weightMem_ptr, weightsize);
+    ret = aclmdlLoadFromMemWithMem(cfg.modelData_ptr, modelSize, &modelId, cfg.devMem_ptr, memSize, cfg.weightMem_ptr,
+                                   weightsize);
     CHECK_ACL_RET("load model from memory failed", ret);
     LOG("Load model success. memSize: %lu, weightSize: %lu.\n", memSize, weightsize);
 
@@ -158,16 +162,29 @@ aclError DvppSetup()
 
     imgSizes = cfg.dvppConfig.imgSizes;
 
-    resizedWidthAligned = (resizedWidth + 15) / 16 * 16;
-    resizedHeightAligned = (resizedHeight + 1) / 2 * 2;
+    resizedWidthAligned = (resizedWidth + 15) / NUM_16 * NUM_16;
+    resizedHeightAligned = (resizedHeight + 1) / NUM_2 * NUM_2;
 
-    resizedOutputBufferSize = resizedWidthAligned * resizedHeightAligned * 3 / 2;
-    LOG("resizedWidth %d resizedHeight %d resizedWidthAligned %d resizedHeightAligned %d resizedOutputBufferSize %d\n", resizedWidth, resizedHeight, resizedWidthAligned, resizedHeightAligned, resizedOutputBufferSize);
+    resizedOutputBufferSize = resizedWidthAligned * resizedHeightAligned * NUM_3 / NUM_2;
+    LOG("resizedWidth %d resizedHeight %d resizedWidthAligned %d resizedHeightAligned %d resizedOutputBufferSize %d\n",
+        resizedWidth, resizedHeight, resizedWidthAligned, resizedHeightAligned, resizedOutputBufferSize);
 
     return ACL_ERROR_NONE;
 }
 
-acldvppPicDesc *createDvppPicDesc(void *dataDev, acldvppPixelFormat format, uint32_t width, uint32_t height, uint32_t widthStride, uint32_t heightStride, uint32_t size)
+/*
+ * @brief : 生成dvpp图像描述信息
+ * @param [in] void *dataDev : 码流buffer信息.
+ * @param [in] acldvppPixelFormat format: 图像格式
+ * @param [in] uint32_t width : 宽度
+ * @param [in] uint32_t height: 高度
+ * @param [in] uint32_t widthStride : 宽度对齐.
+ * @param [in] uint32_t heightStride: 高度对齐.
+ * @param [in] uint32_t size: 码流大小.
+ * @return : acldvppPicDesc：图像描述信息
+ */
+acldvppPicDesc *createDvppPicDesc(void *dataDev, acldvppPixelFormat format, uint32_t width, uint32_t height,
+                                  uint32_t widthStride, uint32_t heightStride, uint32_t size)
 {
     acldvppPicDesc *picDesc = acldvppCreatePicDesc();
     if (picDesc == nullptr) {
@@ -307,7 +324,16 @@ aclError InitInput(std::vector<std::string> files)
     return ACL_ERROR_NONE;
 }
 
-void GetImageHW(void* buff, uint32_t fileSize, std::string fileLocation, uint32_t &W, uint32_t &H){
+/*
+ * @brief : 获取图像宽高
+ * @param [in] void* buff : 输入码流地址.
+ * @param [in] uint32_t fileSize : 输入码流长度
+ * @param [in] std::string fileLocation : 输入文件路径.
+ * @param [in] uint32_t &W : 输入码流宽度.
+ * @param [in] uint32_t &H : 输入码流高度.
+ */
+void GetImageHW(void* buff, uint32_t fileSize, std::string fileLocation, uint32_t &W, uint32_t &H)
+{
     int32_t components = 0;
     ret = acldvppJpegGetImageInfo((void *)buff, fileSize, &W, &H, &components);
     if (ret != ACL_ERROR_NONE) {
@@ -315,15 +341,15 @@ void GetImageHW(void* buff, uint32_t fileSize, std::string fileLocation, uint32_
     }
 }
 
-/**
-    * The preprocessing is divided into three steps:
-    * 1. Decode (acldvppJpegDecodeAsync)
-    * 2. Crop the image to original image size -> resize (acldvppVpcCropAsync)
-    * 3. Center crop to 224
-*/
+/*
+ * @brief : dvpp在推理中的预处理流程
+ * @param [in] string fileLocation : 输入文件路径.
+ * @param [in] char *&ptr : 输出buffer指针.
+ * @return : ACL_ERROR_NONE：预处理失败， decodeErr:parse jpeg head fail.
+ */
 aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
 {
-    //1 Prepare the input data of decode
+    // 1 获取输入码流
     uint32_t W, H, W_Aligned, H_Aligned, outputBuffSize;
     void *decodeInput = nullptr;
     void *decodeOutput = nullptr;
@@ -346,24 +372,26 @@ aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
         return ret;
     }
 
-    //2 Prepare the ouputDesc of decode
+    // 2 获取解码输出描述信息
     GetImageHW(buff, fileSize, fileLocation, W, H);
-    W_Aligned = (W + 127) / 128 * 128;
-    H_Aligned = (H + 15) / 16 * 16;
-    outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
+    W_Aligned = (W + 127) / NUM_128 * NUM_128;
+    H_Aligned = (H + 15) / NUM_16 * NUM_16;
+    outputBuffSize = W_Aligned * H_Aligned * NUM_3 / NUM_2;
     ret = acldvppMalloc(&decodeOutput, outputBuffSize);
     if (ret != ACL_ERROR_NONE) {
         LOG("Malloc decodeOutput buff failed[%d]\n", ret);
         return ret;
     }
-    decodeOutputDesc = createDvppPicDesc(decodeOutput, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned, H_Aligned, outputBuffSize);
+    decodeOutputDesc = createDvppPicDesc(decodeOutput, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned, H_Aligned,
+                                         outputBuffSize);
     if (decodeOutputDesc == nullptr) {
         LOG("create jpeg_output_desc failed\n");
         return 1;
     }
     LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
-                fileLocation.c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
-    //3 Decode
+        fileLocation.c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
+
+    // 3 使用jpegd图像解码
     ret = acldvppJpegDecodeAsync(dvpp_channel_desc, decodeInput, fileSize, decodeOutputDesc, stream);
     if (ret != ACL_ERROR_NONE) {
         LOG(" dvppJpegDecodeAsync failed\n");
@@ -372,31 +400,36 @@ aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
     aclrtFreeHost(buff);
     aclrtSynchronizeStream(stream);
 
-    // 4 crop and resize
+    // 4 对jpegd解码的图片进行原分辨率抠图及短边256等比例缩放。
     acldvppRoiConfig *cropConfig = nullptr;
     acldvppPicDesc *cropOutputDesc = nullptr;
-    //1.0 Prepare the input cropConfig(orginal image) of crop
+    // 4.1 设置对解码后的图片进行原图裁剪，目的是为了减少因jpegd解码后对齐的无效数据对图像精度的影响
     cropConfig = InitCropRoiConfig(W, H);
-    //2.0 Prepare the outputDesc of crop
+
+    // 4.2 宽和高较短的一条边缩放至256，较长边做等比例缩放。对齐至256目的是为了给224x224中心抠图做准备。
     uint32_t newInputWidth = 0;
     uint32_t newInputHeight = 0;
     void *cropOutBufferDev = nullptr;
+    // 短边256对齐，获得对齐后的宽高
     SmallSizeAtLeast(W, H, newInputWidth, newInputHeight);
-    uint32_t cropOutputWidthStride = (newInputWidth + (16 - 1)) / 16 * 16;
-    uint32_t cropOutputHeightStride = (newInputHeight + (2 - 1)) / 2 * 2;
-    uint32_t cropOutBufferSize = cropOutputWidthStride * cropOutputHeightStride * 3 / 2;
+
+    uint32_t cropOutputWidthStride = (newInputWidth + (NUM_16 - 1)) / NUM_16 * NUM_16;
+    uint32_t cropOutputHeightStride = (newInputHeight + (NUM_2 - 1)) / NUM_2 * NUM_2;
+    uint32_t cropOutBufferSize = cropOutputWidthStride * cropOutputHeightStride * NUM_3 / NUM_2;
     ret = acldvppMalloc(&cropOutBufferDev, cropOutBufferSize);
     if (ret != ACL_ERROR_NONE) {
-        std::cout << "[ERROR][Vision] AcldvppMalloc cropOutBufferDev_ failed, ret = " << ret << " cropOutBufferSize_ = " << cropOutBufferSize << endl;
+        std::cout << "[ERROR][Vision] AcldvppMalloc cropOutBufferDev_ failed, ret = " << ret << " cropOutBufferSize_ = "
+                  << cropOutBufferSize << endl;
         return ret;
     }
-    cropOutputDesc = createDvppPicDesc(cropOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, newInputWidth, newInputHeight, cropOutputWidthStride, cropOutputHeightStride, cropOutBufferSize);
+    cropOutputDesc = createDvppPicDesc(cropOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, newInputWidth, newInputHeight,
+                                       cropOutputWidthStride, cropOutputHeightStride, cropOutBufferSize);
     if (cropOutputDesc == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("create cropOutputDesc failed\n");
         return ret;
     }
-    //3.0 crop
+
     ret = acldvppVpcCropAsync(dvpp_channel_desc, decodeOutputDesc, cropOutputDesc, cropConfig, stream);
     if (ret != ACL_ERROR_NONE) {
         std::cout << "[ERROR][Vision] acldvppVpcCropAsync failed, ret = " << ret << std::endl;
@@ -404,15 +437,18 @@ aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
     }
     aclrtSynchronizeStream(stream);
 
-    // 5 center crop
+    // 5 对等比例缩放后的图片做224x224中心抠图，中心抠图后的数据会发送给aipp进行YUV转RGB格式转换。需要注意：中心抠图后的输出格式和aipp
+    // 的输入格式需要保持一致。
     acldvppRoiConfig *centerCropConfig = nullptr;
     acldvppPicDesc *centerCropOutputDesc = nullptr; // resize output desc
     centerCropConfig = InitCropCenterRoiConfig(newInputWidth, newInputHeight, resizedWidth, resizedHeight);
     void *vpcOutBufferDev = nullptr;
-    uint32_t vpcOutBufferSize = resizedWidthAligned * resizedHeightAligned * 3 / 2;
+    uint32_t vpcOutBufferSize = resizedWidthAligned * resizedHeightAligned * NUM_3 / NUM_2;
 
     vpcOutBufferDev = (void *)ptr;
-    centerCropOutputDesc = createDvppPicDesc(vpcOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, resizedWidth, resizedHeight, resizedWidthAligned, resizedHeightAligned, vpcOutBufferSize);
+    centerCropOutputDesc = createDvppPicDesc(vpcOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, resizedWidth,
+                                             resizedHeight, resizedWidthAligned, resizedHeightAligned,
+                                             vpcOutBufferSize);
     if (centerCropOutputDesc == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("create centerCropOutputDesc failed\n");
@@ -428,7 +464,7 @@ aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
     ptr += vpcOutBufferSize;
     aclrtSynchronizeStream(stream);
  
-    // 6 Release resources
+    // 6 释放资源
     acldvppFree(decodeInput);
     acldvppFree(decodeOutput);
     acldvppFree(cropOutBufferDev);
@@ -501,13 +537,13 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
 
-    if (width % 2 == 0) {
+    if (width % NUM_2 == 0) {
         right = width - 1;
     } else {
         right = width;
     }
 
-    if (height % 2 == 0) {
+    if (height % NUM_2 == 0) {
         bottom = height - 1;
     } else {
         bottom = height;
@@ -522,7 +558,8 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     return cropConfig;
 }
 
-acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newInputHeight, uint32_t modelInputWidth, uint32_t modelInputHeight)
+acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newInputHeight, uint32_t modelInputWidth,
+                                          uint32_t modelInputHeight)
 {
     uint32_t left = 0;
     uint32_t right = 0;
@@ -534,16 +571,17 @@ acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newIn
     uint32_t top_half = 0;
     acldvppRoiConfig *centerCropConfig = nullptr;
 
+    // 计算中心抠图起始点的坐标距离码流左边界和上边界的距离
     amount_to_be_cropped_w = newInputWidth - modelInputWidth;
-    left_half = amount_to_be_cropped_w / 2;
+    left_half = amount_to_be_cropped_w / NUM_2;
     amount_to_be_cropped_h = newInputHeight - modelInputHeight;
-    top_half = amount_to_be_cropped_h / 2;
+    top_half = amount_to_be_cropped_h / NUM_2;
 
-    //even
-    left = (left_half % 2 == 0) ? (amount_to_be_cropped_w / 2) : (amount_to_be_cropped_w / 2 + 1);
-    top = (top_half % 2 == 0) ? (amount_to_be_cropped_h / 2) : (amount_to_be_cropped_h / 2 + 1);
+    // 保证起始点坐标为偶数
+    left = (left_half % NUM_2 == 0) ? (amount_to_be_cropped_w / NUM_2) : (amount_to_be_cropped_w / NUM_2 + 1);
+    top = (top_half % NUM_2 == 0) ? (amount_to_be_cropped_h / NUM_2) : (amount_to_be_cropped_h / NUM_2 + 1);
 
-    //odd
+    // 结束点为奇数
     right = left + modelInputWidth - 1;
     bottom = top + modelInputHeight - 1;
 
@@ -552,7 +590,6 @@ acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newIn
         std::cout << "[ERROR][Vision] acldvppCreateRoiConfig failed " << std::endl;
         return nullptr;
     }
-
     return centerCropConfig;
 }
 
@@ -569,14 +606,17 @@ void SmallSizeAtLeast(uint32_t width, uint32_t height, uint32_t &newInputWidth, 
     resizeMin = (float)(RESIZE_MIN);
     minWidthFlag = (width <= height) ? true : false;
 
+    // 短边缩放为256，长边等比例缩放
     if (minWidthFlag == true) {
         newInputWidth = resizeMin;
         newInputHeight = (resizeMin / width) * inputHeight;
-        std::cout << "[INFO]scaleRatio: " << resizeMin / width << " inputWidth_: " << width << " newInputWidth: " << newInputWidth << " inputHeight_: " << inputHeight << " newInputHeight_:" << newInputHeight << std::endl;
+        std::cout << "[INFO]scaleRatio: " << resizeMin / width << " inputWidth_: " << width << " newInputWidth: " <<
+            newInputWidth << " inputHeight_: " << inputHeight << " newInputHeight_:" << newInputHeight << std::endl;
     } else {
         newInputWidth = (resizeMin / height) * width;
         newInputHeight = resizeMin;
-        std::cout << "[INFO]scaleRatio: " << resizeMin / height << " width: " << width << " newInputWidth: " << newInputWidth << " height: " << height << " newInputHeight:" << newInputHeight << std::endl;
+        std::cout << "[INFO]scaleRatio: " << resizeMin / height << " width: " << width << " newInputWidth: " <<
+            newInputWidth << " height: " << height << " newInputHeight:" << newInputHeight << std::endl;
     }
 }
 
@@ -652,9 +692,7 @@ aclError Inference()
     outputDataframe.fileNames = inputDataframe.fileNames;
     outputDataframe.dataset = output;
 
-    uint32_t dvppFlag;
-    (cfg.useDvpp) ? dvppFlag = 1 : dvppFlag = 0;
-
+    uint32_t dvppFlag = (cfg.useDvpp) ? 1 : 0;
     ret = DestroyDatasetResurce(inputDataframe.dataset, dvppFlag);
     if (ret != ACL_ERROR_NONE) {
         LOG("DestroyDatasetResurce failed\n");
@@ -674,17 +712,17 @@ aclError UnloadModel()
 
     aclmdlDestroyDesc(cfg.modelDesc);
 
-    if (nullptr != cfg.devMem_ptr) {
+    if (cfg.devMem_ptr != nullptr) {
         aclrtFree(cfg.devMem_ptr);
         cfg.devMem_ptr = nullptr;
     }
 
-    if (nullptr != cfg.weightMem_ptr) {
+    if (cfg.weightMem_ptr != nullptr) {
         aclrtFree(cfg.weightMem_ptr);
         cfg.weightMem_ptr = nullptr;
     }
 
-    if (nullptr != cfg.modelData_ptr) {
+    if (cfg.modelData_ptr != nullptr) {
         delete[] cfg.modelData_ptr;
         cfg.modelData_ptr = nullptr;
     }

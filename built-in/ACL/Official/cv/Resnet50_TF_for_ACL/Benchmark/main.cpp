@@ -193,7 +193,7 @@ aclError Process()
     LOG("fileNum:%zd\n",fileNames.size());
     struct timeval startTmp, endTmp;
     
-    //get img resize weight and height
+    // 获取图片宽高
     getImgResizeShape();
     
     if(cfg.useDvpp) {
@@ -205,7 +205,7 @@ aclError Process()
     size_t loopCnt = 0;
     while(loopCnt < cfg.loopNum) {
         LOG("loopCnt %d, loopNum %d\n", loopCnt, cfg.loopNum);
-        for(size_t i = 0; i< fileNum/cfg.batchSize; i++) {
+        for(size_t i = 0; i < fileNum / cfg.batchSize; i++) {
             gettimeofday(&startTmp, NULL);
             std::vector<std::string> batchFileNames;
             for (int j = 0; j < cfg.batchSize; j++) {
@@ -229,10 +229,9 @@ aclError Process()
             CHECK_RET(ret);
         }
 
-        //last img
-        if (0 != fileNum % cfg.batchSize) {
+        if (fileNum % cfg.batchSize != 0) {
             std::vector<std::string> batchFileNames;
-            for(size_t i = (fileNum - fileNum % cfg.batchSize); i< fileNum; i++) {
+            for(size_t i = (fileNum - fileNum % cfg.batchSize); i < fileNum; i++) {
                 batchFileNames.push_back(fileNames[i]);
             }
             
@@ -245,7 +244,7 @@ aclError Process()
                 ret = InitInput(batchFileNames);
             }
             gettimeofday(&endTmp, NULL);
-            dataProcTime += (endTmp.tv_sec-startTmp.tv_sec)*1000000+(endTmp.tv_usec-startTmp.tv_usec);
+            dataProcTime += (endTmp.tv_sec-startTmp.tv_sec) * 1000000 + (endTmp.tv_usec - startTmp.tv_usec);
             CHECK_RET(ret);
             
             ret = Inference();
@@ -260,7 +259,7 @@ aclError Process()
 }
 
 void SaveResult()
- {
+{
     ofstream outfile("test_perform_static.txt");
     #if 0
     std::string model_name;
@@ -287,7 +286,8 @@ void SaveResult()
     #endif
     char tmpCh[256];
     memset(tmpCh, 0, sizeof(tmpCh));
-    snprintf(tmpCh, sizeof(tmpCh), "NN inference cost average time: %4.3f ms %4.3f fps/s\n", avgTime, (1.0 * 1000/avgTime));
+    snprintf(tmpCh, sizeof(tmpCh), "NN inference cost average time: %4.3f ms %4.3f fps/s\n",
+             avgTime, (1.0 * 1000 / avgTime));
     outfile << tmpCh;
     outfile.close();
 }
@@ -296,9 +296,10 @@ aclError GetModelInputOutputInfo(Config& cfg)
 {
     aclError ret;
     
-    std::ofstream  outFile("modelInputOutputInfo", std::ios::trunc);
+    std::ofstream outFile("modelInputOutputInfo", std::ios::trunc);
     char tmpChr[256] = {0};
-    //Get model input info
+
+    // 获取模型输入信息
     size_t inputNum = aclmdlGetNumInputs(cfg.modelDesc);
     LOG("model input num %zd\n", inputNum);
     snprintf(tmpChr, sizeof(tmpChr), "model input num %zd\n", inputNum);
@@ -309,19 +310,20 @@ aclError GetModelInputOutputInfo(Config& cfg)
         size_t size = aclmdlGetInputSizeByIndex(cfg.modelDesc, i);
         cfg.inputInfo[i].size = size;
         LOG("model input[%zd] size %zd\n", i, cfg.inputInfo[i].size);
-        snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] size %zd\n",  i, cfg.inputInfo[i].size);
+        snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] size %zd\n", i, cfg.inputInfo[i].size);
         outFile << tmpChr;
         
         aclmdlIODims dims;
         ret = aclmdlGetInputDims(cfg.modelDesc, i, &dims);
-        if (ACL_ERROR_NONE != ret) {
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclmdlGetInputDims fail ret %d\n", ret);
             return 1;
         }
         
         cfg.inputInfo[i].dimCount = dims.dimCount;
-        ret = aclrtMemcpy(cfg.inputInfo[i].dims , cfg.inputInfo[i].dimCount * sizeof(int64_t), dims.dims, cfg.inputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
-        if (ACL_ERROR_NONE != ret) {
+        ret = aclrtMemcpy(cfg.inputInfo[i].dims , cfg.inputInfo[i].dimCount * sizeof(int64_t), dims.dims,
+                          cfg.inputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclrtMemcpy fail ret %d line %d\n", ret, __LINE__);
             return 1;
         }
@@ -331,7 +333,8 @@ aclError GetModelInputOutputInfo(Config& cfg)
         outFile << tmpChr;
         for (size_t dimIdx = 0; dimIdx < cfg.inputInfo[i].dimCount; dimIdx++) {
             LOG("model input[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.inputInfo[i].dims[dimIdx]);
-            snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.inputInfo[i].dims[dimIdx]);
+            snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] dim[%zd] info %ld\n",
+                     i, dimIdx, cfg.inputInfo[i].dims[dimIdx]);
             outFile << tmpChr;
         }
         
@@ -339,10 +342,10 @@ aclError GetModelInputOutputInfo(Config& cfg)
         cfg.inputInfo[i].Type = aclmdlGetInputDataType(cfg.modelDesc, i);
         
         LOG("model input[%zd] format %d inputType %d\n", i, cfg.inputInfo[i].Format, cfg.inputInfo[i].Type);
-        snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] format %d inputType %d\n", i, cfg.inputInfo[i].Format, cfg.inputInfo[i].Type);
+        snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] format %d inputType %d\n", i, cfg.inputInfo[i].Format,
+                 cfg.inputInfo[i].Type);
         outFile << tmpChr;
 
-        //const char tmp[ACL_MAX_TENSOR_NAME_LEN] = aclmdlGetInputNameByIndex(cfg.modelDesc, i);
         cfg.inputInfo[i].Name = aclmdlGetInputNameByIndex(cfg.modelDesc, i);
         LOG("model input[%zd] name %s\n", i, cfg.inputInfo[i].Name);
         snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] name %s\n", i, cfg.inputInfo[i].Name);
@@ -350,7 +353,7 @@ aclError GetModelInputOutputInfo(Config& cfg)
         
         size_t index;
         ret = aclmdlGetInputIndexByName(cfg.modelDesc, cfg.inputInfo[i].Name, &index);
-        if (ACL_ERROR_NONE != ret) {
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclmdlGetInputIndexByName fail ret %d line %d\n", ret, __LINE__);
             return 1;
         }
@@ -363,7 +366,7 @@ aclError GetModelInputOutputInfo(Config& cfg)
         }
     }
 
-    //Get model output info
+    // 获取模型输出信息
     size_t outputNum = aclmdlGetNumOutputs(cfg.modelDesc);
     LOG("model output num %zd\n", outputNum);
     snprintf(tmpChr, sizeof(tmpChr), "model output num %zd\n", outputNum);
@@ -379,14 +382,15 @@ aclError GetModelInputOutputInfo(Config& cfg)
     
         aclmdlIODims dims;
         ret = aclmdlGetOutputDims(cfg.modelDesc, i, &dims);
-        if (ACL_ERROR_NONE != ret) {
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclmdlGetOutputDims fail ret %d\n", ret);
             return 1;
         }
         
         cfg.outputInfo[i].dimCount = dims.dimCount;
-        ret = aclrtMemcpy(cfg.outputInfo[i].dims, cfg.outputInfo[i].dimCount * sizeof(int64_t), dims.dims, cfg.outputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
-        if (ACL_ERROR_NONE != ret) {
+        ret = aclrtMemcpy(cfg.outputInfo[i].dims, cfg.outputInfo[i].dimCount * sizeof(int64_t), dims.dims,
+                          cfg.outputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclrtMemcpy fail ret %d line %d\n", ret, __LINE__);
             return 1;
         }
@@ -397,14 +401,16 @@ aclError GetModelInputOutputInfo(Config& cfg)
         
         for (size_t dimIdx = 0; dimIdx < cfg.outputInfo[i].dimCount; dimIdx++) {
             LOG("model output[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.outputInfo[i].dims[dimIdx]);
-            snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.outputInfo[i].dims[dimIdx]);
+            snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] dim[%zd] info %ld\n",
+                     i, dimIdx, cfg.outputInfo[i].dims[dimIdx]);
             outFile << tmpChr;
         }
         
         cfg.outputInfo[i].Format = aclmdlGetOutputFormat(cfg.modelDesc, i);
         cfg.outputInfo[i].Type = aclmdlGetOutputDataType(cfg.modelDesc, i);
         LOG("model output[%zd] format %d outputType %d\n", i, cfg.outputInfo[i].Format, cfg.outputInfo[i].Type);
-        snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] format %d outputType %d\n", i, cfg.outputInfo[i].Format, cfg.outputInfo[i].Type);
+        snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] format %d outputType %d\n", i, cfg.outputInfo[i].Format,
+                 cfg.outputInfo[i].Type);
         outFile << tmpChr;
             
         cfg.outputInfo[i].Name = aclmdlGetOutputNameByIndex(cfg.modelDesc, i);
@@ -414,7 +420,7 @@ aclError GetModelInputOutputInfo(Config& cfg)
         
         size_t index;
         ret = aclmdlGetOutputIndexByName(cfg.modelDesc, cfg.outputInfo[i].Name, &index);
-        if (ACL_ERROR_NONE != ret) {
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclmdlGetOutputIndexByName fail ret %d line %d\n", ret, __LINE__);
             return 1;
         }
@@ -459,15 +465,15 @@ int main(int argc, char** argv)
     CHECK_RET(ret);
     LOG("\n");
     	
-    avgTime = 1.0*inferTime/processedCnt/cfg.batchSize/1000;
-    avgPreTime = 1.0*dataProcTime/processedCnt/cfg.batchSize/1000;
+    avgTime = 1.0 * inferTime / processedCnt /cfg.batchSize / 1000;
+    avgPreTime = 1.0 * dataProcTime / processedCnt / cfg.batchSize / 1000;
     
-    if (cfg.useDvpp){
+    if (cfg.useDvpp) {
         LOG("\n");
         LOG("DVPP performance details:\n");
         LOG("#############################################\n");
         std::unordered_map<std::string, long long>::iterator iter;
-        for (iter = dvppTime.begin(); iter != dvppTime.end(); iter++){
+        for (iter = dvppTime.begin(); iter != dvppTime.end(); iter++) {
             LOG("%s using avg time %0.2f ms\n",iter->first.c_str(),1.0*iter->second/processedCnt/cfg.batchSize/1000);
         }
         LOG("\n");
@@ -477,13 +483,14 @@ int main(int argc, char** argv)
     LOG("#############################################\n");
     LOG("total %ld imgs processed and batch size %ld\n", processedCnt*cfg.batchSize, cfg.batchSize);
     #if 0
-    if(cfg.postprocessType == "resnet"){
-        LOG("top1 ratio %0.3f top5 ratio %0.3f\n", 1.0*resnet50Res.top1/resnet50Res.total, 1.0*resnet50Res.top5/resnet50Res.total);
+    if(cfg.postprocessType == "resnet") {
+        LOG("top1 ratio %0.3f top5 ratio %0.3f\n",
+            1.0*resnet50Res.top1/resnet50Res.total, 1.0*resnet50Res.top5/resnet50Res.total);
     }
     #endif
 
-    LOG("avg preprocess time %0.2f ms, %0.2f imgs/s\n", avgPreTime, 1.0*1000/avgPreTime);
-    LOG("avg inference time %0.2f ms, %0.2f imgs/s\n", avgTime, 1.0*1000/avgTime);
+    LOG("avg preprocess time %0.2f ms, %0.2f imgs/s\n", avgPreTime, 1.0 * 1000 / avgPreTime);
+    LOG("avg inference time %0.2f ms, %0.2f imgs/s\n", avgTime, 1.0 * 1000 / avgTime);
 
     SaveResult();
 }
