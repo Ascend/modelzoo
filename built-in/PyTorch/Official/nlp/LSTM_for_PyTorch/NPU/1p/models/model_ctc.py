@@ -184,7 +184,7 @@ class CTC_Model(nn.Module):
             sizes = x.size()
             if len(sizes) > 3:
                 x = x.view(sizes[0], sizes[1], sizes[2] * sizes[3])
-            x = x.clone()
+            x = x.mul(1.0)
             x = x.transpose(0, 1).contiguous()
 
             if visualize:
