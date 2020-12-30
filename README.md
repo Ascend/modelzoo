@@ -78,7 +78,7 @@ Thank You!
 	 -Benchmark
 
 	- [openpose_MS_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Benchmark/cv/detection/openpose_MS_for_MindSpore)
-	- [NEZHA-Large for MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Benchmark/nlp/NEZHA-Large%20for%20MindSpore)
+	- [NEZHA-Large_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Benchmark/nlp/NEZHA-Large_for_MindSpore)
 
 	 -Official
 
@@ -109,7 +109,7 @@ Thank You!
 	- [TinyBERT_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/nlp/TinyBERT_for_MindSpore)
 	- [Transformer_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/nlp/Transformer_for_MindSpore)
 	- [DeepFM_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/DeepFM_for_MindSpore)
-	- [NCF for MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/NCF_for_MindSpore)
+	- [NCF_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/NCF_for_MindSpore)
 	- [Wide_Deep_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/Wide_Deep_for_MindSpore)
 
 	 -Research
