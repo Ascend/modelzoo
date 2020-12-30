@@ -152,5 +152,4 @@ typedef std::string clstring;
   } \
   using fLS::FLAGS_##name
 
-
 #endif  // GFLAGS_DECLARE_H_

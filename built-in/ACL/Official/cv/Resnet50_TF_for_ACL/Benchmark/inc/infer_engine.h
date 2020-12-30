@@ -25,7 +25,4 @@ void getImgResizeShape();
 acldvppRoiConfig* InitCropRoiConfig(uint32_t width, uint32_t height);
 acldvppRoiConfig* InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newInputHeight,uint32_t modelInputWidth, uint32_t modelInputHeight);
 void SmallSizeAtLeast(uint32_t width, uint32_t height, uint32_t& newInputWidth, uint32_t& newInputHeigh);
-
-
-
 #endif

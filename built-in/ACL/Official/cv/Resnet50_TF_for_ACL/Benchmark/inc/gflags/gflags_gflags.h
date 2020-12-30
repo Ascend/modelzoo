@@ -95,8 +95,5 @@ using GFLAGS_NAMESPACE::FlagRegisterer;
 using GFLAGS_NAMESPACE::ParseCommandLineFlags;
 #endif
 
-
 } // namespace gflags
-
-
 #endif  // GFLAGS_NS_GFLAGS_H_

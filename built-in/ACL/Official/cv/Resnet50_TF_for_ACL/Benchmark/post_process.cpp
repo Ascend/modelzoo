@@ -66,20 +66,18 @@ aclError SaveBinPostprocess()
 
     std::string resultFolder = cfg.outDir + "/" + cfg.modelType;
     DIR* op = opendir(resultFolder.c_str());
-    if (NULL == op){
+    if (NULL == op) {
         mkdir(resultFolder.c_str(), 00775);
-    }else{
+    } else {
         closedir(op);
     }
 
-    for (size_t i = 0; i < cfg.outputNum; ++i)
-    {        
+    for (size_t i = 0; i < cfg.outputNum; ++i) {
         aclDataBuffer* dataBuffer = aclmdlGetDatasetBuffer(output, i);
         void* data = aclGetDataBufferAddr(dataBuffer);
         uint32_t len;
         len = cfg.outputInfo[i].size;
-        
-        //LOG("output[%d] real data len %d\n", i, len);
+
         void* outHostData = NULL;
         ret = aclrtMallocHost(&outHostData, len);
         if (ret != ACL_ERROR_NONE) {
@@ -95,21 +93,19 @@ aclError SaveBinPostprocess()
         }
 
         uint32_t eachSize = len / cfg.batchSize;
-        //LOG("inferenceIndex=%d, out_index=%d, len=%d, eachSize=%d\n", inferenceIndex, i, len,eachSize);
-        for (size_t j = 0; j < inferFile_vec.size(); j++)
-        {
+        for (size_t j = 0; j < inferFile_vec.size(); j++) {
             FILE* outputFile;
             std::string framename = inferFile_vec[j];
             std::size_t dex = (framename).find_first_of(".");
             std::string inputFileName = (framename).erase(dex);
             
-            if (cfg.modelType.compare(0, 6, "resnet") == 0){
+            if (cfg.modelType.compare(0, 6, "resnet") == 0) {
                 outputFile = fopen((resultFolder + "/" + "davinci_" + inputFileName + "_"  + "output" + ".bin").c_str(), "wb");
-            }else{
+            } else {
                 outputFile = fopen((resultFolder + "/" + "davinci_" + inputFileName + "_"  + "output" + std::to_string(i) + ".bin").c_str(), "wb");
             }
             
-            if (NULL == outputFile){
+            if (NULL == outputFile) {
                 aclrtFreeHost(outHostData);
                 return 1;
             }
