@@ -9,6 +9,16 @@
 
 ## Dataset Prepare
 1. 下载COCO数据集，放在datasets中。如已有下载可通过设置环境变量DETECTRON2_DATASETS=“coco所在数据集路径”进行设置，如export DETECTRON2_DATASETS=/home/sample，则coco数据集放在/home/sample目录中
+
+### Build Detectron2 from Source
+
+编译器版本：gcc & g++ ≥ 5
+```
+python3.7 -m pip install -e Faster_Mask_RCNN_for_PyTorch
+
+```
+在重装PyTorch之后，通常需要重新编译detectron2。重新编译之前，需要使用`rm -rf build/ **/*.so`删除旧版本的build文件夹及对应的.so文件。
+
 ## 1P
 1. 编辑并运行run.sh
 以下是mask_rcnn的训练脚本
