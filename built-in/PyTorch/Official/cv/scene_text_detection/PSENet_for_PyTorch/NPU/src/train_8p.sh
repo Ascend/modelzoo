@@ -4,7 +4,7 @@ export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 
-python3.7 -W ignore train_ic15_8p.py \
+taskset -c 0-95 python3.7 -W ignore train_ic15_8p.py \
   --lr 0.004\
 	--dist-backend 'hccl' \
 	--rank 0  \
