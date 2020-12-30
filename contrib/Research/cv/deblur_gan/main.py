@@ -49,7 +49,7 @@ parser.add_argument("--gen_resblocks", type=int, default=9)
 parser.add_argument("--discrim_blocks", type=int, default=3)
 
 # Data specification
-parser.add_argument("--data_url", type=str, default="s3://DeblurGAN-tf/data")
+parser.add_argument("--data_url", type=str, default="s3://deblur-gan/data")
 parser.add_argument("--native_data", type=str, default="./data")
 parser.add_argument("--train_Sharp_path",
                     type=str,
@@ -91,7 +91,7 @@ parser.add_argument("--chop_size", type=int, default=8e4)
 parser.add_argument("--chop_shave", type=int, default=16)
 
 args = parser.parse_args()
-mox.file.copy_parallel(args.data_url, args.native_data)
+# mox.file.copy_parallel(args.data_url, args.native_data)
 
 model = Deblur_Net(args)
 model.build_graph()
@@ -119,4 +119,4 @@ elif args.mode == 'test_only':
     test_only(args, model, sess, saver)
 
 print("model compute finished")
-mox.file.copy_parallel(args.model_path, os.path.join(args.data_url, 'model'))
+# mox.file.copy_parallel(args.model_path, os.path.join(args.data_url, 'model'))

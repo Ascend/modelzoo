@@ -103,9 +103,17 @@ git clone xxx
 
 ### Train using GOPRO dataset
 1) Download the pre-processed GOPRO datasets
-You can use the processed datasets in [Processed GOPRO Datasets](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu6aox8UoQcF77bZeyFadx6Qu3OYGeYxMxbOcIduJI4YPIUcta9tWioo/cl6uZ4EA3GxoNtLpTNlhYZVPrr958IF5Pme0JjgtZeWNQbze+Afhz6vhZW/f3IAowLGDziQgdkT9w7pgDFiJ6vqot9N8HsvlFhCjigsi0/ZjOeK89XAzOojy+V5/pt0ciRRYlrq7A3IxNAdeUrJl0AHkLvG3z3tUz1X/ZvEzDwhyFJwvBXoUeZMeldZI3myldU87ZSQxFBXyNS/7WxNBK1JqbDl8hLxJXEhEfVWtkV7UMV94iIu0t2mr4e8wiNW0QiKU7Oq+sE=)
+You can use the processed datasets in :
+
+[obs path](s3://deblur-gan/data) `s3://deblur-gan/data`
+
+[obs link](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu6aox8UoQcF77bZeyFadx6Qu3OYGeYxMxbOcIduJI4YPIUcta9tWioo/cl6uZ4EA3GxoNtLpTNlhYZVPrr958IF5Pme0JjgtZeWNQbze+Afhz6vhZW/f3IAowLGDziQgdkT9w7pgDFiJ6vqot9N8HsvlFhCjigsi0/ZjOeK89XAzOojy+V5/pt0ciRRYlrq7A3IxNAdeUrJl0AHkLvG3z3tUz1X/ZvEzDwhyFJwvBXoUeZMeldZI3myldU87ZSQxFBXyNS/7WxNBK1JqbDl8hLxJXEhEfVWtkV7UMV94iIu0t2mr4e8wiNW0QiKU7Oq+sE=)
 
 `password : 123456`
+
+In order to calculate the perceptual loss, the weights of the pre-trained vgg19 network are provided：
+
+[obs path](s3://deblurgan/pre_train_model) `obs://deblurgan/pre_train_model`
 
 2) Training with GOPRO dataset.
 ```
@@ -113,8 +121,11 @@ python main.py --train_Sharp_path ./GOPRO/path/sharp --train_Blur_path ./GOPRO/p
 ```
 
 ### Test model
-1) Download pre-trained model.
-[pre_trained_model](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu5u8kTXHTZTQfDuJQnf4elxsdd6lpzgKfvxm+Q6kGzw+WTlFqsPdaIm+6xbrYbPNuLYQjRmPdlWZ4IivLVC6+tg+FXOMUi/DSO/XM3s+fqz38coKqth6GgorMyFjzdAYYTq00xcdfa8Og6WafcHP0GyUgNoigo475AAReEqDDfmSVAhAUhvyyDhPwmLZWAOAK6HZ3yIZKb1H/BAW5y/EqQpQUVArr4KhGjZkGlKEUkTlzf8fXc5og4qAWoSztixra1eI94+Zi/dKRpC7WG+O7vf9lhCltRIRkKyipYDwN16X5NULiRa5UfopxiufNlmput5DsXxdZ5iG+ctGqqh2Gkv)
+1) Download pre-trained model:
+
+[obs path](obs://deblurgan/pre_train_model) `obs://deblurgan/pre_train_model`
+
+[obs link](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=6HAr7zmWkpT6AB2oYv4B9uX/MwTPPkcH10N9OLs24+lbkbiPb4xY4ExZ/G4UAtxfDZiAINC/6+j/1Vf64tDp74iYTErNVlXPJZLtfRBdPAk09QILgV/aBDgFOvRTIWhuJoJIeavWatJXxkaJhEi7ChvxvdnJmzKhCwbnNSSNFZKlEhaLJJhpGpjqviFb7d4y2GAcI6KlDViDK0fa/6OdJjtB4bxKeucK536IOpgVQu5u8kTXHTZTQfDuJQnf4elxsdd6lpzgKfvxm+Q6kGzw+WTlFqsPdaIm+6xbrYbPNuLYQjRmPdlWZ4IivLVC6+tg+FXOMUi/DSO/XM3s+fqz38coKqth6GgorMyFjzdAYYTq00xcdfa8Og6WafcHP0GyUgNoigo475AAReEqDDfmSVAhAUhvyyDhPwmLZWAOAK6HZ3yIZKb1H/BAW5y/EqQpQUVArr4KhGjZkGlKEUkTlzf8fXc5og4qAWoSztixra1eI94+Zi/dKRpC7WG+O7vf9lhCltRIRkKyipYDwN16X5NULiRa5UfopxiufNlmput5DsXxdZ5iG+ctGqqh2Gkv)
 
 `passwod : 123456`
 
