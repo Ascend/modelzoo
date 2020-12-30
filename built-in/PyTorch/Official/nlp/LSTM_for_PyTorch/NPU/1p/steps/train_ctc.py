@@ -70,6 +70,10 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
     steps_per_epoch = len(data_iter)
     end = time.time()
     for i, data in enumerate(data_iter):
+        if i == 4:
+            batch_time = 0
+            data_time = 0
+
         data_time += (time.time() - end)
         global_step = (epoch_id - 1) * steps_per_epoch + i
         inputs, input_sizes, targets, target_sizes, utt_list = data
@@ -115,9 +119,17 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
             # sum_writer.add_scalar('Accuary/valid/total_wer', total_errs / total_tokens, global_step)
 
         if is_training:
-            print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, Train_time %.6fs, total_loss = %.5f, total_wer = %.5f'
-                  % (epoch_id, i + 1, steps_per_epoch, batch_time / (i+1), data_time / (i+1),
-                     batch_time / (i+1) - data_time / (i+1), total_loss / (i+1), total_errs / total_tokens ))
+            if i <= 3:
+                print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, FPS %.3f, total_loss = %.5f, total_wer = %.5f'
+                      % (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1),
+                         opts.batch_size * (i + 1) / batch_time , total_loss / (i + 1),
+                         total_errs / total_tokens))
+            else:
+                print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, FPS %.3f, total_loss = %.5f, total_wer = %.5f'
+                      % (epoch_id, i + 1, steps_per_epoch, batch_time / (i - 3), data_time / (i - 3),
+                         opts.batch_size * (i - 3) / batch_time, total_loss / (i + 1),
+                         total_errs / total_tokens))
+
         end = time.time()
 
     average_loss = total_loss / (i + 1)

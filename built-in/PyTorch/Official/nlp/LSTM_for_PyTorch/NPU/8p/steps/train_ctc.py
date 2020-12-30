@@ -95,7 +95,7 @@ def device_id_to_process_device_map(device_list):
     return process_device_map
 
 
-def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, optimizer=None, print_every=20,
+def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, opts, sum_writer, optimizer=None, print_every=20,
               is_training=True):
     if is_training:
         model.train()
@@ -111,6 +111,9 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
     steps_per_epoch = len(data_iter)
     end = time.time()
     for i, data in enumerate(data_iter):
+        if i == 4:
+            batch_time = 0
+            data_time = 0
         data_time += (time.time() - end)
         global_step = (epoch_id - 1) * steps_per_epoch + i
         inputs, input_sizes, targets, target_sizes, utt_list = data
@@ -156,9 +159,16 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, args, sum_writer, opt
             # sum_writer.add_scalar('Accuary/valid/total_wer', total_errs / total_tokens, global_step)
 
         if is_training:
-            print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, Train_time %.6fs, total_loss = %.5f, total_wer = %.5f'
-                  % (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1),
-                     batch_time / (i + 1) - data_time / (i + 1), total_loss / (i + 1), total_errs / total_tokens))
+            if i <= 3:
+                print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, FPS %.3f, total_loss = %.5f, total_wer = %.5f'
+                      % (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1),
+                         opts.batch_size * (i + 1) / batch_time, total_loss / (i + 1),
+                         total_errs / total_tokens))
+            else:
+                print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, FPS %.3f, total_loss = %.5f, total_wer = %.5f'
+                      % (epoch_id, i + 1, steps_per_epoch, batch_time / (i - 3), data_time / (i - 3),
+                         opts.batch_size * (i - 3) / batch_time, total_loss / (i + 1),
+                         total_errs / total_tokens))
         end = time.time()
 
     average_loss = total_loss / (i + 1)
@@ -374,10 +384,10 @@ def main_worker(dev, npus_per_node, args, opts):
 
         print("Start training epoch: %d, learning_rate: %.5f" % (count, learning_rate))
 
-        train_acc, loss = run_epoch(count, model, train_loader, loss_fn, device, args, sum_writer, optimizer=optimizer,
-                                    print_every=opts.verbose_step, is_training=True)
+        train_acc, loss = run_epoch(count, model, train_loader, loss_fn, device, args, opts, sum_writer,
+                                    optimizer=optimizer, print_every=opts.verbose_step, is_training=True)
         loss_results.append(loss)
-        acc, dev_loss = run_epoch(count, model, dev_loader, loss_fn, device, args, sum_writer, optimizer=None,
+        acc, dev_loss = run_epoch(count, model, dev_loader, loss_fn, device, args, opts, sum_writer, optimizer=None,
                                   print_every=opts.verbose_step, is_training=False)
         print("loss on dev set is %.4f" % dev_loss)
         dev_loss_results.append(dev_loss)
