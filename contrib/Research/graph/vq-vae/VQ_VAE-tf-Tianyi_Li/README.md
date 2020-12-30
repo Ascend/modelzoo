@@ -94,6 +94,14 @@ This repository implements the paper, [Neural Discrete Representation Learning](
 It will download required datasets on the directory `./datasets/{mnist,cifar10}` by itself.
 Hence, just run the code will do the trick.
 
+## Model
+
+Please download the model and put the downloaded model in ./models/cifar10.
+Download link is： 
+
+链接：https://pan.baidu.com/s/1efqfy-h__FnOmp1YAOwH2A 
+提取码：zhe4 
+
 ### Run train
 
 - Run mnist: `python mnist.py`
