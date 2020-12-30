@@ -1,8 +1,6 @@
 # ALBERT msame 推理
 ## 概述
-迁移[Albert](https://github.com/google-research/albert) 到ascend910平台  
-得到的结果和论文的对比，
-使用的是albert_v2版本的预训练模型
+推理后的结果精度基本和训练的模型保持一致，具体推理详细见wiki [输入链接说明](https://gitee.com/ascend/modelzoo/wikis/Albert-squad%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86%E6%A1%88%E4%BE%8B?sort_id=3269923)
 |  | F1| EM |
 | :-----| ----: | :----: |
 | albert_base(Ascend) | **82.4**| **79.4**|
