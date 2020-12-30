@@ -56,11 +56,13 @@ msame
 
 ## 准备数据和模型
 
-首先需要把输入的数据都转换为.bin格式的数据
+首先需要把输入的数据都转换为.bin格式的数据，若需要转换，则需要上层文件夹的squad_v2文件夹作为原数据，可在上层目录夹的readme中下载
 
 ```
 ./convert_bin.sh
 ```
+
+这里提供了转换后的数据，将input_ids.tar.gz,p_masks.tar.gz,segment_ids.tar.gz以及input_mask.tar.gz解压后得到文件夹
 
 转换完成后，执行以下命令完成推理以及精度测量
 
@@ -119,6 +121,7 @@ albert large的推理精度
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/113008_f0c53721_8144926.png "jlarge.png")
 
-上述的转换后的.bin文件以及推理后的结果均可以在链接中下载
+
+以及推理后的结果均可以在链接中下载
 
 
