@@ -98,9 +98,14 @@ git clone xxx
 
 You can use any datasets as you wish. Here, we only use [DIV2K dataset](https://data.vision.ee.ethz.ch/cvl/DIV2K/) as an example to illustrate the data generation.
 
-You can use our preprocessed dataset : [preprocessed dataset](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=rlHpiH2fa8IfzVQVbABQ6PlBBBCQKou6mgmfGCUClMW0IQ491tmVQCFWF0PMDt72yvobVWdGJEVVQZ2Bm7G0FMZtYPuynJgLFznrOC6APcpWFgGdWXLCN6LGu5Oohf9TShJfBUO32Mzm4r1clihfowl16rHIVfVFsG3whS/lo/gAYrDF1OqVstDRry1LGZLRbtQs2U38wNd9x324LaeWOYOQKdd2KpNRrAFoinjCAPuxwwouSnLHb9cdoo3BnT5S4P4oIYfbr4nmfjW+SNH79VkdSdZR1qiCBB5GlVs7XiyI/KC9wMaPWcn26FZ/3rqvfjhosvDdsKdjnJQri6dsJsZ0zpYlxC4UBW0f72PcYIutlVECxkfL9vuWwKvZrwTvBHQzzdhl6EKpotzON30L8p20R2tUZKHMz1/FJWU7v7CPXnTioDyp3YjWt1Wbmxr0V9Qo7MJRKcWFlnAcs4QXcBZQRoQcjgkDfGuMgwMFnvEEOG7s/EM8UQ0tvEXADyT2LeTrbspssffZfQ4L9sMSmpDPWY2TuKOVvW1aTfTB4eS+C9I7+fvjDNbVpsfcbM+mNgXjAvmAWWY1OcRGLxoNgbK7bWiBB3ZogwOsLspicwo=)
+You can use our preprocessed dataset :
 
+[OBS path](s3://esrgan-ascend/npz/DIV2K/DIV2K) `s3://esrgan-ascend/npz/DIV2K/DIV2K`
+
+[OBS link](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=rlHpiH2fa8IfzVQVbABQ6PlBBBCQKou6mgmfGCUClMW0IQ491tmVQCFWF0PMDt72yvobVWdGJEVVQZ2Bm7G0FMZtYPuynJgLFznrOC6APcpWFgGdWXLCN6LGu5Oohf9TShJfBUO32Mzm4r1clihfowl16rHIVfVFsG3whS/lo/gAYrDF1OqVstDRry1LGZLRbtQs2U38wNd9x324LaeWOYOQKdd2KpNRrAFoinjCAPuxwwouSnLHb9cdoo3BnT5S4P4oIYfbr4nmfjW+SNH79VkdSdZR1qiCBB5GlVs7XiyI/KC9wMaPWcn26FZ/3rqvfjhosvDdsKdjnJQri6dsJsZ0zpYlxC4UBW0f72PcYIutlVECxkfL9vuWwKvZrwTvBHQzzdhl6EKpotzON30L8p20R2tUZKHMz1/FJWU7v7CPXnTioDyp3YjWt1Wbmxr0V9Qo7MJRKcWFlnAcs4QXcBZQRoQcjgkDfGuMgwMFnvEEOG7s/EM8UQ0tvEXADyT2LeTrbspssffZfQ4L9sMSmpDPWY2TuKOVvW1aTfTB4eS+C9I7+fvjDNbVpsfcbM+mNgXjAvmAWWY1OcRGLxoNgbK7bWiBB3ZogwOsLspicwo=)
 `password : 123456`
+
+In order to calculate the perceptual loss, the weights of the pre-trained vgg19 network are provided in `s3://esrgan-ascend/pre_trained_model`
 
 Or you can process the dataset yourself:
 1. download the DIV2K datasets.
@@ -129,8 +134,14 @@ For instance, to train the model without pretrained model :
 python train.py --pretrain_generator=True
 ```
 
+The whole training process takes about **80 hours**.
+
 ### 4. Inference && Test
-First download the [pre-trained model](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=rlHpiH2fa8IfzVQVbABQ6PlBBBCQKou6mgmfGCUClMW0IQ491tmVQCFWF0PMDt72yvobVWdGJEVVQZ2Bm7G0FMZtYPuynJgLFznrOC6APcpWFgGdWXLCN6LGu5Oohf9TShJfBUO32Mzm4r1clihfowl16rHIVfVFsG3whS/lo/gAYrDF1OqVstDRry1LGZLRbtQs2U38wNd9x324LaeWOYOQKdd2KpNRrAFoinjCAPsIEM/Mw5m26iEa5upMPcyuJ9f3hPIKkx31wdYx4BPGECm4CEG6Qr3pXaXx4jDrLd3STQB4w2E9SAx6L4xiuicIWab9rGTJPadc7dhe/8g0tBjzdgzoeIlX0rkC1TqR6CjLGEwdFsFRZOxcxnrLi6K+IuKFoiPvGXZLGfMsAU65lHhQ26VoqvPdYVoQ+az7ErRgEqs7RBCr/YfAXQ3+oM3FQomG9dCQJ8nv+ZgOC1F/TkAqjwSvkNX5pmBHqwwqdxc8efxFYrArh0N+K2ENnQx3Z6MP3ExXu7EQkXRMTYHjLT88YULqGCHRw6C3tQFUJe/CmpbSh285GnW+nlEaJR9wC5xAaC87rQder0TPv0K+1A==)
+First download the pretrained model
+
+[obs path](obs://esrgan-ascend/pre_trained_model) `s3://esrgan-ascend/pre_trained_model`
+
+[obs link](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=rlHpiH2fa8IfzVQVbABQ6PlBBBCQKou6mgmfGCUClMW0IQ491tmVQCFWF0PMDt72yvobVWdGJEVVQZ2Bm7G0FMZtYPuynJgLFznrOC6APcpWFgGdWXLCN6LGu5Oohf9TShJfBUO32Mzm4r1clihfowl16rHIVfVFsG3whS/lo/gAYrDF1OqVstDRry1LGZLRbtQs2U38wNd9x324LaeWOYOQKdd2KpNRrAFoinjCAPsIEM/Mw5m26iEa5upMPcyuJ9f3hPIKkx31wdYx4BPGECm4CEG6Qr3pXaXx4jDrLd3STQB4w2E9SAx6L4xiuicIWab9rGTJPadc7dhe/8g0tBjzdgzoeIlX0rkC1TqR6CjLGEwdFsFRZOxcxnrLi6K+IuKFoiPvGXZLGfMsAU65lHhQ26VoqvPdYVoQ+az7ErRgEqs7RBCr/YfAXQ3+oM3FQomG9dCQJ8nv+ZgOC1F/TkAqjwSvkNX5pmBHqwwqdxc8efxFYrArh0N+K2ENnQx3Z6MP3ExXu7EQkXRMTYHjLT88YULqGCHRw6C3tQFUJe/CmpbSh285GnW+nlEaJR9wC5xAaC87rQder0TPv0K+1A==)
 
 `password : 123456`
 

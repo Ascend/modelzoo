@@ -138,10 +138,11 @@ def train_pretrain_generator(FLAGS, logflag):
                                os.path.join(FLAGS.pre_train_checkpoint_dir,
                                             'pre_gen'),
                                global_step=current_iter)
-                    mox.file.copy_parallel(
-                        FLAGS.pre_train_checkpoint_dir,
-                        "s3://esrgan-ascend/checkpoint/pre_train")
-                    mox.file.copy_parallel(FLAGS.logdir,
-                                           "s3://esrgan-ascend/root_log")
+                    # used in modelarts
+                    # mox.file.copy_parallel(
+                    #     FLAGS.pre_train_checkpoint_dir,
+                    #     "s3://esrgan-ascend/checkpoint/pre_train")
+                    # mox.file.copy_parallel(FLAGS.logdir,
+                    #                        "s3://esrgan-ascend/root_log")
         writer.close()
         log(logflag, 'Pre-train : Process end', 'info')

@@ -51,9 +51,9 @@ def set_flags():
     # About data
     Flags.DEFINE_string('data_url', 's3://esrgan-ascend/npz',
                         'The npz data dir')
-    Flags.DEFINE_string('HR_data', '/cache/data/npz/DIV2K/DIV2K/HR_sub',
+    Flags.DEFINE_string('HR_data', 's3://esrgan-ascend/npz/DIV2K/DIV2K/HR_sub',
                         'HR data dict')
-    Flags.DEFINE_string('LR_data', '/cache/data/npz/DIV2K/DIV2K/LR_sub',
+    Flags.DEFINE_string('LR_data', 's3://esrgan-ascend/npz/DIV2K/DIV2K/LR_sub',
                         'LR data dict')
     Flags.DEFINE_string('HR_npz_filename', 'HR_image.npz',
                         'the filename of HR image npz file')
@@ -61,12 +61,12 @@ def set_flags():
                         'the filename of LR image npz file')
     Flags.DEFINE_boolean('save_data', True,
                          'Whether to load and save data as npz file')
-    Flags.DEFINE_string('train_url', '/cache/data/npz/train_result',
+    Flags.DEFINE_string('train_url', 's3://esrgan-ascend/npz/train_result',
                         'output directory during training')
-    Flags.DEFINE_string('native_data', '/cache/data/npz', 'mox copy dst')
+    Flags.DEFINE_string('native_data', 's3://esrgan-ascend/npz', 'mox copy dst')
     Flags.DEFINE_string(
         'VGG19_weights',
-        '/cache/data/npz/pre_train_checkpoint/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5',
+        's3://esrgan-ascend/pre_trained_model/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5',
         'weights url')
     Flags.DEFINE_integer('crop_size', 192,
                          'the size of crop of training HR images')
@@ -84,7 +84,7 @@ def set_flags():
                         'the type of GAN loss functions. "RaGAN or GAN"')
 
     # About training
-    Flags.DEFINE_integer('num_iter', 500000, 'The number of iterations')
+    Flags.DEFINE_integer('num_iter', 1000000, 'The number of iterations')
     Flags.DEFINE_integer('batch_size', 16, 'Mini-batch size')
     Flags.DEFINE_integer('channel', 3, 'Number of input/output image channel')
     Flags.DEFINE_boolean('pretrain_generator', True,
@@ -117,11 +117,11 @@ def set_flags():
     Flags.DEFINE_integer('train_summary_save_freq', 200,
                          'save summary during training every n iteration')
     Flags.DEFINE_string('pre_train_checkpoint_dir',
-                        '/cache/data/npz/pre_train_checkpoint',
+                        's3://esrgan-ascend/npz/pre_train_checkpoint',
                         'pre-train checkpoint directory')
-    Flags.DEFINE_string('checkpoint_dir', '/cache/data/npz/checkpoint_dir',
+    Flags.DEFINE_string('checkpoint_dir', 's3://esrgan-ascend/npz/checkpoint_dir',
                         'checkpoint directory')
-    Flags.DEFINE_string('logdir', '/cache/data/npz/log_dir', 'log directory')
+    Flags.DEFINE_string('logdir', 's3://esrgan-ascend/npz/log_dir', 'log directory')
     Flags.DEFINE_string('host_pre_train',
                         "s3://esrgan-ascend/data/pre_train_checkpoint",
                         'pre train checkpoint')
@@ -150,7 +150,8 @@ def main():
     # set flag
     FLAGS = set_flags()
     print('obs path :', FLAGS.data_url)
-    mox.file.copy_parallel(FLAGS.data_url, FLAGS.native_data)
+    # used in modelarts
+    # mox.file.copy_parallel(FLAGS.data_url, FLAGS.native_data)
     print("mox copy files finished")
 
     # set logger
@@ -304,12 +305,11 @@ def main():
                                global_step=current_iter)
 
         writer.close()
-        mox.file.copy_parallel(FLAGS.checkpoint_dir,
-                               "s3://esrgan-ascend/data/checkpoint")
+        # mox.file.copy_parallel(FLAGS.checkpoint_dir,
+        #                        "s3://esrgan-ascend/data/checkpoint")
         log(logflag, 'Training ESRGAN end', 'info')
         log(logflag, 'Training script end', 'info')
 
 
 if __name__ == '__main__':
     main()
-    mox.file.copy_parallel("/var/log/npu/slog", "s3://esrgan-ascend/host_log")
