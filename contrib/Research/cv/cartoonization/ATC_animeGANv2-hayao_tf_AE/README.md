@@ -62,7 +62,6 @@ Batch: 1, shape: 256 * 256 * 3，平均推理性能 2032.041667ms
 
 推理效果
 
-![44](C:\Users\83395\Desktop\新建文件夹\44.jpg)
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/182419_05ed823c_8113712.jpeg "hayao_44.jpg")
 
-![AE86](C:\Users\83395\Desktop\新建文件夹\AE86.jpg)
-
+![输入图片说明](https://images.gitee.com/uploads/images/2020/1230/182428_247cf211_8113712.jpeg "hayao_AE86.jpg")
