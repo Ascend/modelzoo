@@ -1,24 +1,24 @@
 # Welcome to the Model Zoo for Ascend
 
-In order to facilitate developers to enjoy the benefits of Ascend ModelZoo, we will continue to add typical networks and some of the related pre-trained models. If you have needs for the ModelZoo, you can file an issue on [Gitee](https://gitee.com/ascend/modelzoo/issues) or [ModelZoo](https://bbs.huaweicloud.com/forum/forum-726-1.html), we will consider it in time.
+In order to facilitate developers to enjoy the benefits of Ascend ModelZoo, we will continue to add typical networks and some of the related pre-trained models. If you have needs for the modelzoo, you can file an issue on [gitee](https://gitee.com/ascend/modelzoo/issues) or [ModelZoo](https://bbs.huaweicloud.com/forum/forum-726-1.html), We will consider it in time.
 
 ## Contributing
 
-Before you start, please read the [contributor guidelines](https://gitee.com/ascend/modelzoo/blob/master/contrib/CONTRIBUTING.md).
+Before you start,Please read the [notice](https://gitee.com/ascend/modelzoo/blob/master/contrib/CONTRIBUTING.md)
 
 Thank You!
 
 ## Table of Contents
 - Models
-- TensorFlow
-
+- TensorFlow	
+	
 	 -Benchmark
-
+	
 	- [Bert-base_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Bert-base_for_TensorFlow)
 	- [Nezha-large_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Nezha-large_for_TensorFlow)
-
+	
 	 -Official
-
+		
 	- [WaveGlow_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/audio/WaveGlow_for_TensorFlow)
 	- [SSD-Resnet34_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/SSD-Resnet34_for_TensorFlow)
 	- [YOLOv3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/YoloV3_for_TensorFlow)
@@ -37,9 +37,9 @@ Thank You!
 	- [UNet_Industrial_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_segmentation/UNet_Industrial_for_TensorFlow)
 	- [BertTnews_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertTnews_for_TensorFlow)
 	- [Transformer_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
-
-	 -Research
-
+	
+	 -Research 
+		
 	- [BigGAN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image__synthesis/BigGAN_for_TensorFlow)
 	- [Cars_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Cars_for_TensorFlow)
 	- [Darts_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Darts_for_TensorFlow)
@@ -47,23 +47,17 @@ Thank You!
 	- [Yuefu_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/nlp/Yuefu_for_TensorFlow)
 	- [DeepFM_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/DeepFM_for_TensorFlow)
 	- [Wide&Deep_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/recommendation/Wide&Deep_for_TensorFlow)
-	- [DDPG_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement_learning/DDPG_for_TensorFlow)
-	- [DQN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement_learning/DQN_for_TensorFlow)
-	- [MUZERO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement_learning/MUZERO_for_TensorFlow)
-	- [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement_learning/PPO_for_TensorFlow)
-	- [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement_learning/QMIX_for_TensorFlow)
+	- [DDPG_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/DDPG_for_TensorFlow)
+	- [DQN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/DQN_for_TensorFlow)
+	- [MUZERO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/MUZERO_for_TensorFlow)
+	- [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/PPO_for_TensorFlow)
+	- [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/QMIX_for_TensorFlow)
 	- [Jasper_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
-	- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceDetection_for_MindSpore)
-	- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
-	- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceAttribute_for_MindSpore)
-	- [FaceQualityAssessment_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceQualityAssessment_for_MindSpore)
-	- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
-	- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/DSCNN_for_MindSpore)
-
+	 
 - PyTorch
 
      -Official
-
+	
 	- [CRNN_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/CRNN_for_PyTorch)
 	- [DeepMar_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/DeepMar_for_PyTorch)
 	- [Densenet121_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/Densenet121_for_PyTorch)
@@ -71,17 +65,17 @@ Thank You!
 	- [MobileNetV2_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/MobileNetV2_for_PyTorch)
 	- [ResNet50_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/ResNet50_for_PyTorch)
 	- [Shufflenetv2_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/Shufflenetv2_for_PyTorch)
-	- [LSTM_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/LSTM_for_PyTorch)
-
+	- [LSTM_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/LSTM_for_PyTorch) 
+ 
 - MindSpore
-
+	
 	 -Benchmark
 
 	- [openpose_MS_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Benchmark/cv/detection/openpose_MS_for_MindSpore)
-	- [NEZHA-Large_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Benchmark/nlp/NEZHA-Large_for_MindSpore)
-
+	- [NEZHA-Large for MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Benchmark/nlp/NEZHA-Large%20for%20MindSpore)
+	
 	 -Official
-
+		
 	- [CenterFace_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/cv/detection/CenterFace_for_MindSpore)
 	- [FasterRCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/cv/detection/FasterRCNN_for_MindSpore)
 	- [Openpose_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/cv/detection/Openpose_for_MindSpore)
@@ -109,15 +103,21 @@ Thank You!
 	- [TinyBERT_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/nlp/TinyBERT_for_MindSpore)
 	- [Transformer_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/nlp/Transformer_for_MindSpore)
 	- [DeepFM_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/DeepFM_for_MindSpore)
-	- [NCF_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/NCF_for_MindSpore)
+	- [NCF for MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/NCF_for_MindSpore)
 	- [Wide_Deep_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Official/recommendation/Wide_Deep_for_MindSpore)
-
-	 -Research
+	
+	 -Research 
 
 	- [Music_Genre_Classification_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/audio/Music_Genre_Classification_for_MindSpore)
     - [Gnmt_v2_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/Gnmt_v2_for_MindSpore)
-
-- ACL
+	- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceDetection_for_MindSpore)
+	- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
+	- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceAttribute_for_MindSpore)
+	- [FaceQualityAssessment_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceQualityAssessment_for_MindSpore)
+	- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
+	- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/DSCNN_for_MindSpore)
+	
+- ACL	
 
     -Official
 
@@ -133,12 +133,52 @@ Thank You!
 	- [YOLOv3_for_ACL](https://gitee.com/ascend/modelzoo/tree/master/built-in/ACL/Official/cv/YOLOv3_for_ACL)
 	- [BertTnews_for_ACL](https://gitee.com/ascend/modelzoo/tree/master/built-in/ACL/Official/nlp/BertTnews_for_ACL)
 
+  
+		
+
+					
+  
+		
 ## Disclaimers
 
 Ascend ModelZoo only provides scripts that downloads and preprocesses public datasets. We do not own these datasets and are not responsible for their quality or maintenance. Please make sure you have permission to use the dataset under the dataset’s license. The models trained on these dataset are for non-commercial research and educational purpose only.
 
-To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on ModelZoo, or wish to update it in any way. Please contact us through a [GitHub](https://github.com/Ascend/modelzoo/issues)/[Gitee](https://gitee.com/ascend/modelzoo/issues) issue. Your understanding and contribution to this community is greatly appreciated.
+To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on Modelzoo, or wish to update it in any way. Please contact us through a Github/Gitee issue. Your understanding and contribution to this community is greatly appreciated.
 
-## License
+Ascend ModelZoo is Apache 2.0 licensed，Please see the LICENSE file.
 
-[Apache License 2.0](LICENSE)
+
+	
+		
+		
+		
+
+		
+
+		
+		
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 	
+		
+		
+		
