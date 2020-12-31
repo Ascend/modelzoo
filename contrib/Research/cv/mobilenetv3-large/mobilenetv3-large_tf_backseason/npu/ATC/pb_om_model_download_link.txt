@@ -1,1 +1,1 @@
-obs://backseason-dataset/mobilenetv3_large_models/npu/ATC/pb_om_model.tar
+obs://backseason-mbv3-open/mobilenetv3_large_models/npu/ATC/pb_om_model.tar

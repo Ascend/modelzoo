@@ -74,7 +74,7 @@ We tested on 4 RTX Titan GPUs.
 bash train_mobilenetv3_4p_xla_amp_yz_74_10.sh
 ```
 After training (~1,200,000 steps, ~179hrs, Top-1 Acc=74.1) we will get the checkpoints under the `gpu/results` folder. 
-[Download Link](https://backseason-dataset.obs.myhuaweicloud.com/mobilenetv3_large_models/gpu/results_mbv3_74_10.tar)
+[Download Link](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/gpu/results_mbv3_74_10.tar)
 
 ### 5. Test
 - We evaluate results by using following commands:
@@ -84,7 +84,7 @@ After training (~1,200,000 steps, ~179hrs, Top-1 Acc=74.1) we will get the check
     Remember to modify the dataset path and checkpoint path, then run the command.
 
 ### 6. Finetune on NPU-Ascend 910
-We need to copy the intermediate checkpoints trained on GPUs (~1,080,000 steps, Top-1 Acc=72.7) to `npu/snapshots` and modify the `npu/snapshots/checkpoint` file accordingly. [Download Link](https://backseason-dataset.obs.myhuaweicloud.com/mobilenetv3_large_models/npu/snapshots.tar)
+We need to copy the intermediate checkpoints trained on GPUs (~1,080,000 steps, Top-1 Acc=72.7) to `npu/snapshots` and modify the `npu/snapshots/checkpoint` file accordingly. [Download Link](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/npu/snapshots.tar)
 
 Then under the `npu/` folder we begin the finetuning process on NPU using ModelArts with PyCharm toolkit.
 
@@ -99,11 +99,11 @@ The default configurations and hyperparameters are updated accordingly as we hav
 - Max epoch: 1200 -> 600 (to resume from the right steps)
 
 After fintuning on NPU (120,000 steps, ~29hrs), we can achieve a Top-1 Acc of 74.12, which is comparable to the performance of GPUs.
-[Log link](https://backseason-dataset.obs.myhuaweicloud.com/mobilenetv3_large_models/mobilenet_v3_test_V0021_job-mobilenet-v3-test.0.log)
+[Log link](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/mobilenet_v3_test_V0021_job-mobilenet-v3-test.0.log)
 
 ### 6. Inference on NPU-Ascend 310
 We achieve an inference time of ~2.8ms on the Ascend 310 NPU with an overall Top-1 Acc of 74.28. 
-[Download Link](https://backseason-dataset.obs.myhuaweicloud.com/mobilenetv3_large_models/npu/ATC/pb_om_model.tar)
+[Download Link](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/npu/ATC/pb_om_model.tar)
 
 For usage of offline inference on HUAWEI ECS please refer to this [wiki](https://gitee.com/backseason/modelzoo/wikis/MobileNetV3_Large_MindStudio%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86%E6%A1%88%E4%BE%8B?sort_id=3335182).
 

@@ -1,1 +1,1 @@
-obs://backseason-dataset/mobilenetv3_large_models/npu/snapshots.tar
+obs://backseason-mbv3-open/mobilenetv3_large_models/npu/snapshots.tar
