@@ -319,7 +319,7 @@ aclError GetModelInputOutputInfo(Config& cfg)
         
         aclmdlIODims dims;
         ret = aclmdlGetInputDims(cfg.modelDesc, i, &dims);
-        if (ret ！= ACL_ERROR_NONE) {
+        if (ret != ACL_ERROR_NONE) {
             LOG("aclmdlGetInputDims fail ret %d\n", ret);
             return 1;
         }
