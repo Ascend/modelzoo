@@ -17,6 +17,9 @@
 #include "util.h"
 #include "infer_engine.h"
 #include "acl/acl_base.h"
+#include "acl/acl.h"
+#include "acl/acl_mdl.h"
+#include "acl/acl_rt.h"
 #include <gflags/gflags.h>
 #include <vector>
 #include <iostream>
@@ -25,9 +28,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <algorithm>
-#include "acl/acl.h"
-#include "acl/acl_mdl.h"
-#include "acl/acl_rt.h"
 #include <string.h>
 #include <map>
 #include <fcntl.h>
@@ -36,10 +36,8 @@
 #include <errno.h> 
 #include <sys/errno.h>
 #include <unordered_map>
-
 #include <memory>
 #include <fstream>
-
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h> 
@@ -47,12 +45,9 @@
 #include <stdarg.h>
 #include <getopt.h>
 
-
-
 using namespace std;
 using std::cout;
 using std::endl;
-
 
 Resnet50Result resnet50Res;
 Config cfg;
@@ -68,11 +63,9 @@ extern DataFrame outputDataframe;
 std::vector<std::string> filePaths;
 extern std::ofstream outFile;
 
-
 void getCommandLineParam(int argc, char** argv, Config& config)
 {
-    while (1)
-    {
+    while (1) {
         int option_index = 0;
         struct option long_options[] =
         {
@@ -146,7 +139,6 @@ void getCommandLineParam(int argc, char** argv, Config& config)
 aclError ParseParams(int argc, char** argv, Config& config, std::string& errorMsg)
 {
     getCommandLineParam(argc, argv, config);
-    
     LOG("parase params start\n");
 
     if (config.om.empty() || !FileExists(config.om)) {
@@ -199,7 +191,6 @@ aclError Process()
     
     // 获取图像宽高
     getImgResizeShape();
-    
     if (cfg.useDvpp) {
         ret = DvppSetup();
         CHECK_RET(ret);
@@ -325,7 +316,8 @@ aclError GetModelInputOutputInfo(Config& cfg)
         }
         
         cfg.inputInfo[i].dimCount = dims.dimCount;
-        ret = aclrtMemcpy(cfg.inputInfo[i].dims , cfg.inputInfo[i].dimCount * sizeof(int64_t), dims.dims, cfg.inputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
+        ret = aclrtMemcpy(cfg.inputInfo[i].dims , cfg.inputInfo[i].dimCount * sizeof(int64_t), dims.dims,
+                          cfg.inputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
         if (ret != ACL_ERROR_NONE) {
             LOG("aclrtMemcpy fail ret %d line %d\n", ret, __LINE__);
             return 1;
@@ -336,14 +328,16 @@ aclError GetModelInputOutputInfo(Config& cfg)
         outFile << tmpChr;
         for (size_t dimIdx = 0; dimIdx < cfg.inputInfo[i].dimCount; dimIdx++) {
             LOG("model input[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.inputInfo[i].dims[dimIdx]);
-            snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.inputInfo[i].dims[dimIdx]);
+            snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] dim[%zd] info %ld\n", i, dimIdx,
+                     cfg.inputInfo[i].dims[dimIdx]);
             outFile << tmpChr;
         }
         
         cfg.inputInfo[i].Format = aclmdlGetInputFormat(cfg.modelDesc, i);
         cfg.inputInfo[i].Type = aclmdlGetInputDataType(cfg.modelDesc, i);
         LOG("model input[%zd] format %d inputType %d\n", i, cfg.inputInfo[i].Format, cfg.inputInfo[i].Type);
-        snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] format %d inputType %d\n", i, cfg.inputInfo[i].Format, cfg.inputInfo[i].Type);
+        snprintf(tmpChr, sizeof(tmpChr), "model input[%zd] format %d inputType %d\n", i, cfg.inputInfo[i].Format,
+                 cfg.inputInfo[i].Type);
         outFile << tmpChr;
 
         cfg.inputInfo[i].Name = aclmdlGetInputNameByIndex(cfg.modelDesc, i);
@@ -388,7 +382,8 @@ aclError GetModelInputOutputInfo(Config& cfg)
         }
         
         cfg.outputInfo[i].dimCount = dims.dimCount;
-        ret = aclrtMemcpy(cfg.outputInfo[i].dims, cfg.outputInfo[i].dimCount * sizeof(int64_t), dims.dims, cfg.outputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
+        ret = aclrtMemcpy(cfg.outputInfo[i].dims, cfg.outputInfo[i].dimCount * sizeof(int64_t), dims.dims,
+                          cfg.outputInfo[i].dimCount * sizeof(int64_t), ACL_MEMCPY_HOST_TO_HOST);
         if (ret != ACL_ERROR_NONE) {
             LOG("aclrtMemcpy fail ret %d line %d\n", ret, __LINE__);
             return 1;
@@ -400,14 +395,16 @@ aclError GetModelInputOutputInfo(Config& cfg)
         
         for (size_t dimIdx = 0; dimIdx < cfg.outputInfo[i].dimCount; dimIdx++) {
             LOG("model output[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.outputInfo[i].dims[dimIdx]);
-            snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] dim[%zd] info %ld\n", i, dimIdx, cfg.outputInfo[i].dims[dimIdx]);
+            snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] dim[%zd] info %ld\n", i, dimIdx,
+                     cfg.outputInfo[i].dims[dimIdx]);
             outFile << tmpChr;
         }
         
         cfg.outputInfo[i].Format = aclmdlGetOutputFormat(cfg.modelDesc, i);
         cfg.outputInfo[i].Type = aclmdlGetOutputDataType(cfg.modelDesc, i);
         LOG("model output[%zd] format %d outputType %d\n", i, cfg.outputInfo[i].Format, cfg.outputInfo[i].Type);
-        snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] format %d outputType %d\n", i, cfg.outputInfo[i].Format, cfg.outputInfo[i].Type);
+        snprintf(tmpChr, sizeof(tmpChr), "model output[%zd] format %d outputType %d\n", i, cfg.outputInfo[i].Format,
+                 cfg.outputInfo[i].Type);
         outFile << tmpChr;
         cfg.outputInfo[i].Name = aclmdlGetOutputNameByIndex(cfg.modelDesc, i);
         LOG("model output[%zd] name %s\n", i, cfg.outputInfo[i].Name);
@@ -431,7 +428,6 @@ aclError GetModelInputOutputInfo(Config& cfg)
     outFile.close();
     return ACL_ERROR_NONE;
 }
-
 
 aclError ParseImgInfo(){
     std::ifstream in(cfg.imgInfo);

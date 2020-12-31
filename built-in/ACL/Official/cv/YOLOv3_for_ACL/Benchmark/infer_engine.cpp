@@ -39,7 +39,7 @@ acldvppChannelDesc *dvpp_channel_desc = nullptr;
 std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> imgSizes;
 
 #define RESIZE_MAX 416
-
+#define NUM_2 2
 uint32_t resizedWidth;
 uint32_t resizedHeight;
 uint32_t resizedWidthAligned;
@@ -51,11 +51,11 @@ std::ofstream outFile("img_info", std::ios::trunc);
 void getImgResizeShape()
 {
     if (ACL_FORMAT_NCHW == cfg.inputInfo[0].Format) {
-        resizedHeight = cfg.inputInfo[0].dims[2];
+        resizedHeight = cfg.inputInfo[0].dims[NUM_2];
         resizedWidth = cfg.inputInfo[0].dims[3];
     } else if (ACL_FORMAT_NHWC == cfg.inputInfo[0].Format) {
         resizedHeight = cfg.inputInfo[0].dims[1];
-        resizedWidth = cfg.inputInfo[0].dims[2];
+        resizedWidth = cfg.inputInfo[0].dims[NUM_2];
     }
 }
 
@@ -159,9 +159,9 @@ aclError DvppSetup()
     imgSizes = cfg.dvppConfig.imgSizes;
 
     resizedWidthAligned = (resizedWidth + 15) / 16 * 16;
-    resizedHeightAligned = (resizedHeight + 1) / 2 * 2;
+    resizedHeightAligned = (resizedHeight + 1) / NUM_2 * NUM_2;
 
-    resizedOutputBufferSize = resizedWidthAligned * resizedHeightAligned * 3 / 2;
+    resizedOutputBufferSize = resizedWidthAligned * resizedHeightAligned * 3 / NUM_2;
     LOG("resizedWidth %d resizedHeight %d resizedWidthAligned %d resizedHeightAligned %d resizedOutputBufferSize %d\n",
         resizedWidth, resizedHeight, resizedWidthAligned, resizedHeightAligned, resizedOutputBufferSize);
 
@@ -330,30 +330,30 @@ acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t mod
     char tmpChr[256] = {0};
 
     if (small == width) {
-        padded_size_half = (modelInputWidth - width) / 2; // 贴图区域距离左边界的距离
+        padded_size_half = (modelInputWidth - width) / NUM_2; // 贴图区域距离左边界的距离
         left = padded_size_half;
         // 建议用户在贴图的起始坐标距离左边界宽度16对齐，保证目标检测区域相对于原图不发生相对便宜，提高精度
         left_stride = (left + 15) / 16 * 16;
-        right = (left_stride + width) % 2 == 0 ? (left_stride + width - 1) : (left_stride + width);
+        right = (left_stride + width) % NUM_2 == 0 ? (left_stride + width - 1) : (left_stride + width);
         if (left_stride + right > modelInputWidth) {
             while (true) {
                 left_stride = left_stride - 16;
-                right = (left_stride + width) % 2 == 0 ? (left_stride + width - 1) : (left_stride + width);
+                right = (left_stride + width) % NUM_2 == 0 ? (left_stride + width - 1) : (left_stride + width);
                 if (left_stride + right < modelInputWidth)
                     break;
             }
         }
 
-        right = (left_stride + width) % 2 == 0 ? (left_stride + width - 1) : (left_stride + width);
-        bottom = (modelInputHeight % 2 == 0 ? modelInputHeight - 1 : modelInputHeight);
+        right = (left_stride + width) % NUM_2 == 0 ? (left_stride + width - 1) : (left_stride + width);
+        bottom = (modelInputHeight % NUM_2 == 0 ? modelInputHeight - 1 : modelInputHeight);
         top = bottom - height + 1;
     } else {
-        padded_size_half = (modelInputHeight - height) / 2;
-        right = (modelInputWidth % 2 == 0 ? modelInputWidth - 1 : modelInputWidth);
+        padded_size_half = (modelInputHeight - height) / NUM_2;
+        right = (modelInputWidth % NUM_2 == 0 ? modelInputWidth - 1 : modelInputWidth);
         left = right + 1 - width;
         left_stride = (left + 15) / 16 * 16;
-        top = (padded_size_half % 2 == 0 ? padded_size_half : padded_size_half + 1);
-        bottom = (height + top - 1) % 2 == 0 ? (height + top - 2) : (height + top - 1);
+        top = (padded_size_half % NUM_2 == 0 ? padded_size_half : padded_size_half + 1);
+        bottom = (height + top - 1) % NUM_2 == 0 ? (height + top - NUM_2) : (height + top - 1);
     }
 
     LOG("left_stride=%d, right=%d, top=%d, bottom=%d\n", left_stride, right, top, bottom);
@@ -387,7 +387,7 @@ void LargeSizeAtLeast(uint32_t W, uint32_t H, uint32_t &newInputWidth, uint32_t 
         scaleRatio = resizeMax / W;
         // 高度2对齐
         newInputHeight = scaleRatio * inputHeight;
-        newInputHeight = (newInputHeight + 1) / 2 * 2;
+        newInputHeight = (newInputHeight + 1) / NUM_2 * NUM_2;
         std::cout << "[info]scaleRatio: " << resizeMax / W << " inputWidth_: " << W << " newInputWidth: " <<
              newInputWidth << " inputHeight_: " << H << " newInputHeight_:" << newInputHeight << std::endl;
     } else {
@@ -453,7 +453,7 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
 
     W_Aligned = (W + 127) / 128 * 128;
     H_Aligned = (H + 15) / 16 * 16;
-    outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
+    outputBuffSize = W_Aligned * H_Aligned * 3 / NUM_2;
     void *jpeg_dev_mem_in_ptr = nullptr;
     ret = acldvppMalloc(&jpeg_dev_mem_in_ptr, fileSize);
     if (ret != ACL_ERROR_NONE) {
@@ -525,8 +525,8 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     LargeSizeAtLeast(W, H, newInputWidth, newInputHeight);
 
     uint32_t cropOutputWidthStride = (newInputWidth + (16 - 1)) / 16 * 16;
-    uint32_t cropOutputHeightStride = (newInputHeight + (2 - 1)) / 2 * 2;
-    uint32_t cropOutBufferSize = cropOutputWidthStride * cropOutputHeightStride * 3 / 2;
+    uint32_t cropOutputHeightStride = (newInputHeight + (NUM_2 - 1)) / NUM_2 * NUM_2;
+    uint32_t cropOutBufferSize = cropOutputWidthStride * cropOutputHeightStride * 3 / NUM_2;
     ret = acldvppMalloc(&cropOutputBufferDev, cropOutBufferSize);
     if (ret != ACL_ERROR_NONE) {
         LOG("acldvppMalloc cropOutputBufferDev failed ret = %d\n", ret);
@@ -556,9 +556,9 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     // 5 使用vpc裁剪并贴图
     acldvppPicDesc *cropAndPasteOutputDesc = nullptr;
     acldvppRoiConfig *pasteConfig = nullptr;
-    uint32_t vpcOutBufferSize = 416 * 416 * 3 / 2;
+    uint32_t vpcOutBufferSize = 416 * 416 * 3 / NUM_2;
     uint32_t vpcOutputWidthStride = (416 + 15) / 16 * 16;
-    uint32_t vpcOutputHeightStride = (416 + 1) / 2 * 2;
+    uint32_t vpcOutputHeightStride = (416 + 1) / NUM_2 * NUM_2;
 
     void *vpcOutBufferDev = (void *)ptr;
     cropAndPasteOutputDesc = createDvppPicDesc(vpcOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, 416, 416,
@@ -679,13 +679,13 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
 
-    if (width % 2 == 0) {
+    if ((width % NUM_2) == 0) {
         right = width - 1;
     } else {
         right = width;
     }
 
-    if (height % 2 == 0) {
+    if ((height % NUM_2) == 0) {
         bottom = height - 1;
     } else {
         bottom = height;
@@ -714,15 +714,15 @@ acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newIn
     acldvppRoiConfig *centerCropConfig = nullptr;
 
     amount_to_be_cropped_w = newInputWidth - modelInputWidth;
-    left_half = amount_to_be_cropped_w / 2;
+    left_half = amount_to_be_cropped_w / NUM_2;
     amount_to_be_cropped_h = newInputHeight - modelInputHeight;
-    top_half = amount_to_be_cropped_h / 2;
+    top_half = amount_to_be_cropped_h / NUM_2;
 
-    //even
-    left = (left_half % 2 == 0) ? (amount_to_be_cropped_w / 2) : (amount_to_be_cropped_w / 2 + 1);
-    top = (top_half % 2 == 0) ? (amount_to_be_cropped_h / 2) : (amount_to_be_cropped_h / 2 + 1);
+    // 保证起始点坐标为偶数
+    left = (left_half % NUM_2 == 0) ? (amount_to_be_cropped_w / NUM_2) : (amount_to_be_cropped_w / NUM_2 + 1);
+    top = (top_half % NUM_2 == 0) ? (amount_to_be_cropped_h / NUM_2) : (amount_to_be_cropped_h / NUM_2 + 1);
 
-    //odd
+    // 结束点为奇数
     right = left + modelInputWidth - 1;
     bottom = top + modelInputHeight - 1;
 
@@ -731,7 +731,6 @@ acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newIn
         std::cout << "[ERROR][Vision] acldvppCreateRoiConfig failed " << std::endl;
         return nullptr;
     }
-
     return centerCropConfig;
 }
 
@@ -762,7 +761,6 @@ aclError Inference()
     }
 
     std::vector<void *> outputDevPtrs;
-
     for (size_t i = 0; i < cfg.outputNum; ++i) {
         size_t buffer_size = cfg.outputInfo[i].size;
         void *outputBuffer = nullptr;
@@ -783,13 +781,11 @@ aclError Inference()
         }
 
         ret = aclmdlAddDatasetBuffer(output, outputData);
-
         if (ret != ACL_ERROR_NONE) {
             LOG("Add output model dataset failed, ret[%d]\n", ret);
             return ret;
         }
     }
-
     gettimeofday(&startTmp, NULL);
     ret = aclmdlExecute(modelId, inputDataframe.dataset, output);
     gettimeofday(&endTmp, NULL);

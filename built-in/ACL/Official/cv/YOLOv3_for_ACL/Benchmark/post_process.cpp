@@ -44,20 +44,16 @@
 #include <sys/errno.h>
 #include <unordered_map>
 
-
 extern int processedCnt;
-
 extern Config cfg;
 extern DataFrame outputDataframe;
 extern aclError ret;
 int topNum = 5;
-
 extern int processedCnt;
 
 aclError SaveBinPostprocess()
 {
     aclError retVal;
-
     LOG("save batch %d start\n", processedCnt);
     DataFrame dataframe = outputDataframe;
     std::vector<std::string>& inferFile_vec = outputDataframe.fileNames;
@@ -76,7 +72,6 @@ aclError SaveBinPostprocess()
         void* data = aclGetDataBufferAddr(dataBuffer);
         uint32_t len;
         len = cfg.outputInfo[i].size;
-
         void* outHostData = NULL;
         ret = aclrtMallocHost(&outHostData, len);
         if (ret != ACL_ERROR_NONE) {
@@ -92,8 +87,7 @@ aclError SaveBinPostprocess()
         }
 
         uint32_t eachSize = len / cfg.batchSize;
-        for (size_t j = 0; j < inferFile_vec.size(); j++)
-        {
+        for (size_t j = 0; j < inferFile_vec.size(); j++) {
             FILE* outputFile;
             std::string framename = inferFile_vec[j];
             std::size_t dex = (framename).find_last_of(".");
