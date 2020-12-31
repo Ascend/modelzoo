@@ -103,7 +103,8 @@ After fintuning on NPU (120,000 steps, ~29hrs), we can achieve a Top-1 Acc of 74
 
 ### 6. Inference on NPU-Ascend 310
 We achieve an inference time of ~2.8ms on the Ascend 310 NPU with an overall Top-1 Acc of 74.28. 
-[Download Link](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/npu/ATC/pb_om_model.tar)
+[Download Link(pb and om models)](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/npu/ATC/pb_om_model.tar)
+[Download Link(ATC logs)](https://backseason-mbv3-open.obs.cn-north-4.myhuaweicloud.com/mobilenetv3_large_models/npu/ATC/ATC_logs.tar)
 
 For usage of offline inference on HUAWEI ECS please refer to this [wiki](https://gitee.com/backseason/modelzoo/wikis/MobileNetV3_Large_MindStudio%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86%E6%A1%88%E4%BE%8B?sort_id=3335182).
 
