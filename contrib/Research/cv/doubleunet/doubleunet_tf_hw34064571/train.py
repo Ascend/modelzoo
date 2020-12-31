@@ -159,7 +159,7 @@ def main(_):
                 _, batch_out, batch_loss_ = sess.run([train_op, out, loss], feed_dict={inputx: x_in, inputy: y_in})
                 MIoU += evaluating_op(batch_out, y_in)
                 batch_loss += batch_loss_
-            print('Epoch%d, train loss=%.4f,val_miou=%.4f' % (
+            print('Epoch%d, train loss=%.4f,train_miou=%.4f' % (
                 epoch + 1 + pre_epoch, batch_loss / total_step, MIoU / total_step))
             checkpoint_path = os.path.join(MODEL_CACHE_PATH, "model.ckpt")
             saver.save(sess, checkpoint_path, global_step=epoch + pre_epoch + 1)
