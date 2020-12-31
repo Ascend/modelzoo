@@ -257,7 +257,7 @@ aclError Process()
 void SaveResult()
 {
     ofstream outfile("test_perform_static.txt");
-    #if 0
+#if 0
     std::string model_name;
     int dex = (cfg.om).find_last_of("/");
     model_name = cfg.om.substr(dex+1);
@@ -279,7 +279,7 @@ void SaveResult()
     outfile << avgPreTime << " " << 1.0*1000/avgPreTime << " ";
     outfile << avgTime << " " << 1.0*1000/avgTime << " ";
     outfile << endl;
-    #endif
+#endif
     char tmpCh[256];
     memset(tmpCh, 0, sizeof(tmpCh));
     snprintf(tmpCh, sizeof(tmpCh), "NN inference cost average time: %4.3f ms %4.3f fps/s\n", avgTime,

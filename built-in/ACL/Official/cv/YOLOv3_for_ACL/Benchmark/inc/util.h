@@ -144,8 +144,8 @@ struct Resnet50Result {
 };
 
 struct DataFrame {
-        std::vector<std::string> fileNames;
-        aclmdlDataset* dataset;
+	std::vector<std::string> fileNames;
+    aclmdlDataset* dataset;
 };
 
 #endif

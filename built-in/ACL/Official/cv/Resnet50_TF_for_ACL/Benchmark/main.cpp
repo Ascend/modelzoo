@@ -261,7 +261,7 @@ aclError Process()
 void SaveResult()
 {
     ofstream outfile("test_perform_static.txt");
-    #if 0
+#if 0
     std::string model_name;
     int dex = (cfg.om).find_last_of("/");
     model_name = cfg.om.substr(dex+1);
@@ -283,7 +283,7 @@ void SaveResult()
     outfile << avgPreTime << " " << 1.0*1000/avgPreTime << " ";
     outfile << avgTime << " " << 1.0*1000/avgTime << " ";
     outfile << endl;
-    #endif
+#endif
     char tmpCh[256];
     memset(tmpCh, 0, sizeof(tmpCh));
     snprintf(tmpCh, sizeof(tmpCh), "NN inference cost average time: %4.3f ms %4.3f fps/s\n",
@@ -295,7 +295,6 @@ void SaveResult()
 aclError GetModelInputOutputInfo(Config& cfg)
 {
     aclError ret;
-    
     std::ofstream outFile("modelInputOutputInfo", std::ios::trunc);
     char tmpChr[256] = {0};
 
@@ -482,12 +481,12 @@ int main(int argc, char** argv)
     LOG("performance summary:\n");
     LOG("#############################################\n");
     LOG("total %ld imgs processed and batch size %ld\n", processedCnt*cfg.batchSize, cfg.batchSize);
-    #if 0
+#if 0
     if(cfg.postprocessType == "resnet") {
         LOG("top1 ratio %0.3f top5 ratio %0.3f\n",
             1.0*resnet50Res.top1/resnet50Res.total, 1.0*resnet50Res.top5/resnet50Res.total);
     }
-    #endif
+#endif
 
     LOG("avg preprocess time %0.2f ms, %0.2f imgs/s\n", avgPreTime, 1.0 * 1000 / avgPreTime);
     LOG("avg inference time %0.2f ms, %0.2f imgs/s\n", avgTime, 1.0 * 1000 / avgTime);

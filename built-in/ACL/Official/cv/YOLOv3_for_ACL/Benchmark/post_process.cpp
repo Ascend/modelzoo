@@ -61,7 +61,7 @@ aclError SaveBinPostprocess()
 
     std::string resultFolder = cfg.outDir + "/" + cfg.modelType;
     DIR* op = opendir(resultFolder.c_str());
-    if (NULL == op) {
+    if (op == NULL) {
         mkdir(resultFolder.c_str(), 00775);
     } else {
         closedir(op);
@@ -101,7 +101,7 @@ aclError SaveBinPostprocess()
                 outputFile = fopen((resultFolder + "/" + "davinci_" + inputFileName + "_"  + "output" + std::to_string(i) + ".bin").c_str(), "wb");
             }
             
-            if (NULL == outputFile) {
+            if (outputFile == NULL) {
                 aclrtFreeHost(outHostData);
                 return 1;
             }
@@ -117,7 +117,6 @@ aclError SaveBinPostprocess()
     }
     
     (void)DestroyDatasetResurce(outputDataframe.dataset, 0);
-    
     LOG("save batch %d done\n", processedCnt);
     return ACL_ERROR_NONE;
 }
