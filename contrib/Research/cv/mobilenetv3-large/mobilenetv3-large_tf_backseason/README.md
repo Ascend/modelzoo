@@ -19,7 +19,7 @@ This model uses Momentum optimizer from Tensorflow with the following hyperparam
 - Learning rate (LR): 0.3
 - LR schedule: cosine_annealing
 - Warmup epoch: 4
-- Batch size: 320*4
+- Batch size: 320\*4
 - Weight decay:  0.00004 
 - Moving average decay: 0.9999
 - Learning rate decay factor: 0.99
@@ -124,7 +124,7 @@ Our result were obtained by running the applicable training script. To achieve t
 #### Training performance results
 | Platform     | train performance      |
 | :----------: | :--------------------: |
-| 1xAscend 910 |  781 img/s (bz=640*1)  |
-| 1xAscend 910 |  1536 img/s (bz=256*1) |
-| 4xRTX Titan  |  2400 img/s (bz=320*4) |
+| 1xAscend 910 |  781 img/s (bz=640\*1)  |
+| 1xAscend 910 |  1536 img/s (bz=256\*1) |
+| 4xRTX Titan  |  2400 img/s (bz=320\*4) |
 
