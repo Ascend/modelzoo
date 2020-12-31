@@ -65,12 +65,6 @@ const int ACL_ERROR_OTHERS = 255;
 		return ret;				\
 	}
 
-
-
-
-
-
-
 bool FolderExists(std::string foldname);
 
 bool FileExists(std::string filename);
@@ -83,14 +77,11 @@ aclError FreeDevMemory(aclmdlDataset* dataset);
 
 aclError DestroyDatasetResurce(aclmdlDataset* dataset, uint32_t flag);
 
-
 struct DvppConfig {
 	uint32_t resizedWidth;
 	uint32_t resizedHeight;
 	std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> imgSizes;
 };
-
-
 
 struct ModelInfo
 {
@@ -149,8 +140,6 @@ struct Config {
     }
 };
 
-
-
 struct Resnet50Result {
 	int top1;
 	int top5;
@@ -163,7 +152,5 @@ struct DataFrame {
         std::vector<std::string> fileNames;
         aclmdlDataset* dataset;
 };
-
-
 
 #endif

@@ -345,7 +345,7 @@ void GetImageHW(void* buff, uint32_t fileSize, std::string fileLocation, uint32_
  * @brief : dvpp在推理中的预处理流程
  * @param [in] string fileLocation : 输入文件路径.
  * @param [in] char *&ptr : 输出buffer指针.
- * @return : ACL_ERROR_NONE：预处理失败， decodeErr:parse jpeg head fail.
+ * @return : ACL_ERROR_NONE：预处理失败
  */
 aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
 {

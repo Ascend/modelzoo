@@ -18,10 +18,9 @@
 #include "infer_engine.h"
 #include "acl/acl_mdl.h"
 #include "acl/acl_rt.h"
+#include "acl/ops/acl_dvpp.h"
 #include <functional>
 #include <algorithm>
-//#include <opencv2/opencv.hpp>
-#include "acl/ops/acl_dvpp.h"
 using namespace std;
 
 std::unordered_map<std::string, long long> dvppTime;
@@ -51,13 +50,10 @@ std::ofstream outFile("img_info", std::ios::trunc);
 
 void getImgResizeShape()
 {
-    if (ACL_FORMAT_NCHW == cfg.inputInfo[0].Format)
-    {
+    if (ACL_FORMAT_NCHW == cfg.inputInfo[0].Format) {
         resizedHeight = cfg.inputInfo[0].dims[2];
         resizedWidth = cfg.inputInfo[0].dims[3];
-    }
-    else if (ACL_FORMAT_NHWC == cfg.inputInfo[0].Format)
-    {
+    } else if (ACL_FORMAT_NHWC == cfg.inputInfo[0].Format) {
         resizedHeight = cfg.inputInfo[0].dims[1];
         resizedWidth = cfg.inputInfo[0].dims[2];
     }
@@ -116,7 +112,8 @@ aclError LoadModel()
     ret = aclrtMalloc(&(cfg.weightMem_ptr), weightsize, ACL_MEM_MALLOC_HUGE_ONLY);
     CHECK_ACL_RET("alloc weight_ptr failed", ret);
 
-    ret = aclmdlLoadFromMemWithMem(cfg.modelData_ptr, modelSize, &modelId, cfg.devMem_ptr, memSize, cfg.weightMem_ptr, weightsize);
+    ret = aclmdlLoadFromMemWithMem(cfg.modelData_ptr, modelSize, &modelId, cfg.devMem_ptr, memSize, cfg.weightMem_ptr,
+                                   weightsize);
     CHECK_ACL_RET("load model from memory failed", ret);
     LOG("Load model success. memSize: %lu, weightSize: %lu.\n", memSize, weightsize);
 
@@ -135,30 +132,26 @@ aclError LoadModel()
 aclError DvppSetup()
 {
     ret = aclrtSetCurrentContext(context);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Set context failed\n");
         return ret;
     }
 
     ret = aclrtCreateStream(&stream);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("create dvpp stream failed\n");
         return ret;
     }
 
     dvpp_channel_desc = acldvppCreateChannelDesc();
-    if (dvpp_channel_desc == nullptr)
-    {
+    if (dvpp_channel_desc == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("create dvpp channel desc failed\n");
         return ret;
     }
 
     ret = acldvppCreateChannel(dvpp_channel_desc);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("create dvpp channel failed\n");
         return ret;
     }
@@ -169,64 +162,58 @@ aclError DvppSetup()
     resizedHeightAligned = (resizedHeight + 1) / 2 * 2;
 
     resizedOutputBufferSize = resizedWidthAligned * resizedHeightAligned * 3 / 2;
-    LOG("resizedWidth %d resizedHeight %d resizedWidthAligned %d resizedHeightAligned %d resizedOutputBufferSize %d\n", resizedWidth, resizedHeight, resizedWidthAligned, resizedHeightAligned, resizedOutputBufferSize);
+    LOG("resizedWidth %d resizedHeight %d resizedWidthAligned %d resizedHeightAligned %d resizedOutputBufferSize %d\n",
+        resizedWidth, resizedHeight, resizedWidthAligned, resizedHeightAligned, resizedOutputBufferSize);
 
     return ACL_ERROR_NONE;
 }
 
-acldvppPicDesc *createDvppPicDesc(void *dataDev, acldvppPixelFormat format, uint32_t width, uint32_t height, uint32_t widthStride, uint32_t heightStride, uint32_t size)
+acldvppPicDesc *createDvppPicDesc(void *dataDev, acldvppPixelFormat format, uint32_t width, uint32_t height,
+                                  uint32_t widthStride, uint32_t heightStride, uint32_t size)
 {
     acldvppPicDesc *picDesc = acldvppCreatePicDesc();
-    if (picDesc == nullptr)
-    {
+    if (picDesc == nullptr) {
         LOG("failed to create pic desc\n");
         return nullptr;
     }
 
     ret = acldvppSetPicDescData(picDesc, dataDev);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc data\n");
         return nullptr;
     }
     ret = acldvppSetPicDescSize(picDesc, size);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc size\n");
         return nullptr;
     }
 
     ret = acldvppSetPicDescFormat(picDesc, format);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc format\n");
         return nullptr;
     }
 
     ret = acldvppSetPicDescWidth(picDesc, width);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc width\n");
         return nullptr;
     }
 
     ret = acldvppSetPicDescHeight(picDesc, height);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc height\n");
         return nullptr;
     }
 
     ret = acldvppSetPicDescWidthStride(picDesc, widthStride);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc widthStride\n");
         return nullptr;
     }
 
     ret = acldvppSetPicDescHeightStride(picDesc, heightStride);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("failed to set desc heightStride\n");
         return nullptr;
     }
@@ -237,8 +224,7 @@ aclError InitInput(std::vector<std::string> files)
 {
     LOG("init input batch %d start\n", processedCnt);
     ret = aclrtSetCurrentContext(context);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Set context failed, ret[%d]\n", ret);
         return ret;
     }
@@ -248,8 +234,7 @@ aclError InitInput(std::vector<std::string> files)
 
     void *dst;
     ret = aclrtMalloc(&dst, modelInputSize, ACL_MEM_MALLOC_NORMAL_ONLY);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Malloc device failed, ret[%d]\n", ret);
         return ret;
     }
@@ -257,15 +242,11 @@ aclError InitInput(std::vector<std::string> files)
 
     char *ptr = (char *)dst;
     inputDataframe.fileNames.clear();
-    for (int i = 0; i < files.size(); i++)
-    {
-
-        //std::string fileLocation = cfg.dataDir + "/" + files[i];
+    for (int i = 0; i < files.size(); i++) {
         std::string fileLocation = files[i];
         FILE *pFile = fopen(fileLocation.c_str(), "r");
 
-        if (pFile == nullptr)
-        {
+        if (pFile == nullptr) {
             ret = ACL_ERROR_OTHERS;
             LOG("open file %s failed\n", fileLocation.c_str());
             return ret;
@@ -274,17 +255,16 @@ aclError InitInput(std::vector<std::string> files)
         fseek(pFile, 0, SEEK_END);
         size_t fileSize = ftell(pFile);
 
-        if (fileSize > imgSize)
-        {
+        if (fileSize > imgSize) {
             ret = ACL_ERROR_OTHERS;
-            LOG("%s fileSize %lu * batch %lu don't match with model inputSize %lu\n", fileLocation.c_str(), fileSize, cfg.batchSize, modelInputSize);
+            LOG("%s fileSize %lu * batch %lu don't match with model inputSize %lu\n", fileLocation.c_str(), fileSize,
+                cfg.batchSize, modelInputSize);
             return ret;
         }
 
         void *buff = nullptr;
         ret = aclrtMallocHost(&buff, fileSize);
-        if (ret != ACL_ERROR_NONE)
-        {
+        if (ret != ACL_ERROR_NONE) {
             LOG("Malloc host buff failed[%d]\n", ret);
             return ret;
         }
@@ -297,23 +277,19 @@ aclError InitInput(std::vector<std::string> files)
         ret = aclrtMemcpy(dstTmp, fileSize, buff, fileSize, ACL_MEMCPY_HOST_TO_DEVICE);
         ptr += fileSize;
         LOG("input addr %p, len %ld\n", dstTmp, fileSize);
-        if (ret != ACL_ERROR_NONE)
-        {
+        if (ret != ACL_ERROR_NONE) {
             LOG("init input %d, Copy host to device failed, ret[%d]\n", i, ret);
             LOG("input addr %p, len %ld\n", dstTmp, fileSize);
-
             aclrtFreeHost(buff);
             return ret;
         }
 
         aclrtFreeHost(buff);
-
         inputDataframe.fileNames.push_back(files[i]);
     }
 
     aclDataBuffer *inputData = aclCreateDataBuffer((void *)dst, modelInputSize);
-    if (inputData == nullptr)
-    {
+    if (inputData == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("aclCreateDataBuffer failed\n");
         return ret;
@@ -321,8 +297,7 @@ aclError InitInput(std::vector<std::string> files)
 
     aclmdlDataset *input = aclmdlCreateDataset();
     ret = aclmdlAddDatasetBuffer(input, inputData);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("ACL_ModelInputDataAdd failed, ret[%d]\n", ret);
         aclmdlDestroyDataset(input);
         return ret;
@@ -333,6 +308,14 @@ aclError InitInput(std::vector<std::string> files)
     return ACL_ERROR_NONE;
 }
 
+/*
+ * @brief : 设置贴图区域
+ * @param [in] uint32_t width : 贴入图像的宽.
+ * @param [in] uint32_t height : 贴入图像的高.
+ * @param [in] uint32_t modelInputWidth : 贴图后图像的宽.
+ * @param [in] uint32_t modelInputHeight : 贴图后图像的高.
+ * @return : acldvppRoiConfig：贴图配置
+ */
 acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t modelInputWidth, uint32_t modelInputHeight)
 {
     uint32_t right = 0;
@@ -343,21 +326,17 @@ acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t mod
     acldvppRoiConfig *cropConfig;
 
     uint32_t small = width < height ? width : height;
-
     uint32_t padded_size_half;
-
     char tmpChr[256] = {0};
 
-    if (small == width)
-    {
-        padded_size_half = (modelInputWidth - width) / 2;
+    if (small == width) {
+        padded_size_half = (modelInputWidth - width) / 2; // 贴图区域距离左边界的距离
         left = padded_size_half;
+        // 建议用户在贴图的起始坐标距离左边界宽度16对齐，保证目标检测区域相对于原图不发生相对便宜，提高精度
         left_stride = (left + 15) / 16 * 16;
         right = (left_stride + width) % 2 == 0 ? (left_stride + width - 1) : (left_stride + width);
-        if (left_stride + right > modelInputWidth)
-        {
-            while (true)
-            {
+        if (left_stride + right > modelInputWidth) {
+            while (true) {
                 left_stride = left_stride - 16;
                 right = (left_stride + width) % 2 == 0 ? (left_stride + width - 1) : (left_stride + width);
                 if (left_stride + right < modelInputWidth)
@@ -368,9 +347,7 @@ acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t mod
         right = (left_stride + width) % 2 == 0 ? (left_stride + width - 1) : (left_stride + width);
         bottom = (modelInputHeight % 2 == 0 ? modelInputHeight - 1 : modelInputHeight);
         top = bottom - height + 1;
-    }
-    else
-    {
+    } else {
         padded_size_half = (modelInputHeight - height) / 2;
         right = (modelInputWidth % 2 == 0 ? modelInputWidth - 1 : modelInputWidth);
         left = right + 1 - width;
@@ -382,8 +359,7 @@ acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t mod
     LOG("left_stride=%d, right=%d, top=%d, bottom=%d\n", left_stride, right, top, bottom);
 
     cropConfig = acldvppCreateRoiConfig(left_stride, right, top, bottom);
-    if (cropConfig == nullptr)
-    {
+    if (cropConfig == nullptr) {
         std::cout << "[ERROR][Vision] acldvppCreateRoiConfig failed " << std::endl;
         return nullptr;
     }
@@ -403,36 +379,37 @@ void LargeSizeAtLeast(uint32_t W, uint32_t H, uint32_t &newInputWidth, uint32_t 
     inputWidth = (float)W;
     inputHeight = (float)H;
     resizeMax = (float)(RESIZE_MAX);
-    //resizeMax = (float)(416);
     maxWidthFlag = (W >= H) ? true : false;
 
     char tmpChr[256] = {0};
-
-    if (maxWidthFlag == true)
-    {
+    if (maxWidthFlag == true) {
         newInputWidth = resizeMax;
         scaleRatio = resizeMax / W;
-        //newInputHeight = (resizeMax / W) * inputHeight;
-        //H 2 stride
+        // 高度2对齐
         newInputHeight = scaleRatio * inputHeight;
         newInputHeight = (newInputHeight + 1) / 2 * 2;
-        std::cout << "[info]scaleRatio: " << resizeMax / W << " inputWidth_: " << W << " newInputWidth: " << newInputWidth << " inputHeight_: " << H << " newInputHeight_:" << newInputHeight << std::endl;
-    }
-    else
-    {
+        std::cout << "[info]scaleRatio: " << resizeMax / W << " inputWidth_: " << W << " newInputWidth: " <<
+             newInputWidth << " inputHeight_: " << H << " newInputHeight_:" << newInputHeight << std::endl;
+    } else {
         scaleRatio = resizeMax / H;
-        //newInputWidth = (resizeMax / H) * W;
-        //W 16 stride
+        // 如果高度是长边，建议宽度在等比例缩放后再做一次16对齐，因为vpc在输出时宽有16字节对齐约束，会导致在贴图的时候，当贴图的宽非16对齐时，
+        // 芯片会进行16字节对齐，导致每次写入数据的时候都会引入部分无效数据，导致精度下降。
         newInputWidth = scaleRatio * W;
         newInputWidth = (newInputWidth + 15) / 16 * 16;
         newInputHeight = resizeMax;
-
-        std::cout << "[info]scaleRatio: " << resizeMax / H << " width: " << W << " newInputWidth: " << newInputWidth << " height: " << H << " newInputHeight:" << newInputHeight << std::endl;
+        std::cout << "[info]scaleRatio: " << resizeMax / H << " width: " << W << " newInputWidth: " << newInputWidth <<
+             " height: " << H << " newInputHeight:" << newInputHeight << std::endl;
     }
     snprintf(tmpChr, sizeof(tmpChr), "%f %f ", (float)newInputWidth / W, (float)newInputHeight / H);
     outFile << tmpChr;
 }
 
+/*
+ * @brief : dvpp在YOLOv3推理中的预处理流程
+ * @param [in] string fileLocation : 输入文件路径.
+ * @param [in] char *&ptr : 输出buffer指针.
+ * @return : ACL_ERROR_NONE：预处理失败
+ */
 aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
 {
     struct timeval func_start;
@@ -440,10 +417,9 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     
     std::string funcName;
     long long costTime;
-
+    // 1 获取输入码流
     FILE *pFile = fopen(fileLocation.c_str(), "r");
-    if (pFile == nullptr)
-    {
+    if (pFile == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("open file %s failed\n", fileLocation.c_str());
         return ret;
@@ -451,11 +427,9 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
 
     fseek(pFile, 0, SEEK_END);
     uint64_t fileSize = ftell(pFile);
-
     void *buff = nullptr;
     ret = aclrtMallocHost(&buff, fileSize);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Malloc host buff failed[%d]\n", ret);
         return ret;
     }
@@ -470,72 +444,65 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     uint32_t H_Aligned = 0;
     uint32_t outputBuffSize = 0;
     int32_t components = 0;
+
+    // 2 获取输入解码宽高
     ret = acldvppJpegGetImageInfo((void *)buff, fileSize, &W, &H, &components);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         cout << "acldvppJpegGetImageInfo failed, ret " << ret << "filename: " << fileLocation.c_str() << endl;
     }
 
     W_Aligned = (W + 127) / 128 * 128;
     H_Aligned = (H + 15) / 16 * 16;
     outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
-
-    //1.0: dvpp decode
-    // alloc jpeg memory on device
     void *jpeg_dev_mem_in_ptr = nullptr;
     ret = acldvppMalloc(&jpeg_dev_mem_in_ptr, fileSize);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Malloc dvpp in buff failed[%d]\n", ret);
         return ret;
     }
 
-    // copy jpeg data from host to device
+    // 把jpeg码流从host侧拷贝到device侧
     ret = aclrtMemcpy(jpeg_dev_mem_in_ptr, fileSize, buff, fileSize, ACL_MEMCPY_HOST_TO_DEVICE);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("copy host to device failed[%d]\n", ret);
         return ret;
     }
 
     aclrtFreeHost(buff);
-    // alloc decode out memroy
+    // 申请device侧输出内存
     void *jpeg_dev_mem_out_ptr = nullptr;
     ret = acldvppMalloc(&jpeg_dev_mem_out_ptr, outputBuffSize);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Malloc dvpp in buff failed[%d]\n", ret);
         return ret;
     }
-
     ret = aclrtMemset(jpeg_dev_mem_out_ptr, outputBuffSize, 128, outputBuffSize);
 
     acldvppPicDesc *jpeg_output_desc = nullptr;
     acldvppPicDesc *resize_output_desc = nullptr;
-
     funcName = "DvppPicDescCreate_output";
     gettimeofday(&func_start, NULL);
 
-    jpeg_output_desc = createDvppPicDesc(jpeg_dev_mem_out_ptr, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned, H_Aligned, outputBuffSize);
-    if (jpeg_output_desc == nullptr)
-    {
+    // 3 获取解码输出描述信息
+    jpeg_output_desc = createDvppPicDesc(jpeg_dev_mem_out_ptr, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned,
+                                         H_Aligned, outputBuffSize);
+    if (jpeg_output_desc == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("create jpeg_output_desc failed\n");
         return ret;
     }
     gettimeofday(&func_end, NULL);
 
-    LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", fileLocation.c_str(), W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
+    LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n",
+        fileLocation.c_str(), W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
 
     costTime = (func_end.tv_sec - func_start.tv_sec) * 1000000 + (func_end.tv_usec - func_start.tv_usec);
-
     dvppTime[funcName] += costTime;
 
     funcName = "DvppJpegDecode";
     gettimeofday(&func_start, NULL);
     ret = acldvppJpegDecodeAsync(dvpp_channel_desc, jpeg_dev_mem_in_ptr, fileSize, jpeg_output_desc, stream);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG(" dvppJpegDecodeAsync failed, fileName: %s\n", fileLocation.c_str());
         return ret;
     }
@@ -545,52 +512,48 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
 
     aclrtSynchronizeStream(stream);
 
-    // 2.0 dvpp crop with resize
+    // 4 对jpegd解码的图片进行原分辨率抠图及长边416等比例缩放。
     acldvppPicDesc *cropOutputDesc = nullptr;
     acldvppRoiConfig *cropConfig = nullptr;
-    //Crop the original image size as cropConfig
-    cropConfig = InitCropRoiConfig(W, H);
 
-    //Scale the larger side to 416 as the output of the cropping
+    // 设置对解码后的图片进行原图裁剪，目的是为了减少因jpegd解码后对齐的无效数据对图像精度的影响
+    cropConfig = InitCropRoiConfig(W, H);
     uint32_t newInputWidth = 0;
     uint32_t newInputHeight = 0;
     void *cropOutputBufferDev = nullptr;
+    // 对宽高较长缩放至416，较短边做等比例缩放
     LargeSizeAtLeast(W, H, newInputWidth, newInputHeight);
 
     uint32_t cropOutputWidthStride = (newInputWidth + (16 - 1)) / 16 * 16;
     uint32_t cropOutputHeightStride = (newInputHeight + (2 - 1)) / 2 * 2;
     uint32_t cropOutBufferSize = cropOutputWidthStride * cropOutputHeightStride * 3 / 2;
-
     ret = acldvppMalloc(&cropOutputBufferDev, cropOutBufferSize);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("acldvppMalloc cropOutputBufferDev failed ret = %d\n", ret);
         return ret;
     }
 
     ret = aclrtMemset(cropOutputBufferDev, cropOutBufferSize, 128, cropOutBufferSize);
-
-    cropOutputDesc = createDvppPicDesc(cropOutputBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, newInputWidth, newInputHeight,
-                                       cropOutputWidthStride, cropOutputHeightStride, cropOutBufferSize);
-    if (cropOutputDesc == nullptr)
-    {
+    cropOutputDesc = createDvppPicDesc(cropOutputBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, newInputWidth,
+                                       newInputHeight, cropOutputWidthStride, cropOutputHeightStride,
+                                       cropOutBufferSize);
+    if (cropOutputDesc == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("create cropOutputDesc failed\n");
     }
 
+    // 原格式抠图以及长边等比例缩放可以在一个接口中完成
     ret = acldvppVpcCropAsync(dvpp_channel_desc, jpeg_output_desc, cropOutputDesc, cropConfig, stream);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("acldvppVpcCropAsync failed, ret=%d\n", ret);
         return ret;
     }
 
     aclrtSynchronizeStream(stream);
-
     acldvppDestroyRoiConfig(cropConfig);
     cropConfig = nullptr;
 
-    //3.0 dvpp crop and paste
+    // 5 使用vpc裁剪并贴图
     acldvppPicDesc *cropAndPasteOutputDesc = nullptr;
     acldvppRoiConfig *pasteConfig = nullptr;
     uint32_t vpcOutBufferSize = 416 * 416 * 3 / 2;
@@ -598,13 +561,15 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     uint32_t vpcOutputHeightStride = (416 + 1) / 2 * 2;
 
     void *vpcOutBufferDev = (void *)ptr;
-    cropAndPasteOutputDesc = createDvppPicDesc(vpcOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, 416, 416, vpcOutputWidthStride, vpcOutputHeightStride, vpcOutBufferSize);
+    cropAndPasteOutputDesc = createDvppPicDesc(vpcOutBufferDev, PIXEL_FORMAT_YUV_SEMIPLANAR_420, 416, 416,
+                                               vpcOutputWidthStride, vpcOutputHeightStride, vpcOutBufferSize);
     cropConfig = InitCropRoiConfig(newInputWidth, newInputHeight);
+    // 设置贴图区域以及贴图目标区域
     pasteConfig = InitVpcOutConfig(newInputWidth, newInputHeight, 416, 416);
 
-    ret = acldvppVpcCropAndPasteAsync(dvpp_channel_desc, cropOutputDesc, cropAndPasteOutputDesc, cropConfig, pasteConfig, stream);
-    if (ret != ACL_ERROR_NONE)
-    {
+    ret = acldvppVpcCropAndPasteAsync(dvpp_channel_desc, cropOutputDesc, cropAndPasteOutputDesc, cropConfig,
+                                      pasteConfig, stream);
+    if (ret != ACL_ERROR_NONE) {
         LOG("acldvppVpcCropAndPasteAsync failed, ret = %d\n", ret);
         return ret;
     }
@@ -617,36 +582,31 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     gettimeofday(&func_start, NULL);
     ptr += vpcOutBufferSize;
     ret = aclrtSynchronizeStream(stream);
-
-    
     gettimeofday(&func_end, NULL);
     costTime = (func_end.tv_sec - func_start.tv_sec) * 1000000 + (func_end.tv_usec - func_start.tv_usec);
     dvppTime[funcName] += costTime;
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("dvpp invoke failed.ret=%d fileName: %s\n", ret, fileLocation.c_str());
         return ret;
     }
 
     ret = acldvppFree(jpeg_dev_mem_in_ptr);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("jpeg_dev_mem_in_ptr free failed\n");
         return ret;
     }
 
     ret = acldvppFree(jpeg_dev_mem_out_ptr);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("jpeg_dev_mem_out_ptr free failed\n");
     }
 
     ret = acldvppFree(cropOutputBufferDev);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("cropOutBufferDev free failed\n");
     }
 
+    // 6 释放资源
     acldvppDestroyPicDesc(jpeg_output_desc);
     acldvppDestroyPicDesc(cropOutputDesc);
     acldvppDestroyPicDesc(cropAndPasteOutputDesc);
@@ -668,26 +628,21 @@ aclError DvppInitInput(std::vector<std::string> files)
     void *dst;
     aclError ret;
     ret = acldvppMalloc(&dst, cfg.inputInfo[0].size);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Malloc device failed, ret[%d]\n", ret);
         return ret;
     }
 
     aclrtMemset(dst, cfg.inputInfo[0].size, 128, cfg.inputInfo[0].size);
-
     LOG("DvppInitInput dvpp malloc dst size:%d\n", cfg.inputInfo[0].size);
 
     char *ptr = (char *)dst;
     inputDataframe.fileNames.clear();
-
     char tmpChr[256] = {0};
 
-    for (int i = 0; i < files.size(); i++)
-    {   
+    for (int i = 0; i < files.size(); i++) {
         snprintf(tmpChr, sizeof(tmpChr), "%s ", files[i].c_str());
         outFile << tmpChr;
-        //std::string fileLocation = cfg.dataDir + "/" + files[i];
         std::string fileLocation = files[i];
         ret = DVPP_Yolo(fileLocation, ptr);
         inputDataframe.fileNames.push_back(files[i]);
@@ -701,16 +656,14 @@ aclError DvppInitInput(std::vector<std::string> files)
     aclmdlDataset *input = aclmdlCreateDataset();
     aclDataBuffer *inputData = aclCreateDataBuffer((void *)dst, cfg.inputInfo[0].size);
 
-    if (inputData == nullptr)
-    {
+    if (inputData == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("aclCreateDataBuffer failed\n");
         return ret;
     }
 
     ret = aclmdlAddDatasetBuffer(input, inputData);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("ACL_ModelInputDataAdd failed, ret[%d]\n", ret);
         aclmdlDestroyDataset(input);
         return ret;
@@ -726,27 +679,20 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
 
-    if (width % 2 == 0)
-    {
+    if (width % 2 == 0) {
         right = width - 1;
-    }
-    else
-    {
+    } else {
         right = width;
     }
 
-    if (height % 2 == 0)
-    {
+    if (height % 2 == 0) {
         bottom = height - 1;
-    }
-    else
-    {
+    } else {
         bottom = height;
     }
 
     cropConfig = acldvppCreateRoiConfig(0, right, 0, bottom);
-    if (cropConfig == nullptr)
-    {
+    if (cropConfig == nullptr) {
         std::cout << "[ERROR][Vision] acldvppCreateRoiConfig failed " << std::endl;
         return nullptr;
     }
@@ -754,7 +700,8 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     return cropConfig;
 }
 
-acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newInputHeight, uint32_t modelInputWidth, uint32_t modelInputHeight)
+acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newInputHeight, uint32_t modelInputWidth,
+                                          uint32_t modelInputHeight)
 {
     uint32_t left = 0;
     uint32_t right = 0;
@@ -780,9 +727,7 @@ acldvppRoiConfig *InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newIn
     bottom = top + modelInputHeight - 1;
 
     centerCropConfig = acldvppCreateRoiConfig(left, right, top, bottom);
-    //std::cout << "[INFO][Vision] left " << left << " right " << right << " top " << top << " bottom " << bottom << std::endl;
-    if (centerCropConfig == nullptr)
-    {
+    if (centerCropConfig == nullptr) {
         std::cout << "[ERROR][Vision] acldvppCreateRoiConfig failed " << std::endl;
         return nullptr;
     }
@@ -795,8 +740,7 @@ aclError Inference()
     LOG("inference batch %d start\n", processedCnt);
     ret = aclrtSetCurrentContext(context);
 
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Set infer context failed\n");
         return ret;
     }
@@ -804,16 +748,14 @@ aclError Inference()
     struct timeval startTmp, endTmp;
     long long timeUse;
 
-    if (inputDataframe.fileNames.size() == 0)
-    {
+    if (inputDataframe.fileNames.size() == 0) {
         ret = ACL_ERROR_OTHERS;
         LOG("No file found\n");
         return ret;
     }
 
     aclmdlDataset *output = aclmdlCreateDataset();
-    if (output == nullptr)
-    {
+    if (output == nullptr) {
         ret = ACL_ERROR_OTHERS;
         LOG("Create Output Dataset failed\n");
         return ret;
@@ -821,24 +763,20 @@ aclError Inference()
 
     std::vector<void *> outputDevPtrs;
 
-    for (size_t i = 0; i < cfg.outputNum; ++i)
-    {
+    for (size_t i = 0; i < cfg.outputNum; ++i) {
         size_t buffer_size = cfg.outputInfo[i].size;
         void *outputBuffer = nullptr;
         ret = aclrtMalloc(&outputBuffer, (size_t)buffer_size, ACL_MEM_MALLOC_NORMAL_ONLY);
-        //LOG("NN output addr %ld, len %ld ",size_t(outputBuffer), size_t(buffer_size));
 
-        if (ret != ACL_ERROR_NONE)
-        {
+        if (ret != ACL_ERROR_NONE) {
             LOG("Malloc output host failed, ret[%d]\n", ret);
             return ret;
         }
-        //LOG("output%ld: addr %ld, size %ld\n", i, size_t(outputBuffer) , size_t(buffer_size));
+
         outputDevPtrs.push_back(outputBuffer);
         aclDataBuffer *outputData = aclCreateDataBuffer(outputBuffer, buffer_size);
 
-        if (outputData == nullptr)
-        {
+        if (outputData == nullptr) {
             ret = ACL_ERROR_OTHERS;
             LOG("Create output data buffer failed\n");
             return ret;
@@ -846,8 +784,7 @@ aclError Inference()
 
         ret = aclmdlAddDatasetBuffer(output, outputData);
 
-        if (ret != ACL_ERROR_NONE)
-        {
+        if (ret != ACL_ERROR_NONE) {
             LOG("Add output model dataset failed, ret[%d]\n", ret);
             return ret;
         }
@@ -860,8 +797,7 @@ aclError Inference()
     LOG("%s inference time use: %lld us\n", inputDataframe.fileNames[0].c_str(), timeUse);
     inferTime += timeUse;
 
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("%s inference failed.\n", inputDataframe.fileNames[0].c_str());
         FreeDevMemory(inputDataframe.dataset);
         aclmdlDestroyDataset(inputDataframe.dataset);
@@ -870,13 +806,10 @@ aclError Inference()
 
     outputDataframe.fileNames = inputDataframe.fileNames;
     outputDataframe.dataset = output;
-
-    uint32_t dvppFlag;
-    (cfg.useDvpp) ? dvppFlag = 1 : dvppFlag = 0;
+    uint32_t dvppFlag = (cfg.useDvpp) ? 1 : 0;
 
     ret = DestroyDatasetResurce(inputDataframe.dataset, dvppFlag);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("DestroyDatasetResurce failed\n");
         return ret;
     }
@@ -891,23 +824,19 @@ aclError UnloadModel()
     ret = aclmdlUnload(modelId);
     CHECK_ACL_RET("unload model failed", ret);
     LOG("unload model done\n");
+    aclmdlDestroyDesc(cfg.modelDesc)
 
-    aclmdlDestroyDesc(cfg.modelDesc);
-
-    if (nullptr != cfg.devMem_ptr)
-    {
+    if (cfg.devMem_ptr != nullptr) {
         aclrtFree(cfg.devMem_ptr);
         cfg.devMem_ptr = nullptr;
     }
 
-    if (nullptr != cfg.weightMem_ptr)
-    {
+    if (cfg.weightMem_ptr != nullptr) {
         aclrtFree(cfg.weightMem_ptr);
         cfg.weightMem_ptr = nullptr;
     }
 
-    if (nullptr != cfg.modelData_ptr)
-    {
+    if (cfg.modelData_ptr != nullptr) {
         delete[] cfg.modelData_ptr;
         cfg.modelData_ptr = nullptr;
     }

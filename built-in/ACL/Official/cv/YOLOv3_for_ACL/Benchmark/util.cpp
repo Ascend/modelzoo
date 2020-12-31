@@ -52,37 +52,27 @@ std::string CausedBy(aclError error)
 bool FolderExists(std::string foldname)
 {
 	DIR* dir;
-
-	if ((dir = opendir(foldname.c_str())) == NULL)   {
+	if ((dir = opendir(foldname.c_str())) == NULL) {
 		return false;
 	}
-
-       closedir(dir);
-       
+	closedir(dir);
 	return true;
 }
-
 
 bool FileExists(std::string filename)
 {
 	std::fstream file;
 	file.open(filename, std::ios::in);
-
 	if (!file) {
 		return false;
 	}
-	
-       file.close();
+	file.close();
 	return true;
 }
-
-
-
 
 char* ReadBinFile(std::string fileName, uint32_t& fileSize)
 {
 	std::ifstream binFile(fileName, std::ifstream::binary);
-
 	if (binFile.is_open() == false) {
 		LOG("open file[%s] failed\n", fileName.c_str());
 		return nullptr;
@@ -148,21 +138,18 @@ aclError GetFiles(std::string path, std::vector<std::string>& files)
 aclError FreeDevMemory(aclmdlDataset* dataset)
 {
     aclError ret;
-
     for (size_t i = 0; i < aclmdlGetDatasetNumBuffers(dataset); ++i) {
         aclDataBuffer* dataBuffer = aclmdlGetDatasetBuffer(dataset, i);
         void* data = aclGetDataBufferAddr(dataBuffer);
         aclrtFree(data);
         aclDestroyDataBuffer(dataBuffer);
     }
-
 	return ACL_ERROR_NONE;
 }
 
 aclError DestroyDatasetResurce(aclmdlDataset* dataset, uint32_t flag)
 {
     aclError ret = ACL_ERROR_NONE;
-
     if (nullptr == dataset) {
         LOG("dataset == null\n");
         return 1;
@@ -174,26 +161,28 @@ aclError DestroyDatasetResurce(aclmdlDataset* dataset, uint32_t flag)
             LOG("dataBuffer == null\n");
             continue;
         }
-
         void* data = aclGetDataBufferAddr(dataBuffer);
-        if (nullptr != data) {
-            if (1 == flag) {
-                if (i > 0) {
-                    ret = aclrtFree(data);
-                    if (ret != ACL_ERROR_NONE) {
-                        LOG("aclrtFree data failed, ret %d\n", ret);
-                    }
-                } else {
-                    ret = acldvppFree(data);
-                    if (ret != ACL_ERROR_NONE) {
-                        LOG("acldvppFree data failed, ret %d\n", ret);
-                    }
-                }
-            } else {
+        if (data == nullptr) {
+            LOG("aclGetDataBufferAddr failed\n");
+            return ACL_ERROR_NONE;
+        }
+
+        if (flag == 1) {
+            if (i > 0) {
                 ret = aclrtFree(data);
                 if (ret != ACL_ERROR_NONE) {
                     LOG("aclrtFree data failed, ret %d\n", ret);
                 }
+            } else {
+                ret = acldvppFree(data);
+                if (ret != ACL_ERROR_NONE) {
+                    LOG("acldvppFree data failed, ret %d\n", ret);
+                }
+            }
+        } else {
+            ret = aclrtFree(data);
+            if (ret != ACL_ERROR_NONE) {
+                LOG("aclrtFree data failed, ret %d\n", ret);
             }
         }
 
@@ -207,7 +196,6 @@ aclError DestroyDatasetResurce(aclmdlDataset* dataset, uint32_t flag)
     if (ret != ACL_ERROR_NONE) {
         LOG("aclrtFree dataset failed, ret %d\n", ret);
     }
-
     return ret;
 }
 
