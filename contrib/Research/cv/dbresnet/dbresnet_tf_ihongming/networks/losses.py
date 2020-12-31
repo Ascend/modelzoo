@@ -29,16 +29,18 @@ import tensorflow as tf
 import tensorflow.keras as K
 
 
-def balanced_crossentropy_loss(pred, gt, mask, negative_ratio=3.):
+def balanced_crossentropy_loss(pred, gt, mask, topk_mask, negative_ratio=3.):
+    # pred = pred[..., 0]
     positive_mask = (gt * mask)
     negative_mask = ((1 - gt) * mask)
     positive_count = tf.reduce_sum(positive_mask)
-    negative_count = tf.reduce_min([tf.reduce_sum(negative_mask), positive_count * negative_ratio])
+    negative_count = tf.reduce_sum(topk_mask)
+
     loss = K.backend.binary_crossentropy(gt, pred)
     positive_loss = loss * positive_mask
-    negative_loss = loss * negative_mask
-    # negative_loss, _ = tf.math.top_k(tf.reshape(negative_loss, (3276800,)), 10)
-    negative_loss, _ = tf.math.top_k(tf.reshape(negative_loss, (-1,)), 300000)
+    negative_loss = tf.reshape(loss * negative_mask , (-1,))
+    negative_loss = tf.sort(negative_loss, direction='DESCENDING')
+    negative_loss = negative_loss * topk_mask
 
     balanced_loss = (tf.reduce_sum(positive_loss) + tf.reduce_sum(negative_loss)) / (
             positive_count + negative_count + 1e-6)
@@ -47,6 +49,8 @@ def balanced_crossentropy_loss(pred, gt, mask, negative_ratio=3.):
 
 def dice_loss(pred, gt, mask, weights):
     # pred = pred[..., 0]
+    # weights = (weights - tf.reduce_min(weights)) / (tf.reduce_max(weights) - tf.reduce_min(weights) + 1e-6) + 1.
+    # mask = mask * weights
     intersection = tf.reduce_sum(pred * gt * mask)
     union = tf.reduce_sum(pred * mask) + tf.reduce_sum(gt * mask) + 1e-6
     loss = 1 - 2.0 * intersection / union
@@ -60,10 +64,10 @@ def l1_loss(pred, gt, mask):
     return loss
 
 
-def db_loss(binarize_map, threshold_map, thresh_binary,
-            gt_score_maps, gt_threshold_map, gt_score_mask, gt_thresh_mask, alpha=5.0, beta=10.0, ohem_ratio=3.0):
+def db_loss(binarize_map, threshold_map, thresh_binary, gt_score_maps,
+            gt_threshold_map, gt_score_mask, gt_thresh_mask, gt_topk_masks, alpha=5.0, beta=10.0, ohem_ratio=3.0):
     threshold_loss = l1_loss(threshold_map, gt_threshold_map, gt_thresh_mask)
-    binarize_loss, _ = balanced_crossentropy_loss(binarize_map, gt_score_maps, gt_score_mask, negative_ratio=ohem_ratio)
+    binarize_loss, _ = balanced_crossentropy_loss(binarize_map, gt_score_maps, gt_score_mask, gt_topk_masks, negative_ratio=ohem_ratio)
     thresh_binary_loss = dice_loss(thresh_binary, gt_score_maps, gt_score_mask, _)
 
     model_loss = alpha * binarize_loss + beta * threshold_loss + thresh_binary_loss
