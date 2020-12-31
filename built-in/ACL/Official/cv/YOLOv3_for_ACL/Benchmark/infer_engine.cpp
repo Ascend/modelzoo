@@ -824,7 +824,7 @@ aclError UnloadModel()
     ret = aclmdlUnload(modelId);
     CHECK_ACL_RET("unload model failed", ret);
     LOG("unload model done\n");
-    aclmdlDestroyDesc(cfg.modelDesc)
+    aclmdlDestroyDesc(cfg.modelDesc);
 
     if (cfg.devMem_ptr != nullptr) {
         aclrtFree(cfg.devMem_ptr);
