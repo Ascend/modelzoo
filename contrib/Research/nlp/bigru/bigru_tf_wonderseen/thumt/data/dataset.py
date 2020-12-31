@@ -15,23 +15,18 @@ import numpy as np
 from thumt.multiprocess.multiprocess import Pool
 from thumt.parameter_config import data_dir
 
+
 def re_path(path):
     if path.startswith("s3:"):
         return path
     else:
         return os.path.join(data_dir, path)
 
+
 def read_txt(filename):
     with tf.gfile.GFile(filename, "r") as reader:
-        # data = []
-        # for i in range(10000):
-        #     l = reader.readline()
-        #     if l:
-        #         data.append(l.strip())
-        #     else:
-        #         break
-        # return data
         return [l.strip() for l in reader.readlines()]
+
 
 def batch_examples(example, batch_size, max_length, mantissa_bits,
                    shard_multiplier=1, length_multiplier=1, constant=False,
@@ -124,8 +119,8 @@ def multiprocess_dataset(dataset):
     ## Add start or end symbols
     dataset = list(map(
         lambda src, tgt: (
-            src.split()+ [params.eos],
-            [params.bos]+tgt.split()+ [params.eos]
+            src.split() + [params.eos],
+            [params.bos] + tgt.split() + [params.eos]
         ),
         [i[0] for i in dataset],
         [i[1] for i in dataset],
@@ -134,7 +129,7 @@ def multiprocess_dataset(dataset):
     ## Filter the sentences
     dataset = list(filter(
        lambda x:(
-           len(x[0])<=src_max_len and len(x[1])<=tgt_max_len
+           len(x[0]) <= src_max_len and len(x[1]) <= tgt_max_len
        ),
        dataset
        )
@@ -165,8 +160,8 @@ def multiprocess_dataset(dataset):
         lambda src, tgt: {
             "source_length": len(src),
             "target_length": len(tgt),
-            "source": src + [pad_id]*(src_max_len-len(src)) if len(src)<src_max_len else src,
-            "target": tgt + [pad_id]*(tgt_max_len-len(tgt)) if len(tgt)<tgt_max_len else tgt,
+            "source": src + [pad_id] * (src_max_len - len(src)) if len(src) < src_max_len else src,
+            "target": tgt + [pad_id] * (tgt_max_len - len(tgt)) if len(tgt) < tgt_max_len else tgt,
 
         },
         [d[0] for d in dataset],
@@ -174,7 +169,8 @@ def multiprocess_dataset(dataset):
     ))
     return features
 
-def get_training_input(filenames, mparams):
+
+def get_training_input(filenames, mparams, with_bucket=False):
     """ Get input for training stage
 
     :param filenames: A list contains [source_filenames, target_filenames]
@@ -201,7 +197,7 @@ def get_training_input(filenames, mparams):
             dt = list(map(
                     lambda src, tgt: (
                     src.split() + [params.eos],
-                    [params.bos] + tgt.split()+ [params.eos]
+                    [params.bos] + tgt.split() + [params.eos]
                 ),
                 [i[0] for i in dt],
                 [i[1] for i in dt],
@@ -220,7 +216,7 @@ def get_training_input(filenames, mparams):
             dt = list(
                 filter(
                     lambda x:(
-                        len(x[0])<=SEQ_LENGTH and len(x[1])<=DECODE_LENGTH
+                        len(x[0]) <= SEQ_LENGTH and len(x[1]) <= DECODE_LENGTH
                     ),
                     dt
                 )
@@ -244,8 +240,8 @@ def get_training_input(filenames, mparams):
                 lambda src, tgt: {
                     "source_length": len(src),
                     "target_length": len(tgt),
-                 "source": src + [pad_id]*(SEQ_LENGTH-len(src)) if len(src) < SEQ_LENGTH else src,
-                 "target": tgt + [pad_id]*(DECODE_LENGTH-len(tgt)) if len(tgt) < DECODE_LENGTH else tgt,
+                 "source": src + [pad_id] * (SEQ_LENGTH - len(src)) if len(src) < SEQ_LENGTH else src,
+                 "target": tgt + [pad_id] * (DECODE_LENGTH - len(tgt)) if len(tgt) < DECODE_LENGTH else tgt,
                 },
                 [d[0] for d in dt],
                 [d[1] for d in dt],
@@ -259,7 +255,7 @@ def get_training_input(filenames, mparams):
             num_thread = 4
             p = Pool(num_thread)
             slice_num = len(dataset) // (num_thread*100) + 1        
-            dataset = [dataset[i*slice_num:(i+1)*slice_num] for i in range(num_thread*100)]
+            dataset = [dataset[i * slice_num : (i + 1) * slice_num] for i in range(num_thread * 100)]
             features = []
             ## for dt in p.map_async(multiprocess_dataset, dataset).get(): features.extend(dt)
             for dt in p.imap_unordered(multiprocess_dataset, dataset): features.extend(dt)
@@ -272,11 +268,8 @@ def get_training_input(filenames, mparams):
         import random
         random.shuffle(features)
 
-
-
         from_tensor_slice = False # True: from_tensor_slice or False: from_generator
-        if from_tensor_slice:
-        ## from_slices (limited by the graph size)
+        if from_tensor_slice: ## from_slices (limited by the graph size)
             ## colloction
             sources = []
             targets = []
@@ -358,7 +351,8 @@ def get_training_input(filenames, mparams):
                 d = d.shuffle(params.buffer_size).repeat()
 
                 ## if without bucket, directly into a batch-version, else comment out this line
-                d = d.batch(batch_size=batch_size, drop_remainder=True)
+                if not with_bucket:
+                    d = d.batch(batch_size=batch_size, drop_remainder=True)
 
                 iterator = dataset_ops.make_one_shot_iterator(d)
                 itera = iterator.get_next()
@@ -371,7 +365,8 @@ def get_training_input(filenames, mparams):
                 "source_length": source_length_tensor,
                 "target_length": target_length_tensor,
             }
-            return feature_tensor_dict
+            if not with_bucket:
+                return feature_tensor_dict
 
             ## bucket
             features_bucket = batch_examples(feature_tensor_dict, params.batch_size,
@@ -383,6 +378,7 @@ def get_training_input(filenames, mparams):
                                       src_length=SEQ_LENGTH, tgt_length=DECODE_LENGTH)
         
             return features_bucket 
+
 
 def get_training_input_from_generator_without_bucket(filenames, params):
     """ Get input for training stage
@@ -408,8 +404,8 @@ def get_training_input_from_generator_without_bucket(filenames, params):
             ## Split string
             dataset = list(map(
                 lambda src, tgt: (
-                    src.split()+ [params.eos],
-                    [params.bos]+tgt.split()+ [params.eos]
+                    src.split() + [params.eos],
+                    [params.bos] + tgt.split() + [params.eos]
                 ),
                 [i[0] for i in dataset],
                 [i[1] for i in dataset],
@@ -427,7 +423,7 @@ def get_training_input_from_generator_without_bucket(filenames, params):
             # )
             dataset = list(filter(
                     lambda x:(
-                        len(x[0])<=SEQ_LENGTH and len(x[1])<=DECODE_LENGTH
+                        len(x[0]) <= SEQ_LENGTH and len(x[1]) <= DECODE_LENGTH
                     ),
                     dataset
                 )
@@ -452,8 +448,8 @@ def get_training_input_from_generator_without_bucket(filenames, params):
                 lambda src, tgt: {
                     "source_length": np.array(len(src)),
                     "target_length": np.array(len(tgt)),
-                    "source": np.array(src + [pad_id]*(SEQ_LENGTH-len(src)) if len(src)<SEQ_LENGTH else src),
-                    "target": np.array(tgt + [pad_id]*(DECODE_LENGTH-len(tgt)) if len(tgt)<DECODE_LENGTH else tgt),
+                    "source": np.array(src + [pad_id] * (SEQ_LENGTH - len(src)) if len(src) < SEQ_LENGTH else src),
+                    "target": np.array(tgt + [pad_id] * (DECODE_LENGTH - len(tgt)) if len(tgt) < DECODE_LENGTH else tgt),
 
                 },
                 [d[0] for d in dataset],
@@ -514,6 +510,7 @@ def get_training_input_from_generator_without_bucket(filenames, params):
 
         return feature_tensor_dict
 
+
 def get_training_input_from_tensor_slice_without_bucket(filenames, params):
     """ Get input for training stage
 
@@ -537,8 +534,8 @@ def get_training_input_from_tensor_slice_without_bucket(filenames, params):
             ## Split string
             dataset = list(map(
                 lambda src, tgt: (
-                    src.split()+ [params.eos],
-                    [params.bos]+tgt.split()+ [params.eos]
+                    src.split() + [params.eos],
+                    [params.bos] + tgt.split() + [params.eos]
                 ),
                 [i[0] for i in dataset],
                 [i[1] for i in dataset],
@@ -556,7 +553,7 @@ def get_training_input_from_tensor_slice_without_bucket(filenames, params):
             # )
             dataset = list(filter(
                     lambda x:(
-                        len(x[0])<=SEQ_LENGTH and len(x[1])<=DECODE_LENGTH
+                        len(x[0]) <= SEQ_LENGTH and len(x[1]) <= DECODE_LENGTH
                     ),
                     dataset
                 )
@@ -582,8 +579,8 @@ def get_training_input_from_tensor_slice_without_bucket(filenames, params):
                 lambda src, tgt: {
                     "source_length": np.array(len(src)),
                     "target_length": np.array(len(tgt)),
-                    "source": np.array(src + [pad_id]*(SEQ_LENGTH-len(src)) if len(src)<SEQ_LENGTH else src),
-                    "target": np.array(tgt + [pad_id]*(DECODE_LENGTH-len(tgt)) if len(tgt)<DECODE_LENGTH else tgt),
+                    "source": np.array(src + [pad_id] * (SEQ_LENGTH - len(src)) if len(src) < SEQ_LENGTH else src),
+                    "target": np.array(tgt + [pad_id] * (DECODE_LENGTH - len(tgt)) if len(tgt) < DECODE_LENGTH else tgt),
 
                 },
                 [d[0] for d in dataset],
@@ -648,12 +645,8 @@ def get_training_input_from_tensor_slice_without_bucket(filenames, params):
         return input_fn(params)
 
 
-
-
-
 def sort_input_file(filename, reverse=True):
-    # Read file
-    
+    # Read file  
     with tf.gfile.Open(filename) as fd:
         inputs = [line.strip() for line in fd]
 
@@ -703,6 +696,7 @@ def sort_and_zip_files(names):
     return [list(x) for x in zip(*sorted_inputs)]
     '''
 
+
 def get_evaluation_input(inputs, params):
     SEQ_LENGTH = params.eval_encode_length
     DECODE_LENGTH = params.eval_decode_length
@@ -717,8 +711,8 @@ def get_evaluation_input(inputs, params):
         ## Split string
         dataset = list(map(
             lambda src, tgt: (
-                src.split()+ [params.eos],
-                tgt.split()+ [params.eos]
+                src.split() + [params.eos],
+                tgt.split() + [params.eos]
             ),
             [i[0] for i in dataset],
             [i[1] for i in dataset],
@@ -752,8 +746,8 @@ def get_evaluation_input(inputs, params):
         pad_id = params.mapping["source"][params.pad]
         features = list(map(
             lambda src, ref: {
-                "source": src + [pad_id]*(SEQ_LENGTH-len(src)) if len(src) < SEQ_LENGTH else src,
-                "references": [ref + [params.pad]*(DECODE_LENGTH-len(ref)) if len(ref) < DECODE_LENGTH else ref],
+                "source": src + [pad_id] * (SEQ_LENGTH - len(src)) if len(src) < SEQ_LENGTH else src,
+                "references": [ref + [params.pad] * (DECODE_LENGTH - len(ref)) if len(ref) < DECODE_LENGTH else ref],
                 "source_length": len(src),
             },
             [d[0] for d in dataset],
@@ -801,8 +795,3 @@ def get_evaluation_input(inputs, params):
             return iterator
     features = input_fn(params)
     return features
-
-
-
-
-
