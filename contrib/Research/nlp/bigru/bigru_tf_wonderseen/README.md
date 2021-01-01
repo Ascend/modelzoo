@@ -199,3 +199,7 @@ Golden Translation at: msame/golden/references/
 BiGRU Translation at: msame/output_offline/
 BLEU = 26.759709157237165
 ```
+
+## 九、GPU迁移NPU经验
+
+详见：[wiki](https://gitee.com/ascend/modelzoo/wikis/Bi-GRU%E7%9A%84%E7%B2%BE%E5%BA%A6%E4%B8%8E%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB?sort_id=3253417)
