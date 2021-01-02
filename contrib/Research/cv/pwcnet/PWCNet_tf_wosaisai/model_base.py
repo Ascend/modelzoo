@@ -158,7 +158,8 @@ class ModelBase:
         """Creates a default saver to load/save model checkpoints. Override, if necessary.
         """
         if self.mode in ['train_noval', 'train_with_val']:
-            self.saver = BestCheckpointSaver(self.opts['ckpt_dir'], self.name, self.opts['max_to_keep'], maximize=False)
+            # self.saver = BestCheckpointSaver(self.opts['ckpt_dir'], self.name, self.opts['max_to_keep'], maximize=False)
+            self.saver = tf.train.Saver()
         else:
             self.saver = tf.train.Saver()
 
@@ -172,23 +173,24 @@ class ModelBase:
             print("Saving model...")
 
         # save_path = self.saver.save(self.sess, self.opts['ckpt_dir'] + self.name, self.g_step_op)
-        save_path = self.saver.save(ranking_value, self.sess, self.g_step_op)
+        if isinstance(self.saver, tf.train.Saver):
+            save_path = self.saver.save(self.sess, self.opts['ckpt_dir'] + self.name, self.g_step_op)
+        else:
+            save_path = self.saver.save(ranking_value, self.sess, self.g_step_op)
 
         # save ck to obs
-        # if save_path is not None:
-        #     dir = save_path.split('/')[-2]
-        #     name = save_path.split('/')[-1]
-        #     if not mox.file.exists('obs://pwcnet-final/log/{0}'.format(dir)):
-        #         mox.file.make_dirs('obs://pwcnet-final/log/{0}'.format(dir))
-        #     mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-final/log/{0}/{1}.data-00000-of-00001'
-        #                            .format(dir, name))
-        #     mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-final/log/{0}/{1}.meta'.format(dir, name))
-        #     mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-final/log/{0}/{1}.index'.format(dir, name))
-        #
-        #     mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-final/log/{0}/checkpoint'
-        #                            .format(dir))
-        #     mox.file.copy_parallel(save_path[0:-len(name)] + 'best_checkpoints', 'obs://pwcnet-final/log/{0}/best_checkpoints'
-        #                            .format(dir))
+        if save_path is not None:
+            dir = save_path.split('/')[-2]
+            name = save_path.split('/')[-1]
+            if not mox.file.exists('obs://pwcnet-final/log/{0}'.format(dir)):
+                mox.file.make_dirs('obs://pwcnet-final/log/{0}'.format(dir))
+            mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-final/log/{0}/{1}.data-00000-of-00001'
+                                   .format(dir, name))
+            mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-final/log/{0}/{1}.meta'.format(dir, name))
+            mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-final/log/{0}/{1}.index'.format(dir, name))
+
+            mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-final/log/{0}/checkpoint'
+                                   .format(dir))
         # save ck to obs
 
         if self.opts['verbose']:

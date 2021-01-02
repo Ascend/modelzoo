@@ -656,11 +656,13 @@ class ModelPWCNet(ModelBase):
             if self.opts['use_tf_data'] is True:
                 # Create tf.data.Dataset managers
                 train_tf_ds = self.ds.get_tf_ds(batch_size, self.num_gpus, split='train', sess=self.sess)
-                val_tf_ds = self.ds.get_tf_ds(batch_size, self.num_gpus, split='val', sess=self.sess)
+                if val_batch_size > 0:
+                    val_tf_ds = self.ds.get_tf_ds(batch_size, self.num_gpus, split='val', sess=self.sess)
 
                 # Ops for initializing the two different iterators
                 train_next_batch = train_tf_ds.make_one_shot_iterator().get_next()
-                val_next_batch = val_tf_ds.make_one_shot_iterator().get_next()
+                if val_batch_size > 0:
+                    val_next_batch = val_tf_ds.make_one_shot_iterator().get_next()
             # print('>>>>>>>>>>>>>>before while<<<<<<<<<<<<<<<<') #zhangcb debug
             while step < self.opts['max_steps'] + 1:
                 # print('>>>>>>>>>>>>>step = {}<<<<<<<<<<<<'.format(step))

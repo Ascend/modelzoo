@@ -51,7 +51,7 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000',
+parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet-53000',
                     help='the path of checkpoint')
 parser.add_argument('--obs', type=bool, default=True,
                     help='whether copy ckpt from obs')
@@ -67,7 +67,7 @@ _MPISINTEL_ROOT = os.path.join(_DATASET_ROOT, 'MPI-Sintel-complete')
 os.makedirs(_MPISINTEL_ROOT)
 mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
 if args.obs:
-    mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned',
+    mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-2',
                            './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned')
 
 gpu_devices = ['/device:CPU:0']

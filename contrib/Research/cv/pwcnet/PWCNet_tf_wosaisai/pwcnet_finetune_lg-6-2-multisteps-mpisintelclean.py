@@ -53,11 +53,11 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--iterations', type=int, default=200000,
+parser.add_argument('--iterations', type=int, default=100000,
                     help='the training iterations')
-parser.add_argument('--display', type=int, default=1000,
+parser.add_argument('--display', type=int, default=100,
                     help='the interval steps to display loss')
-parser.add_argument('--save_path', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/',
+parser.add_argument('--save_path', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-3/',
                     help='the path to save checkpoint')
 parser.add_argument('--batch_size', type=int, default=4,
                     help='the batch size')
@@ -73,7 +73,7 @@ _MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
 
 os.makedirs(_MPISINTEL_ROOT)
 mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-final/pretrained', './pretrained')
+mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned', './pretrained')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
@@ -88,7 +88,7 @@ ds_opts['batch_size'] = batch_size * len(gpu_devices)  # Use a multiple of 8; he
 ds_opts['crop_preproc'] = (384, 768)  # Crop to a smaller input size
 
 ds_opts['type'] = 'clean'
-ds = MPISintelDataset(mode='train_with_val', ds_root=_MPISINTEL_ROOT, options=ds_opts)
+ds = MPISintelDataset(mode='train_noval', ds_root=_MPISINTEL_ROOT, options=ds_opts)
 
 # Display dataset configuration
 ds.print_config()
@@ -96,7 +96,7 @@ ds.print_config()
 # Start from the default options
 nn_opts = deepcopy(_DEFAULT_PWCNET_FINETUNE_OPTIONS)
 nn_opts['verbose'] = True
-nn_opts['ckpt_path'] = os.path.join('./pretrained', 'pwcnet.ckpt-595000')
+nn_opts['ckpt_path'] = os.path.join('./pretrained', 'pwcnet.ckpt-176000')
 nn_opts['ckpt_dir'] = args.save_path
 nn_opts['batch_size'] = ds_opts['batch_size']
 nn_opts['x_shape'] = [2, ds_opts['crop_preproc'][0], ds_opts['crop_preproc'][1], 3]
@@ -115,22 +115,27 @@ nn_opts['loss_fn'] = 'loss_robust'
 nn_opts['q'] = 0.4
 nn_opts['epsilon'] = 0.01
 
+# nn_opts['loss_fn'] = 'loss_multiscale'
+# nn_opts['q'] = 1.
+# nn_opts['epsilon'] = 0.
+
 # Set the learning rate schedule. This schedule is for a single GPU using a batch size of 8.
 # Below,we adjust the schedule to the size of the batch and the number of GPUs.
 nn_opts['lr_policy'] = 'multisteps'
-nn_opts['lr_boundaries'] = [80000, 120000, 160000, 200000]
-nn_opts['lr_values'] = [1e-4, 5e-05, 2.5e-05, 1.25e-05, 6.25e-06]
-# nn_opts['lr_values'] = [1e-05, 5e-06, 2.5e-06, 1.25e-06, 6.25e-07]
+nn_opts['lr_boundaries'] = [60000, 60000, 80000, 100000]
+# nn_opts['lr_values'] = [1e-4, 5e-05, 2.5e-05, 1.25e-05, 6.25e-06]
+nn_opts['lr_values'] = [1e-05, 5e-06, 2.5e-06, 1.25e-06, 6.25e-07]
 nn_opts['max_steps'] = args.iterations
 nn_opts['display_step'] = args.display
 nn_opts['val_step'] = 1000
+nn_opts['tb_val_imgs'] = None
 
 # Below,we adjust the schedule to the size of the batch and our number of GPUs (2).
 nn_opts['max_steps'] = int(nn_opts['max_steps'] * 4 / ds_opts['batch_size'])
 nn_opts['lr_boundaries'] = [int(boundary * 4 / ds_opts['batch_size']) for boundary in nn_opts['lr_boundaries']]
 
 # Instantiate the model and display the model configuration
-nn = ModelPWCNet(mode='train_with_val', options=nn_opts, dataset=ds)
+nn = ModelPWCNet(mode='train_noval', options=nn_opts, dataset=ds)
 nn.print_config()
 
 # Train the model
