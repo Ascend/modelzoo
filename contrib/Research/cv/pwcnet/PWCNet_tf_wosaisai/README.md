@@ -152,6 +152,8 @@ obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.index
 ### 运行命令
 ####  Reproduce V1 版本
 ```
+sh train_v1.sh
+或者
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
        --iterations 200000
        --display 1000 
@@ -163,6 +165,10 @@ python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
 ```
 
 ####  Reproduce V2 版本
+```
+sh train_v2.sh
+```
+或者
 ##### Step-1 200K iterations
 ```
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
