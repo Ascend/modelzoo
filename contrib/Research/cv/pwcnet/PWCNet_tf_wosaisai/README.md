@@ -16,58 +16,67 @@
     <tr>
         <td></td>
         <td >training clean set</td>
-        <td >test set</td>
-        <td colspan="5">training details</td>
+        <td colspan="6">training details</td>
     </tr>   
     <tr>
         <td></td>
-        <td>Avg. EPE &#8595;</td>
         <td>Avg. EPE &#8595;</td>
         <td>Enviroment</td>
         <td>device </td>
         <td>batch size </td>
         <td>iterations </td>
         <td>lr schedule</td>
+        <td>loss function</td>
     </tr>
     <tr>
         <td>pretrained model</td>
         <td>2.60</td>
-        <td></td>
         <td>TensorFlow, GPU</td>
         <td>2</td>
         <td>16</td>
         <td>600000</td>
         <td>multi-steps</td>
+        <td>loss_multiscale(600K)</td>
     </tr>
     <tr>
         <td>Report in paper</td>
         <td>1.70</td>
-        <td></td>
         <td>Caffe, GPU</td>
         <td>Unknown</td>
         <td>4</td>
         <td>Unknown</td>
         <td>multi-steps</td>
+        <td>loss_robust</td>
     </tr>
     <tr>
         <td>Reproduce on GPU</td>
         <td>1.76</td>
-        <td></td>
         <td>TensorFlow, GPU</td>
         <td>1</td>
         <td>4</td>
         <td>200000</td>
         <td>multi-steps</td>
+        <td>loss_robust(200K)</td>
     </tr>
     <tr>
         <td>Reproduce on Ascend 910</td>
         <td>1.76</td>
-        <td></td>
         <td>ModelArts, Ascend 910</td>
         <td>1</td>
         <td>4</td>
         <td>200000</td>
         <td>multi-steps</td>
+        <td>loss_robust(200K)</td>
+    </tr>
+    <tr>
+        <td>Reproduce on Ascend 910 V2</td>
+        <td>1.25</td>
+        <td>ModelArts, Ascend 910</td>
+        <td>1</td>
+        <td>4</td>
+        <td>200000+60000</td>
+        <td>multi-steps</td>
+        <td>loss_robust(200K)+loss_multiscale(60K)</td>
     </tr>
 </table>
 
@@ -123,8 +132,7 @@ OBS已设置为公共读，不需要手动从OBS中下载数据集和checkpoint�
 --dataset 数据集文件夹路径，数据集将自动从公共读的OBS下载到本地该文件夹下
 ```
 
-### 运行命令
-```
+### 运行命令``
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
        --iterations 200000
        --display 1000 
