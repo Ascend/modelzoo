@@ -46,7 +46,6 @@ from dataset_mpisintel import MPISintelDataset
 
 from model_pwcnet import ModelPWCNet, _DEFAULT_PWCNET_FINETUNE_OPTIONS
 
-import moxing as mox
 import os
 import shutil
 
@@ -57,12 +56,16 @@ parser.add_argument('--iterations', type=int, default=100000,
                     help='the training iterations')
 parser.add_argument('--display', type=int, default=100,
                     help='the interval steps to display loss')
-parser.add_argument('--save_path', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-3/',
+parser.add_argument('--save_path', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/',
                     help='the path to save checkpoint')
 parser.add_argument('--batch_size', type=int, default=4,
                     help='the batch size')
-parser.add_argument('--dataset', type=str, default='/cache/',
+parser.add_argument('--dataset', type=str, default='./dataset/',
                     help='the path of dataset')
+parser.add_argument('--pretrained', type=str, default='./pretrained/pwcnet.ckpt-176000',
+                    help='the path of pretrained model')
+parser.add_argument('--robust', type=bool, default=False,
+                    help='use robust loss')
 parser.add_argument('--data_url', type=str)
 parser.add_argument('--train_url', type=str)
 
@@ -70,10 +73,6 @@ args = parser.parse_args()
 
 _DATASET_ROOT = args.dataset
 _MPISINTEL_ROOT = _DATASET_ROOT + 'MPI-Sintel-complete'
-
-os.makedirs(_MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned', './pretrained')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'
@@ -96,7 +95,7 @@ ds.print_config()
 # Start from the default options
 nn_opts = deepcopy(_DEFAULT_PWCNET_FINETUNE_OPTIONS)
 nn_opts['verbose'] = True
-nn_opts['ckpt_path'] = os.path.join('./pretrained', 'pwcnet.ckpt-176000')
+nn_opts['ckpt_path'] = args.pretrained
 nn_opts['ckpt_dir'] = args.save_path
 nn_opts['batch_size'] = ds_opts['batch_size']
 nn_opts['x_shape'] = [2, ds_opts['crop_preproc'][0], ds_opts['crop_preproc'][1], 3]
@@ -111,13 +110,14 @@ nn_opts['use_res_cx'] = True
 nn_opts['pyr_lvls'] = 6
 nn_opts['flow_pred_lvl'] = 2
 
-nn_opts['loss_fn'] = 'loss_robust'
-nn_opts['q'] = 0.4
-nn_opts['epsilon'] = 0.01
-
-# nn_opts['loss_fn'] = 'loss_multiscale'
-# nn_opts['q'] = 1.
-# nn_opts['epsilon'] = 0.
+if args.robust:
+    nn_opts['loss_fn'] = 'loss_robust'
+    nn_opts['q'] = 0.4
+    nn_opts['epsilon'] = 0.01
+else:
+    nn_opts['loss_fn'] = 'loss_multiscale'
+    nn_opts['q'] = 1.
+    nn_opts['epsilon'] = 0.
 
 # Set the learning rate schedule. This schedule is for a single GPU using a batch size of 8.
 # Below,we adjust the schedule to the size of the batch and the number of GPUs.

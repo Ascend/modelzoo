@@ -44,7 +44,6 @@ from dataset_base import _DEFAULT_DS_VAL_OPTIONS
 from dataset_mpisintel import MPISintelDataset
 from model_pwcnet import ModelPWCNet, _DEFAULT_PWCNET_VAL_OPTIONS
 from visualize import display_img_pairs_w_flows
-import moxing as mox
 import os
 import shutil
 
@@ -53,9 +52,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet-53000',
                     help='the path of checkpoint')
-parser.add_argument('--obs', type=bool, default=True,
-                    help='whether copy ckpt from obs')
-parser.add_argument('--dataset', type=str, default='/cache/')
+parser.add_argument('--dataset', type=str, default='./dataset/')
 parser.add_argument('--data_url', type=str)
 parser.add_argument('--train_url', type=str)
 
@@ -63,12 +60,6 @@ args = parser.parse_args()
 
 _DATASET_ROOT = args.dataset
 _MPISINTEL_ROOT = os.path.join(_DATASET_ROOT, 'MPI-Sintel-complete')
-
-os.makedirs(_MPISINTEL_ROOT)
-mox.file.copy_parallel('obs://pwcnet-final/MPI-Sintel-complete', _MPISINTEL_ROOT)
-if args.obs:
-    mox.file.copy_parallel('obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-2',
-                           './pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned')
 
 gpu_devices = ['/device:CPU:0']
 controller = '/device:CPU:0'

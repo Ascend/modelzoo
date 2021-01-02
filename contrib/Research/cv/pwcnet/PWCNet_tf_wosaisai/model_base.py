@@ -50,8 +50,8 @@ _DEBUG_USE_REF_IMPL = False
 import npu_bridge  # 导入TFAdapter插件库
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 # zhangcb change NPU
-
-import moxing as mox  # obs Lizy
+#
+# import moxing as mox  # obs Lizy
 
 
 class ModelBase:
@@ -178,20 +178,20 @@ class ModelBase:
         else:
             save_path = self.saver.save(ranking_value, self.sess, self.g_step_op)
 
-        # save ck to obs
-        if save_path is not None:
-            dir = save_path.split('/')[-2]
-            name = save_path.split('/')[-1]
-            if not mox.file.exists('obs://pwcnet-final/log/{0}'.format(dir)):
-                mox.file.make_dirs('obs://pwcnet-final/log/{0}'.format(dir))
-            mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-final/log/{0}/{1}.data-00000-of-00001'
-                                   .format(dir, name))
-            mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-final/log/{0}/{1}.meta'.format(dir, name))
-            mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-final/log/{0}/{1}.index'.format(dir, name))
-
-            mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-final/log/{0}/checkpoint'
-                                   .format(dir))
-        # save ck to obs
+        # # save ck to obs
+        # if save_path is not None:
+        #     dir = save_path.split('/')[-2]
+        #     name = save_path.split('/')[-1]
+        #     if not mox.file.exists('obs://pwcnet-final/log/{0}'.format(dir)):
+        #         mox.file.make_dirs('obs://pwcnet-final/log/{0}'.format(dir))
+        #     mox.file.copy_parallel(save_path + '.data-00000-of-00001', 'obs://pwcnet-final/log/{0}/{1}.data-00000-of-00001'
+        #                            .format(dir, name))
+        #     mox.file.copy_parallel(save_path + '.meta', 'obs://pwcnet-final/log/{0}/{1}.meta'.format(dir, name))
+        #     mox.file.copy_parallel(save_path + '.index', 'obs://pwcnet-final/log/{0}/{1}.index'.format(dir, name))
+        #
+        #     mox.file.copy_parallel(save_path[0:-len(name)] + 'checkpoint', 'obs://pwcnet-final/log/{0}/checkpoint'
+        #                            .format(dir))
+        # # save ck to obs
 
         if self.opts['verbose']:
             if save_path is None:
