@@ -59,7 +59,7 @@
         <td>loss_robust(200K)</td>
     </tr>
     <tr>
-        <td>Reproduce on Ascend 910</td>
+        <td>Reproduce on Ascend 910 V1</td>
         <td>1.76</td>
         <td>ModelArts, Ascend 910</td>
         <td>1</td>
@@ -84,7 +84,7 @@
 ## Requirements
 - Tensorflow 1.15.0
 - Ascend 910
-- cv2
+- opencv-python
 - numpy
 - os
 - shutil
@@ -94,33 +94,48 @@
 
 ---
 ## 数据准备
+### 预训练模型
 预训练模型在
 ```
+https://pan.baidu.com/s/1Qzk68OuCQM5-fWwVUfI3Cg 提取码：usks
+
+或者OBS地址：
 obs://pwcnet-final/pretrained/pwcnet.ckpt-595000.index
 obs://pwcnet-final/pretrained/pwcnet.ckpt-595000.meta
 obs://pwcnet-final/pretrained/pwcnet.ckpt-595000.data-00000-of-00001
-obs://pwcnet-final/pretrained/checkpoint
-```  
 
-在MPI Sintel clean training set上，在ModelArts TensorFlow Ascend 910环境下训练好的模型在   
+下载到当前目录./pretrained
+```  
+### 数据集下载
+http://files.is.tue.mpg.de/sintel/MPI-Sintel-complete.zip
+将其解压到当前目录下./dataset/文件夹
+
+### Fintuned 模型
+在MPI Sintel clean training set上，在ModelArts TensorFlow Ascend 910环境下训练好的 V1 模型在   
 ```
+https://pan.baidu.com/s/1l38WF_Syr8zPI5sDtocDTw 提取码: 6vwq  
+
+或者OBS地址：
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.index
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.meta
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
 obs://pwcnet-final/log/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/checkpoint
 ```
+V2模型在
+```
+https://pan.baidu.com/s/1VvU5VRncEKDh08bCbrbsaA 提取码: j5tf 
+```
 
 在GPU上复现的模型在
 ```
+https://pan.baidu.com/s/1jkHmk-qvgsgSMI_QkynOHw 提取码: cu1n
+
+或者OBS地址：
 obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.data-00000-of-00001
 obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.meta
 obs://pwcnet-final/log/gpu-finetuned/checkpoint
 obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.index
 ```
-注意：数据集直接下载后解压，不需要对数据做预处理，
-OBS已设置为公共读，不需要手动从OBS中下载数据集和checkpoint文件，代码中会从OBS中拷贝到本地。
-
-
 
 ## 训练
 ### 参数说明
@@ -129,37 +144,58 @@ OBS已设置为公共读，不需要手动从OBS中下载数据集和checkpoint�
 --display 训练过程中打印loss的迭代间隔数
 --save_path 保存checkpoint的文件夹路径
 --batch_size 训练的batch_size大小
---dataset 数据集文件夹路径，数据集将自动从公共读的OBS下载到本地该文件夹下
+--dataset 数据集文件夹路径
+--pretrained 预训练模型路径
+--robust 布尔值，若为True，训练时使用loss_robust, 否则使用loss_multiscale
 ```
 
-### 运行命令``
+### 运行命令
+####  Reproduce V1 版本
+```
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
        --iterations 200000
        --display 1000 
        --save_path ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/
        --batch_size 4 
-       --dataset /cache/ 
+       --dataset ./dataset/
+       --robust True
+       --pretrained ./pretrained/pwcnet.ckpt-595000
 ```
+
+####  Reproduce V2 版本
+##### Step-1 200K iterations
+```
+python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
+       --iterations 200000
+       --display 1000 
+       --save_path ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/
+       --batch_size 4 
+       --dataset ./dataset/
+       --robust True
+       --pretrained ./pretrained/pwcnet.ckpt-595000
+```
+##### Step-2 60K iterations
+```
+python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
+       --iterations 600000
+       --display 100 
+       --save_path ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-step2/
+       --batch_size 4 
+       --dataset ./dataset/
+       --robust False
+       --pretrained ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000
+```
+
 ## 测试 
 ### 参数说明
 ```
---dataset 数据集文件夹路径，数据集将自动从公共读的OBS下载到本地该文件夹下
+--dataset 数据集文件夹路径
 --ckpt 需要测试的checkpoint的路径
---obs 可选项，如果为True，代码中会自动从公共读的OBS中下载训练好的checkpoint到本地pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned文件夹下，如果需要测试本地的checkpoint，需要把该参数设置为False
 ```
 
 ### 运行命令
-#### 测试OBS中训练好的模型
 ```
 python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
-       --dataset /cache/
-       --ckpt ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned/pwcnet.ckpt-176000
-       --obs True
-```
-#### 测试本地模型
-```
-python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
-       --dataset /cache/
+       --dataset ./dataset/
        --ckpt <local checkpoint path>
-       --obs False
 ```
