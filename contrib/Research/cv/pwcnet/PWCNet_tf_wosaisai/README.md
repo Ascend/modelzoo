@@ -153,7 +153,9 @@ obs://pwcnet-final/log/gpu-finetuned/pwcnet.ckpt-176000.index
 ####  Reproduce V1 版本
 ```
 sh train_v1.sh
+```
 或者
+```
 python pwcnet_finetune_lg-6-2-multisteps-mpisintelclean.py
        --iterations 200000
        --display 1000 
