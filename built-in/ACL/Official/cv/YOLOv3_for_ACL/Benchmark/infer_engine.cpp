@@ -332,7 +332,7 @@ acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t mod
     if (small == width) {
         padded_size_half = (modelInputWidth - width) / NUM_2; // 贴图区域距离左边界的距离
         left = padded_size_half;
-        // 建议用户在贴图的起始坐标距离左边界宽度16对齐，保证目标检测区域相对于原图不发生相对便宜，提高精度
+        // 建议用户在贴图的起始坐标距离左边界宽度16对齐，保证目标检测区域相对于原图不发生相对偏移，提高精度
         left_stride = (left + 15) / 16 * 16;
         right = (left_stride + width) % NUM_2 == 0 ? (left_stride + width - 1) : (left_stride + width);
         if (left_stride + right > modelInputWidth) {
