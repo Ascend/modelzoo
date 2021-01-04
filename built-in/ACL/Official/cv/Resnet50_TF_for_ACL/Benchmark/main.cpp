@@ -272,11 +272,9 @@ void SaveResult()
     outfile << model_name << " ";        
     outfile << processedCnt*cfg.batchSize << " ";
     outfile << cfg.batchSize << " ";
-    if(cfg.postprocessType == "resnet"){
+    if (cfg.postprocessType == "resnet") {
         outfile << 1.0*resnet50Res.top1/resnet50Res.total << " " << 1.0*resnet50Res.top5/resnet50Res.total << " ";
-    }
-    else{
-
+    } else {
         outfile << "NA" << " " << "NA" << " "; 
     }
 
