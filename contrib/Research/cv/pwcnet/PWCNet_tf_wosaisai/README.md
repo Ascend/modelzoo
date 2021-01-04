@@ -210,17 +210,59 @@ python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
 
 ## 离线推理
 ### 1、原始模型转PB模型
-
+```
+python offline_infer/convert_ckpt2pb.py \
+        --ckpt ./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-step2/pwcnet-53000
+```
+--ckpt参数指定需要转换的模型路径，
+转成的PB模型会保存在```offline_infer/pwcnet.pb```  
+我们转换好的PB模型在 https://pan.baidu.com/s/1mOwNu8pTMG2yjQrjZsctrA 提取码: f514
 
 ### 2、PB模型转OM模型
-使用Mind-Studio转换PB模型到OM模型，转换好的OM模型在
-```
-https://pan.baidu.com/s/1kzRSw9XlvVPHU8gt5uQ73g 提取码: 7f48
-```
+使用HECS上的Mind-Studio转换PB模型到OM模型  
+我们转换好的OM模型在 https://pan.baidu.com/s/1y7MdpSfXFc6O9mEZ_hKw_g 提取码: yt3w 
 
 ### 3、数据预处理
+读取数据集中所有图片，对其进行预处理，保存在--output路径下gt和image两个文件夹
+```
+python offline_infer/dataprep.py \
+       --dataset ./datasets/ \
+       --output ./offline_infer/Bin/
+```
+或者从 OBS:// 中下载并解压到```./offline_infer/```目录下
 
 ### 4、准备msame推理工具
+参考[msame](https://gitee.com/ascend/tools/tree/ccl/msame)
 
 ### 5、推理性能精度测试
+#### 推理性能测试
+使用如下命令进行性能测试：
+```
+./msame --model ./pwcnet.om --output ./output/ --loop 100
+```
+测试结果如下：
+```
+[INFO] output data success
+Inference average time: 1205.341410 ms
+Inference average time without first time: 1205.274374 ms
+[INFO] unload model success, model Id is 1
+[INFO] Execute sample success.
+Test Finish!
+```
+Batchsize=1, input shape = [1, 2, 448, 1024, 3], 平均推理时间1205ms
 
+#### 推理精度测试
+使用OM模型推理结果，运行：
+```
+./offline_infer/msame --model ./offline_infer/pwcnet.om --input ./offline_infer/Bin/image/ --output ./offline_infer/Bin/res
+```
+所有的输出会保存在```./offline_infer/Bin/res/```目录下，
+或者从 OBS:// 中下载并解压到该目录下
+
+运行以下命令进行离线推理精度测试
+```
+python offline_infer/evaluation.py \ 
+       --gt_path offline_infer/Bin/gt/ \
+       --output_path pffinline_infer/Bin/res/ 
+```
+离线推理精度EPE=1.25，与在线模型精度一致

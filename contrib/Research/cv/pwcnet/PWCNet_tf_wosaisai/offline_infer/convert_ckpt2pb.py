@@ -29,7 +29,7 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--ckpt', type=str, default='/home/lzyhha/lzy/PWCNet-Huawei/tfoptflow/modelarts-mpisintelclean/finetune-2/pwcnet-53000',
+parser.add_argument('--ckpt', type=str, default='./pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-step2/pwcnet-53000',
                     help='the path of checkpoint')
 parser.add_argument('--data_url', type=str)
 parser.add_argument('--train_url', type=str)
@@ -84,16 +84,16 @@ output = tf.multiply(flow_pred_tnsr, one, name='output')
 with tf.Session() as sess:
     # 保存图，在./pb_model文件夹中生成model.pb文件
     # model.pb文件将作为input_graph给到接下来的freeze_graph函数
-    tf.train.write_graph(sess.graph_def, './', 'model.pb')  # 通过write_graph生成模型文件
+    tf.train.write_graph(sess.graph_def, './offline_infer/', 'model.pb')  # 通过write_graph生成模型文件
     freeze_graph.freeze_graph(
-        input_graph='./model.pb',  # 传入write_graph生成的模型文件
+        input_graph='./offline_infer/model.pb',  # 传入write_graph生成的模型文件
         input_saver='',
         input_binary=False,
         input_checkpoint=ckpt_path,  # 传入训练生成的checkpoint文件
         output_node_names='output',  # 与定义的推理网络输出节点保持一致
         restore_op_name='save/restore_all',
         filename_tensor_name='save/Const:0',
-        output_graph='./pwcnet.pb',  # 改为需要生成的推理网络的名称
+        output_graph='./offline_infer/pwcnet.pb',  # 改为需要生成的推理网络的名称
         clear_devices=False,
         initializer_nodes='')
 print("done")
