@@ -229,7 +229,7 @@ python offline_infer/dataprep.py \
        --dataset ./datasets/ \
        --output ./offline_infer/Bin/
 ```
-或者从 OBS:// 中下载并解压到```./offline_infer/```目录下
+或者从 ```OBS://pwcnet-final/data/Bin.zip``` 下载并解压到```./offline_infer/```目录下
 
 ### 4、准备msame推理工具
 参考[msame](https://gitee.com/ascend/tools/tree/ccl/msame)
@@ -257,7 +257,7 @@ Batchsize=1, input shape = [1, 2, 448, 1024, 3], 平均推理时间1205ms
 ./offline_infer/msame --model ./offline_infer/pwcnet.om --input ./offline_infer/Bin/image/ --output ./offline_infer/Bin/res
 ```
 所有的输出会保存在```./offline_infer/Bin/res/```目录下，
-或者从 OBS:// 中下载并解压到该目录下
+或者从 ```OBS://pwcnet-final/result.zip``` 下载并解压到该目录下
 
 运行以下命令进行离线推理精度测试
 ```
