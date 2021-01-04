@@ -29,7 +29,7 @@ import shutil
 import argparse
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--ckpt', type=str, default='/home/lzyhha/lzy/PWCNet-Huawei/tfoptflow/pwcnet-lg-6-2-multisteps-mpisintelclean-finetuned-single/pwcnet.ckpt-176000',
+parser.add_argument('--ckpt', type=str, default='/home/lzyhha/lzy/PWCNet-Huawei/tfoptflow/modelarts-mpisintelclean/finetune-2/pwcnet-53000',
                     help='the path of checkpoint')
 parser.add_argument('--data_url', type=str)
 parser.add_argument('--train_url', type=str)
