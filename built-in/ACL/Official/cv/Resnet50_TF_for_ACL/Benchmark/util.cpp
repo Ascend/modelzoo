@@ -52,13 +52,10 @@ std::string CausedBy(aclError error)
 bool FolderExists(std::string foldname)
 {
 	DIR* dir;
-
-	if ((dir = opendir(foldname.c_str())) == NULL)   {
+	if ((dir = opendir(foldname.c_str())) == NULL) {
 		return false;
 	}
-
-       closedir(dir);
-       
+	closedir(dir);
 	return true;
 }
 
@@ -66,8 +63,7 @@ void* ReadFile(std::string fileLocation, uint64_t &fileSize)
 {
     aclError ret;
     FILE *pFile = fopen(fileLocation.c_str(), "r");
-    if (pFile == nullptr)
-    {
+    if (pFile == nullptr) {
         LOG("open file %s failed\n", fileLocation.c_str());
         return nullptr;
     }
@@ -77,8 +73,7 @@ void* ReadFile(std::string fileLocation, uint64_t &fileSize)
 
     void *buff = nullptr;
     ret = aclrtMallocHost(&buff, fileSize);
-    if (ret != ACL_ERROR_NONE)
-    {
+    if (ret != ACL_ERROR_NONE) {
         LOG("Malloc host buff failed[%d]\n", ret);
         return nullptr;
     }
@@ -87,22 +82,19 @@ void* ReadFile(std::string fileLocation, uint64_t &fileSize)
     fread(buff, sizeof(char), fileSize, pFile);
     fclose(pFile);
 	return buff;
- }
+}
+
 bool FileExists(std::string filename)
 {
 	std::fstream file;
 	file.open(filename, std::ios::in);
-
 	if (!file) {
 		return false;
 	}
 	
-       file.close();
+	file.close();
 	return true;
 }
-
-
-
 
 char* ReadBinFile(std::string fileName, uint32_t& fileSize)
 {
@@ -173,7 +165,6 @@ aclError GetFiles(std::string path, std::vector<std::string>& files)
 aclError FreeDevMemory(aclmdlDataset* dataset)
 {
     aclError ret;
-
     for (size_t i = 0; i < aclmdlGetDatasetNumBuffers(dataset); ++i) {
         aclDataBuffer* dataBuffer = aclmdlGetDatasetBuffer(dataset, i);
         void* data = aclGetDataBufferAddr(dataBuffer);

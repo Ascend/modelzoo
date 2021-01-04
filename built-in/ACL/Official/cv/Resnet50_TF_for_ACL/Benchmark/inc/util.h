@@ -65,12 +65,6 @@ const int ACL_ERROR_OTHERS = 255;
 		return ret;				\
 	}
 
-
-
-
-
-
-
 bool FolderExists(std::string foldname);
 
 bool FileExists(std::string filename);
@@ -90,8 +84,6 @@ struct DvppConfig {
 	uint32_t resizedHeight;
 	std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> imgSizes;
 };
-
-
 
 struct ModelInfo
 {
@@ -149,8 +141,6 @@ struct Config {
     }
 };
 
-
-
 struct Resnet50Result {
 	int top1;
 	int top5;
@@ -160,10 +150,8 @@ struct Resnet50Result {
 };
 
 struct DataFrame {
-        std::vector<std::string> fileNames;
-        aclmdlDataset* dataset;
+    std::vector<std::string> fileNames;
+    aclmdlDataset* dataset;
 };
-
-
 
 #endif

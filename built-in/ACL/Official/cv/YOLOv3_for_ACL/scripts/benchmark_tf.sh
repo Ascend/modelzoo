@@ -69,11 +69,11 @@ collect_result()
 
     #echo "python3.7 $cur_dir/../script/back_process.py --img_info_path=$cur_dir/../Benchmark/out/img_info --class_name_path=$classNamePath --result_file_path=$cur_dir/../result/$modelType"
     if [[ $useDvpp == 1 ]];then
-        python3.7 $cur_dir/../script/back_process.py --img_info_path=$cur_dir/../Benchmark/out/img_info --class_name_path=$classNamePath --result_file_path=$cur_dir/../results/$modelType --img_conf_path=$imgInfoFile >> $testcase_dir/run.log
+        python3.7 $cur_dir/../scripts/back_process.py --img_info_path=$cur_dir/../Benchmark/out/img_info --class_name_path=$classNamePath --result_file_path=$cur_dir/../results/$modelType --img_conf_path=$imgInfoFile >> $testcase_dir/run.log
     else
-        python3.7 $cur_dir/../script/back_process.py --class_name_path=$classNamePath --result_file_path=$cur_dir/../results/$modelType --img_conf_path=$imgInfoFile >> $testcase_dir/run.log
+        python3.7 $cur_dir/../scripts/back_process.py --class_name_path=$classNamePath --result_file_path=$cur_dir/../results/$modelType --img_conf_path=$imgInfoFile >> $testcase_dir/run.log
     fi
-    python3.7 $cur_dir/../script/eval_coco.py $cur_dir/../Benchmark/out/result.json $trueValuePath >> $testcase_dir/run.log
+    python3.7 $cur_dir/../scripts/eval_coco.py $cur_dir/../Benchmark/out/result.json $trueValuePath >> $testcase_dir/run.log
 
     map=`cat $testcase_dir/run.log |grep 'Average Precision'|grep 'IoU=0.50:0.95'|grep 'area=   all'|awk '{print $13}'`
     echo MAP: $map >> $testcase_dir/precision_results.log

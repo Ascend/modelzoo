@@ -113,9 +113,7 @@ $ complete -o bashdefault -o default -o nospace -C                            \
 #define GFLAGS_COMPLETIONS_H_
 
 namespace google {
-
 extern void HandleCommandLineCompletions(void);
-
 }
 
 #endif  // GFLAGS_COMPLETIONS_H_

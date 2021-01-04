@@ -1,13 +1,14 @@
 #ifndef BENCHMARK_UTIL_H
 #define BENCHMARK_UTIL_H
-#include <string>
-#include <stdio.h>
-#include <sys/time.h>
+
 #include "acl/acl_base.h"
 #include "acl/acl_mdl.h"
 #include "acl/acl_rt.h"
 #include "acl/acl_rt.h"
 #include "acl/ops/acl_dvpp.h"
+#include <string>
+#include <stdio.h>
+#include <sys/time.h>
 #include <iostream>
 #include <vector>
 #include <dirent.h>
@@ -29,14 +30,12 @@ const int ACL_ERROR_OTHERS = 255;
 		printf(fmt, ##args);    \
 	} while(0)
 
-
 #define START_PROC                      \
 	struct timeval start, end;          \
 	long long time_use;                 \
 	do {                                \
 		gettimeofday(&start, NULL);     \
 	} while (0);
-
 
 #define END_PROC                                                                    \
 	do {                                                                            \
@@ -45,13 +44,11 @@ const int ACL_ERROR_OTHERS = 255;
 		LOG("time use: %lld us\n", time_use); 						        \
 	} while (0);
 
-
 #define CHECK_ACL_RET(msg, ret) 																\
 	if (ret != ACL_ERROR_NONE) {																\
 		std::cout << msg << ", ret "<< ret << std::endl;	\
 		return ret;																				\
 	}
-
 
 #define CHECK_WITH_RET(condition, ret, msg)														\
 	if(!(condition)) {																			\
@@ -59,17 +56,10 @@ const int ACL_ERROR_OTHERS = 255;
 		return ret;																				\
 	}
 
-
 #define CHECK_RET(ret)			\
 	if(ret != ACL_ERROR_NONE) {	\
 		return ret;				\
 	}
-
-
-
-
-
-
 
 bool FolderExists(std::string foldname);
 
@@ -83,17 +73,13 @@ aclError FreeDevMemory(aclmdlDataset* dataset);
 
 aclError DestroyDatasetResurce(aclmdlDataset* dataset, uint32_t flag);
 
-
 struct DvppConfig {
 	uint32_t resizedWidth;
 	uint32_t resizedHeight;
 	std::unordered_map<std::string, std::pair<uint32_t, uint32_t>> imgSizes;
 };
 
-
-
-struct ModelInfo
-{
+struct ModelInfo {
     aclFormat Format;
     const char* Name;
     size_t size;
@@ -149,8 +135,6 @@ struct Config {
     }
 };
 
-
-
 struct Resnet50Result {
 	int top1;
 	int top5;
@@ -160,10 +144,8 @@ struct Resnet50Result {
 };
 
 struct DataFrame {
-        std::vector<std::string> fileNames;
-        aclmdlDataset* dataset;
+	std::vector<std::string> fileNames;
+    aclmdlDataset* dataset;
 };
-
-
 
 #endif

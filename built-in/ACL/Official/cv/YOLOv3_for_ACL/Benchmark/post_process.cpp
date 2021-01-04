@@ -27,7 +27,6 @@
 #include <dirent.h> 
 #include <stdarg.h>
 #include <iostream>
-
 #include <unistd.h>
 #include <thread>
 #include <algorithm>
@@ -45,20 +44,16 @@
 #include <sys/errno.h>
 #include <unordered_map>
 
-
 extern int processedCnt;
-
 extern Config cfg;
 extern DataFrame outputDataframe;
 extern aclError ret;
 int topNum = 5;
-
 extern int processedCnt;
 
 aclError SaveBinPostprocess()
 {
     aclError retVal;
-
     LOG("save batch %d start\n", processedCnt);
     DataFrame dataframe = outputDataframe;
     std::vector<std::string>& inferFile_vec = outputDataframe.fileNames;
@@ -66,20 +61,17 @@ aclError SaveBinPostprocess()
 
     std::string resultFolder = cfg.outDir + "/" + cfg.modelType;
     DIR* op = opendir(resultFolder.c_str());
-    if (NULL == op){
+    if (op == NULL) {
         mkdir(resultFolder.c_str(), 00775);
-    }else{
+    } else {
         closedir(op);
     }
 
-    for (size_t i = 0; i < cfg.outputNum; ++i)
-    {        
+    for (size_t i = 0; i < cfg.outputNum; ++i) {
         aclDataBuffer* dataBuffer = aclmdlGetDatasetBuffer(output, i);
         void* data = aclGetDataBufferAddr(dataBuffer);
         uint32_t len;
         len = cfg.outputInfo[i].size;
-        
-        //LOG("output[%d] real data len %d\n", i, len);
         void* outHostData = NULL;
         ret = aclrtMallocHost(&outHostData, len);
         if (ret != ACL_ERROR_NONE) {
@@ -95,8 +87,7 @@ aclError SaveBinPostprocess()
         }
 
         uint32_t eachSize = len / cfg.batchSize;
-        for (size_t j = 0; j < inferFile_vec.size(); j++)
-        {
+        for (size_t j = 0; j < inferFile_vec.size(); j++) {
             FILE* outputFile;
             std::string framename = inferFile_vec[j];
             std::size_t dex = (framename).find_last_of(".");
@@ -104,13 +95,13 @@ aclError SaveBinPostprocess()
             dex = (temp).find_last_of("/");
             std::string inputFileName = (temp).erase(0, dex + 1);
             
-            if (cfg.modelType.compare(0, 6, "resnet") == 0){
+            if (cfg.modelType.compare(0, 6, "resnet") == 0) {
                 outputFile = fopen((resultFolder + "/" + "davinci_" + inputFileName + "_"  + "output" + ".bin").c_str(), "wb");
-            }else{
+            } else {
                 outputFile = fopen((resultFolder + "/" + "davinci_" + inputFileName + "_"  + "output" + std::to_string(i) + ".bin").c_str(), "wb");
             }
             
-            if (NULL == outputFile){
+            if (outputFile == NULL) {
                 aclrtFreeHost(outHostData);
                 return 1;
             }
@@ -126,7 +117,6 @@ aclError SaveBinPostprocess()
     }
     
     (void)DestroyDatasetResurce(outputDataframe.dataset, 0);
-    
     LOG("save batch %d done\n", processedCnt);
     return ACL_ERROR_NONE;
 }
