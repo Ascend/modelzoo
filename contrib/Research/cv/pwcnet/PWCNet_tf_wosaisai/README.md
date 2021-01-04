@@ -207,3 +207,20 @@ python pwcnet_eval_lg-6-2-multisteps-chairsthingsmix_mpisintelclean.py
        --dataset ./dataset/
        --ckpt <local checkpoint path>
 ```
+
+## 离线推理
+### 1、原始模型转PB模型
+
+
+### 2、PB模型转OM模型
+使用Mind-Studio转换PB模型到OM模型，转换好的OM模型在
+```
+https://pan.baidu.com/s/1kzRSw9XlvVPHU8gt5uQ73g 提取码: 7f48
+```
+
+### 3、数据预处理
+
+### 4、准备msame推理工具
+
+### 5、推理性能精度测试
+
