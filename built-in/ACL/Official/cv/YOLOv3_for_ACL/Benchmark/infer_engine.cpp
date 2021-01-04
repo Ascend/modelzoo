@@ -392,8 +392,8 @@ void LargeSizeAtLeast(uint32_t W, uint32_t H, uint32_t &newInputWidth, uint32_t 
              newInputWidth << " inputHeight_: " << H << " newInputHeight_:" << newInputHeight << std::endl;
     } else {
         scaleRatio = resizeMax / H;
-        // 如果高度是长边，建议宽度在等比例缩放后再做一次16对齐，因为vpc在输出时宽有16字节对齐约束，会导致在贴图的时候，当贴图的宽非16对齐时，
-        // 芯片会进行16字节对齐，导致每次写入数据的时候都会引入部分无效数据，导致精度下降。
+        // 如果高度是长边，建议宽度在等比例缩放后再做一次16对齐。因为vpc在输出时宽有16字节对齐约束，当贴图的宽非16对齐时，会导致在贴图的时候，
+        // 芯片会自动进行16字节对齐，导致每次写入数据的时候都会引入部分无效数据，从而导致精度下降。
         newInputWidth = scaleRatio * W;
         newInputWidth = (newInputWidth + 15) / 16 * 16;
         newInputHeight = resizeMax;
