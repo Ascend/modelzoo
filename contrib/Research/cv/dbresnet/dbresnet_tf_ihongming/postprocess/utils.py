@@ -187,29 +187,3 @@ def resize_img(img, max_size=736):
     ratio_w = resize_w / float(w)
 
     return resized_img, (ratio_h, ratio_w)
-
-
-def ckpt2pb(ckptpath):
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-    tf.reset_default_graph()
-    input_images = tf.placeholder(tf.float32, shape=[None, None, None, 3], name='input_images')
-    global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
-
-    binarize_map, threshold_map, thresh_binary = model.dbnet(input_images, is_training=False)
-    # binarize_map, threshold_map, thresh_binary = model.model(input_images, is_training=False)
-
-    variable_averages = tf.train.ExponentialMovingAverage(0.997, global_step)
-    saver = tf.train.Saver(variable_averages.variables_to_restore())
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
-    gpu_config = tf.ConfigProto(log_device_placement=False, gpu_options=gpu_options, allow_soft_placement=True)
-    sess = tf.Session(config=gpu_config)
-    saver.restore(sess, ckptpath)
-
-    from tensorflow.python.framework import graph_util
-    constant_graph = graph_util.convert_variables_to_constants(
-        sess,
-        sess.graph_def,
-        ['feature_fusion/binarize_branch/Conv2d_transpose_1/Sigmoid'])
-
-    with tf.gfile.FastGFile('db.pb', mode='wb') as f:
-        f.write(constant_graph.SerializeToString())

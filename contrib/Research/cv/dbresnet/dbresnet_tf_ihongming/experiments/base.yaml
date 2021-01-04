@@ -1,9 +1,0 @@
-import: []
-package:
-  - 'experiment'
-  #TODO (zx) remove
-  #    - 'structure.model'
-  #    - 'training.learning_rate'
-  - 'data'
-  - 'data.processes'
-define: []

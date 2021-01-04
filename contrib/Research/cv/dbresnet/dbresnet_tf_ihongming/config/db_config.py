@@ -26,28 +26,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-# from easydict import EasyDict as edict
 import easydict
+
 edict = easydict.EasyDict
 
-
 cfg = edict()
-cfg.root = './logs'
+cfg.root = './logs_adam_paperlr'
+cfg.PLATFORM = 'GPU'
 
 cfg.TRAIN = edict()
 cfg.TRAIN.FLAG = True
-#
+
 # 训练
+cfg.TRAIN.VIS_GPU = '0'
 cfg.TRAIN.BATCH_SIZE = 8
-cfg.TRAIN.MAX_STEPS = 10000000
-cfg.TRAIN.LEARNING_RATE = 0.0001
+cfg.TRAIN.MAX_STEPS = 240000
+cfg.TRAIN.LEARNING_RATE = 0.0007
 cfg.TRAIN.LOSS_ALPHA = 1.0
 cfg.TRAIN.LOSS_BETA = 10.0
 
 # 存储目录
-cfg.TRAIN.SAVE_CHECKPOINT_STEPS = 2000
+cfg.TRAIN.SAVE_CHECKPOINT_STEPS = 3000
 cfg.TRAIN.SAVE_SUMMARY_STEPS = 200
 cfg.TRAIN.SAVE_MAX = 1000
+cfg.TRAIN.DATA_DIR = './datasets/total_text'
 cfg.TRAIN.TRAIN_LOGS = os.path.join(cfg.root, 'tf_logs')
 cfg.TRAIN.CHECKPOINTS_OUTPUT_DIR = os.path.join(cfg.root, 'ckpt')
 
@@ -60,18 +62,20 @@ cfg.THRESH_MAX = 0.7
 cfg.TRAIN.IMG_SIZE = 640
 cfg.TRAIN.MIN_TEXT_SIZE = 8
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~super em~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cfg.LR = 'paper_decay'
+cfg.ADAM_DECAY_STEP = 10000
+cfg.ADAM_DECAY_RATE = 0.9
+
 cfg.TRAIN.OPT = 'adam'
 cfg.TRAIN.MOVING_AVERAGE_DECAY = 0.9
 
 cfg.TRAIN.RESTORE = None
-cfg.TRAIN.RESTORE_CKPT_PATH = os.path.join(cfg.root, 'ckpt')
+cfg.TRAIN.RESTORE_CKPT_PATH = os.path.join('./logs_adam_mask', 'ckpt')
+cfg.TRAIN.model_checkpoint_path='./logs_adam_mask/ckpt/DB_resnet_v1_50_sgd_model.ckpt-123000'
 cfg.TRAIN.PRETRAINED_MODEL_PATH = None
 
 cfg.EVAL = edict()
 cfg.EVAL.NUM_READERS = 1
-cfg.EVAL.TEST_STEP = 20
-
 cfg.EVAL.IMG_DIR = './datasets/total_text/test_images'
 cfg.EVAL.LABEL_DIR = './datasets/total_text/test_gts'
 
