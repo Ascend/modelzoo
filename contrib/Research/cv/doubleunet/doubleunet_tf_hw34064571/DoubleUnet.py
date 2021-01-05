@@ -66,7 +66,7 @@ def decoder1(inputs, skip_connections, is_training):
     for i, f in enumerate(num_filters):
         x = nn.upsample(x)
         x = tf.concat([x, skip_connections[i]], axis=-1)
-        x = se_block(x, f, is_training)
+        x = se_block(x, f, is_training=is_training)
 
     return x
 
@@ -77,7 +77,7 @@ def encoder2(inputs, is_training):
     x = inputs
 
     for i, f in enumerate(num_filters):
-        x = se_block(x, f, is_training)
+        x = se_block(x, f, is_training=is_training)
         skip_connections.append(x)
         x = nn.max_pool(x)
 
@@ -91,7 +91,7 @@ def decoder2(x, skip_1, skip_2, is_training):
     for i, f in enumerate(num_filters):
         x = nn.upsample(x)
         x = tf.concat([x, skip_1[i], skip_2[i]], axis=-1)
-        x = se_block(x, f, is_training)
+        x = se_block(x, f, is_training=is_training)
 
     return x
 
