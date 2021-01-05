@@ -5,6 +5,4 @@ python3.7 train.py \
   --smooth_weight 0.05 \
   --ssim_weight 0.15 \
   --icp_weight 0 \
-  --train_steps 1 \
-  --summary_freq 1 \
   --checkpoint_dir ./checkpoints
