@@ -25,6 +25,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
+sys.path.append('..')
 
 from dataset_base import _DEFAULT_DS_VAL_OPTIONS
 from dataset_mpisintel import MPISintelDataset
@@ -36,8 +38,8 @@ from tqdm import tqdm
 import shutil
 
 parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('--dataset', type=str, default='/home/lzyhha/datasets/')
-parser.add_argument('-o', '--output', default='/home/lzyhha/datasets/MPI-Sintel-complete/Bin', help='output path.')
+parser.add_argument('--dataset', type=str, default='./datasets/')
+parser.add_argument('-o', '--output', default='offline_infer/Bin', help='output path.')
 
 args = parser.parse_args()
 
