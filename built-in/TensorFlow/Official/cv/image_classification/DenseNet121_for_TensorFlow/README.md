@@ -1,4 +1,4 @@
-# DenseNet-121 for Tensorflow 
+﻿# DenseNet-121 for Tensorflow 
 
 This repository provides a script and recipe to train the DenseNet-121 model .
 
@@ -10,7 +10,7 @@ This repository provides a script and recipe to train the DenseNet-121 model .
   * [Optimizer](#Optimizer)
 * [Quick start guide](#quick-start-guide)
   * [Prepare the dataset](#Prepare-the-dataset)
-  * [Docker container scene](#Docker container scene)
+  * [Docker container scene](#Docker-container-scene)
   * [Check json](#Check-json)
   * [Key configuration changes](#Key-configuration-changes)
   * [Running the example](#Running-the-example)

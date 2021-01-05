@@ -11,7 +11,7 @@ This repository provides a script and recipe to train the VGG16 model .
   * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
   * [Prepare the dataset](#Prepare-the-dataset)
-  * [Docker container scene](#Docker container scene)
+  * [Docker container scene](#Docker-container-scene)
   * [Check json](#Check-json)
   * [Key configuration changes](#Key-configuration-changes)
   * [Running the example](#Running-the-example)

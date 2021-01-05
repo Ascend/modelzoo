@@ -11,7 +11,7 @@ This repository provides a script and recipe to train the MobileNetv2 model to a
   * [Data augmentation](#Data-augmentation)
 * [Quick start guide](#quick-start-guide)
   * [Prepare the dataset](#Prepare-the-dataset)
-  * [Docker container scene](#Docker container scene)
+  * [Docker container scene](#Docker-container-scene)
   * [Key configuration changes](#Key-configuration-changes)
   * [Check json](#Check-json)
   * [Running the example](#Running-the-example)

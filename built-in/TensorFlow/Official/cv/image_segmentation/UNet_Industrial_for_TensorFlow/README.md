@@ -10,7 +10,7 @@ This repository provides an auto-mix-precision script and recipe to train U-Net 
 * [Default configuration](#Default-configuration)
 * [Quick start guide](#quick-start-guide)
   * [Prepare the dataset](#Prepare-the-dataset)
-  * [Docker container scene](#Docker container scene)
+  * [Docker container scene](#Docker-container-scene)
   * [Pre-compile](#Pre-compile)
   * [Key configuration changes](#Key-configuration-changes)
   * [Modification of OPP operator](#Modification-of-OPP-operator)
