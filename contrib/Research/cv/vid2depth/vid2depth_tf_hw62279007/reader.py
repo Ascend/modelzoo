@@ -182,11 +182,10 @@ class DataReader(object):
       cx = intrinsics[0, 2] - tf.cast(offset_x, dtype=tf.float32)
       cy = intrinsics[1, 2] - tf.cast(offset_y, dtype=tf.float32)
       intrinsics = cls.make_intrinsics_matrix(fx, fy, cx, cy)
+      with npu_scope.without_npu_compile_scope():
+          im, intrinsics = scale_randomly(im, intrinsics)
+          im, intrinsics = crop_randomly(im, intrinsics, out_h, out_w)
       return im, intrinsics
-    with npu_scope.without_npu_compile_scope():
-        im, intrinsics = scale_randomly(im, intrinsics)
-        im, intrinsics = crop_randomly(im, intrinsics, out_h, out_w)
-    return im, intrinsics
 
   def compile_file_list(self, data_dir, split, load_pose=False):
     """Creates a list of input files."""
