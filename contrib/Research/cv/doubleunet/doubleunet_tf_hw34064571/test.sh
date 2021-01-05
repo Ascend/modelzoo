@@ -1,0 +1,1 @@
+python train.py --is_training False
