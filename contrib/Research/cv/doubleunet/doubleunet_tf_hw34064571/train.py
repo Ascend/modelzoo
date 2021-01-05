@@ -4,8 +4,8 @@ import tensorflow.nn as nn
 import numpy as np
 from DoubleUnet import doubleunet
 from Dataset import VOC2012
-# import moxing as mox
-# from npu_bridge.estimator import npu_ops
+import moxing as mox
+from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from tensorflow.python.framework import graph_util
 from tensorflow.python import pywrap_tensorflow
@@ -16,34 +16,34 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
     "data_path", './dataset/',
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_string(
     "output_path", './model/',
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_bool(
     "is_training", True,
     "Whether to run training.")
 flags.DEFINE_integer(
     "class_num", 2,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "img_num", 16,
     "voc2012.train_images.shape[0] ")
 flags.DEFINE_integer(
     "batch_size", 16,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "epochs", 1,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_HEIGHT", 256,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_WIDTH", 320,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_DEPTH", 3,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_float(
     "learning_rate_base", 1e-5,
     "The initial learning rate for GradientDescent.")
