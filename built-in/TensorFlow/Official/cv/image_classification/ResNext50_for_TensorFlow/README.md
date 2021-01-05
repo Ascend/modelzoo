@@ -89,9 +89,9 @@ bash scripts/docker_start.sh
 
 ```
 #!/usr/bin/env bash
-docker_image=$1 \#接受第一个参数作为docker_image
-data_dir=$2 \#接受第二个参数作为训练数据集路径
-model_dir=$3 \#接受第三个参数作为模型执行路径
+docker_image=$1 \   #接受第一个参数作为docker_image
+data_dir=$2 \       #接受第二个参数作为训练数据集路径
+model_dir=$3 \      #接受第三个参数作为模型执行路径
 docker run -it --ipc=host \
         --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
  --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
@@ -100,7 +100,7 @@ docker run -it --ipc=host \
         -v ${model_dir}:${model_dir} \  #模型执行路径
         -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
         -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
-        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \#docker_image为镜像名称
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image为镜像名称
         /bin/bash
 ```
 
