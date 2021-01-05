@@ -167,6 +167,43 @@ python train.py \
   --checkpoint_dir ~/vid2depth/checkpoints
 ```
 
+### Run training on NPU
+
+```shell
+# Train
+python3.7 train.py \
+  --data_dir ./data/kitti_raw_eigen \
+  --seq_length 3 \
+  --reconstr_weight 0.85 \
+  --smooth_weight 0.05 \
+  --ssim_weight 0.15 \
+  --icp_weight 0 \
+  --checkpoint_dir ./checkpoints
+```
+or simplely run the shell script:
+```
+bash train_npu.sh
+```
+Train log of NPU:
+```
+2021-01-05 23:02:19.923832: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:114, total_bytes:4, shape:, tensor_ptr:281459378523712, output281459345860592
+2021-01-05 23:02:19.923878: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:115, total_bytes:4, shape:, tensor_ptr:281459380395072, output281459345830976
+2021-01-05 23:02:19.923893: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:116, total_bytes:4, shape:, tensor_ptr:281459379966976, output281459345862128
+2021-01-05 23:02:19.923905: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:117, total_bytes:4, shape:, tensor_ptr:281459379664064, output281459345829232
+2021-01-05 23:02:19.923918: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:118, total_bytes:4, shape:, tensor_ptr:281459379549120, output281459345745168
+2021-01-05 23:02:19.923947: I tf_adapter/kernels/geop_npu.cc:573] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp15_0[ 134782831us]
+I0105 23:02:20.097224 281473551822864 train.py:169] Epoch: [ 1] [    1/   46] time: 249.73s (249s total) loss: 2.643
+2021-01-05 23:02:21.111948: I tf_adapter/optimizers/get_attr_optimize_pass.cc:64] NpuAttrs job is localhost
+2021-01-05 23:02:21.112550: I tf_adapter/optimizers/get_attr_optimize_pass.cc:128] GetAttrOptimizePass_9 success. [0 ms]
+2021-01-05 23:02:21.112582: I tf_adapter/optimizers/mark_start_node_pass.cc:82] job is localhost Skip the optimizer : MarkStartNodePass.
+2021-01-05 23:02:21.112617: I tf_adapter/optimizers/mark_noneed_optimize_pass.cc:102] mix_compile_mode is True
+2021-01-05 23:02:21.112631: I tf_adapter/optimizers/mark_noneed_optimize_pass.cc:103] iterations_per_loop is 1
+2021-01-05 23:02:21.112690: I tf_adapter/optimizers/om_partition_subgraphs_pass.cc:1763] OMPartition subgraph_17 begin.
+2021-01-05 23:02:21.112702: I tf_adapter/optimizers/om_partition_subgraphs_pass.cc:1764] mix_compile_mode is True
+2021-01-05 23:02:21.112711: I tf_adapter/optimizers/om_partition_subgraphs_pass.cc:1765] iterations_per_loop is 1
+2021-01-05 23:02:21.112750: I tf_adapter/optimizers/om_partition_subgraphs_pass.cc:354] FindNpuSupportCandidates enableDP:0, mix_compile_mode: 1, hasMakeIteratorOp:0, hasIteratorOp:0
+```
+
 ## Reference
 If you find our work useful in your research please consider citing our paper:
 
