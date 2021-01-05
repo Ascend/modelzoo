@@ -48,7 +48,7 @@ flags.DEFINE_float(
     "learning_rate_base", 1e-5,
     "The initial learning rate for GradientDescent.")
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 DATA_CACHE_PATH = FLAGS.data_path
 MODEL_CACHE_PATH = FLAGS.output_path
 
@@ -129,10 +129,10 @@ def main(_):
         train_op = opt.minimize(loss, global_step=global_step)
 
     config = tf.ConfigProto(allow_soft_placement=True)
-    # custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
-    # custom_op.name = "NpuOptimizer"
-    # custom_op.parameter_map["use_off_line"].b = True
-    # config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
