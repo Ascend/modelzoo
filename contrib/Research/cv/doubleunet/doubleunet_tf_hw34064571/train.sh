@@ -1,1 +1,1 @@
-python train.py --is_training True
+python3.7 train.py --is_training=True
