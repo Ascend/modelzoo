@@ -27,10 +27,13 @@ flags.DEFINE_integer(
     "class_num", 2,
     "The config json file corresponding to the pre-trained ALBERT model. ")
 flags.DEFINE_integer(
+    "img_num", 16,
+    "voc2012.train_images.shape[0] ")
+flags.DEFINE_integer(
     "batch_size", 16,
     "The config json file corresponding to the pre-trained ALBERT model. ")
 flags.DEFINE_integer(
-    "epochs", 300,
+    "epochs", 1,
     "The config json file corresponding to the pre-trained ALBERT model. ")
 flags.DEFINE_integer(
     "_HEIGHT", 256,
@@ -147,7 +150,7 @@ def main(_):
 
     if FLAGS.is_training:
         print("Training start....")
-        total_step = int(voc2012.train_images.shape[0] / FLAGS.batch_size)
+        total_step = int(FLAGS.img_num() / FLAGS.batch_size)
         print('train dataset shape:' + str(voc2012.train_images.shape[0]))
         for epoch in range(FLAGS.epochs - pre_epoch):
             voc2012.data_shuffle()
