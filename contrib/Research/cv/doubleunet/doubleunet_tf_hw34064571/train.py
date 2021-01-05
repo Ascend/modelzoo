@@ -150,7 +150,7 @@ def main(_):
 
     if FLAGS.is_training:
         print("Training start....")
-        total_step = int(FLAGS.img_num() / FLAGS.batch_size)
+        total_step = int(FLAGS.img_num / FLAGS.batch_size)
         print('train dataset shape:' + str(voc2012.train_images.shape[0]))
         for epoch in range(FLAGS.epochs - pre_epoch):
             voc2012.data_shuffle()
