@@ -1,0 +1,1219 @@
+{
+  "op": [
+    {
+      "is_support": false,
+      "name": "Merge/MergeSummary",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "MergeSummary"
+    },
+    {
+      "is_support": false,
+      "name": "data_loading/enqueue_paths/DecodeJpeg",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "DecodeJpeg"
+    },
+    {
+      "is_support": false,
+      "name": "data_loading/enqueue_paths/ReaderReadV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ReaderReadV2"
+    },
+    {
+      "is_support": false,
+      "name": "data_loading/enqueue_paths/WholeFileReaderV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "WholeFileReaderV2"
+    },
+    {
+      "is_support": false,
+      "name": "data_loading/load_intrinsics/DecodeCSV",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "DecodeCSV"
+    },
+    {
+      "is_support": false,
+      "name": "data_loading/load_intrinsics/ReaderReadV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ReaderReadV2"
+    },
+    {
+      "is_support": false,
+      "name": "data_loading/load_intrinsics/TextLineReaderV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "TextLineReaderV2"
+    },
+    {
+      "is_support": false,
+      "name": "reconstr_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "rx0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "rx1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "ry0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "ry1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "rz0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "rz1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_depth0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_depth1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_depth2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_disp0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_disp1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_disp2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_disparity0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_disparity1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_disparity2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_image0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_image1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_image2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_ssim_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_ssim_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_ssim_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_ssim_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_mask0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_mask1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_mask1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warp_mask2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warped_image0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warped_image1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warped_image1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale0_warped_image2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_depth0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_depth1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_depth2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_disp0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_disp1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_disp2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_disparity0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_disparity1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_disparity2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_image0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_image1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_image2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_ssim_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_ssim_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_ssim_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_ssim_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_mask0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_mask1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_mask1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warp_mask2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warped_image0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warped_image1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warped_image1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale1_warped_image2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_depth0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_depth1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_depth2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_disp0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_disp1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_disp2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_disparity0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_disparity1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_disparity2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_image0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_image1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_image2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_ssim_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_ssim_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_ssim_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_ssim_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_mask0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_mask1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_mask1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warp_mask2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warped_image0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warped_image1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warped_image1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale2_warped_image2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_depth0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_depth1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_depth2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_disp0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_disp1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_disp2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_disparity0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_disparity1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_disparity2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_image0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_image1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_image2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_ssim_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_ssim_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_ssim_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_ssim_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_error0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_error1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_error1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_error2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_mask0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_mask1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_mask1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warp_mask2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warped_image0-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warped_image1-0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warped_image1-2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "scale3_warped_image2-1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "smooth_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "ssim_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "total_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "tx0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "tx1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "ty0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "ty1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "tz0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    },
+    {
+      "is_support": false,
+      "name": "tz1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "HistogramSummary"
+    }
+  ]
+}
