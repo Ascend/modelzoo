@@ -21,7 +21,7 @@ flags.DEFINE_string(
     "output_path", './model/',
     "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_bool(
-    "is_training", True,
+    "is_training", False,
     "Whether to run training.")
 flags.DEFINE_integer(
     "class_num", 2,
