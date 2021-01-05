@@ -7,6 +7,7 @@
 * [默认配置](#默认配置)
 * [快速上手](#快速上手)
   * [准备数据集](#准备数据集)
+  * [Docker容器场景](#Docker容器场景)
   * [关键配置修改](#关键配置修改)
   * [运行示例](#运行示例)
     * [训练](#训练)
@@ -71,6 +72,45 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
 - 请用户自行准备好数据集，包含训练集和验证集两部分，可选用的数据集包括ImageNet2012，CIFAR10、Flower等。
 - 以ImageNet2012举例，训练集和验证集图片统一放到“data/resnext50/imagenet_TF”目录下。
+
+### Docker容器场景
+
+- 编译镜像
+```bash
+docker build -t ascend-resnext50 .
+```
+
+- 启动容器实例
+```bash
+bash scripts/docker_start.sh
+```
+
+参数说明:
+
+```
+#!/usr/bin/env bash
+docker_image=$1 \#接受第一个参数作为docker_image
+data_dir=$2 \#接受第二个参数作为训练数据集路径
+model_dir=$3 \#接受第三个参数作为模型执行路径
+docker run -it --ipc=host \
+        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
+ --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
+        -v ${data_dir}:${data_dir} \    #训练数据集路径
+        -v ${model_dir}:${model_dir} \  #模型执行路径
+        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
+        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \#docker_image为镜像名称
+        /bin/bash
+```
+
+执行docker_start.sh后带三个参数：
+  - 生成的docker_image
+  - 数据集路径
+  - 模型执行路径
+```bash
+./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
+```
 
 ### 关键配置修改
 
