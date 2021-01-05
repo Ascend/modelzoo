@@ -21,15 +21,13 @@ shufflenetv2
    ├─val
      ├─shard-0000.tfrecords
    └─...
-  ├─pretrained_model 用于存放预训练模型 
-   ├─checkpoint
+  ├─model 用于存放预训练模型和生成的模型，用于验证
+   ├─checkpoint                                #预训练模型
    ├─model.ckpt-1050924.data-00000-of-00001
    ├─model.ckpt-1050924.meta
    ├─model.ckpt-1050924.index
-   └─...
-  ├─model 用于存放生成的模型，用于验证
-   ├─checkpoint
-   ├─model.ckpt-1601408.data-00000-of-00001
+   ├─...
+   ├─model.ckpt-1601408.data-00000-of-00001    #生成的模型
    ├─model.ckpt-1601408.meta
    ├─model.ckpt-1601408.index
    └─...
