@@ -38,7 +38,7 @@ from train_module import Network, Loss, Optimizer
 from utils import log, normalize_images, save_image
 import glob
 from data import load_train_dataset
-import moxing as mox
+
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
@@ -138,11 +138,5 @@ def train_pretrain_generator(FLAGS, logflag):
                                os.path.join(FLAGS.pre_train_checkpoint_dir,
                                             'pre_gen'),
                                global_step=current_iter)
-                    # used in modelarts
-                    # mox.file.copy_parallel(
-                    #     FLAGS.pre_train_checkpoint_dir,
-                    #     "s3://esrgan-ascend/checkpoint/pre_train")
-                    # mox.file.copy_parallel(FLAGS.logdir,
-                    #                        "s3://esrgan-ascend/root_log")
         writer.close()
         log(logflag, 'Pre-train : Process end', 'info')

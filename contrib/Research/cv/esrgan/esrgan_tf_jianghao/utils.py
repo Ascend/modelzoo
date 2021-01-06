@@ -29,7 +29,6 @@
 import logging
 import os
 import glob
-import moxing as mox
 
 import cv2
 import numpy as np

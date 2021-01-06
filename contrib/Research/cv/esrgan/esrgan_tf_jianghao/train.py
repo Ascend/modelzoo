@@ -31,7 +31,6 @@ import gc
 import logging
 import math
 import os
-import moxing as mox
 
 import tensorflow as tf
 from sklearn.utils import shuffle
@@ -149,10 +148,6 @@ def set_logger(FLAGS):
 def main():
     # set flag
     FLAGS = set_flags()
-    print('obs path :', FLAGS.data_url)
-    # used in modelarts
-    # mox.file.copy_parallel(FLAGS.data_url, FLAGS.native_data)
-    print("mox copy files finished")
 
     # set logger
     logflag = set_logger(FLAGS)
@@ -305,8 +300,6 @@ def main():
                                global_step=current_iter)
 
         writer.close()
-        # mox.file.copy_parallel(FLAGS.checkpoint_dir,
-        #                        "s3://esrgan-ascend/data/checkpoint")
         log(logflag, 'Training ESRGAN end', 'info')
         log(logflag, 'Training script end', 'info')
 
