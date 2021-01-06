@@ -343,8 +343,8 @@ def extract_z(MODEL,
     with tf.variable_scope('net'):
         with tf.variable_scope('params') as params:
             pass
-        #x_ph = tf.placeholder(tf.float32,[None,32,32,3]) # backup code4Li
-        x_ph = tf.placeholder(tf.float32,[BATCH_SIZE,32,32,3])
+        x_ph = tf.placeholder(tf.float32,[None,32,32,3]) # backup code4Li
+        #x_ph = tf.placeholder(tf.float32,[BATCH_SIZE,32,32,3])
         net= VQVAE(None,None,BETA,x_ph,K,D,_cifar10_arch,params,False)
 
     init_op = tf.group(tf.global_variables_initializer(),
