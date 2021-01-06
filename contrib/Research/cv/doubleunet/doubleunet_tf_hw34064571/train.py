@@ -27,13 +27,13 @@ flags.DEFINE_integer(
     "class_num", 2,
     "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
-    "img_num", 16,
-    "voc2012.train_images.shape[0] ")
+    "img_num", 2445,
+    "train images number")
 flags.DEFINE_integer(
     "batch_size", 16,
     "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
-    "epochs", 1,
+    "epochs", 300,
     "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_HEIGHT", 256,
