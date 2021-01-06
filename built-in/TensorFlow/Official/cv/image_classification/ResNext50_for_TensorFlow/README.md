@@ -82,7 +82,7 @@ docker build -t ascend-resnext50 .
 
 - 启动容器实例
 ```bash
-bash scripts/docker_start.sh
+bash docker_start.sh
 ```
 
 参数说明:
