@@ -1,6 +1,6 @@
 start_time=`date +%s`
 python3。7  train.py\
---is_training=True  >train.log 2>&1
+--is_training=True --epochs=1 --img_num=16 >train.log 2>&1
 end_time=`date +%s`
 
 #结果判断，功能检查输出ckpt/日志关键字、精度检查loss值/accucy关键字、性能检查耗时打点/ThroughOutput等关键字
