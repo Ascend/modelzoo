@@ -12,7 +12,7 @@
 
 * Tensorflow 1.15.0.
 * Ascend910
-* gym[atari] gym=
+* gym[atari] gym=0.10.5
 
 ## 代码路径解释
 
