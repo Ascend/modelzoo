@@ -1,1 +1,1 @@
-python3.7 train.py --is_training=False
+python3.7 train.py --is_training=False --batch_size=16
