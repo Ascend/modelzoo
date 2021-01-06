@@ -33,7 +33,6 @@ import argparse
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 import os
-import moxing as mox
 parser = argparse.ArgumentParser()
 
 
@@ -53,13 +52,17 @@ parser.add_argument("--data_url", type=str, default="s3://deblur-gan/data")
 parser.add_argument("--native_data", type=str, default="./data")
 parser.add_argument("--train_Sharp_path",
                     type=str,
-                    default="./data/train/sharp")
-parser.add_argument("--train_Blur_path", type=str, default="./data/train/blur")
-parser.add_argument("--vgg_path", type=str, default="./data/vgg19/vgg19.npy")
+                    default="s3://deblurgan/data/tain/sharp")
+parser.add_argument("--train_Blur_path",
+                    type=str,
+                    default="s3://deblurgan/data/train/blur")
+parser.add_argument("--vgg_path",
+                    type=str,
+                    default="s3://deblurgan/pre_train_model/vgg19.npy")
 parser.add_argument("--model_path", type=str, default="./data/model")
 parser.add_argument("--logdir", type=str, default="./data/log")
 
-parser.add_argument("--train_url", type=str, default="s3://deblur-gan/")
+parser.add_argument("--train_url", type=str, default="s3://deblurgan/")
 parser.add_argument("--ext", type=str, default="./png")
 parser.add_argument("--test_Sharp_path", type=str, default="./val_sharp")
 parser.add_argument("--test_Blur_path", type=str, default="./val_blur")
@@ -85,13 +88,15 @@ parser.add_argument("--fine_tuning", type=str2bool, default=False)
 parser.add_argument("--log_freq", type=int, default=1)
 parser.add_argument("--model_save_freq", type=int, default=20)
 parser.add_argument("--test_batch", type=int, default=1)
-parser.add_argument("--pre_trained_model", type=str, default="./")
+parser.add_argument(
+    "--pre_trained_model",
+    type=str,
+    default="s3://deblurgan/pre_train_model/DeblurGAN_last.index")
 parser.add_argument("--chop_forward", type=str2bool, default=False)
 parser.add_argument("--chop_size", type=int, default=8e4)
 parser.add_argument("--chop_shave", type=int, default=16)
 
 args = parser.parse_args()
-# mox.file.copy_parallel(args.data_url, args.native_data)
 
 model = Deblur_Net(args)
 model.build_graph()
@@ -119,4 +124,3 @@ elif args.mode == 'test_only':
     test_only(args, model, sess, saver)
 
 print("model compute finished")
-# mox.file.copy_parallel(args.model_path, os.path.join(args.data_url, 'model'))

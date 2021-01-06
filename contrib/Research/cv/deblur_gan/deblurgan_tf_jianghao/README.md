@@ -129,22 +129,23 @@ python main.py --train_Sharp_path ./GOPRO/path/sharp --train_Blur_path ./GOPRO/p
 
 `passwod : 123456`
 
-2) Deblur your own images
-```
-python main.py --mode test_only --pre_trained_model ./path/to/model --test_Blur_path ./path/to/own/images
-```
-
-3) If you have an out of memory(OOM) error, please use chop_forward option
-```
-python main.py --mode test_only --pre_trained_model ./path/to/model --test_Blur_path ./path/to/own/images --in_memory True --chop_forward True
-```
-
-4) Verify inference results
+2) Verify inference results
 
 To verify the model inference results, please use the evalauation.py script:
 ```
 python evaluation.py --HR_data_dir inference_result
 ```
+
+3) Deblur your own images
+```
+python main.py --mode test_only --pre_trained_model ./path/to/model --test_Blur_path ./path/to/own/images
+```
+
+4) If you have an out of memory(OOM) error, please use chop_forward option
+```
+python main.py --mode test_only --pre_trained_model ./path/to/model --test_Blur_path ./path/to/own/images --in_memory True --chop_forward True
+```
+
 ### 4. Model format conversion
 You can use ckpt2pb script to convert checkpoint to pb format froze model:
 ```

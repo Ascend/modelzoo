@@ -49,17 +49,19 @@ def main():
     ## Data specification
     parser.add_argument("--train_Sharp_path",
                         type=str,
-                        default="./data/train/sharp/")
+                        default="s3://deblurgan/data/sharp/")
     parser.add_argument("--train_Blur_path",
                         type=str,
-                        default="./data/train/blur")
+                        default="s3://deblurgan/data/blur")
     parser.add_argument("--test_Sharp_path",
                         type=str,
-                        default="./data/test/sharp")
+                        default="s3://deblurgan/data/sharp")
     parser.add_argument("--test_Blur_path",
                         type=str,
-                        default="./data/test/blur")
-    parser.add_argument("--vgg_path", type=str, default="./vgg19/vgg19.npy")
+                        default="s3://deblurgan/data/blur")
+    parser.add_argument("--vgg_path",
+                        type=str,
+                        default="s3://deblurgan/pre_train_model/vgg19.npy")
     parser.add_argument("--patch_size", type=int, default=256)
     parser.add_argument("--result_path", type=str, default="./result")
     parser.add_argument("--model_path", type=str, default="./ascend")

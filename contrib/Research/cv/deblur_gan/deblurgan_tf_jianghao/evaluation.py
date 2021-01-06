@@ -275,7 +275,7 @@ def calc_measures(args, calc_psnr=True, calc_ssim=True):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--HR_data_dir', default='./data/test/sharp', type=str)
+    parser.add_argument('--HR_data_dir', default='s3://deblurgan/data/test/sharp', type=str)
     parser.add_argument('--inference_result', default='./result', type=str)
     parser.add_argument('--crop_border', default=0, type=int)
     args = parser.parse_args()
