@@ -12,7 +12,7 @@
 
 * Tensorflow 1.15.0.
 * Ascend910
-* gym[atari]
+* gym[atari] gym=
 
 ## 代码路径解释
 
@@ -32,6 +32,7 @@ A3C
   ├─AcNet.py 核心网络结构
   ├─model.py 模型结构
   ├─workerm.py 每一个线程下工作单元worker结构
+  ├─env.py gym环境预处理
   ├─train.py 启动训练脚本
 ```
 
@@ -40,6 +41,8 @@ A3C
 --output_url 输出模型目录
 
 --log_url 输出日志目录
+
+--seed 环境随机种子
 
 --env_name 测试游戏名称
 
