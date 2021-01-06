@@ -4,7 +4,6 @@ import tensorflow.nn as nn
 import numpy as np
 from DoubleUnet import doubleunet
 from Dataset import VOC2012
-import moxing as mox
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from tensorflow.python.framework import graph_util
