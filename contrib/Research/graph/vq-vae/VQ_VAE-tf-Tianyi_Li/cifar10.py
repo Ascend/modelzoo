@@ -182,7 +182,7 @@ def main(config,
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
     
     sess = tf.Session(config=config)
-    #sess.graph.finalize()
+    #sess.graph.finalize() #结束这个graph,将其设置为只读(read-only).
     sess.run(init_op)
 
     summary_writer = tf.summary.FileWriter(LOG_DIR,sess.graph)
