@@ -4,8 +4,7 @@ import tensorflow.nn as nn
 import numpy as np
 from DoubleUnet import doubleunet
 from Dataset import VOC2012
-# import moxing as mox
-# from npu_bridge.estimator import npu_ops
+from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from tensorflow.python.framework import graph_util
 from tensorflow.python import pywrap_tensorflow
@@ -16,39 +15,39 @@ FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
     "data_path", './dataset/',
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_string(
     "output_path", './model/',
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_bool(
-    "is_training", True,
+    "is_training", False,
     "Whether to run training.")
 flags.DEFINE_integer(
     "class_num", 2,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
-    "img_num", 16,
-    "voc2012.train_images.shape[0] ")
+    "img_num", 2445,
+    "train images number")
 flags.DEFINE_integer(
     "batch_size", 16,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
-    "epochs", 1,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "epochs", 300,
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_HEIGHT", 256,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_WIDTH", 320,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_integer(
     "_DEPTH", 3,
-    "The config json file corresponding to the pre-trained ALBERT model. ")
+    "The config json file corresponding to the pre-trained DoubleUnet model. ")
 flags.DEFINE_float(
     "learning_rate_base", 1e-5,
     "The initial learning rate for GradientDescent.")
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 DATA_CACHE_PATH = FLAGS.data_path
 MODEL_CACHE_PATH = FLAGS.output_path
 
@@ -129,10 +128,10 @@ def main(_):
         train_op = opt.minimize(loss, global_step=global_step)
 
     config = tf.ConfigProto(allow_soft_placement=True)
-    # custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
-    # custom_op.name = "NpuOptimizer"
-    # custom_op.parameter_map["use_off_line"].b = True
-    # config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
