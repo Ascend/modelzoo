@@ -1,5 +1,5 @@
 start_time=`date +%s`
-python3。7  train.py\
+python3.7  train.py\
 --is_training=True --epochs=1 --img_num=16 >train.log 2>&1
 end_time=`date +%s`
 
