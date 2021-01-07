@@ -93,8 +93,8 @@ def training_op( log,label,lrs):
     loss = tf.reduce_mean(cross_entropy, name='loss')
     correct = tf.nn.in_top_k(log, label, 1)
     accuracy = tf.reduce_mean(tf.cast(correct, "float"))
-    optimizer = tf.train.GradientDescentOptimizer(lrs)
-    # optimizer = tf.train.MomentumOptimizer(lrs, 0.9)
+    #optimizer = tf.train.GradientDescentOptimizer(lrs)
+    optimizer = tf.train.MomentumOptimizer(lrs, 0.9)
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
         op = optimizer.minimize(loss)
