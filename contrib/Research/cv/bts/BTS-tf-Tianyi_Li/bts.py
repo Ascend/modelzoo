@@ -372,7 +372,7 @@ class BtsModel(object):
 			dense_features, skips = self.densenet(net_input, reduction=0.5, growth_rate=32,
 												  num_filters=self.num_filters, num_layers=[6, 12, 24, 16],
 												  is_training=self.is_training, reuse=reuse, scope='densenet121')
-
+		
 		with tf.variable_scope('decoder'):
 			with slim.arg_scope([slim.conv2d, slim.conv2d_transpose], activation_fn=tf.nn.elu):
 				self.bts(dense_features, skips, num_filters=256)
@@ -382,7 +382,7 @@ class BtsModel(object):
 			dense_features, skips = self.densenet(net_input, reduction=0.5, growth_rate=48,
 												  num_filters=self.num_filters, num_layers=[6, 12, 36, 24],
 												  is_training=self.is_training, reuse=reuse, scope='densenet161')
-
+        
 		with tf.variable_scope('decoder'):
 			with slim.arg_scope([slim.conv2d, slim.conv2d_transpose], activation_fn=tf.nn.elu):
 				self.bts(dense_features, skips, num_filters=512)
