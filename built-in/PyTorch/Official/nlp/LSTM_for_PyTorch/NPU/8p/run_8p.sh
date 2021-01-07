@@ -39,7 +39,7 @@ fi
 
 if [ $stage -le 2 ]; then
     echo "Step 2: Acoustic Model(CTC) Training..."
-    python3 steps/train_ctc.py \
+    taskset -c 0-128 python3 steps/train_ctc.py \
     --rank 0 \
     --world_size 1 \
     --dist_backend 'hccl' \
