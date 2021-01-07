@@ -8,7 +8,7 @@ STAT_FILE="log.txt"
 export PTCOPY_ENABLE=1
 export TASK_QUEUE_ENABLE=1
 export GLOBAL_LOG_LEVEL=3
-
+export DYNAMIC_OP="ADD#MUL"
 
 python3 train_8p.py $DATA_DIR \
   --arch transformer_wmt_en_de \
