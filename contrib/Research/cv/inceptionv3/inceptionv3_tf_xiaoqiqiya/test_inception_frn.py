@@ -117,7 +117,7 @@ with tf.device("/gpu:1"):
     custom_op.name = "NpuOptimizer"
     custom_op.parameter_map["use_off_line"].b = True  # 在昇腾AI处理器执行训练
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 关闭remap开关
-    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+    sess = tf.Session(config=config)
 
     saver = tf.train.Saver()
     sess.run(tf.global_variables_initializer())
