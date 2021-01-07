@@ -230,8 +230,8 @@ def train(params):
         custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name =  "NpuOptimizer"
         custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
-        custom_op.parameter_map["mix_compile_mode"].b =  True # with npu_scope.without_npu_compile_scope():
+        #custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+        #custom_op.parameter_map["mix_compile_mode"].b =  True # with npu_scope.without_npu_compile_scope():
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
         
         sess = tf.Session(config=config)
