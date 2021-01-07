@@ -252,7 +252,11 @@ class EpochBatchIterator(object):
         self.max_positions_num = max_positions_num
 
         with numpy_seed(self.seed):
-            self.frozen_batches = tuple(self._batch_generator())
+            batches = list(self._batch_generator())
+            size = len(batches)
+            k = size % 8
+            batches = batches[:size-k]
+            self.frozen_batches = tuple(batches)
 
     def __len__(self):
         return len(self.frozen_batches)
