@@ -177,7 +177,7 @@ try:
               print('Epoch %d, step %d,lr %.5f, train loss = %.4f, train accuracy = %.2f%%' %(epoch+1,step+1,cosine_decay(global_step),tra_loss, tra_acc * 100.0))
             if (step + 1) % 10 == 0:
                 checkpoint_path = os.path.join(FLAGS.output_path, "inception_model.ckpt")
-                saver_train.save(sess, checkpoint_path, global_step=epoch)
+                saver_train.save(sess, checkpoint_path)
 except tf.errors.OutOfRangeError:
     print('epoch limit reached')
 finally:
