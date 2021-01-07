@@ -40,7 +40,7 @@ fi
 
 if [ $stage -le 2 ]; then
     echo "Step 2: Acoustic Model(CTC) Training..."
-    python3 steps/train_ctc.py \
+    taskset -c 0-128 python3 steps/train_ctc.py \
     --use_npu True \
     --device_id $device_id \
     --loss_scale 128 \
