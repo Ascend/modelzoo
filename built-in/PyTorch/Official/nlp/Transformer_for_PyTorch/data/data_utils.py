@@ -254,7 +254,7 @@ class EpochBatchIterator(object):
         with numpy_seed(self.seed):
             batches = list(self._batch_generator())
             size = len(batches)
-            k = size % 8
+            k = size % self.num_shards
             batches = batches[:size-k]
             self.frozen_batches = tuple(batches)
 
