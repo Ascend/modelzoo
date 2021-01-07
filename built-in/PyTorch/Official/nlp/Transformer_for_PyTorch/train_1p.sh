@@ -15,7 +15,8 @@ python3 -u train_1p.py \
   --arch transformer_wmt_en_de \
   --share-all-embeddings \
   --optimizer adam \
-  --adam-betas '(0.9, 0.997)' \
+  --adam-beta1 0.9 \
+  --adam-beta2 0.997 \
   --adam-eps "1e-9" \
   --clip-norm 0.0 \
   --lr-scheduler inverse_sqrt \

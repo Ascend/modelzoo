@@ -39,8 +39,10 @@ class SeqAdam(Optimizer):
     @staticmethod
     def add_args(parser):
         """Add optimizer-specific arguments to the parser."""
-        parser.add_argument('--adam-betas', default='(0.9, 0.999)', metavar='B',
-                            help='betas for Adam optimizer')
+        parser.add_argument('--adam-beta1', type=float, default=0.9, metavar='B',
+                            help='beta1 for Adam optimizer')
+        parser.add_argument('--adam-beta2', type=float, default=0.999, metavar='B',
+                            help='beta2 for Adam optimizer')
         parser.add_argument('--adam-eps', type=float, default=1e-8, metavar='D',
                             help='epsilon for Adam optimizer')
 
@@ -54,7 +56,7 @@ class SeqAdam(Optimizer):
         """
         return {
             'lr': self.args.lr[0],
-            'betas': eval(self.args.adam_betas),
+            'betas': (self.args.adam_beta1, self.args.adam_beta2),
             'eps': self.args.adam_eps,
             'weight_decay': self.args.weight_decay,
         }
