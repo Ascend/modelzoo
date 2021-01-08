@@ -1,3 +1,33 @@
+# coding=utf-8
+# Copyright 2018 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# Copyright 2020 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
 import argparse
 import glob
 import os
@@ -128,30 +158,36 @@ def train(args):
 
 def model_trans():
     # 占位转换
-    ckpt_list = glob.glob(
-        "/cache/ckpt_first/model.ckpt-[!0]*.meta*")
+    origin_ckpt_path = "/cache/ckpt_first"
+    placed_ckpt_path = "/cache/ckpt_first/placeholder"
+    pb_path = "/cache/model/resnet_placeholder.pb"
+    match_rule = "model.ckpt-[!0]*.meta*"
+    ckpt_match_path = os.path.join(origin_ckpt_path, match_rule)
+    ckpt_list = glob.glob(ckpt_match_path)
     if not ckpt_list:
         print("ckpt file not generated.")
         return
     ckpt_list.sort(key=lambda fn: os.path.getmtime(fn))
     ckpt_model = ckpt_list[-1].rsplit(".", 1)[0]
-    replace_ckpt_with_placeholder.add_placeholder_on_ckpt(ckpt_model)
+    placeholder_path = os.path.join(placed_ckpt_path,
+                                    ckpt_model.rsplit("/", 1)[1])
+    replace_ckpt_with_placeholder.add_placeholder_on_ckpt(
+        ckpt_model, placeholder_path)
 
     if not os.path.exists(PB_OUTPUT_PATH):
         os.makedirs(PB_OUTPUT_PATH, exist_ok=True)
 
     # 设置模型参数
-    ckpt_list = glob.glob(
-        "/cache/ckpt_first/placeholder/model.ckpt-[!0]*.meta*")
-    if not ckpt_list:
+    placed_match_path = os.path.join(placed_ckpt_path, match_rule)
+    placed_ckpt_list = glob.glob(placed_match_path)
+    if not placed_ckpt_list:
         print("after placeholder, ckpt file not generated.")
         return
-    ckpt_list.sort(key=lambda fn: os.path.getmtime(fn))
-    ckpt = ckpt_list[-1].rsplit(".", 1)[0]
-    output_pb_path = '/cache/model/resnet_placeholder.pb'
+    placed_ckpt_list.sort(key=lambda fn: os.path.getmtime(fn))
+    ckpt = placed_ckpt_list[-1].rsplit(".", 1)[0]
     output_nodes = 'fp32_vars/final_dense'
     model_input = {'meta_file': ckpt,
-                   'output_file': output_pb_path,
+                   'output_file': pb_path,
                    'output_nodes': output_nodes}
     # 转换ckpt模型为pb格式
     frozen_graph.main(model_input)
