@@ -49,14 +49,14 @@ atc --model=./resnet.prototxt --weight=./resnet.caffemodel --framework=0 --outpu
 
 ```
 [INFO] output data success
-Inference average time: 4.538660 ms
-Inference average time without first time: 4.535606 ms
+Inference average time: 1.885420 ms
+Inference average time without first time: 1.884051 ms
 [INFO] unload model success, model Id is 1
 [INFO] Execute sample success.
 Test Finish!
 ```
 
-Batch: 1, shape: 352 * 640 * 3，带AIPP，平均推理性能4.54ms
+Batch: 1, shape: 112 * 112 * 3，带AIPP，平均推理性能1.885420ms
 
 ## 精度测试
 
@@ -64,3 +64,4 @@ Batch: 1, shape: 352 * 640 * 3，带AIPP，平均推理性能4.54ms
 
 推理效果
 
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0108/175929_bd00c702_5400693.png "handwrite.png")
