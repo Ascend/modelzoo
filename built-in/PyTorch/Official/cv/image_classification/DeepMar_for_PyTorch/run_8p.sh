@@ -17,7 +17,7 @@ python3.7 ${currentDir}/transform_peta.py \
 python3.7 ${currentDir}/train_deepmar_resnet50_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --save_dir=/data/peta/ \
-        --workers=80 \
+        --workers=128 \
         --batch_size=2048 \
         --new_params_lr=0.016 \
         --finetuned_params_lr=0.016 \
