@@ -46,9 +46,9 @@ import numpy as np
 import dllogger as DLLogger
 from utils.log_helper import AggregatorBackend, setup_logger
 
-MAX = 2147482647
+MAX = 2147483647
 def _gen_seeds(shape):
-    return np.random.uniform(1, MAX, size = shape).astype(np.float32)
+    return np.random.uniform(1, MAX, size=shape).astype(np.float32)
 seed_shape = (32 * 1024 * 12, )
 
 

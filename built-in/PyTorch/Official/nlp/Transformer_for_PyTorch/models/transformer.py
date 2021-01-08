@@ -320,17 +320,17 @@ class TransformerEncoderLayer(nn.Module):
                               need_weights=False,
                               static_kv=False)
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p =self.dropout)
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.ln1(x)
 
         residual = x
         x = F.threshold(self.fc1(x), 0.0, 0.0)
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p =self.relu_dropout)
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.relu_dropout)
         x = self.fc2(x)
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p =self.dropout)
+            x, _, _ = torch.dropoutV2(x, self.seed, p =self.dropout)
         x = residual + x
         x = self.ln2(x)
         return x
@@ -384,7 +384,7 @@ class TransformerDecoderLayer(nn.Module):
         )
 
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p=self.dropout)
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.self_attn_layer_norm(x)
 
@@ -411,10 +411,10 @@ class TransformerDecoderLayer(nn.Module):
         residual = x
         x = F.threshold(self.fc1(x), 0.0, 0.0)
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p =self.relu_dropout)
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.relu_dropout)
         x = self.fc2(x)
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p =self.dropout)
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.layer_norm(x)
         return x, attn
