@@ -4,6 +4,7 @@ export SLOG_PRINT_TO_STDOUT=0
 export GLOBAL_LOG_LEVEL=3
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
+export DYNAMIC_OP="ADD#MUL"
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
 /usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
 /usr/local/Ascend/driver/tools/msnpureport -e disable
