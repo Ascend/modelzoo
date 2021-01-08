@@ -110,3 +110,5 @@ python    run_wideresnet.py  --model_path ./model_save/wideresnet.ckpt  --data_p
 		tf_data_list.append(os.path.join(filepath,i)) 
 	return tf_data_list  
 以上代码主要功能就是将所有数据集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
+ **offline_inference** 
+[offline_inference](https://gitee.com/xiaoqiqiyaya/modelzoo/blob/master/contrib/Research/cv/wideresnet/wideresnet_tf_xiaoqiqi/offline_inference/README.md)
