@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| Top-1 accuracy | 0.770 | 0.759  |
+| Top-1 accuracy | 0.770 | 0.766  |
 
 ###  Requirements
 
@@ -110,3 +110,4 @@ python    run_resnet.py  --model_path ./model_save/resnet_model.ckpt --data_path
 以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。\
 
  **### offline_inference** 
+[offline_inference readme](https://gitee.com/xiaoqiqiyaya/modelzoo/blob/master/contrib/Research/cv/resnet152/resnet152_tf_xiaoqiqiya/offline_inference/README.md)
