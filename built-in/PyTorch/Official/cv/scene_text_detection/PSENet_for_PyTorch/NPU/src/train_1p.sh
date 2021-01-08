@@ -3,6 +3,7 @@
 export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
+export DYNAMIC_OP="ADD#MUL"
 
 python3.7 -W ignore train_ic15.py \
   --lr 0.001\

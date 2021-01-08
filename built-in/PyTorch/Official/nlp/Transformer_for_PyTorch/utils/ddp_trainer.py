@@ -140,9 +140,6 @@ class DDPTrainer(object):
         # forward and backward pass
         sample, sample_size = self._prepare_sample(sample)
 
-        if sample_size <= 0:
-            return
-
         if sample['target'].size(0) != self.args.max_sentences:
             return
         loss, oom_fwd = self._forward(sample)

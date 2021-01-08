@@ -8,6 +8,7 @@ STAT_FILE="log.txt"
 export PTCOPY_ENABLE=1
 export TASK_QUEUE_ENABLE=1
 export GLOBAL_LOG_LEVEL=3
+export DYNAMIC_OP="ADD#MUL"
 
 python3 -u train_1p.py \
   ./data/dataset/wmt14_en_de_joined_dict/ \
