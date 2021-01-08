@@ -46,6 +46,11 @@ import numpy as np
 import dllogger as DLLogger
 from utils.log_helper import AggregatorBackend, setup_logger
 
+MAX = 2147482647
+def _gen_seeds(shape):
+    return np.random.uniform(1, MAX, size = shape).astype(np.float32)
+seed_shape = (32 * 1024 * 12, )
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -105,7 +110,10 @@ def main(args):
     add_extra_items_to_checkpoint({'src_dict': src_dict, 'tgt_dict': tgt_dict})
     datasets = load_dataset_splits(args, ['train', 'valid', 'test'], src_dict, tgt_dict)
 
-    model = build_model(args)
+    seed = _gen_seeds(seed_shape)
+    seed = torch.from_numpy(seed)
+    seed = seed.to(loc)
+    model = build_model(args, seed=seed)
     print('| num. model params: {}'.format(sum(p.numel() for p in model.parameters())))
 
     # Build trainer

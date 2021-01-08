@@ -81,14 +81,15 @@ class TransformerModel(nn.Module):
                             help='share encoder, decoder and output embeddings'
                                  ' (requires shared dictionary and embed dim)')
 
-    def __init__(self, encoder, decoder):
+    def __init__(self, encoder, decoder, seed=0):
         super().__init__()
         self._is_generation_fast = False
         self.encoder = encoder
         self.decoder = decoder
+        self.seed = seed
 
     @classmethod
-    def build_model(cls, args):
+    def build_model(cls, args, seed):
         # make sure all arguments are present in older models
         base_architecture(args)
 
@@ -113,10 +114,10 @@ class TransformerModel(nn.Module):
             encoder_embed_tokens = Embedding(args.src_vocab_size, args.encoder_embed_dim, args.padding_idx)
             decoder_embed_tokens = Embedding(args.tgt_vocab_size, args.decoder_embed_dim, args.padding_idx)
 
-        encoder = TransformerEncoder(args, encoder_embed_tokens)
-        decoder = TransformerDecoder(args, decoder_embed_tokens)
+        encoder = TransformerEncoder(args, encoder_embed_tokens, seed=seed)
+        decoder = TransformerDecoder(args, decoder_embed_tokens, seed=seed)
 
-        return TransformerModel(encoder, decoder)
+        return TransformerModel(encoder, decoder, seed)
 
     def make_generation_fast_(self, **kwargs):
         """Optimize model for faster generation."""
@@ -156,9 +157,10 @@ class TransformerModel(nn.Module):
 class TransformerEncoder(nn.Module):
     """Transformer encoder."""
 
-    def __init__(self, args, embed_tokens, left_pad=True):
+    def __init__(self, args, embed_tokens, left_pad=True, seed=0):
         super().__init__()
         self.dropout = args.dropout
+        self.seed = seed
 
         embed_dim = embed_tokens.embedding_dim
         self.padding_idx = embed_tokens.padding_idx
@@ -174,7 +176,7 @@ class TransformerEncoder(nn.Module):
 
         self.layers = nn.ModuleList([])
         self.layers.extend([
-            TransformerEncoderLayer(args)
+            TransformerEncoderLayer(args, self.seed)
             for i in range(args.encoder_layers)
         ])
 
@@ -182,7 +184,8 @@ class TransformerEncoder(nn.Module):
         x = self.embed_scale * self.embed_tokens(src_tokens)
         if self.embed_positions is not None:
             x += self.embed_positions(src_tokens)
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        if self.training:
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
 
         # B:batch size ; T: seq length ; C: embedding dim 512
         # B x T x C -> T x B x C
@@ -215,9 +218,10 @@ class TransformerEncoder(nn.Module):
 class TransformerDecoder(IncrementalDecoder):
     """Transformer decoder."""
 
-    def __init__(self, args, embed_tokens, left_pad=False):
+    def __init__(self, args, embed_tokens, left_pad=False, seed=0):
         super().__init__()
         self.dropout = args.dropout
+        self.seed = seed
         self.share_input_output_embed = args.share_decoder_input_output_embed
 
         embed_dim = embed_tokens.embedding_dim
@@ -233,7 +237,7 @@ class TransformerDecoder(IncrementalDecoder):
 
         self.layers = nn.ModuleList([])
         self.layers.extend([
-            TransformerDecoderLayer(args)
+            TransformerDecoderLayer(args, self.seed)
             for _ in range(args.decoder_layers)
         ])
 
@@ -262,7 +266,8 @@ class TransformerDecoder(IncrementalDecoder):
         x = self.embed_scale * self.embed_tokens(prev_output_tokens)
         if positions is not None:
             x += positions
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p=self.dropout)
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
@@ -288,12 +293,14 @@ class TransformerEncoderLayer(nn.Module):
     """Encoder layer block.
     """
 
-    def __init__(self, args):
+    def __init__(self, args, seed=0):
         super().__init__()
+        self.seed = seed
         self.embed_dim = args.encoder_embed_dim
         self.self_attn = MultiheadAttention(
             self.embed_dim, args.encoder_attention_heads,
             dropout=args.attention_dropout,
+            seed = seed
         )
         self.dropout = args.dropout
         self.relu_dropout = args.relu_dropout
@@ -312,15 +319,18 @@ class TransformerEncoderLayer(nn.Module):
                               incremental_state=None,
                               need_weights=False,
                               static_kv=False)
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p =self.dropout)
         x = residual + x
         x = self.ln1(x)
 
         residual = x
         x = F.threshold(self.fc1(x), 0.0, 0.0)
-        x = F.dropout(x, p=self.relu_dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p =self.relu_dropout)
         x = self.fc2(x)
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p =self.dropout)
         x = residual + x
         x = self.ln2(x)
         return x
@@ -329,12 +339,14 @@ class TransformerEncoderLayer(nn.Module):
 class TransformerDecoderLayer(nn.Module):
     """Decoder layer block."""
 
-    def __init__(self, args):
+    def __init__(self, args, seed=0):
         super().__init__()
+        self.seed = seed
         self.embed_dim = args.decoder_embed_dim
         self.self_attn = MultiheadAttention(
             self.embed_dim, args.decoder_attention_heads,
             dropout=args.attention_dropout,
+            seed = seed
         )
         self.dropout = args.dropout
         self.relu_dropout = args.relu_dropout
@@ -343,6 +355,7 @@ class TransformerDecoderLayer(nn.Module):
         self.encoder_attn = MultiheadAttention(
             self.embed_dim, args.decoder_attention_heads,
             dropout=args.attention_dropout,
+            seed = seed
         )
         self.encoder_attn_layer_norm = nn.LayerNorm(self.embed_dim)
 
@@ -370,7 +383,8 @@ class TransformerDecoderLayer(nn.Module):
             static_kv=False
         )
 
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.self_attn_layer_norm(x)
 
@@ -388,18 +402,19 @@ class TransformerDecoderLayer(nn.Module):
                 mask_future_timesteps=False,
                 need_weights=(not self.training and self.need_attn),
             )
-
-            x = F.dropout(x, p=self.dropout, training=self.training)
+            if self.training:
+                x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
             x = residual + x
 
             x = self.encoder_attn_layer_norm(x)
 
         residual = x
         x = F.threshold(self.fc1(x), 0.0, 0.0)
-        x = F.dropout(x, p=self.relu_dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p =self.relu_dropout)
         x = self.fc2(x)
-
-        x = F.dropout(x, p=self.dropout, training=self.training)
+        if self.training:
+            x,_,_ = torch.dropoutV2(x, self.seed, p =self.dropout)
         x = residual + x
         x = self.layer_norm(x)
         return x, attn

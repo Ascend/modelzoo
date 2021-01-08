@@ -48,6 +48,12 @@ import dllogger as DLLogger
 from utils.log_helper import AggregatorBackend, setup_logger
 
 
+MAX = 2147482647
+def _gen_seeds(shape):
+    return np.random.uniform(1, MAX, size = shape).astype(np.float32)
+seed_shape = (32 * 1024 * 12, )
+
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -117,7 +123,11 @@ def main_worker(pid_idx, device_nums_per_node, args):
     src_dict, tgt_dict = data_utils.load_dictionaries(args)
     add_extra_items_to_checkpoint({'src_dict': src_dict, 'tgt_dict': tgt_dict})
     datasets = load_dataset_splits(args, ['train', 'valid', 'test'], src_dict, tgt_dict)
-    model = build_model(args)
+
+    seed = _gen_seeds(seed_shape)
+    seed = torch.from_numpy(seed)
+    seed = seed.to(loc)
+    model = build_model(args, seed=seed)
     if args.distributed_world_size > 1 and args.distributed_rank == 0:
         print('| num. model params: {}'.format(sum(p.numel() for p in model.parameters())))
 
@@ -228,16 +238,16 @@ def train(args, trainer, datasets, epoch_itr):
             if loss != None:
                 losses.update(loss)
 
-        if i >= 10:
+        if i >= 2:
             t = time.time()
             batch_time.update((t - end)/update_freq)
             sentence_s.update(args.max_sentences/(t-end)*args.distributed_world_size)
             end = time.time()
-        if i < 10:
+        if i < 2:
             end = time.time()
-        if i >= 10:
+        if i >= 2:
             if args.distributed_world_size > 1 and args.distributed_rank == 0:
-                progress.display(int((i+1)/update_freq) - 1)
+                progress.display(int((i+1)/update_freq))
 
 
         # ignore the first mini-batch in words-per-second calculation
@@ -263,9 +273,10 @@ def train(args, trainer, datasets, epoch_itr):
             break
 
     if args.distributed_world_size > 1 and args.distributed_rank == 0:
-        print("End of epoch, batch_size:", args.max_sentences, 'Time: {:.3f}'.format(batch_time.avg),
-              ' Sentence/s@all {:.3f}'.format(
-                  args.max_sentences / batch_time.avg * args.distributed_world_size))
+        if batch_time.avg > 0:
+            print("End of epoch, batch_size:", args.max_sentences, 'Time: {:.3f}'.format(batch_time.avg),
+                  ' Sentence/s@all {:.3f}'.format(
+                      args.max_sentences / batch_time.avg * args.distributed_world_size))
 
     # Print epoch stats and reset training meters
     if args.distributed_world_size > 1 and args.distributed_rank == 0:
