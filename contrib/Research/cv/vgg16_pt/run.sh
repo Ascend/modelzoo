@@ -1,1 +1,0 @@
-python3.7 ./main.py  --workers 16 --lr 0.01 --amp --opt-level 'O2' --loss-scale-value 1024  --momentum 0.9 --batch-size 256 --weight-decay 1e-4 --epochs 150 --print-freq 10  --eval-freq 3 --device 'npu:0' --data /home/data/imagenet
