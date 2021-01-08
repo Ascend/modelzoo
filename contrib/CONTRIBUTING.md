@@ -91,7 +91,7 @@ Ascend ModelZoo，欢迎各位开发者
     #
     # Copyright (c) 2017 xxxx
     # All rights reserved.
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Redistribution and use in source and binary forms, with or without
     # modification, are permitted provided that the following conditions are met:
@@ -126,7 +126,7 @@ Ascend ModelZoo，欢迎各位开发者
 
     2、基于PyTorch框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明
      ```
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Licensed under the BSD 3-Clause License  (the "License");
     # you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ Ascend ModelZoo，欢迎各位开发者
 
     2、迁移或开发场景下MindSpore/ACL模型，需要在模型目录下每个源文件中添加区华为公司Apache 2.0 License头部声明
      ```
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
