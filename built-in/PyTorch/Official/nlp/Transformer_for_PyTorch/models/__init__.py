@@ -15,8 +15,8 @@ ARCH_MODEL_REGISTRY = {}
 ARCH_CONFIG_REGISTRY = {}
 
 
-def build_model(args):
-    return ARCH_MODEL_REGISTRY[args.arch].build_model(args)
+def build_model(args, seed):
+    return ARCH_MODEL_REGISTRY[args.arch].build_model(args, seed)
 
 
 def register_model(name):
