@@ -144,8 +144,7 @@ def main():
         f = open(os.path.join(log_url, "log.txt"), 'a')
         for item in LOG:
             (name, G_EP, ep_r, Score, frames_local, frames, t) = item
-            t = t-T0
-            f.write(name + "  " + str(G_EP) + " " + str(ep_r) + "  " + str(Score) + "  " + str(frames_local) + " " + str(frames) + "  "+ str(t) + "\n")
+            f.write("Worker Name: %s, Episode: %d, Local Frames: %d, Total Frames: %d, Local Score: %d, Total Score: %.2f, Time: %.2f \n" % (name, G_EP, frames_local, frames, ep_r, Score, t))
         f.close()
         
         var_list = tf.trainable_variables()
