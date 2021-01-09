@@ -95,7 +95,6 @@ class Worker(object):
             frame_local = 0
             while True:
                 
-                
                 FRAME_TOTAL += 1
                 frames += 1
                 frame_local += 1
@@ -152,7 +151,8 @@ class Worker(object):
                     
                     log = (self.name, GLOBAL_EP, ep_r, GLOBAL_RUNNING_R[-1], frame_local, frames, time.time()-self.T0)
                     LOG.append(log)
-                    print(log)
+                    Str = "Worker Name: %s, Episode: %d, Local Frames: %d, Total Frames: %d, Local Score: %d, Total Score: %.2f, Time: %.2f" % (self.name, GLOBAL_EP, frame_local, frames, ep_r, GLOBAL_RUNNING_R[-1], time.time()-self.T0)
+                    print(Str)
                     GLOBAL_EP += 1
                     break
 
