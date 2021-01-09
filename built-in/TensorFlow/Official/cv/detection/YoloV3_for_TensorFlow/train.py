@@ -46,12 +46,32 @@ parser.add_argument("--mode", type=str, default='single',
                     help="setting train mode of training.")
 parser.add_argument("--resume", type=bool, default=False,
                     help="setting if train from resume.")
+parser.add_argument("--data_url", default='/cache/data_url',
+                    help="setting dir of training data.")
+parser.add_argument("--train_url", default='/cache/training',
+                    help="setting dir of training output.")
 args_input = parser.parse_args()
 
 if args_input.mode == 'single':
     import args_single as args
 elif args_input.mode == 'multi':
     import args_multi as args
+elif args_input.mode == 'modelarts_single':
+    import moxing as mox
+    import modelarts.frozen_graph as fg
+    import modelarts.args_modelarts_single as args
+elif args_input.mode == 'modelarts_multi':
+    import moxing as mox
+    import modelarts.frozen_graph as fg
+    import modelarts.args_modelarts_multi as args
+
+if args_input.mode == 'modelarts_single' or args_input.mode == 'modelarts_multi':
+    real_path = '/cache/data_url'
+    if not os.path.exists(real_path):
+        os.makedirs(real_path)
+    mox.file.copy_parallel(args_input.data_url, real_path)
+    print('training data finish copy to %s.' % real_path)
+
 print('setting train mode %s.' % args_input.mode)
 
 # setting loggers
@@ -88,12 +108,12 @@ def valid_shape(*x):
     gt_box = [gt_box_13, gt_box_26, gt_box_52]
 
     # npu modified
-    if args_input.mode == 'single':
+    if args_input.mode == 'single' or args_input.mode == 'modelarts_single':
         image.set_shape([args.batch_size, args.img_size[0], args.img_size[1], 3])
         y_true[0].set_shape([args.batch_size, 13, 13, 3, args.class_num + 5 + 1])
         y_true[1].set_shape([args.batch_size, 26, 26, 3, args.class_num + 5 + 1])
         y_true[2].set_shape([args.batch_size, 52, 52, 3, args.class_num + 5 + 1])
-    elif args_input.mode == 'multi':
+    elif args_input.mode == 'multi' or args_input.mode == 'modelarts_multi':
         image.set_shape([args.batch_size, args.img_size[0], args.img_size[1], 3])
         y_true[0].set_shape([args.batch_size, 19 * 1, 19 * 1, 3, args.class_num + 5 + 1])
         y_true[1].set_shape([args.batch_size, 19 * 2, 19 * 2, 3, args.class_num + 5 + 1])
@@ -267,3 +287,13 @@ with tf.Session(config=config) as sess:
         int(__global_step),
         loss_total.average,
         __lr))
+
+if args_input.mode == 'modelarts_single' or args_input.mode == 'modelarts_multi':
+    model_args = {}
+    model_args['ckpt_path'] = os.path.join(args.save_dir, 'model-final_step_{}_loss_{:.4f}_lr_{:.5g}'.format(
+        int(__global_step), loss_total.average, __lr))
+    model_args['anchor_path'] = args.anchor_path
+    model_args['class_name_path'] = args.class_name_path
+    fg.freeze_graph_def(**model_args)
+    # model copy to train_url
+    mox.file.copy_parallel('/cache/training/', args_input.train_url)
