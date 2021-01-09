@@ -34,6 +34,7 @@ A3C
   ├─workerm.py 每一个线程下工作单元worker结构
   ├─env.py gym环境预处理
   ├─train.py 启动训练脚本
+  ├─train_testcase.sh 自测试用例
 ```
 
 ## 参数解释
