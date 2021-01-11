@@ -114,8 +114,8 @@ We added graphsage/frozen_graph.py for the transformation from ckpt to pb.
 
 #### 5.2. How to run?
 To run this code, to the following two steps. 
-##### 1 . change the last line of scripts/run_npu_supervised_wrapper.sh, change '''graphsage/supervised_train.py''' to ''' graphsage/frozen_graph.py'''
-##### 2.  change the last line of scripts/run_npu_supervised.sh, to '''bash scripts/run_npu_supervised_wrapper.sh 0 1 toy-ppi meanpool'''
+##### 1 . change the last line of scripts/run_npu_supervised_wrapper.sh, change 'graphsage/supervised_train.py' to ' graphsage/frozen_graph.py'
+##### 2.  change the last line of scripts/run_npu_supervised.sh, to 'bash scripts/run_npu_supervised_wrapper.sh 0 1 toy-ppi meanpool'
 ```bash
 $ bash scripts/run_npu_supervised.sh
 ```
