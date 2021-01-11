@@ -28,6 +28,7 @@
 from __future__ import print_function
 from six.moves import xrange
 import os
+
 os.system("pip install better_exceptions")
 import better_exceptions
 import tensorflow as tf
