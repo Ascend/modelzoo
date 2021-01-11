@@ -42,8 +42,8 @@ class_name_path =   os.path.join(work_path, './data/coco.names')  # The path of 
 fg.transform_images_path(os.path.join(work_path, './data/coco2014_trainval.txt'), train_file)
 fg.transform_images_path(os.path.join(work_path, './data/coco2014_minival.txt'), val_file)
 ### Distribution setting
-num_gpus=int(os.environ['RANK_SIZE'])
-iterations_per_loop=10
+num_gpus = int(os.environ['RANK_SIZE'])
+iterations_per_loop = 10
 
 ### Training releated numbersls
 
@@ -74,7 +74,7 @@ lr_decay_factor = 0.96  # The learning rate decay factor. Used when chosen `expo
 lr_lower_bound = 1e-6  # The minimum learning rate.
 # only used in piecewise lr type
 pw_boundaries = [80, 90]  # epoch based boundaries
-pw_values = [learning_rate_init, learning_rate_init*0.1, learning_rate_init*0.01]
+pw_values = [learning_rate_init, learning_rate_init * 0.1, learning_rate_init * 0.01]
 
 ### Load and finetune
 # Choose the parts you want to restore the weights. List form.
@@ -99,7 +99,7 @@ use_label_smooth = False # Whether to use class label smoothing strategy.
 use_focal_loss = False  # Whether to apply focal loss on the conf loss.
 use_mix_up = False  # Whether to use mix up data augmentation strategy.
 use_warm_up = True  # whether to use warm up strategy to prevent from gradient exploding.
-warm_up_epoch = min(total_epoches*0.1, 3)  # Warm up training epoches. Set to a larger value if gradient explodes.
+warm_up_epoch = min(total_epoches * 0.1, 3)  # Warm up training epoches. Set to a larger value if gradient explodes.
 
 ### some constants in validation
 # nms
