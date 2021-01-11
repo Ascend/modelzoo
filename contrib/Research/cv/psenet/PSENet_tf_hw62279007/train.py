@@ -31,6 +31,7 @@ import tensorflow as tf
 from tensorflow.contrib import slim
 from utils.utils_tool import logger, cfg
 
+
 tf.app.flags.DEFINE_integer('input_size', 512, '')
 tf.app.flags.DEFINE_integer('batch_size_per_gpu', 8, '')
 tf.app.flags.DEFINE_integer('num_readers', 32, '')
