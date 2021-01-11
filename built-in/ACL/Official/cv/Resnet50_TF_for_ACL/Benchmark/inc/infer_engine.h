@@ -36,7 +36,7 @@ acldvppRoiConfig* InitCropCenterRoiConfig(uint32_t newInputWidth, uint32_t newIn
 
 /*
  * @brief : 宽高较短的边缩放至RESIZE_MIN(256)，较长的边做等比例缩放。
- * @param [in] uint32_t width : 输入图片宽度
+ * @param [in] uint32_t width : 输入图片宽
  * @param [in] uint32_t height : 输入图片高
  * @param [in] uint32_t &newInputWidth : 等比例缩放后的宽
  * @param [in] uint32_t &newInputHeight : 等比例缩放后的高
