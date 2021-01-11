@@ -36,7 +36,7 @@ cd scripts;bash eval.sh
 
 ### PB generation
 To run, backpack you codes and do the following changes.
-Change the line 38 of scripts/train_1p.sh to 'python3 BigGAN/frozen_graph.py'
+##### Change the line 38 of scripts/train_1p.sh to 'python3 BigGAN/frozen_graph.py'
 
 ```bash
 cd scripts && bash run_npu_1p.sh
