@@ -3,6 +3,7 @@ import numpy as np
 from utils import *
 from models import *
 
+
 def trainAE(conf, data):
     encoder_X = tf.placeholder(tf.float32, shape=[None, conf.img_height, conf.img_width, conf.channel])
     decoder_X = tf.placeholder(tf.float32, shape=[None, conf.img_height, conf.img_width, conf.channel])
