@@ -11,7 +11,7 @@
 ## 代码及路径解释
 
 ```
-shufflenetv
+shufflenetv1
 └─
   ├─README.md
   ├─LICENSE  
