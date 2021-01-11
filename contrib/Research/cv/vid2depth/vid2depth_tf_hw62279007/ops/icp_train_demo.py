@@ -28,6 +28,7 @@
 
 """Verify the op's ability to discover a hidden transformation and residual."""
 
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
