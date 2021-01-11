@@ -46,6 +46,7 @@ Please cite his [paper](https://arxiv.org/abs/1704.03155v2) if you find this use
 1. Models trained on ICDAR 2013 (training set) + ICDAR 2015 (training set): [BaiduYun link](http://pan.baidu.com/s/1jHWDrYQ) [GoogleDrive](https://drive.google.com/open?id=0B3APw5BZJ67ETHNPaU9xUkVoV0U)
 2. Resnet V1 50 provided by tensorflow slim: [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz)
 
+
 ### Train
 If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image
 and run
