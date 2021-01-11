@@ -1,9 +1,10 @@
 python3 cifar10.py --dataset $CIFAR10 > train.log 2>&1
-#½á¹ûÅĞ¶Ï£¬¹¦ÄÜ¼ì²éÊä³öckpt/ÈÕÖ¾¹Ø¼ü×Ö¡¢¾«¶È¼ì²élossÖµ/accucy¹Ø¼ü×Ö¡¢ĞÔÄÜ¼ì²éºÄÊ±´òµã/ThroughOutputµÈ¹Ø¼ü×Ö
-key1="\[GEOP\]"  #¹¦ÄÜ¼ì²é×Ö
+#ç»“æœåˆ¤æ–­ï¼ŒåŠŸèƒ½æ£€æŸ¥è¾“å‡ºckpt/æ—¥å¿—å…³é”®å­—ã€ç²¾åº¦æ£€æŸ¥losså€¼/accucyå…³é”®å­—ã€æ€§èƒ½æ£€æŸ¥è€—æ—¶æ‰“ç‚¹/ThroughOutputç­‰å…³é”®å­—
+key1="\[GEOP\]"  #åŠŸèƒ½æ£€æŸ¥å­—
 
 
-if [ `grep -c "$key1" "train.log"` -ne '0' ] && [ `grep -c "Loss" "train.log"` -ne '0' ] && [ `grep -c "Extracting Finished" "train.log"` -ne '0' ] ;then   #¿ÉÒÔ¸ù¾İĞèÒªµ÷Õû¼ì²éÂß¼­
+
+if [ `grep -c "$key1" "train.log"` -ne '0' ] && [ `grep -c "Loss" "train.log"` -ne '0' ] && [ `grep -c "Extracting Finished" "train.log"` -ne '0' ] ;then   #å¯ä»¥æ ¹æ®éœ€è¦è°ƒæ•´æ£€æŸ¥é€»è¾‘
    echo "Run testcase success!"
 else
    echo "Run testcase failed!"
