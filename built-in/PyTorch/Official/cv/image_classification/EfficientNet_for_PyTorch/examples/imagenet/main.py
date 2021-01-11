@@ -44,7 +44,7 @@ parser.add_argument('--data', metavar='DIR',
                     help='path to dataset')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                     help='model architecture (default: resnet18)')
-parser.add_argument('-j', '--workers', default=128, type=int, metavar='N',
+parser.add_argument('-j', '--workers', default=64, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
                     help='number of total epochs to run')
@@ -293,23 +293,24 @@ def main_worker(npu, nnpus_per_node, args):
         if epoch % args.val_feq == 0 or epoch == args.epochs - 1:
             validate(val_loader, model, criterion, args, nnpus_per_node)
 
-        if not args.multiprocessing_distributed or (args.multiprocessing_distributed
+        if epoch == args.epochs - 1:
+            if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % nnpus_per_node == 0):
-            if not args.amp:
-                save_checkpoint({
-                    'epoch': epoch + 1,
-                    'arch': args.arch,
-                    'state_dict': model.state_dict(),
-                    'optimizer': optimizer.state_dict(),
-                })
-            else:
-                save_checkpoint({
-                    'epoch': epoch + 1,
-                    'arch': args.arch,
-                    'state_dict': model.state_dict(),
-                    'optimizer': optimizer.state_dict(),
-                    'amp': amp.state_dict(),
-                })
+                if not args.amp:
+                    save_checkpoint({
+                        'epoch': epoch + 1,
+                        'arch': args.arch,
+                        'state_dict': model.state_dict(),
+                        'optimizer': optimizer.state_dict(),
+                    })
+                else:
+                    save_checkpoint({
+                       'epoch': epoch + 1,
+                        'arch': args.arch,
+                        'state_dict': model.state_dict(),
+                        'optimizer': optimizer.state_dict(),
+                        'amp': amp.state_dict(),
+                    })
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node):

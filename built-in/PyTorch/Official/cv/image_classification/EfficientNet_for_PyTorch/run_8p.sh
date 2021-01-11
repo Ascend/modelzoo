@@ -11,17 +11,17 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-taskset -c 0-128 python3.7 ${currentDir}/examples/imagenet/main.py \
+taskset -c 0-95 python3.7 ${currentDir}/examples/imagenet/main.py \
     --data=/data/imagenet \
     --arch=efficientnet-b0 \
-    --batch-size=2048 \
-    --lr=3.2 \
+    --batch-size=4096 \
+    --lr=1.6 \
     --momentum=0.9 \
     --epochs=100 \
     --autoaug \
     --amp \
     --pm=O1 \
-    --loss_scale=128 \
+    --loss_scale=32 \
     --val_feq=10 \
     --addr=$(hostname -I |awk '{print $1}') \
     --dist-backend=hccl \
