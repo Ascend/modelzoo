@@ -2,7 +2,7 @@
 
 ## 概述
 
-迁移shufflenetv2到ascend910平台上使用NPU训练，并将结果与原论文进行对比
+迁移shufflenetv1到ascend910平台上使用NPU训练，并将结果与原论文进行对比
 
 | Accuracy | Paper | Ours  |
 |----------|-------|-------|
