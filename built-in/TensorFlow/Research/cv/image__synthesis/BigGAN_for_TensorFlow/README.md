@@ -32,3 +32,14 @@ cd scripts;bash run_npu_8p.sh
 
 
 cd scripts;bash eval.sh 
+
+
+
+### PB generation
+We added BigGAN/frozen_graph.py for the pb file generation.
+To run this code, backpack your codes first, then
+####  change the last line of scripts/npu_run.sh to 'python3.7 BigGAN/frozen_graph.py'
+
+```bash
+$ bash scripts/run_npu_supervised.sh
+```** 
