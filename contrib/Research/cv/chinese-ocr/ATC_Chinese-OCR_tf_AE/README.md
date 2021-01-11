@@ -62,6 +62,5 @@ Batch: 1, shape: 32,320,1，带AIPP，平均推理性能3.998333 ms
 
 推理效果
 
-![1](C:\Users\83395\Desktop\新建文件夹\Chinese-OCR\1.png)
-
-![2](C:\Users\83395\Desktop\新建文件夹\Chinese-OCR\2.png)
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/120031_a9284a67_8113712.png "1.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/120043_5f11ce67_8113712.png "2.png")
