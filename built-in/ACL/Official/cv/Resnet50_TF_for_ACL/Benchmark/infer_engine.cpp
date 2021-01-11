@@ -345,7 +345,7 @@ void GetImageHW(void* buff, uint32_t fileSize, std::string fileLocation, uint32_
  * @brief : dvpp在推理中的预处理流程
  * @param [in] string fileLocation : 输入文件路径.
  * @param [in] char *&ptr : 输出buffer指针.
- * @return : ACL_ERROR_NONE：预处理失败
+ * @return : ACL_ERROR_NONE：预处理成功， 其他：预处理失败
  */
 aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
 {
@@ -400,19 +400,17 @@ aclError DVPP_Resnet50(std::string fileLocation, char *&ptr)
     aclrtFreeHost(buff);
     aclrtSynchronizeStream(stream);
 
-    // 4 对jpegd解码的图片进行原分辨率抠图及短边256等比例缩放。
+    // 4 对jpegd解码的图片进行原分辨率抠图及短边256等比例缩放
     acldvppRoiConfig *cropConfig = nullptr;
     acldvppPicDesc *cropOutputDesc = nullptr;
-    // 4.1 设置对解码后的图片进行原图裁剪，目的是为了减少因jpegd解码后对齐的无效数据对图像精度的影响
+    // 设置对解码后的图片进行原图裁剪，目的是为了减少因jpegd解码后对齐的无效数据对图像精度的影响
     cropConfig = InitCropRoiConfig(W, H);
 
-    // 4.2 宽和高较短的一条边缩放至256，较长边做等比例缩放。对齐至256目的是为了给224x224中心抠图做准备。
     uint32_t newInputWidth = 0;
     uint32_t newInputHeight = 0;
     void *cropOutBufferDev = nullptr;
-    // 短边256对齐，获得对齐后的宽高
+    // 宽和高较短的一条边缩放至256，较长边做等比例缩放。对齐至256目的是为了给224x224中心抠图做准备,短边256对齐，获得对齐后的宽高
     SmallSizeAtLeast(W, H, newInputWidth, newInputHeight);
-
     uint32_t cropOutputWidthStride = (newInputWidth + (NUM_16 - 1)) / NUM_16 * NUM_16;
     uint32_t cropOutputHeightStride = (newInputHeight + (NUM_2 - 1)) / NUM_2 * NUM_2;
     uint32_t cropOutBufferSize = cropOutputWidthStride * cropOutputHeightStride * NUM_3 / NUM_2;

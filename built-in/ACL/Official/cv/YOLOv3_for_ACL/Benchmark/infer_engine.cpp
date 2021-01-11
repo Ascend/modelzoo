@@ -332,7 +332,6 @@ acldvppRoiConfig *InitVpcOutConfig(uint32_t width, uint32_t height, uint32_t mod
     if (small == width) {
         padded_size_half = (modelInputWidth - width) / NUM_2; // 贴图区域距离左边界的距离
         left = padded_size_half;
-        // 建议用户在贴图的起始坐标距离左边界宽度16对齐，保证目标检测区域相对于原图不发生相对偏移，提高精度
         left_stride = (left + 15) / 16 * 16;
         right = (left_stride + width) % NUM_2 == 0 ? (left_stride + width - 1) : (left_stride + width);
         if (left_stride + right > modelInputWidth) {
@@ -408,7 +407,7 @@ void LargeSizeAtLeast(uint32_t W, uint32_t H, uint32_t &newInputWidth, uint32_t 
  * @brief : dvpp在YOLOv3推理中的预处理流程
  * @param [in] string fileLocation : 输入文件路径.
  * @param [in] char *&ptr : 输出buffer指针.
- * @return : ACL_ERROR_NONE：预处理失败
+ * @return : ACL_ERROR_NONE：预处理成功， 其他：预处理失败
  */
 aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
 {
@@ -509,13 +508,11 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     gettimeofday(&func_end, NULL);
     costTime = (func_end.tv_sec - func_start.tv_sec) * 1000000 + (func_end.tv_usec - func_start.tv_usec);
     dvppTime[funcName] += costTime;
-
     aclrtSynchronizeStream(stream);
 
     // 4 对jpegd解码的图片进行原分辨率抠图及长边416等比例缩放。
     acldvppPicDesc *cropOutputDesc = nullptr;
     acldvppRoiConfig *cropConfig = nullptr;
-
     // 设置对解码后的图片进行原图裁剪，目的是为了减少因jpegd解码后对齐的无效数据对图像精度的影响
     cropConfig = InitCropRoiConfig(W, H);
     uint32_t newInputWidth = 0;
@@ -612,7 +609,6 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     acldvppDestroyPicDesc(cropAndPasteOutputDesc);
     acldvppDestroyRoiConfig(pasteConfig);
     acldvppDestroyRoiConfig(cropConfig);
-    
     return ACL_ERROR_NONE;
 }
 
