@@ -1,1 +1,0 @@
-python train.py --threads_num 16 --env_name PongDeterministic-v4
