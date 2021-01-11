@@ -6,14 +6,7 @@ python train.py \
 key1="\[GEOP\]"  #功能检查字
 key1="total loss"  #功能检查字
 
-if [ `grep -c "$key1" "train.log"` -ne '0' ] ;then   #可以根据需要调整检查逻辑
-   echo "Run testcase success!"
-else
-   echo "Run testcase failed!"
-fi
-
-
-if [ `grep -c "$key2" "train.log"` -ne '0' ] ;then   #可以根据需要调整检查逻辑
+if [ `grep -c "$key1" "train.log"` -ne '0' ] && [ `grep -c "$key2" "train.log"` -ne '0' ];then   #可以根据需要调整检查逻辑
    echo "Run testcase success!"
 else
    echo "Run testcase failed!"
