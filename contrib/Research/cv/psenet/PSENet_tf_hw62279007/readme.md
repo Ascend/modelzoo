@@ -51,6 +51,8 @@ python eval.py --test_data_path=./tmp/images/ --gpu_list=0 --checkpoint_path=./r
 --output_dir=./tmp/
 ```
 
+
+
 a text file and result image will be then written to the output path.
 
 ### Examples
