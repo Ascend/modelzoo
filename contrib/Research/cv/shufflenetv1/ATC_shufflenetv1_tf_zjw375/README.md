@@ -11,6 +11,8 @@ ATC转换命令：
 ``` 
 
 ## 3、文件
+
+```
 shufflenetv2
 └─
   ├─README.md
@@ -23,6 +25,8 @@ shufflenetv2
   ├─label_preprocess.py 将label保存成bin格式
   ├─accuracy_top1.py.py 验证
   ├─start_inference.sh 推理、验证脚本文件
+```
+
 
 ## 4、编译msame推理工具
 参考https://gitee.com/ascend/tools/tree/ccl/msame, 编译出msame推理工具
