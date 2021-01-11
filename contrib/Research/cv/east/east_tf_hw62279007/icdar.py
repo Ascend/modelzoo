@@ -27,6 +27,7 @@
 # limitations under the License.
 
 # coding:utf-8
+
 import glob
 import csv
 import cv2
