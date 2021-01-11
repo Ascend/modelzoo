@@ -19,11 +19,11 @@ from utils.misc_utils import parse_anchors, read_class_names
 
 
 def freeze_graph_def(**args):
-    '''
+    """
     frozen the model of ckpt
     params:
         args: type is dict, include class_name_path, anchor_path, ckpt_path
-    '''
+    """
     tf.reset_default_graph()
     # set inputs node
     inputs = tf.placeholder(tf.float32, shape=[None, 416, 416, 3], name="input")
@@ -55,12 +55,12 @@ def freeze_graph_def(**args):
 
 
 def transform_images_path(input_path, output_path):
-    '''
+    """
     transform the images path to suit the modelarts
     params:
         input_path: the original txt file
         output_path: after transform txt file
-    '''
+    """
     output_list = []
     with open(input_path, 'r') as f:
         ban_list = f.read().split('\n')[:-1]
