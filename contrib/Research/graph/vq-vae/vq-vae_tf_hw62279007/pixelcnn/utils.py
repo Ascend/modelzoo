@@ -4,6 +4,7 @@ import scipy.misc
 from datetime import datetime
 import tensorflow as tf
 
+
 def binarize(images):
     return (np.random.uniform(size=images.shape) < images).astype(np.float32)
 
