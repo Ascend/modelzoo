@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 def get_weights(shape, name, mask=None):
     weights_initializer = tf.contrib.layers.xavier_initializer()
     W = tf.get_variable(name, shape, tf.float32, weights_initializer)
