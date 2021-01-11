@@ -38,6 +38,7 @@
 #   --seq_length 3 \
 #   --num_threads 12
 
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
