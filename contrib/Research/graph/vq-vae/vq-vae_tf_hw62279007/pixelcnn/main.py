@@ -5,6 +5,7 @@ from models import PixelCNN
 from autoencoder import *
 from utils import *
 
+
 def train(conf, data):
     X = tf.placeholder(tf.float32, shape=[None, conf.img_height, conf.img_width, conf.channel])
     model = PixelCNN(X, conf)
