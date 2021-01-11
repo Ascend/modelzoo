@@ -32,3 +32,10 @@ cd scripts;bash run_npu_8p.sh
 
 
 cd scripts;bash eval.sh 
+
+
+### PB generation
+To run, backpack you codes and do the following changes.
+Change the last line of scripts/npu_run.sh to 'python3.7 BigGAN/frozen_graph.py'
+
+cd scripts;bash run_npu_1p.sh
