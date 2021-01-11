@@ -1,6 +1,7 @@
 import tensorflow as tf
 from layers import *
 
+
 class PixelCNN(object):
     def __init__(self, X, conf, h=None):
         self.X = X
