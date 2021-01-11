@@ -62,10 +62,6 @@ Batch: 1, shape: 224 * 224 * 3，带AIPP，平均推理性能 6.353273 ms
 
 推理效果
 
-
-<div style="float:left;border:solid 1px 000;margin:2px;"><img src="C:\Users\83395\Desktop\新建文件夹\seg\ori.jpg"  width="200" ></div>
-<div style="float:left;border:solid 1px 000;margin:2px;"><img src="C:\Users\83395\Desktop\新建文件夹\seg\background.jpg"  width="200" ></div>
-<div style="float:left;border:solid 1px 000;margin:2px;"><img src="C:\Users\83395\Desktop\新建文件夹\seg\new.jpg"  width="200" ></div>
-
-
-
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/120507_cb76e9b4_8113712.jpeg "ori.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/120522_68b139f4_8113712.jpeg "background.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/120532_0b5121b3_8113712.jpeg "new.jpg")
