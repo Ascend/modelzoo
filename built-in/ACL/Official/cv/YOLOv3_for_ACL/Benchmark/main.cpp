@@ -189,7 +189,7 @@ aclError Process()
     LOG("***********fileNum:%zd\n",filePaths.size());
     struct timeval startTmp, endTmp;
     
-    // 获取图像宽高
+    // 获取模型输入所需要的宽高
     getImgResizeShape();
     if (cfg.useDvpp) {
         ret = DvppSetup();
