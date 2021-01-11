@@ -27,6 +27,7 @@
 # limitations under the License.
 
 #-*- coding:utf-8 -*-
+
 import tensorflow as tf
 from utils.utils_tool import logger
 
