@@ -18,9 +18,9 @@ shufflenetv2
 └─
   ├─README.md
   ├─LICENSE  
-  ├─input                   用于存放验证集.bin文件         桶地址 
+  ├─input                   用于存放验证集.bin文件         桶地址 obs://modelarts-zjw/Inference_input 
   ├─output                  用于存放推理后的预测值.bin文件
-  ├─label_output            用于存放标签.bin文件
+  ├─label_output            用于存放标签.bin文件           桶地址 obs://modelarts-zjw/Inference_label_output
   ├─model                   用于存放om模型                桶地址 obs://modelarts-zjw/om_model
   ├─ck_model                用于存放checkpoint模型        桶地址 obs://modelarts-zjw/trained_model
   ├─pb_model                用于存放pb模型                桶地址 obs://modelarts-zjw/pb_model
@@ -39,7 +39,7 @@ shufflenetv2
 
 从 obs://modelarts-zjw/Inference_input 下载input.tar.gz 解压至input文件夹
 
-从obs://modelarts-zjw/Inference_label_output 下载label_output.tar.gz 解压至label_output文件夹
+从 obs://modelarts-zjw/Inference_label_output 下载label_output.tar.gz 解压至label_output文件夹
 
 
 ## 6、性能、精度测试：
