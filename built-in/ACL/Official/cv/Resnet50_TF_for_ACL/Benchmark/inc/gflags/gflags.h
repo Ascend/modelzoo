@@ -619,9 +619,6 @@ public:
 
 #endif  // SWIG
 
-
 // Import gflags library symbols into alternative/deprecated namespace(s)
 #include "gflags_gflags.h"
-
-
 #endif  // GFLAGS_GFLAGS_H_

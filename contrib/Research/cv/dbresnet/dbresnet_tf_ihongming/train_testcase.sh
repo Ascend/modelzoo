@@ -11,6 +11,7 @@ rm -rf $output/*
 start_time=`date +%s`
 python3.7 train.py -m $max_steps \
     -s $save_steps \
+    -p NPU \
     2>&1 | tee train.log
 
 end_time=`date +%s`

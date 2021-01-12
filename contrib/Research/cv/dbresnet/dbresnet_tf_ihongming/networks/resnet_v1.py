@@ -256,7 +256,6 @@ def resnet_v1_block(scope, base_depth, num_units, stride):
   }])
 
 
-
 def resnet_v1_50(inputs,
                  num_classes=None,
                  is_training=True,

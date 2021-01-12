@@ -8,6 +8,7 @@
 * [默认配置](#默认配置)
 * [快速上手](#快速上手)
   * [准备数据集](#准备数据集)
+  * [Docker容器场景](#Docker容器场景)
   * [OPP算子修改](#OPP算子修改)
   * [检查json](#检查json)
   * [关键配置修改](#关键配置修改)
@@ -84,6 +85,47 @@ Wide&Deep是一个同时具有Memorization和Generalization功能的CTR预估模
 - 训练集和验证集图片分别位于train/和val/文件夹路径下，同一目录下的所有数据都有标签。
 
 - 当前提供的训练脚本中，是以criteo数据集为例，训练过程中进行数据预处理操作，请用户自行将数据集封装为tfrecord格式，后续训练过程中进行数据预处理操作，请用户使用该脚本之前自行修改训练脚本中的数据集加载和预处理方法；在使用其他数据集时，视具体需求添加类似的模块。
+
+
+### Docker容器场景
+
+- 编译镜像
+```bash
+docker build -t ascend-widedeep .
+```
+
+- 启动容器实例
+```bash
+bash scripts/docker_start.sh
+```
+
+参数说明:
+
+```
+#!/usr/bin/env bash
+docker_image=$1 \   #接受第一个参数作为docker_image
+data_dir=$2 \       #接受第二个参数作为训练数据集路径
+model_dir=$3 \      #接受第三个参数作为模型执行路径
+docker run -it --ipc=host \
+        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
+ --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
+        -v ${data_dir}:${data_dir} \    #训练数据集路径
+        -v ${model_dir}:${model_dir} \  #模型执行路径
+        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
+        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image为镜像名称
+        /bin/bash
+```
+
+执行docker_start.sh后带三个参数：
+  - 生成的docker_image
+  - 数据集路径
+  - 模型执行路径
+```bash
+./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
+```
+
 
 
 ### OPP算子修改

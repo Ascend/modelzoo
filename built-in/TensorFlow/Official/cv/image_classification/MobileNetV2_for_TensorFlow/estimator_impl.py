@@ -104,7 +104,14 @@ class EstimatorImpl:
         os.environ['TF_USE_CUDNN_BATCHNORM_SPATIAL_PERSISTENT'] = '1'
         os.environ['TF_ENABLE_WINOGRAD_NONFUSED'] = '1'
 
+        dump_config = DumpConfig(
+            enable_dump= "True" == os.getenv("FLAG_ENABLE_DUMP"), 
+            dump_path=os.getenv("DUMP_PATH"),
+            dump_step=os.getenv("DUMP_STEP"),
+            dump_mode=os.getenv("DUMP_MODE"))
+
         run_config = NPURunConfig(
+            dump_config=dump_config,
             hcom_parallel=True,
             precision_mode="allow_mix_precision",
             enable_data_pre_proc=True,

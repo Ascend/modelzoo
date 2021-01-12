@@ -23,10 +23,10 @@ om模型下载地址：
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/cartoonization/cartoonization.om
 
-使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
+使用ATC模型转换工具进行模型转换时可以参考如下指令：
 
 ```
-/home/ascend/Ascend/ascend-toolkit/20.0.RC1/atc/bin/atc --output_type=FP32 --input_shape="data:1,3,224,224" --weight="/home/ascend/models/googlenet.caffemodel" --check_report=/home/ascend/modelzoo/googlenet/device/check_report_result.json --input_format=NCHW --output="/home/ascend/modelzoo/googlenet/device/googlenet" --soc_version=Ascend310 --insert_op_conf=/home/ascend/modelzoo/googlenet/device/insert_op.cfg --framework=0 --save_original_model=false --model="/home/ascend/models/googlenet.prototxt" 
+atc --output_type=FP32 --input_shape="train_real_A:1,256,256,3"  --input_format=NHWC --output="cartoonization" --soc_version=Ascend310 --insert_op_conf=insert_op.cfg --framework=3 --model="cartoonization.pb" --precision_mode=allow_fp32_to_fp16
 ```
 
 ## 使用msame工具推理

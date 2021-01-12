@@ -1,0 +1,1 @@
+python   test_inception_frn.py  --model_path ./model_save/inception_model.ckpt --data_path ./test_data  

@@ -41,7 +41,7 @@ activation_function: "relu"
 
 #[Training]
 init_lr: 0.001
-num_epoches: 500
+num_epoches: 30
 end_adjust_acc: 2
 lr_decay: 0.5
 batch_size: 1024

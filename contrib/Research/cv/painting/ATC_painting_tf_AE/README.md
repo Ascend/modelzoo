@@ -6,11 +6,9 @@
 
 参考实现 ：
 
-
-
 原始模型网络下载地址 ：
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/painting/wspade448_fixLayout.pb
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/painting/AIPainting_v2.pb
 
 
 ## om模型
@@ -22,7 +20,7 @@ https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/AT
 使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
 
 ```
-/home/ascend/Ascend/ascend-toolkit/20.0.RC1/atc/bin/atc --output_type=FP32 --input_shape="objs:9;coarse_layout:1,256,256,17"  --input_format=NHWC --output="/home/ascend/modelzoo/AIPainting_v2/device/AIPainting_v2" --soc_version=Ascend310 --framework=3  --model="/home/ascend/Downloads/AIPainting_v2.pb"
+atc --output_type=FP32 --input_shape="objs:9;coarse_layout:1,256,256,17"  --input_format=NHWC --output="AIPainting_v2" --soc_version=Ascend310 --framework=3  --model="AIPainting_v2.pb"
 ```
 
 ## 使用msame工具推理
@@ -61,3 +59,4 @@ Test Finish!
 ![大海](https://images.gitee.com/uploads/images/2020/1127/161214_f419d7b2_7990837.jpeg "80e3f5c9dc91af8dc84eb7ed1063c24.jpg")
 
 ​							                                                     图为AI生成的大海
+

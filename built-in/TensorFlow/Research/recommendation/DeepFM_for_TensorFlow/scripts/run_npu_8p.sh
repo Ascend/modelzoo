@@ -1,9 +1,15 @@
 #!/bin/bash
 
-rm -rf /var/log/npu/slog/host-0/*
-
 currentDir=$(cd "$(dirname "$0")"; pwd)
 #source ${currentDir}/env.sh
+
+# DataDump
+export FLAG_ENABLE_DUMP=False
+export DUMP_PATH=/var/log/npu/dump
+export DUMP_STEP="0|2"
+export DUMP_MODE="all"
+mkdir -p $DUMP_PATH
+chown -R HwHiAiUser:HwHiAiUser $DUMP_PATH
 
 # user env
 export JOB_ID=9999001

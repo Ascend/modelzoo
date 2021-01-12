@@ -110,4 +110,8 @@ python    run_xception.py  --model_path ./model/xception_model.ckpt  --data_path
 	for i in file_list: 
 		tf_data_list.append(os.path.join(filepath,i)) 
 	return tf_data_list  
-以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
+以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。\
+
+ **### offline_inference** 
+[offline_inference readme](https://gitee.com/xiaoqiqiyaya/modelzoo/blob/master/contrib/Research/cv/xception/xception_tf_xiaoqiqiya/offline_inference/README.md)
+

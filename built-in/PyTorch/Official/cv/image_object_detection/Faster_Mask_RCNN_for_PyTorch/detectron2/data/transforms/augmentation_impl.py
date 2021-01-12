@@ -154,7 +154,6 @@ class ResizeShortestEdge(Augmentation):
         """
         super().__init__()
         assert sample_style in ["range", "choice"], sample_style
-
         self.is_range = sample_style == "range"
         if isinstance(short_edge_length, int):
             short_edge_length = (short_edge_length, short_edge_length)
@@ -179,6 +178,7 @@ class ResizeShortestEdge(Augmentation):
             newh, neww = size, scale * w
         else:
             newh, neww = scale * h, size
+
         if max(newh, neww) > self.max_size:
             scale = self.max_size * 1.0 / max(newh, neww)
             newh = newh * scale

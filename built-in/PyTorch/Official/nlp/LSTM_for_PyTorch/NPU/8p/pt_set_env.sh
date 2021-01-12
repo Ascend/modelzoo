@@ -18,4 +18,7 @@ fi
 export SLOG_PRINT_TO_STDOUT=0
 #su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
 
-export TASK_QUEUE_ENABLE=1
+#export TASK_QUEUE_ENABLE=1
+export PTCOPY_ENABLE=1
+export GLOBAL_LOG_LEVEL=3
+export DYNAMIC_OP="ADD#MUL"

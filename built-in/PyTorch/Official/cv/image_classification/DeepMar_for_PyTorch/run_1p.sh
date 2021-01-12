@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 source pt_set_env.sh
 
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_1p_job_${currtime}

@@ -207,7 +207,7 @@ class SimpleTrainer(TrainerBase):
     or write your own training loop.
     """
 
-    def __init__(self, model, data_loader, optimizer):
+    def __init__(self, model, data_loader, optimizer, aspect_ratio_grouping=False):
         """
         Args:
             model: a torch Module. Takes a data from data_loader and returns a
@@ -224,10 +224,11 @@ class SimpleTrainer(TrainerBase):
         like evaluation during training, you can overwrite its train() method.
         """
         model.train()
-
+        self.aspect_ratio_grouping = aspect_ratio_grouping
         self.model = model
         self.data_loader = data_loader
-        self._data_loader_iter = iter(data_loader)
+        if self.aspect_ratio_grouping:
+            self._data_loader_iter = iter(data_loader)
         self.optimizer = optimizer
 
     def run_step(self):
@@ -239,7 +240,10 @@ class SimpleTrainer(TrainerBase):
         """
         If you want to do something with the data, you can wrap the dataloader.
         """
-        data = next(self._data_loader_iter)
+        if self.aspect_ratio_grouping:
+            data=next(self._data_loader_iter)
+        else:
+            data = self.data_loader.next()
         data_time = time.perf_counter() - start
 
         """

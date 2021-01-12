@@ -1,4 +1,4 @@
-# Deeplabv3 for Tensorflow 
+# CRNN for Tensorflow 
 
 This repository provides a script and recipe to train the CRNN  model. The code is based on https://github.com/MaybeShewill-CV/CRNN_Tensorflow,
 modifications are made to run on NPU. Original README file can be found in `README_ORI.md`  

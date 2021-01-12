@@ -53,13 +53,7 @@ Thank You!
 	- [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/PPO_for_TensorFlow)
 	- [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/QMIX_for_TensorFlow)
 	- [Jasper_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
-	- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceDetection_for_MindSpore)
-	- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
-	- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceAttribute_for_MindSpore)
-	- [FaceQualityAssessment_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceQualityAssessment_for_MindSpore)
-	- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
-	- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/DSCNN_for_MindSpore)
-  
+	 
 - PyTorch
 
      -Official
@@ -116,6 +110,12 @@ Thank You!
 
 	- [Music_Genre_Classification_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/audio/Music_Genre_Classification_for_MindSpore)
     - [Gnmt_v2_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/Gnmt_v2_for_MindSpore)
+	- [FaceDetection_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceDetection_for_MindSpore)
+	- [FaceRecognition_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
+	- [FaceAttribute_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceAttribute_for_MindSpore)
+	- [FaceQualityAssessment_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/image_classification/FaceQualityAssessment_for_MindSpore)
+	- [FaceRecognitionForTracking_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/cv/detection/FaceRecognition_for_MindSpore)
+	- [DSCNN_for_MindSpore](https://gitee.com/ascend/modelzoo/tree/master/built-in/MindSpore/Research/nlp/DSCNN_for_MindSpore)
 	
 - ACL	
 
@@ -143,11 +143,10 @@ Thank You!
 
 Ascend ModelZoo only provides scripts that downloads and preprocesses public datasets. We do not own these datasets and are not responsible for their quality or maintenance. Please make sure you have permission to use the dataset under the dataset’s license. The models trained on these dataset are for non-commercial research and educational purpose only.
 
-To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on Modelzoo, or wish to update it in any way. Please contact us through a [Github](https://github.com/Ascend/modelzoo/issues)/[Gitee](https://gitee.com/ascend/modelzoo/issues) issue. Your understanding and contribution to this community is greatly appreciated.
+To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on Modelzoo, or wish to update it in any way. Please contact us through a Github/Gitee issue. Your understanding and contribution to this community is greatly appreciated.
 
-## License
+Ascend ModelZoo is Apache 2.0 licensed，Please see the LICENSE file.
 
-[Apache License 2.0](LICENSE)
 
 	
 		

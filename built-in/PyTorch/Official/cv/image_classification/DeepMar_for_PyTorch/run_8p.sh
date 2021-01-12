@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 source pt_set_env.sh
 
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 4"
-
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_8p_job_${currtime}
@@ -20,7 +17,7 @@ python3.7 ${currentDir}/transform_peta.py \
 python3.7 ${currentDir}/train_deepmar_resnet50_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --save_dir=/data/peta/ \
-        --workers=80 \
+        --workers=128 \
         --batch_size=2048 \
         --new_params_lr=0.016 \
         --finetuned_params_lr=0.016 \

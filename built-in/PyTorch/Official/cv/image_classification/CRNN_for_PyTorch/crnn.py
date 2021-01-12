@@ -2,6 +2,20 @@
 import torch
 
 
+class PermuteImplementation(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input):
+        ctx.save_for_backward(input)
+        conv = input.squeeze(2)
+        result = conv.transpose(1, 2).contiguous().transpose(0, 1)
+        return result.detach()
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        out = grad_output.transpose(0, 1).contiguous().transpose(1, 2)
+        out = out.unsqueeze(2)
+        return out
+
 class BidirectionalLSTM(torch.nn.Module):
     # Inputs hidden units Out
     def __init__(self, nIn, nHidden, nOut):
@@ -77,9 +91,10 @@ class CRNN(torch.nn.Module):
         conv = self.cnn(input)
         b, c, h, w = conv.size()
         assert h == 1, "the height of conv must be 1"
-        conv = conv.squeeze(2)  # b *512 * width
+        # conv = conv.squeeze(2)  # b *512 * width
         # conv = conv.permute(2, 0, 1)  # [w, b, c]
-        conv = conv.transpose(1, 2).contiguous().transpose(0, 1)
+        # conv = conv.transpose(1, 2).contiguous().transpose(0, 1)
+        conv = squeeze_permute(conv)
         output = torch.nn.functional.log_softmax(self.rnn(conv), dim=2)
 
         return output
@@ -93,6 +108,8 @@ def weights_init(m):
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
+def squeeze_permute(x):
+    return PermuteImplementation.apply(x)
 
 def get_crnn(config):
     model = CRNN(config.MODEL.IMAGE_SIZE.H, 1, config.MODEL.NUM_CLASSES + 1, config.MODEL.NUM_HIDDEN)

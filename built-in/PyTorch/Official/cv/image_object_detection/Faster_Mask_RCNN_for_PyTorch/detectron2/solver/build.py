@@ -15,6 +15,7 @@
 from enum import Enum
 from typing import Any, Callable, Dict, Iterable, List, Set, Type, Union
 import torch
+import apex
 
 from detectron2.config import CfgNode
 
@@ -120,7 +121,10 @@ def build_optimizer(cfg: CfgNode, model: torch.nn.Module) -> torch.optim.Optimiz
         torch.nn.LayerNorm,
         torch.nn.LocalResponseNorm,
     )
+
     params: List[Dict[str, Any]] = []
+    params_1 = []
+    params_2 = []
     memo: Set[torch.nn.parameter.Parameter] = set()
     for module in model.modules():
         for key, value in module.named_parameters(recurse=False):
@@ -132,18 +136,24 @@ def build_optimizer(cfg: CfgNode, model: torch.nn.Module) -> torch.optim.Optimiz
             memo.add(value)
             lr = cfg.SOLVER.BASE_LR
             weight_decay = cfg.SOLVER.WEIGHT_DECAY
+            weight_decay_1 = cfg.SOLVER.WEIGHT_DECAY
             if isinstance(module, norm_module_types):
                 weight_decay = cfg.SOLVER.WEIGHT_DECAY_NORM
-            elif key == "bias":
+            if key == "bias":
                 # NOTE: unlike Detectron v1, we now default BIAS_LR_FACTOR to 1.0
                 # and WEIGHT_DECAY_BIAS to WEIGHT_DECAY so that bias optimizer
                 # hyperparameters are by default exactly the same as for regular
                 # weights.
                 lr = cfg.SOLVER.BASE_LR * cfg.SOLVER.BIAS_LR_FACTOR
-                weight_decay = cfg.SOLVER.WEIGHT_DECAY_BIAS
-            params += [{"params": [value], "lr": lr, "weight_decay": weight_decay}]
+                weight_decay_1 = cfg.SOLVER.WEIGHT_DECAY_BIAS
+                params_1.append(value)
+            else:
+                params_2.append(value)
 
-    optimizer = torch.optim.SGD(
+    params = [{"params": params_1, "lr": lr, "weight_decay": weight_decay_1}, 
+            {"params": params_2, "lr": lr, "weight_decay": weight_decay}]
+
+    optimizer = apex.optimizers.NpuFusedSGD(
         params, cfg.SOLVER.BASE_LR, momentum=cfg.SOLVER.MOMENTUM, nesterov=cfg.SOLVER.NESTEROV
     )
     optimizer = maybe_add_gradient_clipping(cfg, optimizer)

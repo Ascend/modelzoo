@@ -255,6 +255,7 @@ def validate(config, val_loader, dataset, converter, model, criterion, device, e
             loss = criterion(preds, text, preds_size, length)
             losses.update(loss.item(), inp.size(0))
             _, preds = preds.max(2)
+            preds = preds.int()
             preds = preds.transpose(1, 0).contiguous().view(-1)
             sim_preds = converter.decode(preds.data, preds_size.data, raw=False)
             for pred, target in zip(sim_preds, labels):

@@ -35,6 +35,7 @@ import tensorflow as tf
 from tensorflow.python.util import nest
 import os,sys
 import numpy as np 
+from tensorflow.python.data.experimental.ops import threadpool
 
 IMAGE_SIZE = 224
 
@@ -172,6 +173,8 @@ def make_dataset(args, take_count, batch_size,
     #ds = ds.map(lambda image, counter: parse_record(image, training), num_parallel_calls=24)
     ds = ds.batch(batch_size, drop_remainder=True)
     ds = ds.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
+    ds = threadpool.override_threadpool(ds,
+                                        threadpool.PrivateThreadPool(128,display_name='input_pipeline_threa_pool'))
     return ds
 
 

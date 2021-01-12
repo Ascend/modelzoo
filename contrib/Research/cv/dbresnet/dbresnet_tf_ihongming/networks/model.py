@@ -32,11 +32,13 @@ from tensorflow.contrib import slim
 
 
 def dbnet(image_input, input_size=640, k=50, is_training=True, scope="resnet_v1_50"):
-
+    
     with tf.name_scope("resnet_layer"):
         with slim.arg_scope(resnet_v1.resnet_arg_scope(weight_decay=1e-5)):
-            logits, end_points = resnet_v1.resnet_v1_50(inputs=image_input, is_training=is_training)
+            logits, end_points = resnet_v1.resnet_v1_50(inputs=image_input, is_training=is_training, scope=scope)
+        
         C2, C3, C4, C5 = end_points['pool2'], end_points['pool3'], end_points['pool4'], end_points['pool5']
+       
 
     with tf.name_scope("detector_layer"):
         filter_in2 = tf.get_variable("filter_in2", [1, 1, 64, 256],
@@ -48,7 +50,7 @@ def dbnet(image_input, input_size=640, k=50, is_training=True, scope="resnet_v1_
         in3 = tf.nn.conv2d(C3, filter=filter_in3, strides=[1, 1, 1, 1], padding='SAME', name='in3')
 
         filter_in4 = tf.get_variable("filter_in4", [1, 1, 512, 256],
-                                     initializer=tf.truncated_normal_initializer(stddev=0.1))
+                                     initializer=tf.initializers.he_normal())
         in4 = tf.nn.conv2d(C4, filter=filter_in4, strides=[1, 1, 1, 1], padding='SAME', name='in4')
 
         filter_in5 = tf.get_variable("filter_in5", [1, 1, 2048, 256],
@@ -64,40 +66,31 @@ def dbnet(image_input, input_size=640, k=50, is_training=True, scope="resnet_v1_
         out2 = tf.add(in2, tf.image.resize_nearest_neighbor(out3, size=[tf.shape(out3)[1] * 2, tf.shape(out3)[2] * 2]),
                       name='out2')
 
-        filter_p5 = tf.get_variable("filter_p5", [3, 3, 256, 64],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_p5 = tf.get_variable("filter_p5", [3, 3, 256, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         in5_t = tf.nn.conv2d(in5, filter=filter_p5, strides=[1, 1, 1, 1], padding='SAME', name='in5_t')
         P5 = tf.image.resize_nearest_neighbor(in5_t, size=[tf.shape(in5_t)[1] * 8, tf.shape(in5_t)[2] * 8], name="P5")
 
-        filter_p4 = tf.get_variable("filter_p4", [3, 3, 256, 64],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_p4 = tf.get_variable("filter_p4", [3, 3, 256, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         out4_t = tf.nn.conv2d(out4, filter=filter_p4, strides=[1, 1, 1, 1], padding='SAME', name='out4_t')
-        P4 = tf.image.resize_nearest_neighbor(out4_t, size=[tf.shape(out4_t)[1] * 4, tf.shape(out4_t)[2] * 4],
-                                              name="P4")
+        P4 = tf.image.resize_nearest_neighbor(out4_t, size=[tf.shape(out4_t)[1] * 4, tf.shape(out4_t)[2] * 4], name="P4")
 
-        filter_p3 = tf.get_variable("filter_p3", [3, 3, 256, 64],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_p3 = tf.get_variable("filter_p3", [3, 3, 256, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         out3_t = tf.nn.conv2d(out3, filter=filter_p3, strides=[1, 1, 1, 1], padding='SAME', name='out3_t')
         P3 = tf.image.resize_nearest_neighbor(out3_t, size=[tf.shape(out3_t)[1] * 2, tf.shape(out3_t)[2] * 2],
                                               name="P3")
 
-        filter_p2 = tf.get_variable("filter_p2", [3, 3, 256, 64],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_p2 = tf.get_variable("filter_p2", [3, 3, 256, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         P2 = tf.nn.conv2d(out2, filter=filter_p2, strides=[1, 1, 1, 1], padding='SAME', name='P2')
 
         fuse = tf.concat([P5, P4, P3, P2], axis=3)
-        print(fuse)
 
         # probability map
-        filter_probability = tf.get_variable("filter_probability", [3, 3, 256, 64],
-                                             initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_probability = tf.get_variable("filter_probability", [3, 3, 256, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         p = tf.nn.conv2d(fuse, filter=filter_probability, strides=[1, 1, 1, 1], padding='SAME')
         p = tf.layers.batch_normalization(p, training=is_training, momentum=0.9)
         p = tf.nn.relu(p)
 
-        print(p)
-        filter_tr = tf.get_variable("filter_tr", [2, 2, 64, 64],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_tr = tf.get_variable("filter_tr", [2, 2, 64, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         p = tf.nn.conv2d_transpose(p, output_shape=[tf.shape(p)[0], tf.shape(p)[1] * 2, tf.shape(p)[2] * 2, 64],
                                    filter=filter_tr,
                                    strides=[1, 2, 2, 1],
@@ -105,34 +98,27 @@ def dbnet(image_input, input_size=640, k=50, is_training=True, scope="resnet_v1_
                                    )
         p = tf.layers.batch_normalization(p, training=is_training, momentum=0.9)
         p = tf.nn.relu(p)
-        filter_tr2 = tf.get_variable("filter_tr2", [2, 2, 1, 64],
-                                     initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_tr2 = tf.get_variable("filter_tr2", [2, 2, 1, 64],initializer=tf.truncated_normal_initializer(stddev=0.1))
         p = tf.nn.conv2d_transpose(p, output_shape=[tf.shape(p)[0], tf.shape(p)[1] * 2, tf.shape(p)[2] * 2, 1],
                                    filter=filter_tr2,
                                    strides=[1, 2, 2, 1],
                                    padding='SAME')
         p = tf.nn.sigmoid(p)
-        print(p)
-        print(">>>>>>")
 
         # threshold map
-        filter_threshold = tf.get_variable("filter_threshold", [3, 3, 256, 64],
-                                           initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_threshold = tf.get_variable("filter_threshold", [3, 3, 256, 64], initializer=tf.truncated_normal_initializer(stddev=0.1))
         t = tf.nn.conv2d(fuse, filter=filter_threshold, strides=[1, 1, 1, 1], padding='SAME')
         t = tf.layers.batch_normalization(t, training=is_training, momentum=0.9)
         t = tf.nn.relu(t)
 
-        filter_th = tf.get_variable("filter_th", [2, 2, 64, 64],
-                                    initializer=tf.truncated_normal_initializer(stddev=0.1))
-        t = tf.nn.conv2d_transpose(t, output_shape=[tf.shape(t)[0], tf.shape(t)[1] * 2, tf.shape(t)[2] * 2,
-                                                          64],
+        filter_th = tf.get_variable("filter_th", [2, 2, 64, 64], initializer=tf.truncated_normal_initializer(stddev=0.1))
+        t = tf.nn.conv2d_transpose(t, output_shape=[tf.shape(t)[0], tf.shape(t)[1] * 2, tf.shape(t)[2] * 2, 64],
                                    filter=filter_th,
                                    strides=[1, 2, 2, 1],
                                    padding='SAME')
         t = tf.layers.batch_normalization(t, training=is_training, momentum=0.9)
         t = tf.nn.relu(t)
-        filter_th2 = tf.get_variable("filter_th2", [2, 2, 1, 64],
-                                     initializer=tf.truncated_normal_initializer(stddev=0.1))
+        filter_th2 = tf.get_variable("filter_th2", [2, 2, 1, 64], initializer=tf.truncated_normal_initializer(stddev=0.1))
         t = tf.nn.conv2d_transpose(t, output_shape=[tf.shape(t)[0], tf.shape(t)[1] * 2, tf.shape(t)[2] * 2, 1],
                                    filter=filter_th2,
                                    strides=[1, 2, 2, 1],
@@ -141,9 +127,7 @@ def dbnet(image_input, input_size=640, k=50, is_training=True, scope="resnet_v1_
 
         # approximate binary map
         b_hat = tf.reciprocal(1 + tf.exp(-k * (p - t)), name='thresh_binary')
-        print(p)
-        print(t)
-        print(b_hat)
+
         return p, t, b_hat
 
 

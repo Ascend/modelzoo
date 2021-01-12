@@ -40,6 +40,7 @@ class Trainer(object):
         from npu_bridge.estimator.npu.npu_estimator import NPUEstimator
 
         run_config = NPURunConfig(
+            auto_tune_mode=os.getenv("FLAG_AUTOTUNE"),
             hcom_parallel=True,
             precision_mode="allow_mix_precision",
             enable_data_pre_proc=True,

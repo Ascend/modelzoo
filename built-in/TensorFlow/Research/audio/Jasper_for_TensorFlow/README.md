@@ -79,7 +79,32 @@ https:gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.
         train_8p.sh
 ```
 
-# [ModelZoo Homepage](#contents)
+## [Checkpoint to pb](#contents)
+
+```
+cd generate_pb
+python ckpt2pb.py
+```
+
+
+
+## [Online Inference](#contents)
+
+```
+python3.7.5 jasper_online_inference.py
+
+args:
+--model_path	 #original path of pb model,default value: ../model/jasper_infer_float32.pb
+--data_dir		 #parents dir of dev.json file，default value：../datasets
+--output_dir	 #the output dir of preprocess of jasper bin files.default value:../datasets
+--pre_process  	 #weather execute preprocess.option value:True/False，default value is: False
+--post_process   #weather execute postprocess.option value:True/False，default value is: True
+--batchSize		 #batch size of inference.default value is 1
+```
+
+
+
+# ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
 

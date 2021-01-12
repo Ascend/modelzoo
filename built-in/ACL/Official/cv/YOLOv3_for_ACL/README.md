@@ -97,7 +97,7 @@ To compare with official implement, for example, we use [get_coco_dataset.sh](ht
 
   ```
   cd scripts
-  bash benchmark_tf.sh --batchSize=1 --modelType=yolov3 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=yolov3_tf_aipp.om --trueValuePath=instants_val2014.json --imgInfoFile=coco2014_minival.txt --classNamePath=coco.names 
+  bash benchmark_tf.sh --batchSize=1 --modelType=yolov3 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=yolov3_tf_aipp.om --trueValuePath=instance_val2014.json --imgInfoFile=coco2014_minival.txt --classNamePath=coco.names 
   ```
 
 

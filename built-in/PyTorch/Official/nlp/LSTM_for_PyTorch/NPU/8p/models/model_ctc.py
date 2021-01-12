@@ -30,7 +30,7 @@ class BatchRNN(nn.Module):
     """
 
     def __init__(self, input_size, hidden_size, rnn_type=nn.LSTM,
-                 bidirectional=False, batch_norm=True, dropout=0.1):
+                 bidirectional=False, batch_norm=True, dropout=0.1, seed=0):
         super(BatchRNN, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -40,7 +40,8 @@ class BatchRNN(nn.Module):
                             bidirectional=False, bias=False)
         self.rnn_w = rnn_type(input_size=input_size, hidden_size=hidden_size,
                               bidirectional=False, bias=False)
-        self.dropout = nn.Dropout(p=dropout)
+        self.prob = dropout
+        self.seed = seed
 
     def forward(self, x):
         if self.batch_norm is not None:
@@ -48,11 +49,14 @@ class BatchRNN(nn.Module):
             x = self.batch_norm(x)
             x = x.transpose(-1, -2)
         x_post, _ = self.rnn(x)
-        x_reverse = torch.flip(x, [0])
-        x_reverse, _ = self.rnn_w(x_reverse)
-        x_reverse = torch.flip(x_reverse, [0])
+        x_reverse = torch.flip(torch.unsqueeze(x, 0), [1])
+        x_reverse, _ = self.rnn_w(torch.squeeze(x_reverse, 0))
+        x_reverse = torch.flip(torch.unsqueeze(x_reverse, 0), [1])
+        x_reverse = torch.squeeze(x_reverse, 0)
+        x_reverse = x_reverse.mul(1.0)
         x = torch.cat((x_post, x_reverse), 2)
-        x = self.dropout(x)
+        if self.training:
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.prob)
         
         return x
 
@@ -63,7 +67,7 @@ class LayerCNN(nn.Module):
     """
 
     def __init__(self, in_channel, out_channel, kernel_size, stride, padding, pooling_size=None,
-                 activation_function=nn.ReLU, batch_norm=True, dropout=0.1):
+                 activation_function=nn.ReLU, batch_norm=True, dropout=0.1, seed=0):
         super(LayerCNN, self).__init__()
         if len(kernel_size) == 2:
             self.conv = nn.Conv2d(in_channel, out_channel, kernel_size=kernel_size, stride=stride, padding=padding)
@@ -78,7 +82,9 @@ class LayerCNN(nn.Module):
             self.pooling = nn.MaxPool1d(pooling_size)
         else:
             self.pooling = None
-        self.dropout = nn.Dropout(p=dropout)
+
+        self.prob = dropout
+        self.seed = seed
 
     def forward(self, x):
         x = self.conv(x)
@@ -87,13 +93,14 @@ class LayerCNN(nn.Module):
         x = self.activation(x)
         if self.pooling is not None:
             x = self.pooling(x)
-        x = self.dropout(x)
+        if self.training:
+            x, _, _ = torch.dropoutV2(x, self.seed, p=self.prob)
 
         return x
 
 
 class CTC_Model(nn.Module):
-    def __init__(self, add_cnn=False, cnn_param=None, rnn_param=None, num_class=39, drop_out=0.1):
+    def __init__(self, add_cnn=False, cnn_param=None, rnn_param=None, num_class=39, drop_out=0.1, seed=0):
         """
         add_cnn   [bool]:  whether add cnn in the model
         cnn_param [dict]:  cnn parameters, only support Conv2d i.e.
@@ -113,7 +120,7 @@ class CTC_Model(nn.Module):
         self.num_class = num_class
         self.num_directions = 2 if rnn_param["bidirectional"] else 1
         self.drop_out = drop_out
-
+        self.seed = seed
         if add_cnn:
             cnns = []
             activation = cnn_param["activate_function"]
@@ -129,7 +136,7 @@ class CTC_Model(nn.Module):
                 pooling_size = cnn_layers[n][4]
 
                 cnn = LayerCNN(in_channel, out_channel, kernel_size, stride, padding, pooling_size,
-                               activation_function=activation, batch_norm=batch_norm, dropout=drop_out)
+                               activation_function=activation, batch_norm=batch_norm, dropout=drop_out, seed=self.seed)
                 cnns.append(('%d' % n, cnn))
 
                 try:
@@ -149,12 +156,12 @@ class CTC_Model(nn.Module):
         bidirectional = rnn_param["bidirectional"]
         batch_norm = rnn_param["batch_norm"]
         rnn = BatchRNN(input_size=rnn_input_size, hidden_size=rnn_hidden_size, rnn_type=rnn_type,
-                       bidirectional=bidirectional, dropout=drop_out, batch_norm=False)
+                       bidirectional=bidirectional, dropout=drop_out, batch_norm=False, seed=self.seed)
         rnns.append(('0', rnn))
         for i in range(rnn_layers - 1):
             rnn = BatchRNN(input_size=self.num_directions * rnn_hidden_size, hidden_size=rnn_hidden_size,
                            rnn_type=rnn_type,
-                           bidirectional=bidirectional, dropout=drop_out, batch_norm=batch_norm)
+                           bidirectional=bidirectional, dropout=drop_out, batch_norm=batch_norm, seed=self.seed)
             rnns.append(('%d' % (i + 1), rnn))
         self.rnns = nn.Sequential(OrderedDict(rnns))
 
@@ -176,9 +183,11 @@ class CTC_Model(nn.Module):
                 visual.append(x)
 
             x = x.transpose(1, 2).contiguous()
+            x = x.mul(1.0)
             sizes = x.size()
             if len(sizes) > 3:
                 x = x.view(sizes[0], sizes[1], sizes[2] * sizes[3])
+            x = x.mul(1.0)
             x = x.transpose(0, 1).contiguous()
 
             if visualize:
