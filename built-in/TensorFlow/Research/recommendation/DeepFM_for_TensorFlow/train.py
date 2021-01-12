@@ -370,8 +370,13 @@ if __name__ == '__main__':
     custom_op.parameter_map["iterations_per_loop"].i = 10
     custom_op.parameter_map["min_group_size"].b = 1
     custom_op.parameter_map["hcom_parallel"].b = True
-    custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")    
- 
+    custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+    # DataDump
+    custom_op.parameter_map["enable_dump"].b = "True" == os.getenv("FLAG_ENABLE_DUMP")
+    custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(os.getenv("DUMP_PATH"))
+    custom_op.parameter_map["dump_step"].s = tf.compat.as_bytes(os.getenv("DUMP_STEP"))
+    custom_op.parameter_map["sump_mode"].s = tf.compat.as_bytes(os.getenv("DUMP_MODE"))
+        
     sess_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
     global_start_time = time.time()

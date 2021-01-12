@@ -9,6 +9,9 @@ fi
 # set env
 export HCCL_CONNECT_TIMEOUT=600
 
+# Autotune
+export FLAG_AUTOTUNE="" #"RL,GA"
+
 currentDir=$(cd "$(dirname "$0")"; pwd)
 
 # user env
