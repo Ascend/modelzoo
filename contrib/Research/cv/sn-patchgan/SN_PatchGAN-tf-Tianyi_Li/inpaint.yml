@@ -1,7 +1,7 @@
 # =========================== Basic Settings ===========================
 # machine info
 num_gpus_per_job: 1  # number of gpus each job need
-num_cpus_per_job: 4  # number of gpus each job need
+num_cpus_per_job: 4  #yuanshi is 4  # number of gpus each job need
 num_hosts_per_job: 1
 memory_per_job: 32  # number of gpus each job need
 gpu_type: 'HUAWEI-Ascend-910'
@@ -26,6 +26,11 @@ random_seed: False
 padding: 'SAME'
 
 # training
+#train_spe: 4000
+#max_iters: 100000000
+#viz_max_out: 10
+#val_psteps: 2000
+
 train_spe: 4000
 max_iters: 100000000
 viz_max_out: 10
@@ -61,7 +66,7 @@ width: 128
 max_delta_height: 32
 max_delta_width: 32
 #batch_size: 16
-batch_size: 16
+batch_size: 11
 vertical_margin: 0
 horizontal_margin: 0
 
