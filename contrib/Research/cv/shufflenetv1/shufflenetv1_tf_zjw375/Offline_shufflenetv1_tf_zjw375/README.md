@@ -17,14 +17,17 @@ shufflenetv2
 └─
   ├─README.md
   ├─LICENSE  
-  ├─input 用于存放验证集.bin文件
-  ├─model 用于存放om模型
-  ├─output 用于存放推理后的预测值.bin文件
-  ├─label_output 用于存放标签.bin文件
-  ├─img_preprocess.py 将RGB图像转换为bin格式
-  ├─label_preprocess.py 将label保存成bin格式
-  ├─accuracy_top1.py.py 验证
-  ├─start_inference.sh 推理、验证脚本文件
+  ├─input                   用于存放验证集.bin文件
+  ├─output                  用于存放推理后的预测值.bin文件
+  ├─label_output            用于存放标签.bin文件
+  ├─model                   用于存放om模型
+  ├─ck_model                用于存放checkpoint模型
+  ├─pb_model                用于存放pb模型
+  ├─model_freeze.py         将.ckpt模型转换为.pb模型
+  ├─img_preprocess.py       将RGB图像转换为bin格式
+  ├─label_preprocess.py     将label保存成bin格式
+  ├─accuracy_top1.py.py     验证
+  ├─start_inference.sh      执行推理、验证脚本文件
 ```
 
 
