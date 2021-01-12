@@ -7,7 +7,7 @@ obs链接：
 
 ATC转换命令：
 ```
-
+/home/HwHiAiUser/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="input:96,224,224,3" --check_report=/home/HwHiAiUser/modelzoo/shufflenetv1/device/network_analysis.report --input_format=NHWC --output="/home/HwHiAiUser/modelzoo/shufflenetv1/device/shufflenetv1" --soc_version=Ascend310 --framework=3 --model="/home/HwHiAiUser/910model/shufflenetv1.pb"
 ``` 
 
 ## 3、文件
