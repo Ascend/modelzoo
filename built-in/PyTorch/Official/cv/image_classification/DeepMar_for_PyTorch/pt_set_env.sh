@@ -23,6 +23,7 @@ else
 fi
 
 # ln -s /usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc /usr/local/bin/
+source env_new.sh
 
 export SLOG_PRINT_TO_STDOUT=0
 #su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
