@@ -10,11 +10,11 @@ https://github.com/shicai/MobileNet-Caffe
 
 原始模型网络下载地址 ：
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/garbage/mobilenetv2.pb
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com:443/003_Atc_Models/AE/ATC%20Model/garbage/mobilenetv2.air
 
 对应的cfg文件：
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/garbage/insert_op.cfg
+https://c7xcode.obs.cn-north-4.myhuaweicloud.com/models/garbage_picture/insert_op_yuv.cfg
 
 
 ## om模型
@@ -26,7 +26,7 @@ https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/AT
 使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
 
 ```
-atc --model=mobilenetv2.pb  --framework=1 --output=mobilenetv2 --insert_op_conf=mobilenetv2.cfg  --soc_version=Ascend310
+atc --model=mobilenetv2.air  --framework=1 --output=mobilenetv2  --soc_version=Ascend310
 ```
 
 ## 使用msame工具推理
