@@ -38,13 +38,13 @@ shufflenetv1
   ├─layers.py 定义搭建模型所需函数
   ├─input_pipline.py 数据处理
 ```
-## 数据集合预训练模型
+## 数据集和预训练模型
 
 数据集：ImageNet12 桶地址：obs://zjw-shufflenet/data
 
 预训练模型：checkpoint 桶地址：obs://modelarts-zjw/pretrained_model
 
-
+生成的模型：checkpoint 桶地址：obs://modelarts-zjw/trained_model
 ## 训练过程及验证结果
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/171048_48ebe3c1_8511959.png "屏幕截图.png")
 
