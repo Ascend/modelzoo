@@ -1,14 +1,15 @@
 ## 1、原始模型
 模型下载来自：由训练脚本产生的模型。桶地址：obs://modelarts-zjw/trained_model
+
 将保存的ckpt文件转化为pb文件之后，使用ATC工具转化成om模型
 
 ## 2、转om模型
 obs链接：obs://modelarts-zjw/om_model
 
 ATC转换命令：
-```
+
 /home/HwHiAiUser/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="input:96,224,224,3" --check_report=/home/HwHiAiUser/modelzoo/shufflenetv1/device/network_analysis.report --input_format=NHWC --output="/home/HwHiAiUser/modelzoo/shufflenetv1/device/shufflenetv1" --soc_version=Ascend310 --framework=3 --model="/home/HwHiAiUser/910model/shufflenetv1.pb"
-``` 
+ 
 
 ## 3、代码及路径解释
 
