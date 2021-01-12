@@ -42,7 +42,7 @@ import numpy as np
 
 from apex import amp
 from multi_epochs_dataloader import MultiEpochsDataLoader
-
+import pretrained_model_loader
 
 BATCH_SIZE = 512
 OPTIMIZER_BATCH_SIZE = 2048
@@ -255,15 +255,20 @@ def main_worker(gpu, ngpus_per_node, args):
     # optionally resume from a checkpoint
     if args.resume:
         if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume, map_location=loc)
-            args.start_epoch = checkpoint['epoch']
-            best_acc1 = checkpoint['best_acc1']
-            model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            if args.amp:
-                amp.load_state_dict(checkpoint['amp'])
-            print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
+            if args.pretrained:
+                checkpoint = torch.load(args.resume, map_location=loc)
+                pretrained_model_loader.load_state_dict(model, checkpoint)
+                print("=> loaded pretrained model '{}'".format(args.resume))
+            else:
+                print("=> loading checkpoint '{}'".format(args.resume))
+                checkpoint = torch.load(args.resume, map_location=loc)
+                args.start_epoch = checkpoint['epoch']
+                best_acc1 = checkpoint['best_acc1']
+                model.load_state_dict(checkpoint['state_dict'])
+                optimizer.load_state_dict(checkpoint['optimizer'])
+                if args.amp:
+                    amp.load_state_dict(checkpoint['amp'])
+                print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
