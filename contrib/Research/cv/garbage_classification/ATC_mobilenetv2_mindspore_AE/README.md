@@ -6,7 +6,7 @@
 
 参考实现 ：
 
-https://github.com/shicai/MobileNet-Caffe
+https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2
 
 原始模型网络下载地址 ：
 
