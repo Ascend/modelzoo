@@ -4,6 +4,9 @@ export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 0
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 4
+
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_1p_job_${currtime}
