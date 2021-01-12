@@ -1,4 +1,5 @@
 source ./env_b031.sh
+source ./env_new.sh
 export PYTHONPATH=./:$PYTHONPATH
 export SLOG_PRINT_TO_STDOUT=0
 export GLOBAL_LOG_LEVEL=3
