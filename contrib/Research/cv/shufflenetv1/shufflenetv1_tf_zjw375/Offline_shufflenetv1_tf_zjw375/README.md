@@ -36,8 +36,9 @@ shufflenetv2
 
 ## 5、数据处理(这里我们直接给出处理后的数据)
 
-从。。。。下载。zip 在input文件夹中解压 unzip .zip
-从       下载.zip 在label_output文件夹中解压 unzip .zip
+从 obs://modelarts-zjw/Inference_input 下载input.tar.gz 解压至input文件夹
+
+从obs://modelarts-zjw/Inference_label_output 下载label_output.tar.gz 解压至label_output文件夹
 
 
 ## 6、性能、精度测试：
