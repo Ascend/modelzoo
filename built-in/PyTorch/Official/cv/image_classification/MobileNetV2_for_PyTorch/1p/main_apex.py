@@ -46,6 +46,7 @@ import numpy as np
 
 from hook import *
 
+
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('--data', metavar='DIR', default='/dataset/imagenet',
                     help='path to dataset')
