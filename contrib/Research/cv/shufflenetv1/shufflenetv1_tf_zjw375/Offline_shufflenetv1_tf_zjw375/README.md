@@ -45,7 +45,7 @@ shufflenetv2
 使用的数据集为ImageNet12, 推理输入的格式：Batch_size:96，shape:96x224x224x3.
 
 bash start_inference.sh
-```
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0112/113240_903ac216_8511959.png "屏幕截图.png")
-```
+
 每个batch的推理时间为：1942.04 / 16 = 17.10ms 推理精度为0.61
