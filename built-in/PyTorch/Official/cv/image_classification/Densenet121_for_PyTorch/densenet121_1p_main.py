@@ -77,7 +77,7 @@ parser.add_argument('-p', '--print-freq', default=1, type=int,
                     metavar='N', help='print frequency (default: 10)')
 parser.add_argument('-ef', '--eval-freq', default=5, type=int,
                     metavar='N', help='evaluate frequency (default: 5)')
-parser.add_argument('--resume',default='', type=str, metavar='PATH',
+parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')

@@ -428,8 +428,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % ngpus_per_node == 0):
         print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
-        hwlog.remark_print(key=hwlog.FPS,
-                           value=' * FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
 
 
 def validate(val_loader, model, criterion, args, ngpus_per_node):
