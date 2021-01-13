@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 source npu_set_env.sh
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+export ASCEND_GLOBAL_LOG_LEVEL=3
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 
