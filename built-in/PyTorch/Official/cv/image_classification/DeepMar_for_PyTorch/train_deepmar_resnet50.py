@@ -31,7 +31,6 @@ import time
 import argparse
 import pdb
 import sys
-from torch.utils.tensorboard import SummaryWriter
 
 from baseline.dataset import add_transforms
 from baseline.dataset.Dataset import AttDataset
