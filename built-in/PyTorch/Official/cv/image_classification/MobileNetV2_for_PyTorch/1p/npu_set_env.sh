@@ -14,6 +14,6 @@ fi
 
 source env_new.sh
 
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
-export GLOBAL_LOG_LEVEL=3
+export ASCEND_GLOBAL_LOG_LEVEL=3
