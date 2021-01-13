@@ -27,7 +27,7 @@ fi
 
 source env_new.sh
 
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 #su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
 
 export TASK_QUEUE_ENABLE=1
