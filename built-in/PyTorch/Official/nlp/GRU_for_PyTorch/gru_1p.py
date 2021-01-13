@@ -124,6 +124,9 @@ def main_worker(args):
         batch_size=args.batch_size,
         device=device)
 
+    seed_init = gen_seeds(32*1024*12).float().to(CALCULATE_DEVICE)
+    print('seed init', seed_init)
+
     enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, ENC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
     dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, DEC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
 
