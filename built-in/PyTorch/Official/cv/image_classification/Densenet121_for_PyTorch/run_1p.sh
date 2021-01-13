@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source npu_set_env.sh
-ip=$(hostname -I|awk '{print $1}')
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host ${ip}:22118 --log \"SetLogLevel(0)[error]\" --device 0"
+
+su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 172.17.0.1:22118 --log \"SetLogLevel(0)[error]\" --device 0"
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
