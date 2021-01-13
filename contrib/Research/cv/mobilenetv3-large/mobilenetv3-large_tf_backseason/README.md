@@ -122,9 +122,17 @@ Our result were obtained by running the applicable training script. To achieve t
 | 1xAscend 910 |  60 (fintune)   | 72.7% -> 74.1% |
 
 #### Training performance results
-| Platform     | train performance      |
-| :----------: | :--------------------: |
-| 1xAscend 910 |  781 img/s (bz=640\*1)  |
-| 1xAscend 910 |  1536 img/s (bz=256\*1) |
-| 4xRTX Titan  |  2400 img/s (bz=320\*4) |
+| Platform         | batch size |  speed    |
+| :--------------: | :--------: |:--------: |
+| 1xAscend 910     |    192     | 1882 img/s|
+| 1xTesla V100-16G |    192     | 774 img/s |
+| 1xAscend 910     |    128     | 1805 img/s|
+| 1xTesla V100-16G |    128     | 691 img/s |
+| 1xAscend 910     |    64      | 1498 img/s|
+| 1xTesla V100-16G |    64      | 525 img/s |
+| 1xAscend 910     |    32      | 1110 img/s|
+| 1xTesla V100-16G |    32      | 355 img/s |
+| 1xAscend 910     |    1       | 68  img/s |
+| 1xTesla V100-16G |    1       | 21 img/s |
+
 
