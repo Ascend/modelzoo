@@ -133,7 +133,7 @@ class Config(object):
                                  'multi node data parallel training')
                        
         parser.add_argument('--device_num', default=-1, type=int, help='device num')
-        parser.add_argument('--device_list', default='', type=str, help='device id list')
+        parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
 
 
         args = parser.parse_args()
