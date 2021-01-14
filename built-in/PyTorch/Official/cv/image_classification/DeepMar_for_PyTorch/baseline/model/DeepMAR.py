@@ -61,8 +61,8 @@ class DeepMAR_ResNet50(nn.Module):
         x = F.avg_pool2d(x, (7, 7))
         # x = x.view(x.size(0), -1)
         x = torch.flatten(x, 1)
-        # if self.drop_pool5:
-        #    x = F.dropout(x, p=self.drop_pool5_rate, training=self.training)
+        if self.drop_pool5:
+            x = F.dropout(x, p=self.drop_pool5_rate, training=self.training)
         x = self.classifier(x)
         return x
 
