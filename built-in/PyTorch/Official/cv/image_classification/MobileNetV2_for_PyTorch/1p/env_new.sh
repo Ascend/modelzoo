@@ -3,7 +3,7 @@ import sys
 import re
 result=''
 for index in range(len(sys.path)):
-    match_sit = re.search('site', sys.path[index])
+    match_sit = re.search('-packages', sys.path[index])
     if match_sit is not None:
         match_lib = re.search('lib', sys.path[index])
 
