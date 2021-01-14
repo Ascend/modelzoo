@@ -90,7 +90,8 @@ class EstimatorImpl:
         #################################################################
         from npu_bridge.estimator.npu.npu_config import NPURunConfig
         from npu_bridge.estimator.npu.npu_estimator import NPUEstimator
-
+        from npu_bridge.estimator.npu.npu_config import DumpConfig
+        
         self.estimator_config = tf.ConfigProto(
             inter_op_parallelism_threads=10,
             intra_op_parallelism_threads=10,
