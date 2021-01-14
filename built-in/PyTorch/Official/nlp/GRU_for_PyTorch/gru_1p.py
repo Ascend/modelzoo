@@ -35,8 +35,12 @@ DEC_DROPOUT = 0.5
 CLIP = 1
 
 MAX = 2147483647
+
+
 def gen_seeds(num):
-    return torch.randint(1,MAX,size=(num,),dtype=torch.float)
+    return torch.randint(1, MAX, size=(num,), dtype=torch.float)
+
+
 seed_init = 0
 
 parser = argparse.ArgumentParser(description='PyTorch Seq2seq-GRU Training')
@@ -72,7 +76,7 @@ parser.add_argument('--npu', default=None, type=int,
 # apex
 parser.add_argument('--amp', default=False, action='store_true',
                     help='use amp to train the model')
-parser.add_argument('--loss-scale', default=1024., type=float,
+parser.add_argument('--loss-scale', default=32., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
@@ -124,14 +128,10 @@ def main_worker(args):
         batch_size=args.batch_size,
         device=device)
 
-    seed_init = gen_seeds(32*1024*12).float().to(CALCULATE_DEVICE)
-    print('seed init', seed_init)
+    seed_init = gen_seeds(32 * 1024 * 12).float().to(CALCULATE_DEVICE)
 
     enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, ENC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
     dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, DEC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
-
-    seed_init = gen_seeds(32 * 1024 * 12).float().to(CALCULATE_DEVICE)
-    print('seed init', seed_init)
 
     model = Seq2Seq(enc, dec, device).to(CALCULATE_DEVICE)
     model.apply(init_weights)
@@ -207,7 +207,8 @@ def train(model, iterator, optimizer, criterion, args, clip):
         optimizer.step()
 
         batch_time = time.time() - start
-        print('loss: %.4f' % loss.item(),'batch_time:%.8f' % batch_time,'data_time:%.8f' % data_time,'FPS:%.8f' % (args.batch_size / batch_time))
+        print('loss: %.4f' % loss.item(), 'batch_time:%.8f' % batch_time, 'data_time:%.8f' % data_time,
+              'FPS:%.8f' % (args.batch_size / batch_time))
 
         epoch_loss += loss.item()
         end = time.time()

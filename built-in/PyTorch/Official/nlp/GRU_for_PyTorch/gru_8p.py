@@ -81,7 +81,7 @@ parser.add_argument('--device-list', default='0,1,2,3,4,5,6,7', type=str, help='
 # apex
 parser.add_argument('--amp', default=False, action='store_true',
                     help='use amp to train the model')
-parser.add_argument('--loss-scale', default=1024., type=float,
+parser.add_argument('--loss-scale', default=32., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
@@ -122,7 +122,6 @@ def main():
     else:
         # Simply call main_worker function
         main_worker(args.npu, ngpus_per_node, args)
-
 
 def main_worker(npu, ngpus_per_node, args):
     args.npu = args.process_device_map[npu]
@@ -171,7 +170,6 @@ def main_worker(npu, ngpus_per_node, args):
     test_iterator = Iterator(test_data, batch_size=args.batch_size, device=device)
 
     seed_init = gen_seeds(32*1024*12).float().to(CALCULATE_DEVICE)
-    print('seed init', seed_init)
 
     enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, ENC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
     dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, DEC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
@@ -201,9 +199,8 @@ def main_worker(npu, ngpus_per_node, args):
 
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            torch.save(model.state_dict(), 'seq2seq-gru-model.pth.tar')
+    torch.save(model.state_dict(), 'seq2seq-gru-model.pth.tar')
+
 
 
 def train(model, train_iterator, optimizer, criterion, epoch, args, ngpus_per_node, clip):
@@ -253,14 +250,13 @@ def train(model, train_iterator, optimizer, criterion, epoch, args, ngpus_per_no
                 progress.display(i)
 
         batch_time.update(time.time() - end)
+        epoch_loss += loss.item()
+        end = time.time()
 
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % ngpus_per_node == 0):
         print("[npu id:", args.npu, "]",
               '* FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
-
-        epoch_loss += loss.item()
-        end = time.time()
 
     return epoch_loss / len(train_iterator)
 
