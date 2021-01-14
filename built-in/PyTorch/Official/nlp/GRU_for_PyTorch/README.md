@@ -1,6 +1,6 @@
 一、准数据集<br>
-下载数据集，并在模型脚本目录创建data/multi30k，将数据集数据解压至该目录下。
-mkdir -p data/multi30k
+下载数据集，并在模型脚本目录创建data/multi30k，在该目录下下载解压数据集。
+mkdir -p ./.data/multi30k
 wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/training.tar.gz &&  tar -xf training.tar.gz -C data/multi30k && rm training.tar.gz
 wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/validation.tar.gz && tar -xf validation.tar.gz -C data/multi30k && rm validation.tar.gz
 wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/mmt16_task1_test.tar.gz && tar -xf mmt16_task1_test.tar.gz -C data/multi30k && rm mmt16_task1_test.tar.gz
@@ -50,3 +50,9 @@ wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/mmt16_task1_test.tar.gz && 
 
     ./docker_start.sh pytorch:b020 ./data/multi30k /home/GRU
 3.执行步骤一训练流程（环境安装除外）
+
+四、测试结果
+
+训练日志路径：在训练脚本的同目录下result文件夹里，如：
+
+    ./result/training_8p_job_20201121023601
