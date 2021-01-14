@@ -5,9 +5,11 @@ mkdir -p "$MODELDIR"
 LOGFILE="$MODELDIR/log"
 STAT_FILE="log.txt"
 
+source env_new.sh
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+export ASCEND_GLOBAL_LOG_LEVEL=3
 export PTCOPY_ENABLE=1
 export TASK_QUEUE_ENABLE=1
-export GLOBAL_LOG_LEVEL=3
 export DYNAMIC_OP="ADD#MUL"
 
 python3 -u train_1p.py \
