@@ -35,21 +35,21 @@ import sys
 from baseline.dataset import add_transforms
 from baseline.dataset.Dataset import AttDataset
 from baseline.model.DeepMAR import DeepMAR_ResNet50
-from baseline.model.DeepMAR import DeepMAR_ResNet50_ExtractFeature 
+from baseline.model.DeepMAR import DeepMAR_ResNet50_ExtractFeature
 from baseline.utils.evaluate import attribute_evaluate
 from baseline.utils.utils import str2bool
 from baseline.utils.utils import transfer_optim_state
 from baseline.utils.utils import time_str
 from baseline.utils.utils import save_ckpt, load_ckpt
-from baseline.utils.utils import load_state_dict 
+from baseline.utils.utils import load_state_dict
 from baseline.utils.utils import ReDirectSTD
 from baseline.utils.utils import adjust_lr_staircase
 
 from baseline.utils.utils import set_devices
 from baseline.utils.utils import AverageMeter
-from baseline.utils.utils import to_scalar 
-from baseline.utils.utils import may_set_mode 
-from baseline.utils.utils import may_mkdir 
+from baseline.utils.utils import to_scalar
+from baseline.utils.utils import may_set_mode
+from baseline.utils.utils import may_mkdir
 from baseline.utils.utils import set_seed
 from baseline.utils.utils import seed_everything
 
@@ -57,15 +57,16 @@ from baseline.utils.utils import seed_everything
 from apex import amp
 import torch.npu
 
+
 class Config(object):
     def __init__(self):
-        
+
         parser = argparse.ArgumentParser()
         parser.add_argument('--npu', type=int, default=0, help='NPU id to use.')
         parser.add_argument('--set_seed', type=str2bool, default=False)
         ## dataset parameter
         parser.add_argument('--dataset', type=str, default='peta',
-                choices=['peta','rap', 'pa100k', 'rap2'])
+                            choices=['peta', 'rap', 'pa100k', 'rap2'])
         parser.add_argument('--save_dir', type=str, default='/home/dataset/peta/')
         parser.add_argument('--split', type=str, default='trainval',
                             choices=['trainval', 'train'])
@@ -78,7 +79,7 @@ class Config(object):
         # model
         parser.add_argument('--num_att', type=int, default=35)
         parser.add_argument('--pretrained', type=str2bool, default=True)
-        parser.add_argument('--last_conv_stride', type=int, default=2, choices=[1,2])
+        parser.add_argument('--last_conv_stride', type=int, default=2, choices=[1, 2])
         parser.add_argument('--drop_pool5', type=str2bool, default=True)
         parser.add_argument('--drop_pool5_rate', type=float, default=0.5)
 
@@ -87,7 +88,7 @@ class Config(object):
         parser.add_argument('--new_params_lr', type=float, default=0.001)
         parser.add_argument('--finetuned_params_lr', type=float, default=0.001)
         parser.add_argument('--staircase_decay_at_epochs', type=eval,
-                            default=(51, ))
+                            default=(51,))
         parser.add_argument('--staircase_decay_multiple_factor', type=float,
                             default=0.1)
         parser.add_argument('--total_epochs', type=int, default=150)
@@ -113,14 +114,14 @@ class Config(object):
         parser.add_argument('--opt_level', default='O2', type=str,
                             help='opt level using in amp, default O2 means FP16')
         args = parser.parse_args()
-        
+
         # gpu ids
         self.npu = args.npu
         # random
         self.set_seed = args.set_seed
         if self.set_seed:
             self.seed = 0
-        else: 
+        else:
             self.seed = None
         # amp
         self.amp = args.amp
@@ -130,13 +131,13 @@ class Config(object):
         self.run = args.run
         # Dataset #
         datasets = dict()
-        datasets['peta'] =  args.save_dir + '/peta_dataset.pkl'
+        datasets['peta'] = args.save_dir + '/peta_dataset.pkl'
         partitions = dict()
         partitions['peta'] = args.save_dir + '/peta_partition.pkl'
-        
+
         self.dataset_name = args.dataset
-        if args.dataset not in datasets  or args.dataset not in partitions:
-            print ("Please select the right dataset name.")
+        if args.dataset not in datasets or args.dataset not in partitions:
+            print("Please select the right dataset name.")
             raise ValueError
         else:
             self.dataset = datasets[args.dataset]
@@ -165,13 +166,13 @@ class Config(object):
         self.ckpt_file = args.ckpt_file
         if self.resume:
             if self.ckpt_file == '':
-                print ('Please input the ckpt_file if you want to resume training')
+                print('Please input the ckpt_file if you want to resume training')
                 raise ValueError
         self.load_model_weight = args.load_model_weight
         self.model_weight_file = args.model_weight_file
         if self.load_model_weight:
             if self.model_weight_file == '':
-                print ('Please input the model_weight_file if you want to load model weight')
+                print('Please input the model_weight_file if you want to load model weight')
                 raise ValueError
         self.test_only = args.test_only
         self.exp_dir = args.exp_dir
@@ -181,7 +182,7 @@ class Config(object):
         self.epochs_per_val = args.epochs_per_val
         self.epochs_per_save = args.epochs_per_save
         self.run = args.run
-        
+
         # for model
         model_kwargs = dict()
         model_kwargs['num_att'] = args.num_att
@@ -194,15 +195,16 @@ class Config(object):
 
         if self.exp_dir == '':
             self.exp_dir = os.path.join('exp',
-                '{}'.format(self.exp_subpath),
-                '{}'.format(self.dataset_name),
-                'partition{}'.format(self.partition_idx),
-                'run{}'.format(self.run))
+                                        '{}'.format(self.exp_subpath),
+                                        '{}'.format(self.dataset_name),
+                                        'partition{}'.format(self.partition_idx),
+                                        'run{}'.format(self.run))
         self.stdout_file = os.path.join(self.exp_dir, \
-            'log', 'stdout_{}.txt'.format(time_str()))
+                                        'log', 'stdout_{}.txt'.format(time_str()))
         self.stderr_file = os.path.join(self.exp_dir, \
-            'log', 'stderr_{}.txt'.format(time_str()))
+                                        'log', 'stderr_{}.txt'.format(time_str()))
         may_mkdir(self.stdout_file)
+
 
 ### main function ###
 cfg = Config()
@@ -214,6 +216,7 @@ if cfg.log_to_file:
 
 # dump the configuration to log.
 import pprint
+
 print('-' * 60)
 print('cfg.__dict__')
 pprint.pprint(cfg.__dict__)
@@ -232,40 +235,40 @@ torch.npu.set_device(CALCULATE_DEVICE)
 # dataset 
 normalize = transforms.Normalize(mean=cfg.mean, std=cfg.std)
 transform = transforms.Compose([
-        transforms.Resize(cfg.resize),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        normalize,])
+    transforms.Resize(cfg.resize),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    normalize, ])
 # by a subset of attributes 
 train_set = AttDataset(
-    dataset = cfg.dataset, 
-    partition = cfg.partition,
-    split = cfg.split,
-    partition_idx= cfg.partition_idx,
-    transform = transform)
+    dataset=cfg.dataset,
+    partition=cfg.partition,
+    split=cfg.split,
+    partition_idx=cfg.partition_idx,
+    transform=transform)
 
 num_att = len(train_set.dataset['selected_attribute'])
 cfg.model_kwargs['num_att'] = num_att
 
 train_loader = torch.utils.data.DataLoader(
-    dataset = train_set,
-    batch_size = cfg.batch_size,
-    shuffle = True,
-    num_workers = cfg.workers,
-    pin_memory = True,
-    drop_last = True)
+    dataset=train_set,
+    batch_size=cfg.batch_size,
+    shuffle=True,
+    num_workers=cfg.workers,
+    pin_memory=True,
+    drop_last=True)
 
 test_transform = transforms.Compose([
-        transforms.Resize(cfg.resize),
-        transforms.ToTensor(),
-        normalize,])
+    transforms.Resize(cfg.resize),
+    transforms.ToTensor(),
+    normalize, ])
 
 test_set = AttDataset(
-    dataset = cfg.dataset,
-    partition = cfg.partition,
-    split = cfg.test_split,
-    partition_idx = cfg.partition_idx,
-    transform = test_transform)
+    dataset=cfg.dataset,
+    partition=cfg.partition,
+    split=cfg.test_split,
+    partition_idx=cfg.partition_idx,
+    transform=test_transform)
 
 ### Att model ###
 model = DeepMAR_ResNet50(**cfg.model_kwargs)
@@ -274,7 +277,7 @@ model = DeepMAR_ResNet50(**cfg.model_kwargs)
 finetuned_params = []
 new_params = []
 for n, p in model.named_parameters():
-    if n.find('classifier') >=0:
+    if n.find('classifier') >= 0:
         new_params.append(p)
     else:
         finetuned_params.append(p)
@@ -283,8 +286,8 @@ param_groups = [{'params': finetuned_params, 'lr': cfg.finetuned_params_lr},
 
 optimizer = optim.SGD(
     param_groups,
-    momentum = cfg.sgd_momentum,
-    weight_decay = cfg.sgd_weight_decay)
+    momentum=cfg.sgd_momentum,
+    weight_decay=cfg.sgd_weight_decay)
 
 model = model.to(CALCULATE_DEVICE)
 # apex
@@ -292,7 +295,6 @@ if cfg.amp:
     # Initialization
     model, optimizer = amp.initialize(model, optimizer, opt_level=cfg.opt_level, loss_scale=cfg.loss_scale)
     print("=> Using amp mode.")
-
 
 # using the weighted cross entropy loss
 if cfg.weighted_entropy:
@@ -306,7 +308,7 @@ if rate is None:
     weight_neg = [1 for i in range(num_att)]
 else:
     if len(rate) != num_att:
-        print ("the length of rate should be equal to %d" % (num_att))
+        print("the length of rate should be equal to %d" % (num_att))
         raise ValueError
     weight_pos = []
     weight_neg = []
@@ -319,7 +321,7 @@ modules_optims = [model, optimizer]
 
 # load model weight if necessary
 if cfg.load_model_weight:
-    map_location = (lambda storage, loc:storage)
+    map_location = (lambda storage, loc: storage)
     ckpt = torch.load(cfg.model_weight_file, map_location=map_location)
     model.load_state_dict(ckpt['state_dicts'][0], strict=False)
 
@@ -338,10 +340,11 @@ transfer_optim_state(state=optimizer.state, device_id=cfg.npu)
 # for evaluation
 feat_func_att = DeepMAR_ResNet50_ExtractFeature(model=model)
 
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
-    def __init__(self, name, fmt=':f', start_count_index=2):
+    def __init__(self, name, fmt=':f', start_count_index=9):
         self.name = name
         self.fmt = fmt
         self.reset()
@@ -367,28 +370,30 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
 
+
 def attribute_evaluate_subfunc(feat_func, test_set, device_id, **test_kwargs):
     """ evaluate the attribute recognition precision """
     result = attribute_evaluate(feat_func, test_set, device_id, **test_kwargs)
-    print ('-' * 60)
-    print ('Evaluation on %s set:' % (cfg.test_split))
-    print ('Label-based evaluation: \n mA: %.4f'%(np.mean(result['label_acc'])))
-    print ('Instance-based evaluation: \n Acc: %.4f, Prec: %.4f, Rec: %.4f, F1: %.4f' \
-        %(result['instance_acc'], result['instance_precision'], result['instance_recall'], result['instance_F1']))
-    print ('-' * 60)
+    print('-' * 60)
+    print('Evaluation on %s set:' % (cfg.test_split))
+    print('Label-based evaluation: \n mA: %.4f' % (np.mean(result['label_acc'])))
+    print('Instance-based evaluation: \n Acc: %.4f, Prec: %.4f, Rec: %.4f, F1: %.4f' \
+          % (result['instance_acc'], result['instance_precision'], result['instance_recall'], result['instance_F1']))
+    print('-' * 60)
 
     # return result['instance_acc']
+
 
 def save_checkpoint(state, filename='checkpoint.path.tar'):
     torch.save(state, filename)
 
+
 # print the model into log
 # test only
 if cfg.test_only:
-    print ('test with feat_func_att')
+    print('test with feat_func_att')
     attribute_evaluate_subfunc(feat_func_att, test_set, **cfg.test_kwargs)
     sys.exit(0)
-
 
 # training
 for epoch in range(start_epoch, cfg.total_epochs):
@@ -402,20 +407,20 @@ for epoch in range(start_epoch, cfg.total_epochs):
         epoch + 1,
         cfg.staircase_decay_at_epochs,
         cfg.staircase_decay_multiple_factor)
-    
+
     may_set_mode(modules_optims, 'train')
     # recording loss
     loss_meter = AverageMeter('Loss', ':.4e', start_count_index=0)
     batch_time = AverageMeter('Time', ':6.3f')
-    dataset_L = len(train_loader) # crop batch data
+    dataset_L = len(train_loader)  # crop batch data
     ep_st = time.time()
-    ep_st_mark=ep_st
+    ep_st_mark = ep_st
     # runing every batch data
     for step, (imgs, targets) in enumerate(train_loader):
 
         step_st = time.time()
         # measure data loading time
-        data_time = step_st-ep_st
+        data_time = step_st - ep_st
 
         imgs_var = Variable(imgs)
         targets_var = Variable(targets)
@@ -461,17 +466,17 @@ for epoch in range(start_epoch, cfg.total_epochs):
         # do not include data load time
         if (step + 1) % cfg.steps_per_log == 0 or (step + 1) % len(train_loader) == 0:
             log = '{}, Step {}/{} in Ep {}, {:.2f}s, datatime:{:.6f}, batchtime:{:.6f}, FPS:{:.2f}, loss:{:.4f}'.format( \
-            time_str(), step + 1, dataset_L, epoch + 1, time.time() - step_st, data_time, batch_time.val, fps, loss_meter.val)
+                time_str(), step + 1, dataset_L, epoch + 1, time.time() - step_st, data_time, batch_time.val, fps,
+                loss_meter.val)
 
             print(log)
-
 
     ##############
     # epoch log  #
     ##############
     epoch_time = time.time() - ep_st_mark
     log = 'Ep{}, {:.2f}s, loss {:.4f}'.format(
-        epoch+1, epoch_time, loss_meter.avg)
+        epoch + 1, epoch_time, loss_meter.avg)
     print(log)
     print(' * FPS@all {:.3f}'.format(cfg.batch_size / batch_time.avg))
 
