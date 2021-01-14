@@ -6,7 +6,7 @@ su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
-train_log_dir=${currentDir}/result/training_1p_job_${currtime}
+train_log_dir=${currentDir}/result/training_8p_job_${currtime}
 mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
@@ -14,7 +14,7 @@ echo "train log path is ${train_log_dir}"
 export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 
-python3.7 ${currentDir}/densenet121_1p_main.py \
+python3.7 ${currentDir}/densenet121_8p_main.py \
         --addr=$(hostname -I|awk '{print $1}') \
         --seed 49 \
         --workers 160 \
@@ -32,4 +32,4 @@ python3.7 ${currentDir}/densenet121_1p_main.py \
         --device-list '0,1,2,3,4,5,6,7' \
         --amp \
         --benchmark 0 \
-        --data /data/imagenet/ > ./densenet121_1p.log 2>&1 &
+        --data /data/imagenet/ > ./densenet121_8p.log 2>&1 &
