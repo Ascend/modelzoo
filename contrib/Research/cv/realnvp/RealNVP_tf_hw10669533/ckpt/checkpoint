@@ -1,0 +1,6 @@
+model_checkpoint_path: "/home/work/workspace/device2/save_model_1608121226.1290338/params_cifar.ckpt"
+all_model_checkpoint_paths: "/home/work/workspace/device2/save_model_1608115941.772958/params_cifar.ckpt"
+all_model_checkpoint_paths: "/home/work/workspace/device2/save_model_1608117264.8041062/params_cifar.ckpt"
+all_model_checkpoint_paths: "/home/work/workspace/device2/save_model_1608118585.1958208/params_cifar.ckpt"
+all_model_checkpoint_paths: "/home/work/workspace/device2/save_model_1608119903.816429/params_cifar.ckpt"
+all_model_checkpoint_paths: "/home/work/workspace/device2/save_model_1608121226.1290338/params_cifar.ckpt"
