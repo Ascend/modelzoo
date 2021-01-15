@@ -30,6 +30,7 @@ class BigGAN(object):
         self.n_critic = args.n_critic
         self.sn = args.sn
         self.ld = args.ld
+        self.args =args
 
 
         self.sample_num = args.sample_num  # number of generated images to be saved
@@ -52,10 +53,15 @@ class BigGAN(object):
             self.c_dim = 3
             self.data = load_cifar10(size=self.img_size)
 
-        else :
+        else:
             self.c_dim = 3
+            print('------dataset ----', self.dataset_name)
             self.data = load_data(dataset_name=self.dataset_name, size=self.img_size)
+            print("----self.data ---", self.data)
             self.custom_dataset = True
+
+        if self.args.phase == 'test':
+            self.custom_dataset = False
 
 
         self.dataset_num = len(self.data)
@@ -112,6 +118,7 @@ class BigGAN(object):
 
             x = conv(x, channels=self.c_dim, kernel=3, stride=1, pad=1, pad_type='zero', scope='g_logit')
             x = tanh(x)
+            # x = tf.identity(x, name='fake_image')
 
             return x
 
@@ -234,10 +241,10 @@ class BigGAN(object):
         """ Graph Input """
         # images
         # tf.random.set_random_seed(1234)
-        if self.custom_dataset :
+        if self.custom_dataset:
             Image_Data_Class = ImageData(self.img_size, self.c_dim)
+            print('--- self.data---', self.data)
             inputs = tf.data.Dataset.from_tensor_slices(self.data)
-
             inputs = inputs.repeat(self.dataset_num).apply(map_and_batch(Image_Data_Class.image_processing, self.batch_size, num_parallel_batches=16, drop_remainder=True))
 
             #inputs_iterator = inputs.make_one_shot_iterator()
@@ -245,55 +252,65 @@ class BigGAN(object):
 
             #self.inputs = inputs_iterator.get_next()
             self.inputs = inputs
-        else :
+        else:
             self.inputs = tf.placeholder(tf.float32, [self.batch_size, self.img_size, self.img_size, self.c_dim], name='real_images')
+        if self.args.phase == 'test':
+            self.z = tf.placeholder(tf.float32, [1, 1, 1, self.z_dim], name='z')
 
-        rank_size = 8
-        rank_id = int(os.getenv('DEVICE_ID'))
-        print('train ranksize = %d, rankid = %d' % (rank_size, rank_id))
-        self.inputs = self.inputs.shard(rank_size, rank_id)
-        inputs_iterator = self.inputs.make_one_shot_iterator()
+            """ Loss Function """
+            # output of D for real images
+            # real_logits = self.discriminator(self.inputs)
 
-        self.inputs = inputs_iterator.get_next()
-        # noises
-        self.z = tf.placeholder(tf.float32, [self.batch_size, 1, 1, self.z_dim], name='z')
+            # output of D for fake images
+            fake_images = self.generator(self.z)
+            # fake_logits = self.discriminator(fake_images, reuse=True)
+        else:
+            rank_size = 8
+            rank_id = int(os.getenv('DEVICE_ID'))
+            print('train ranksize = %d, rankid = %d' % (rank_size, rank_id))
+            self.inputs = self.inputs.shard(rank_size, rank_id)
+            inputs_iterator = self.inputs.make_one_shot_iterator()
 
-        """ Loss Function """
-        # output of D for real images
-        real_logits = self.discriminator(self.inputs)
+            self.inputs = inputs_iterator.get_next()
+            # noises
+            self.z = tf.placeholder(tf.float32, [self.batch_size, 1, 1, self.z_dim], name='z')
 
-        # output of D for fake images
-        fake_images = self.generator(self.z)
-        fake_logits = self.discriminator(fake_images, reuse=True)
+            """ Loss Function """
+            # output of D for real images
+            real_logits = self.discriminator(self.inputs)
 
-        if self.gan_type.__contains__('wgan') or self.gan_type == 'dragan' :
-            GP = self.gradient_penalty(real=self.inputs, fake=fake_images)
-        else :
-            GP = 0
+            # output of D for fake images
+            fake_images = self.generator(self.z)
+            fake_logits = self.discriminator(fake_images, reuse=True)
 
-        # get loss for discriminator
-        self.d_loss = discriminator_loss(self.gan_type, real=real_logits, fake=fake_logits) + GP
+            if self.gan_type.__contains__('wgan') or self.gan_type == 'dragan' :
+                GP = self.gradient_penalty(real=self.inputs, fake=fake_images)
+            else :
+                GP = 0
 
-        # get loss for generator
-        self.g_loss = generator_loss(self.gan_type, fake=fake_logits)
+            # get loss for discriminator
+            self.d_loss = discriminator_loss(self.gan_type, real=real_logits, fake=fake_logits) + GP
 
-        """ Training """
-        # divide trainable variables into a group for D and a group for G
-        t_vars = tf.trainable_variables()
-        d_vars = [var for var in t_vars if 'discriminator' in var.name]
-        g_vars = [var for var in t_vars if 'generator' in var.name]
+            # get loss for generator
+            self.g_loss = generator_loss(self.gan_type, fake=fake_logits)
 
-        # optimizers
-        self.d_optim = tf.train.AdamOptimizer(self.d_learning_rate, beta1=self.beta1, beta2=self.beta2).minimize(self.d_loss, var_list=d_vars)
-        self.g_optim = tf.train.AdamOptimizer(self.g_learning_rate, beta1=self.beta1, beta2=self.beta2).minimize(self.g_loss, var_list=g_vars)
+            """ Training """
+            # divide trainable variables into a group for D and a group for G
+            t_vars = tf.trainable_variables()
+            d_vars = [var for var in t_vars if 'discriminator' in var.name]
+            g_vars = [var for var in t_vars if 'generator' in var.name]
 
-        """" Testing """
-        # for test
-        self.fake_images = self.generator(self.z, is_training=False, reuse=True)
+            # optimizers
+            self.d_optim = tf.train.AdamOptimizer(self.d_learning_rate, beta1=self.beta1, beta2=self.beta2).minimize(self.d_loss, var_list=d_vars)
+            self.g_optim = tf.train.AdamOptimizer(self.g_learning_rate, beta1=self.beta1, beta2=self.beta2).minimize(self.g_loss, var_list=g_vars)
 
-        """ Summary """
-        self.d_sum = tf.summary.scalar("d_loss", self.d_loss)
-        self.g_sum = tf.summary.scalar("g_loss", self.g_loss)
+            """" Testing """
+            # for test
+            self.fake_images = self.generator(self.z, is_training=False, reuse=True)
+
+            """ Summary """
+            self.d_sum = tf.summary.scalar("d_loss", self.d_loss)
+            self.g_sum = tf.summary.scalar("g_loss", self.g_loss)
 
     ##################################################################################
     # Train
@@ -333,8 +350,6 @@ class BigGAN(object):
         for epoch in range(start_epoch, self.epoch):
             # get batch data
             log_list = []
-            pre_idx = 0
-            save_pre_time = 0.0000
             for idx in range(start_batch_id, self.iteration):
                 batch_z = np.random.uniform(-1, 1, [self.batch_size, 1, 1, self.z_dim])
 
@@ -370,14 +385,9 @@ class BigGAN(object):
                 if g_loss == None :
                     g_loss = past_g_loss
                 if idx % 10 == 0:
-                    pre_duraiton = time.time() - start_time
-                    duration = time.time() - start_time - save_pre_time
-                    FPS = ((idx - pre_idx) * 1.0 / duration) * self.batch_size
-                    save_pre_time = pre_duraiton
-                    pre_idx = idx 
-                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, FPS: %.4f, d_loss: %.8f, g_loss: %.8f" \
-                        % (epoch, idx, self.iteration, time.time() - start_time, FPS, d_loss, g_loss))
-                    log_list.append("Epoch={}, step={}, time={}, FPS={}, d_loss={:.8f}, g_loss={:.8f}\n".format(epoch, idx, time.time() - start_time, FPS, d_loss, g_loss))    
+                    print("Epoch: [%2d] [%5d/%5d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
+                        % (epoch, idx, self.iteration, time.time() - start_time, d_loss, g_loss))
+                    log_list.append("Epoch={}, step={}, time={}, d_loss={:.8f}, g_loss={:.8f}\n".format(epoch, idx, time.time() - start_time, d_loss, g_loss))    
 
                 # save training results for every 300 steps
                 if np.mod(idx+1, self.print_freq) == 0:
@@ -413,7 +423,7 @@ class BigGAN(object):
             self.model_name, self.dataset_name, self.gan_type, self.img_size, self.z_dim, self.sn)
 
     def save(self, checkpoint_dir, step):
-        #checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
+        checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
 
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
@@ -423,7 +433,7 @@ class BigGAN(object):
     def load(self, checkpoint_dir):
         import re
         print(" [*] Reading checkpoints...")
-        #checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
+        checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir)
 
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
