@@ -32,25 +32,25 @@ from utils import utils
 
 class QueryLinear(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, input, weights_q, scale):
-        s = Variable(torch.tensor([scale]))
-        ctx.save_for_backward(input, weights_q, s)
+    def forward(ctx, input, weights_q, scale_cpu, scale_npu):
+
+        ctx.save_for_backward(input, weights_q, scale_cpu, scale_npu)
         q = torch.addmm(input.view(input.size(0) * input.size(1), input.size(2)),
-                        input.view(input.size(0) * input.size(1), input.size(2)), weights_q, beta=0.0, alpha=s[0])
+                        input.view(input.size(0) * input.size(1), input.size(2)), weights_q, beta=0.0, alpha=scale_cpu)
         q = q.view(input.size(0), input.size(1), input.size(2))
         return q.detach()
 
     @staticmethod
     def backward(ctx, q_grad):
-        input, weights_q, s = ctx.saved_tensors
+        input, weights_q, scale_cpu, scale_npu = ctx.saved_tensors
         input = input.view(input.size(0) * input.size(1), input.size(2)).transpose(0, 1)
         q = torch.addmm(q_grad.view(q_grad.size(0) * q_grad.size(1), q_grad.size(2)),
                         q_grad.view(q_grad.size(0) * q_grad.size(1), q_grad.size(2)), weights_q.transpose(0, 1),
-                        beta=0.0, alpha=s[0])
+                        beta=0.0, alpha=scale_cpu)
         q = q.view(q_grad.size(0), q_grad.size(1), q_grad.size(2))
         q_grad = q_grad.view(q_grad.size(0) * q_grad.size(1), q_grad.size(2))
-        weights_q_grad = s[0].type_as(input)*torch.mm(input, q_grad)
-        return q, weights_q_grad, None
+        weights_q_grad = scale_npu.type_as(input)*torch.mm(input, q_grad)
+        return q, weights_q_grad, None, None
 
 
 class KeyValueLinears(torch.autograd.Function):
@@ -83,12 +83,11 @@ class KeyValueLinears(torch.autograd.Function):
 
 class SelfAttentionLinears(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, input, weights_q, weights_k, weights_v, scale):
-        s = Variable(torch.tensor([scale]).npu())
-        ctx.save_for_backward(input, weights_q, weights_k, weights_v, s)
+    def forward(ctx, input, weights_q, weights_k, weights_v, scale_cpu, scale_npu):
+        ctx.save_for_backward(input, weights_q, weights_k, weights_v, s_cpu, s_npu)
         q = torch.addmm(input.contiguous().view(input.size(0) * input.size(1), input.size(2)),
                         input.contiguous().view(input.size(0) * input.size(1), input.size(2)), weights_q, beta=0.0,
-                        alpha=s[0])
+                        alpha=scale_cpu)
         q = q.view(input.size(0), input.size(1), input.size(2))
         k = torch.addmm(input.contiguous().view(input.size(0) * input.size(1), input.size(2)),
                         input.contiguous().view(input.size(0) * input.size(1), input.size(2)), weights_k, beta=0.0,
@@ -102,14 +101,14 @@ class SelfAttentionLinears(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, q_grad, k_grad, v_grad):
-        input, weights_q, weights_k, weights_v, s = ctx.saved_tensors
+        input, weights_q, weights_k, weights_v, scale_cpu, scale_npu = ctx.saved_tensors
         input = input.contiguous().view(input.size(0) * input.size(1), input.size(2)).transpose(0, 1)
 
         q = torch.addmm(q_grad.view(q_grad.size(0) * q_grad.size(1), q_grad.size(2)),
                         q_grad.view(q_grad.size(0) * q_grad.size(1), q_grad.size(2)), weights_q.transpose(0, 1),
-                        beta=0.0, alpha=s[0])
+                        beta=0.0, alpha=scale_cpu)
         q_grad = q_grad.view(q_grad.size(0) * q_grad.size(1), q_grad.size(2))
-        weights_q_grad = s[0].type_as(input)*torch.mm(input,q_grad)
+        weights_q_grad = scale_npu.type_as(input)*torch.mm(input,q_grad)
         k = q.addmm_(k_grad.view(k_grad.size(0) * k_grad.size(1), k_grad.size(2)), weights_k.transpose(0, 1), beta=1.0)
         k_grad = k_grad.view(k_grad.size(0) * k_grad.size(1), k_grad.size(2))
         weights_k_grad = torch.mm(input, k_grad)
@@ -117,7 +116,7 @@ class SelfAttentionLinears(torch.autograd.Function):
         v = v.view(v_grad.size(0), v_grad.size(1), v_grad.size(2))
         v_grad = v_grad.view(v_grad.size(0) * v_grad.size(1), v_grad.size(2))
         weights_v_grad = torch.mm(input, v_grad)
-        return v, weights_q_grad, weights_k_grad, weights_v_grad, None
+        return v, weights_q_grad, weights_k_grad, weights_v_grad, None, None
 
 class StridedBmm1Func(torch.autograd.Function):
     @staticmethod
@@ -151,14 +150,14 @@ class StridedBmm2Func(torch.autograd.Function):
         return grad_input1, grad_input2
 
 
-def query_linear(input: Tensor, weights_q: Tensor, scale: float):
-    return QueryLinear.apply(input, weights_q, scale)
+def query_linear(input: Tensor, weights_q: Tensor, scale_cpu: Tensor, scale_npu: Tensor):
+    return QueryLinear.apply(input, weights_q, scale_cpu, scale_npu)
 
 def key_value_linears(input: Tensor, weights_k: Tensor, weights_v: Tensor):
     return KeyValueLinears.apply(input, weights_k, weights_v)
 
-def self_attn_linears(input: Tensor, weights_q: Tensor, weights_k: Tensor, weights_v: Tensor, scale: float):
-    return SelfAttentionLinears.apply(input, weights_q, weights_k, weights_v, scale)
+def self_attn_linears(input: Tensor, weights_q: Tensor, weights_k: Tensor, weights_v: Tensor, scale_cpu: Tensor, scale_npu: Tensor):
+    return SelfAttentionLinears.apply(input, weights_q, weights_k, weights_v, scale_cpu, scale_npu)
 
 def strided_bmm1(input1: Tensor, input2: Tensor):
     return StridedBmm1Func.apply(input1, input2)
@@ -181,6 +180,8 @@ class MultiheadAttention(nn.Module):
         self.head_dim = embed_dim // num_heads
         assert self.head_dim * num_heads == self.embed_dim, "embed_dim must be divisible by num_heads"
         self.scaling = self.head_dim ** -0.5
+        self.scaling_cpu = Variable(torch.tensor(self.scaling))
+        self.scaling_npu = self.scaling_cpu.npu()
         self._mask = torch.empty(0)
         self.q_proj_weight = Parameter(torch.Tensor(embed_dim, embed_dim))
         self.k_proj_weight = Parameter(torch.Tensor(embed_dim, embed_dim))
@@ -239,9 +240,9 @@ class MultiheadAttention(nn.Module):
 
         if qkv_same:
             q, k, v = self_attn_linears(query, self.q_proj_weight,self.k_proj_weight, self.v_proj_weight,
-                                        self.scaling)
+                                        self.scaling_cpu, self.scaling_npu)
         elif kv_same:
-            q = query_linear(query, self.q_proj_weight, self.scaling)
+            q = query_linear(query, self.q_proj_weight, self.scaling_cpu, self.scaling_npu)
             if not (saved_state is not None and 'prev_key' in saved_state and static_kv):
                 k, v = key_value_linears(key, self.k_proj_weight, self.v_proj_weight)
         else:
