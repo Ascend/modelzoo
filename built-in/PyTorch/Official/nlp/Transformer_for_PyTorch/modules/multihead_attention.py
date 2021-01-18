@@ -84,7 +84,7 @@ class KeyValueLinears(torch.autograd.Function):
 class SelfAttentionLinears(torch.autograd.Function):
     @staticmethod
     def forward(ctx, input, weights_q, weights_k, weights_v, scale_cpu, scale_npu):
-        ctx.save_for_backward(input, weights_q, weights_k, weights_v, s_cpu, s_npu)
+        ctx.save_for_backward(input, weights_q, weights_k, weights_v, scale_cpu, scale_npu)
         q = torch.addmm(input.contiguous().view(input.size(0) * input.size(1), input.size(2)),
                         input.contiguous().view(input.size(0) * input.size(1), input.size(2)), weights_q, beta=0.0,
                         alpha=scale_cpu)
