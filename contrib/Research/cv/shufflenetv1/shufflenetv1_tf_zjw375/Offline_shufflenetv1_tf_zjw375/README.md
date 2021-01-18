@@ -1,5 +1,5 @@
 ## 1、原始模型
-模型下载来自：由训练脚本产生的模型。桶地址：obs://modelarts-zjw/trained_model
+模型下载来自：由训练脚本产生的GPU版本模型。桶地址：obs://modelarts-zjw/trained_model
 
 将保存的ckpt文件转化为pb文件之后，使用ATC工具转化成om模型
 
@@ -50,4 +50,4 @@ bash start_inference.sh
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0112/113240_903ac216_8511959.png "屏幕截图.png")
 
-每个batch的推理时间为：1942.04 / 16 = 17.10ms 推理精度为0.61
+每个batch的推理时间为：1642.04 / 96 = 17.10ms 推理精度为0.61。该模型为GPU训练模型
