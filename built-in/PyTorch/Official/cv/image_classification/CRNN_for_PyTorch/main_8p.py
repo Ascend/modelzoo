@@ -32,9 +32,6 @@ def main():
     config, npu = parse_arg()
     print('config is: ', config)
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-
     # seed everything
     utils.seed_everything()
 
@@ -56,11 +53,6 @@ def main():
         # world_size means nums of all devices or nums of processes
         config.DISTRIBUTED.WORLD_SIZE = npus_per_node * config.DISTRIBUTED.WORLD_SIZE
 
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",
-          os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(npu)
-
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if npu is not None:
         print("[npu id:", npu, "]", "Use NPU: {} for training".format(npu))

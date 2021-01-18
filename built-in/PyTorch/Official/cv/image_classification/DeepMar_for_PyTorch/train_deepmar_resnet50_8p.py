@@ -258,9 +258,6 @@ def main():
     pprint.pprint(cfg.__dict__)
     print('-' * 60)
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-
     # set the random seed
     # print(cfg.seed)
     if cfg.set_seed:
@@ -292,10 +289,6 @@ def main_worker(npu, npus_per_node, cfg):
     process_device_map = device_id_to_process_device_map(cfg.device_list)
 
     cfg.npu = process_device_map[npu]
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(npu)
-
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if npu is not None:
         print("[npu id:", npu, "]", "Use NPU: {} for training".format(npu))
