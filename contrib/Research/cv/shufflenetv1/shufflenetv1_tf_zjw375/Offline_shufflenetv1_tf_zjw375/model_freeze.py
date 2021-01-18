@@ -4,7 +4,7 @@ from tensorflow.python.tools import freeze_graph
 from architecture import shufflenet
 
 # checkpoint path
-ckpt_path = "./model/model.ckpt-1281121"
+ckpt_path = "./model/model.ckpt-1147669"
 
 def main():
     tf.reset_default_graph()
@@ -17,7 +17,7 @@ def main():
         num_classes=1000,
         groups=3,
         dropout=0.5,
-        complexity_scale_factor=1.0
+        complexity_scale_factor=0.5
     )
     # Output Node
     logits = tf.nn.softmax(logits, axis=1, name="logits")
