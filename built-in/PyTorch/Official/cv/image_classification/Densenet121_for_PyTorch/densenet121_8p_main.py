@@ -145,9 +145,6 @@ def main():
     print(args)
     print("===============main()=================")
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-
     if args.seed is not None:
         random.seed(args.seed)
         torch.manual_seed(args.seed)
@@ -194,10 +191,6 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = args.process_device_map[gpu]
-    print("[npu id:", args.gpu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",
-          os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(gpu)
-    print("[npu id:", args.gpu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if args.gpu is not None:
         print("[npu id:", args.gpu, "]", "Use GPU: {} for training".format(args.gpu))
@@ -521,7 +514,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[npu id:", os.environ['KERNEL_NAME_ID'], "]", '\t'.join(entries))
+        print("[npu id:", '0', "]", '\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
