@@ -91,7 +91,7 @@ class Time(object):
         self.print("{:.9f} seconds".format(execution_time), Colors.CGREEN2)
 
     @staticmethod
-    def print(self, string, color):
+    def print(string, color):
         print(color + string + Colors.CEND)
 
 
