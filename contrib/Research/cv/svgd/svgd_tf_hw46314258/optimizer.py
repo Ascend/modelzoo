@@ -76,8 +76,8 @@ class SVGD(object):
         """build optimizer"""
         flatgrads_list, flatvars_list = [], []
 
-        for grads, vars in zip(self.grads_list, self.vars_list):
-            flatgrads, flatvars = self.flatten_grads_and_vars(grads, vars)
+        for grads, variables in zip(self.grads_list, self.vars_list):
+            flatgrads, flatvars = self.flatten_grads_and_vars(grads, variables)
             flatgrads_list.append(flatgrads)
             flatvars_list.append(flatvars)
 
@@ -89,10 +89,10 @@ class SVGD(object):
 
         # make gradients for each particle
         grads_list = []
-        for flatgrads, vars in zip(flatgrads_list, self.vars_list):
+        for flatgrads, variables in zip(flatgrads_list, self.vars_list):
             start = 0
             grads = []
-            for var in vars:
+            for var in variables:
                 shape = self.var_shape(var)
                 size = int(np.prod(shape))
                 end = start + size
@@ -102,13 +102,13 @@ class SVGD(object):
 
         # optimizer
         update_ops = []
-        for grads, vars in zip(grads_list, self.vars_list):
+        for grads, variables in zip(grads_list, self.vars_list):
             opt = self.make_gradient_optimizer()
             # gradient ascent
-            update_ops.append(opt.apply_gradients([(-g, v) for g, v in zip(grads, vars)]))
+            update_ops.append(opt.apply_gradients([(-g, v) for g, v in zip(grads, variables)]))
         return tf.group(*update_ops)
 
-    def flatten_grads_and_vars(self, grads, vars):
+    def flatten_grads_and_vars(self, grads, variables):
         """Flatten gradients and variables (from openai/baselines/common/tf_util.py)
 
         :param grads: list of gradients
@@ -117,10 +117,10 @@ class SVGD(object):
         """
         flatgrads =  tf.concat(axis=0, values=[
             tf.reshape(grad if grad is not None else tf.zeros_like(var), [self.num_elements(var)])
-            for (var, grad) in zip(vars, grads)])
+            for (var, grad) in zip(variables, grads)])
         flatvars = tf.concat(axis=0, values=[
             tf.reshape(var, [self.num_elements(var)])
-            for var in vars])
+            for var in variables])
         return flatgrads, flatvars
 
     def num_elements(self, var):
@@ -147,10 +147,10 @@ class Ensemble(object):
         """build optimizer"""
         # optimizer
         update_ops = []
-        for grads, vars in zip(self.grads_list, self.vars_list):
+        for grads, variables in zip(self.grads_list, self.vars_list):
             opt = self.make_gradient_optimizer()
             # gradient ascent
-            update_ops.append(opt.apply_gradients([(-g, v) for g, v in zip(grads, vars)]))
+            update_ops.append(opt.apply_gradients([(-g, v) for g, v in zip(grads, variables)]))
         return tf.group(*update_ops)
 
 
