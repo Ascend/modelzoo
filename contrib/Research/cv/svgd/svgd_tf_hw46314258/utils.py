@@ -88,7 +88,7 @@ class Time(object):
 
     def __exit__(self, exe_type, exc_value, traceback):
         execution_time = time.time() - self.start_time
-        self.print("{:.9f} seconds".format(execution_time), Colors.CGREEN2)
+        print(Colors.CGREEN2 + "{:.9f} seconds".format(execution_time) + Colors.CEND)
 
     # @staticmethod
     # def print(string, color):
