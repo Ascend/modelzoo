@@ -1,3 +1,4 @@
+"""This is utils"""
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +34,7 @@ import numpy as np
 
 
 class Colors(object):
+    """Colors"""
     CEND = '\33[0m'
     CBOLD = '\33[1m'
     CITALIC = '\33[3m'
@@ -79,6 +81,7 @@ class Colors(object):
 
 
 class Time(object):
+    """Time"""
     def __init__(self, string):
         self.string = string
 
@@ -96,4 +99,5 @@ class Time(object):
 
 
 def tf_log_normal(x, m, s):
+    """tf log normal"""
     return - (x - m) ** 2 / 2. / s ** 2 - tf.log(s) - 0.5 * tf.log(2. * np.pi)
