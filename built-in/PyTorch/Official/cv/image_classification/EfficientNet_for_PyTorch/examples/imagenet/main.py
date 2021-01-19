@@ -107,6 +107,9 @@ parser.add_argument('--nnpus_per_node', default=None, type=int,
 parser.add_argument('--val_feq', default=10, type=int,
                     help='validation frequency')
 parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
+parser.add_argument('--stop-step-num', default=None, type=int,
+                    help='after the stop-step, killing the training task')
+cur_step = 0
 
 def device_id_to_process_device_map(device_list):
     devices = device_list.split(",")
@@ -311,7 +314,8 @@ def main_worker(npu, nnpus_per_node, args):
                         'optimizer': optimizer.state_dict(),
                         'amp': amp.state_dict(),
                     })
-
+        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+            break
 
 def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node):
     batch_time = AverageMeter('Time', ':6.3f')
@@ -367,6 +371,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % nnpus_per_node == 0):
             progress.print(i)
+        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+            break
+
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                         and args.rank % nnpus_per_node == 0):
         fps = str(fps_time)
