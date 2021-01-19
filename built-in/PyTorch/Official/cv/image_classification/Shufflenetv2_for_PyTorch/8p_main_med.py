@@ -138,8 +138,8 @@ def main():
     print(args)
     print("===============main()=================")
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
+    os.environ['LOCAL_DEVICE_ID'] = str(0)
+    print("+++++++++++++++++++++++++++LOCAL_DEVICE_ID:", os.environ['LOCAL_DEVICE_ID'])
 
     if args.seed is not None:
         random.seed(args.seed)
@@ -178,7 +178,7 @@ def main():
         # Use torch.multiprocessing.spawn to launch distributed processes: the
         # main_worker process function
         # The child process uses the environment variables of the parent process,
-        # we have to set KERNEL_NAME_ID for every proc
+        # we have to set LOCAL_DEVICE_ID for every proc
         if args.device == 'npu':
             # main_worker(args.gpu, ngpus_per_node, args)
             mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
@@ -197,9 +197,9 @@ def main_worker(gpu, ngpus_per_node, args):
     else:
         args.gpu = gpu
 
-    print("[npu id:", args.gpu, "]", "++++++++++++++++ before set KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(args.gpu)
-    print("[npu id:", args.gpu, "]", "++++++++++++++++ KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
+    print("[npu id:", args.gpu, "]", "++++++++++++++++ before set LOCAL_DEVICE_ID:", os.environ['LOCAL_DEVICE_ID'])
+    os.environ['LOCAL_DEVICE_ID'] = str(args.gpu)
+    print("[npu id:", args.gpu, "]", "++++++++++++++++ LOCAL_DEVICE_ID:", os.environ['LOCAL_DEVICE_ID'])
 
     if args.gpu is not None:
         print("[npu id:", args.gpu, "]", "Use GPU: {} for training".format(args.gpu))
@@ -498,7 +498,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[npu id:", os.environ['KERNEL_NAME_ID'], "]", '\t'.join(entries))
+        print("[npu id:", os.environ['LOCAL_DEVICE_ID'], "]", '\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
