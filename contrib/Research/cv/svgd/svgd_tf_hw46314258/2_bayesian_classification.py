@@ -78,10 +78,10 @@ def network(inputs, labels, scope):
             net = tf.layers.dense(net, 100, activation=tf.nn.tanh)
         logits = tf.layers.dense(net, 1)
         log_likelihood = - tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
-        variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=scope)
+        variables_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=scope)
         prob_1_x_w_ = tf.nn.sigmoid(logits)
-        gradients = tf.gradients(log_likelihood, variables)
-    return gradients, variables, prob_1_x_w_
+        gradients = tf.gradients(log_likelihood, variables_)
+    return gradients, variables_, prob_1_x_w_
 
 
 def make_gradient_optimizer():
