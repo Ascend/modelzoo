@@ -83,7 +83,7 @@ class Time(object):
         self.string = string
 
     def __enter__(self):
-        self.print("{}".format(self.string), Colors.CBLUE2)
+        self.print("".format(self.string), Colors.CBLUE2)
         self.start_time = time.time()
 
     def __exit__(self, exe_type, exc_value, traceback):
