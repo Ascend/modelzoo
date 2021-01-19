@@ -35,6 +35,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 import torch.npu
+import DistributedResnet50.image_classification.resnet as nvmodels
 
 from apex import amp
 
@@ -171,7 +172,10 @@ parser.add_argument('--static-loss-scale',
                     default=1,
                     help=
                     'Static loss scale, positive power of 2 values can improve fp16 convergence.')
-
+parser.add_argument('-t',
+                    '--fine-tuning',
+                    action='store_true',
+                    help='transfer learning + fine tuning - train only the last FC layer.')
 best_acc1 = 0
 
 def main():
@@ -233,10 +237,29 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = models.__dict__[args.arch](pretrained=True)
+        #model = models.__dict__[args.arch](pretrained=True)
+        model = nvmodels.build_resnet("resnet50", "classic", True)
+        print("加载自己的训练模型")
+        pretrained_dict = \
+        torch.load("/home/checkpoint_npu0model_best.pth.tar", map_location="cpu")["state_dict"]
+        pretrained_dict.pop('fc.weight')
+        pretrained_dict.pop('fc.bias')
+        model.load_state_dict(pretrained_dict, strict=False)
     else:
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch](zero_init_residual=True)
+
+    if args.fine_tuning:
+        print("=> transfer learning + fine tuning(train only the last FC layer)")
+        if args.arch == "resnet50":
+            model.classifier = nn.Linear(1024,101)
+            model.classifier.parameters()
+        else:
+            print("Error: Fine-tuning is not supported on this architecture")
+            exit(-1)
+    else:
+        model.parameters()
+
     for layer in model.modules():
         if isinstance(layer, nn.Linear):
             torch.nn.init.kaiming_normal_(layer.weight, a=math.sqrt(5), )
