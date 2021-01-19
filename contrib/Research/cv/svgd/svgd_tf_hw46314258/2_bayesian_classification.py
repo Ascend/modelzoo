@@ -77,9 +77,9 @@ def network(inputs, labels, scope):
         logits = tf.layers.dense(net, 1)
         log_likelihood = - tf.nn.sigmoid_cross_entropy_with_logits(labels=labels, logits=logits)
         variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=scope)
-        prob_1_x_w = tf.nn.sigmoid(logits)
+        prob_1_x_w_ = tf.nn.sigmoid(logits)
         gradients = tf.gradients(log_likelihood, variables)
-    return gradients, variables, prob_1_x_w
+    return gradients, variables, prob_1_x_w_
 
 
 def make_gradient_optimizer():
@@ -92,9 +92,9 @@ with Time("graph construction"):
 
     grads_list, vars_list, prob_1_x_w_list = [], [], []
     for i in range(num_particles):
-        grads, vars, prob_1_x_w = network(x_, y_, 'p{}'.format(i))
+        grads, variables, prob_1_x_w = network(x_, y_, 'p{}'.format(i))
         grads_list.append(grads)
-        vars_list.append(vars)
+        vars_list.append(variables)
         prob_1_x_w_list.append(prob_1_x_w)
 
     if algorithm == 'svgd':
@@ -135,9 +135,9 @@ with tf.Session() as sess:
         p1_grid = sess.run(prob_1_x, feed_dict={x_: x_grid}).reshape(x0_grid.shape)
         contour = ax.contour(x0_grid, x1_grid, p1_grid, 50, cmap=plt.cm.coolwarm, zorder=0)
 
-        x0, x1 = x_train[np.where(y_train[:, 0] == 0)], x_train[np.where(y_train[:, 0] == 1)]
-        ax.scatter(x0[:, 0], x0[:, 1], s=1, c='blue', zorder=1)
-        ax.scatter(x1[:, 0], x1[:, 1], s=1, c='red', zorder=2)
+        x_0, x_1 = x_train[np.where(y_train[:, 0] == 0)], x_train[np.where(y_train[:, 0] == 1)]
+        ax.scatter(x_0[:, 0], x_0[:, 1], s=1, c='blue', zorder=1)
+        ax.scatter(x_1[:, 0], x_1[:, 1], s=1, c='red', zorder=2)
 
         ax.set_title('$p(1|(x_0, x_1))$ with {} ({} particles)'.format(algorithm, num_particles))
         ax.set_xlabel('$x_0$')
