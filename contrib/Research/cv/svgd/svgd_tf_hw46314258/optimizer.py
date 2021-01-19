@@ -172,7 +172,7 @@ class AdagradOptimizer(object):
             g, v = gv
             historical_grad = tf.Variable(tf.zeros_like(g), trainable = False)
             alpha = tf.Variable(0.0, trainable = False)
-            historical_grad_update_op = historical_grad.assign(alpha * historical_grad + (1.-alpha) * g ** 2)
+            historical_grad_update_op = historical_grad.assign(alpha * historical_grad + (1. - alpha) * g ** 2)
             with tf.control_dependencies([historical_grad_update_op]):
                 adj_grad = tf.div(g, self.fudge_factor + tf.sqrt(historical_grad))
                 v_update_op = v.assign(v - self.learning_rate * adj_grad)
