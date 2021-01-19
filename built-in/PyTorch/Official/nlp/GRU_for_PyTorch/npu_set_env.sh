@@ -4,3 +4,5 @@ export PATH=$PATH:$ASCEND_HOME/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/fwkaclli
 export ASCEND_OPP_PATH=$ASCEND_HOME/opp/
 export OPTION_EXEC_EXTERN_PLUGIN_PATH=$ASCEND_HOME/fwkacllib/lib64/plugin/opskernel/libfe.so:$ASCEND_HOME/fwkacllib/lib64/plugin/opskernel/libaicpu_engine.so:$ASCEND_HOME/fwkacllib/lib64/plugin/opskernel/libge_local_engine.so
 export PYTHONPATH=$ASCEND_HOME/fwkacllib/python/site-packages/:$ASCEND_HOME/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:$ASCEND_HOME/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
+
+source env_new.sh
