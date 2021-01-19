@@ -48,7 +48,7 @@ tf.set_random_seed(seed)
 def network(scope):
     """network"""
     with tf.variable_scope(scope):
-        x = tf.Variable(initial_xs[eval(scope[1:])])
+        x = tf.Variable(initial_xs[ast.literal_eval(scope[1:])])
         log_prob0, log_prob1 = tf_log_normal(x, -2., 1.), tf_log_normal(x, 2., 1.)
         # log of target distribution p(x)
         log_p = tf.reduce_logsumexp(tf.stack([log_prob0, log_prob1, log_prob1]), axis=0) - tf.log(3.)
