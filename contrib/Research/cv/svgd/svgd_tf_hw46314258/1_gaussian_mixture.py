@@ -34,6 +34,8 @@ import optimizer
 from utils import Time, tf_log_normal
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
+import ast
+
 
 # hyper-parameters
 num_particles = 100  # number of ensembles (SVGD particles)
@@ -54,9 +56,9 @@ def network(scope):
         log_prob0, log_prob1 = tf_log_normal(x, -2., 1.), tf_log_normal(x, 2., 1.)
         # log of target distribution p(x)
         log_p = tf.reduce_logsumexp(tf.stack([log_prob0, log_prob1, log_prob1]), axis=0) - tf.log(3.)
-        variables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=scope)
-        gradients = tf.gradients(log_p, variables)
-    return gradients, variables
+        variables_ = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=scope)
+        gradients = tf.gradients(log_p, variables_)
+    return gradients, variables_
 
 
 def make_gradient_optimizer():
