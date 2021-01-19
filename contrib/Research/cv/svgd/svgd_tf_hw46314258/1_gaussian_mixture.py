@@ -1,3 +1,4 @@
+"""This is an experiment"""
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +29,8 @@
 
 import tensorflow as tf
 import numpy as np
-from optimizer import SVGD, Ensemble, AdagradOptimizer
+# from optimizer import SVGD, Ensemble, AdagradOptimizer
+import optimizer
 from utils import Time, tf_log_normal
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
@@ -59,7 +61,7 @@ def network(scope):
 
 def make_gradient_optimizer():
     """make gradient optimizer"""
-    return AdagradOptimizer(learning_rate=learning_rate)
+    return optimizer.AdagradOptimizer(learning_rate=learning_rate)
 
 
 with Time("graph construction"):
@@ -72,11 +74,11 @@ with Time("graph construction"):
         vars_list.append(variables)
 
     if algorithm == 'svgd':
-        optimizer = SVGD(grads_list=grads_list,
+        optimizer = optimizer.SVGD(grads_list=grads_list,
                          vars_list=vars_list,
                          make_gradient_optimizer=make_gradient_optimizer)
     elif algorithm == 'ensemble':
-        optimizer = Ensemble(grads_list=grads_list,
+        optimizer = optimizer.Ensemble(grads_list=grads_list,
                              vars_list=vars_list,
                              make_gradient_optimizer=make_gradient_optimizer)
     else:
