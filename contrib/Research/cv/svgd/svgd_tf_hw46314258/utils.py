@@ -83,16 +83,16 @@ class Time(object):
         self.string = string
 
     def __enter__(self):
-        Time.print(self.string, Colors.CBLUE2)
+        print(Colors.CBLUE2 + self.string + Colors.CEND)
         self.start_time = time.time()
 
     def __exit__(self, exe_type, exc_value, traceback):
         execution_time = time.time() - self.start_time
         self.print("{:.9f} seconds".format(execution_time), Colors.CGREEN2)
 
-    @staticmethod
-    def print(string, color):
-        print(color + string + Colors.CEND)
+    # @staticmethod
+    # def print(string, color):
+    #     print(color + string + Colors.CEND)
 
 
 def tf_log_normal(x, m, s):
