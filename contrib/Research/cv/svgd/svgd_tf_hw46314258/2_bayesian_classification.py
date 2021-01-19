@@ -1,3 +1,4 @@
+"""This is an experiment"""
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +31,8 @@
 import tensorflow as tf
 import numpy as np
 from utils import Time
-from optimizer import SVGD, Ensemble
+# from optimizer import SVGD, Ensemble
+import optimizer
 import matplotlib.pyplot as plt
 
 # hyper-parameters
@@ -98,11 +100,11 @@ with Time("graph construction"):
         prob_1_x_w_list.append(prob_1_x_w)
 
     if algorithm == 'svgd':
-        optimizer = SVGD(grads_list=grads_list,
+        optimizer = optimizer.SVGD(grads_list=grads_list,
                          vars_list=vars_list,
                          make_gradient_optimizer=make_gradient_optimizer)
     elif algorithm == 'ensemble':
-        optimizer = Ensemble(grads_list=grads_list,
+        optimizer = optimizer.Ensemble(grads_list=grads_list,
                              vars_list=vars_list,
                              make_gradient_optimizer=make_gradient_optimizer)
     else:
