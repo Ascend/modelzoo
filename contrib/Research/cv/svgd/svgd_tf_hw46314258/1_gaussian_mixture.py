@@ -67,9 +67,9 @@ with Time("graph construction"):
 
     grads_list, vars_list = [], []
     for i in range(num_particles):
-        grads, vars = network('p{}'.format(i))
+        grads, variables = network('p{}'.format(i))
         grads_list.append(grads)
-        vars_list.append(vars)
+        vars_list.append(variables)
 
     if algorithm == 'svgd':
         optimizer = SVGD(grads_list=grads_list,
