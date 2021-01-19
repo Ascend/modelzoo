@@ -1,4 +1,4 @@
-source set_env_b023.sh
+source npu_set_env.sh
 
 export SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1

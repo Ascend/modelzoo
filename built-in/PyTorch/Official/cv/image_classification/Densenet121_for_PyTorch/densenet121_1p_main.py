@@ -104,6 +104,8 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
                          'multi node data parallel training')
 parser.add_argument('--npu', default=0, type=int,
                     help='NPU id to use.')
+parser.add_argument('--stop-step-num', default=None, type=int,
+                    help='after the stop-step,killing the training task.')
 
 # apex
 parser.add_argument('--amp', default=False, action='store_true',
@@ -112,6 +114,8 @@ parser.add_argument('--loss-scale', default=1024., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+
+cur_step = 0
 
 
 def main():
@@ -160,6 +164,7 @@ def main():
 
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
+    global cur_step
     args.gpu = gpu
 
     if args.gpu is not None:
@@ -330,9 +335,12 @@ def main_worker(gpu, ngpus_per_node, args):
                         'best_acc1': best_acc1,
                         'optimizer': optimizer.state_dict(),
                     }, is_best)
+        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+            break
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
+    global cur_step
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
@@ -347,7 +355,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     model.train()
 
     end = time.time()
+    step_per_epoch = len(train_loader)
     for i, (images, target) in enumerate(train_loader):
+        cur_step = epoch * step_per_epoch + i
         # measure data loading time
         data_time.update(time.time() - end)
 
@@ -380,6 +390,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
+
+        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+            break
 
     print(' * FPS@all {:.3f}'.format(args.batch_size / batch_time.avg))
 
