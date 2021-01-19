@@ -84,6 +84,7 @@ class Time(object):
     """Time"""
     def __init__(self, string):
         self.string = string
+        self.start_time = 0
 
     def __enter__(self):
         print(Colors.CBLUE2 + self.string + Colors.CEND)
