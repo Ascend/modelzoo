@@ -23,7 +23,7 @@ om模型下载地址：
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/YOLOV3-RESNET18%20/yolov3resnet18_framework_tensorflow_aipp_1_batch_1_input_uint8_output_FP32.om 
 
-使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
+使用ATC模型转换工具进行模型转换时可以参考如下指令:
 
 ```
 atc --model="./yolo3_resnet18.pb" --output_type=FP32 --input_shape="images:1,352,640,3" --insert_op_conf=./insert_op.cfg --input_format=NHWC --output="./yolov3resnet18_framework_tensorflow_aipp_1_batch_1_input_uint8_output_FP32" --framework=3  --soc_version=Ascend310

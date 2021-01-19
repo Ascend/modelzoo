@@ -23,7 +23,7 @@ om模型下载地址：
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/garbage/mobilenetv2.om
 
-使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
+使用ATC模型转换工具进行模型转换时可以参考如下指令:
 
 ```
 atc --model=mobilenetv2.air  --framework=1 --output=mobilenetv2  --soc_version=Ascend310

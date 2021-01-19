@@ -23,7 +23,7 @@ om模型下载地址：
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/colorization/colorization_framework_caffe_aipp_0_batch_1_input_fp32_output_FP32.om
 
-使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
+使用ATC模型转换工具进行模型转换时可以参考如下指令:
 
 ```
 atc --output_type=FP32 --input_shape="data_l:1,1,224,224" --weight="./colorization.caffemodel"  --input_format=NCHW --output="./colorization" --soc_version=Ascend310 --framework=0 --save_original_model=false --model="./colorization.prototxt" 

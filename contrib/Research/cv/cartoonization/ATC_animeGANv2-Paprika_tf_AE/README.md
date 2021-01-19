@@ -18,7 +18,7 @@ om模型下载地址：
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/cartoonization/AnimeGANv2/AnimeGANv2_Paprika.om
 
-使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
+使用ATC模型转换工具进行模型转换时可以参考如下指令:
 
 ```
 atc --model=AnimeGANv2_Paprika.pb  --input_shape="generator_input:1,256,256,3"  --framework=3  --output=AnimeGANv2_Paprika  --soc_version=Ascend310 
