@@ -1,3 +1,4 @@
+"""This module provides optimizer."""
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +45,7 @@ class SVGD(object):
 
     @staticmethod
     def svgd_kernel(flatvars_list, median_heuristic=True):
+        """svgd kernel"""
         # For pairwise distance in a matrix form, I use the following reference:
         #       https://stackoverflow.com/questions/37009647
         #               /compute-pairwise-distance-in-a-batch-without-replicating-tensor-in-tensorflow
@@ -124,11 +126,12 @@ class SVGD(object):
         return flatgrads, flatvars
 
     def num_elements(self, var):
+        """num of elements"""
         return int(np.prod(self.var_shape(var)))
 
     @staticmethod
     def var_shape(var):
-        '''shape of variable'''
+        """shape of variable"""
         out = var.get_shape().as_list()
         assert all(isinstance(a, int) for a in out), \
             'shape function assumes that shape is fully known'
@@ -136,6 +139,7 @@ class SVGD(object):
 
 
 class Ensemble(object):
+    """class Ensemble"""
     def __init__(self, grads_list, vars_list, make_gradient_optimizer):
         self.grads_list = grads_list
         self.vars_list = vars_list
@@ -162,12 +166,13 @@ class AdagradOptimizer(object):
         self.fudge_factor = tf.constant(fudge_factor)
 
     def apply_gradients(self, gvs):
+        """apply gradients"""
         v_update_ops = []
         for gv in gvs:
             g, v = gv
             historical_grad = tf.Variable(tf.zeros_like(g), trainable = False)
             alpha = tf.Variable(0.0, trainable = False)
-            historical_grad_update_op = historical_grad.assign(alpha*historical_grad+(1.-alpha)*g**2)
+            historical_grad_update_op = historical_grad.assign(alpha * historical_grad + (1.-alpha) * g ** 2)
             with tf.control_dependencies([historical_grad_update_op]):
                 adj_grad = tf.div(g, self.fudge_factor + tf.sqrt(historical_grad))
                 v_update_op = v.assign(v - self.learning_rate * adj_grad)
