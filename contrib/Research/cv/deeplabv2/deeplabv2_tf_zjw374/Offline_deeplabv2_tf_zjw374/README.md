@@ -13,15 +13,15 @@ ATC转换命令：
 ## 3、代码及路径解释
 
 ```
-shufflenetv2
+deeplabv2
 └─
   ├─README.md
   ├─LICENSE  
   ├─bin_dataset             用于存放验证集.bin文件         桶地址 obs://modelarts-zjw/Offline_deeplabv2/bin_dataset
   ├─output                  用于存放推理后的预测值.bin文件
-  ├─model                   用于存放om模型                桶地址 obs://modelarts-zjw/Offline_shufflenetv2/om_model
-  ├─ck_model                用于存放checkpoint模型        桶地址 obs://modelarts-zjw/Offline_shufflenetv2/ck_model
-  ├─pb_model                用于存放pb模型                桶地址 obs://modelarts-zjw/Offline_shufflenetv2/pb_model
+  ├─model                   用于存放om模型                桶地址 obs://modelarts-zjw/Offline_deeplabv2/om_model
+  ├─ck_model                用于存放checkpoint模型        桶地址 obs://modelarts-zjw/Offline_deeplabv2/ck_model
+  ├─pb_model                用于存放pb模型                桶地址 obs://modelarts-zjw/Offline_deeplabv2/pb_model
   ├─model_freeze.py         将.ckpt模型转换为.pb模型
   ├─310img_preprocess.py    将RGB图像转换为bin格式
   ├─310Inference.py         推理
