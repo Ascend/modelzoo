@@ -44,6 +44,6 @@ shufflenetv2
 
 bash start_inference.sh
 
-
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0120/114335_932bdda0_8511959.png "屏幕截图.png")
 
 Inference average time without first time: 3.65 ms 推理精度为0.6132。
