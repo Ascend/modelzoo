@@ -20,6 +20,8 @@ import numpy as np
 #from .. import _init_paths
 import sys 
 
+sys.path.append("/opt/npu/m00536736/OCR/CRNN/CRNN_NPU")
+
 from crnn_model import crnn_net
 from local_utils import evaluation_tools
 from config import global_config
