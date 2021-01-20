@@ -28,7 +28,7 @@ bash train_1p.sh
 bash train_8p.sh
 ```
 
-## VGG-229 training result
+## VGG-16 training result
 
 | Acc@1    | FPS       | Npu_nums | Epochs   | AMP_Type |
 | :------: | :------:  | :------: | :------: | :------: |
