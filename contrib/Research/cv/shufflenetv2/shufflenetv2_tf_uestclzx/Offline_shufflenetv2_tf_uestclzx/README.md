@@ -25,7 +25,7 @@ shufflenetv2
   ├─pb_model                用于存放pb模型                桶地址 obs://modelarts-zjw/Offline_shufflenetv2/pb_model
   ├─model_freeze.py         将.ckpt模型转换为.pb模型
   ├─img_preprocess.py       将RGB图像转换为bin格式
-  ├─accuracy_top1.py     验证
+  ├─accuracy_top1.py        验证
   ├─start_inference.sh      执行推理、验证脚本文件
 ```
 
