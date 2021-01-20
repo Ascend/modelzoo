@@ -26,7 +26,6 @@ class VGG(nn.Module):
     def __init__(self, features, num_classes=1000, init_weights=True):
         super(VGG, self).__init__()
         self.features = features
-        #self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
         self.fc1 = nn.Linear(512 * 7 * 7, 4096)
         self.relu = nn.ReLU()
         self.drop = nn.Dropout()
@@ -37,15 +36,17 @@ class VGG(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        #x = self.avgpool(x)
         x = torch.flatten(x, 1)
-        #x = self.classifier(x)
         x = self.fc1(x)
-        x = self.relu(x).cpu()
-        x = self.drop(x).npu()
+        x = self.relu(x)
+        if self.training:
+            x = x.cpu()
+            x = self.drop(x).npu()
         x = self.fc2(x)
-        x = self.relu(x).cpu()
-        x = self.drop(x).npu()
+        x = self.relu(x)
+        if self.training:
+            x = x.cpu()
+            x = self.drop(x).npu()
         x = self.fc3(x)
         return x
 
