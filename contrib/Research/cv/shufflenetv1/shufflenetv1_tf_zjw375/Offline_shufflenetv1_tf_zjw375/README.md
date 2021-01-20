@@ -14,7 +14,7 @@ ATC转换命令：
 ## 3、代码及路径解释
 
 ```
-shufflenetv2
+shufflenetv1
 └─
   ├─README.md
   ├─LICENSE  
