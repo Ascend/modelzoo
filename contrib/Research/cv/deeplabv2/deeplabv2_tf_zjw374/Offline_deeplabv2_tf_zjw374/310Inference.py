@@ -63,11 +63,7 @@ def test(sess):
         preds = np.fromfile(pred_path,dtype = np.int64)
         label = np.fromfile(label_path, dtype = np.float32)
         print(len(preds),len(label))
-        #t_preds = tf.convert_to_tensor(preds)
-        #t_label = tf.convert_to_tensor(label)
-        #t_preds = tf.cast(t_preds, dtype=tf.int64)
-        #t_label = tf.cast(t_label, dtype=tf.uint8)
-        
+         
         _, _, c_matrix = sess.run([accu_update_op, mIou_update_op, confusion_matrix], feed_dict = {'Placeholder:0': preds, 'Placeholder_1:0': label.astype(np.int64)})
         
         confusion_matrix_ += c_matrix
