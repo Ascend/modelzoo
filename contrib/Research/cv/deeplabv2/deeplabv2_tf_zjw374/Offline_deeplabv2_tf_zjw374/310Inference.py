@@ -4,74 +4,6 @@ import sys
 import time
 import numpy as np
 import tensorflow as tf
-#from PIL import Image
-"""
-from network import *
-from utils import ImageReader, decode_labels, inv_preprocess, prepare_label, write_log, read_labeled_image_list
-"""
-
-
-# def test_setup(self):
-#     # Create queue coordinator.
-#     self.coord = tf.train.Coordinator()
-#
-#     # Input size
-#     input_size = (self.conf.input_height, self.conf.input_width)
-#
-#     # Load reader
-#     with tf.name_scope("create_inputs"):
-#         reader = ImageReader(
-#             self.conf.data_dir,
-#             self.conf.valid_data_list,
-#             None,  # the images have different sizes
-#             False,  # no data-aug
-#             False,  # no data-aug
-#             self.conf.ignore_label,
-#             IMG_MEAN,
-#             self.coord)
-#         image, label = reader.image, reader.label  # [h, w, 3 or 1]
-#     # Add one batch dimension [1, h, w, 3 or 1]
-#     self.image_batch, self.label_batch = tf.expand_dims(image, dim=0), tf.expand_dims(label, dim=0)
-#
-#     # Create network
-#     if self.conf.encoder_name not in ['res101', 'res50', 'deeplab']:
-#         print('encoder_name ERROR!')
-#         print("Please input: res101, res50, or deeplab")
-#         sys.exit(-1)
-#     elif self.conf.encoder_name == 'deeplab':
-#         net = Deeplab_v2(self.image_batch, self.conf.num_classes, False)
-#     else:
-#         net = ResNet_segmentation(self.image_batch, self.conf.num_classes, False, self.conf.encoder_name)
-#
-#     # predictions
-#     raw_output = net.outputs
-#     raw_output = tf.image.resize_bilinear(raw_output, tf.shape(self.image_batch)[1:3, ])
-#     raw_output = tf.argmax(raw_output, axis=3)
-#     pred = tf.expand_dims(raw_output, dim=3)
-#     self.pred = tf.reshape(pred, [-1, ])
-#     # labels
-#     gt = tf.reshape(self.label_batch, [-1, ])
-#     # Ignoring all labels greater than or equal to n_classes.
-#     temp = tf.less_equal(gt, self.conf.num_classes - 1)
-#     weights = tf.cast(temp, tf.int32)
-#
-#     # fix for tf 1.3.0
-#     gt = tf.where(temp, gt, tf.cast(temp, tf.uint8))
-#
-#     # Pixel accuracy
-#     self.accu, self.accu_update_op = tf.contrib.metrics.streaming_accuracy(
-#         self.pred, gt, weights=weights)
-#
-#     # mIoU
-#     self.mIoU, self.mIou_update_op = tf.contrib.metrics.streaming_mean_iou(
-#         self.pred, gt, num_classes=self.conf.num_classes, weights=weights)
-#
-#     # confusion matrix
-#     self.confusion_matrix = tf.contrib.metrics.confusion_matrix(
-#         self.pred, gt, num_classes=self.conf.num_classes, weights=weights)
-#
-#     # Loader for loading the checkpoint
-#     self.loader = tf.train.Saver(var_list=tf.global_variables())
 
 num_classes = 21
 valid_num_steps = 1447
@@ -89,17 +21,12 @@ def compute_IoU_per_class(confusion_matrix):
     print('mIoU: %.3f' % mIoU)
 
 def graph():
-    #tf.reset_default_graph()
-
+   
     pred_ = tf.placeholder(tf.int64, shape = None)
     gt_ = tf.placeholder(tf.int64, shape = None)
-    print(pred_.name)
-    print(gt_.name)
     pred = tf.reshape(pred_,[-1])
     gt = tf.reshape(gt_,[-1])
-    #pred = tf.cast(pred, dtype=tf.int64)#
-    gt = tf.cast(gt, dtype=tf.uint8)#
-    # Ignoring all labels greater than or equal to n_classes.
+    gt = tf.cast(gt, dtype=tf.uint8)
     temp = tf.less_equal(gt, num_classes - 1)
     weights = tf.cast(temp, tf.int32)
 
@@ -118,12 +45,6 @@ def graph():
     confusion_matrix = tf.contrib.metrics.confusion_matrix(
         pred, gt, num_classes=num_classes, weights=weights)
 
-    # # Start queue threads.
-    # threads = tf.train.start_queue_runners(coord=self.coord, sess=self.sess)
-
-    # Test!
-    
-    
     return accu, accu_update_op, mIoU, mIou_update_op, confusion_matrix
 
 def test(sess):
@@ -141,7 +62,6 @@ def test(sess):
         label_path = './bin_dataset/' + line.split(' ')[1].split('\n')[0]+'.bin'
         preds = np.fromfile(pred_path,dtype = np.int64)
         label = np.fromfile(label_path, dtype = np.float32)
-        print("*******************",label,label.dtype)
         print(len(preds),len(label))
         #t_preds = tf.convert_to_tensor(preds)
         #t_label = tf.convert_to_tensor(label)
