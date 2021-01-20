@@ -19,6 +19,7 @@ deeplabv2
   ├─LICENSE  
   ├─bin_dataset             用于存放验证集.bin文件         桶地址 obs://modelarts-zjw/Offline_deeplabv2/bin_dataset
   ├─output                  用于存放推理后的预测值.bin文件
+  ├─data                    用于存放标签文件
   ├─model                   用于存放om模型                桶地址 obs://modelarts-zjw/Offline_deeplabv2/om_model
   ├─ck_model                用于存放checkpoint模型        桶地址 obs://modelarts-zjw/Offline_deeplabv2/ck_model
   ├─pb_model                用于存放pb模型                桶地址 obs://modelarts-zjw/Offline_deeplabv2/pb_model
