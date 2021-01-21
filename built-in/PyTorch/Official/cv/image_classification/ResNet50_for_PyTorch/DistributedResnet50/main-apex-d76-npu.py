@@ -628,8 +628,8 @@ def main_worker(gpu, ngpus_per_node, args):
                     'epoch': epoch + 1,
                     'arch': args.arch,
                     'state_dict': modeltmp.state_dict(),
-                    'best_acc1': best_acc1.to("cpu"),
-                }, is_best.to("cpu"),filename=filename)
+                    'best_acc1': best_acc1,
+                }, is_best,filename=filename)
                 
                 if (epoch == (args.epochs - 1)) or ((args.checkpoint_freq > 0) and (((epoch+1) % args.checkpoint_freq) == 0)):
                     #保留每个freq的checkpoint，共epochs/freq个checkpoint文件
