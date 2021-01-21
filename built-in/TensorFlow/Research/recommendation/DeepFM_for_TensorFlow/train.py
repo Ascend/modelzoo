@@ -375,7 +375,7 @@ if __name__ == '__main__':
     custom_op.parameter_map["enable_dump"].b = "True" == os.getenv("FLAG_ENABLE_DUMP")
     custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(os.getenv("DUMP_PATH"))
     custom_op.parameter_map["dump_step"].s = tf.compat.as_bytes(os.getenv("DUMP_STEP"))
-    custom_op.parameter_map["sump_mode"].s = tf.compat.as_bytes(os.getenv("DUMP_MODE"))
+    custom_op.parameter_map["dump_mode"].s = tf.compat.as_bytes(os.getenv("DUMP_MODE"))
         
     sess_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
