@@ -640,8 +640,8 @@ def main_worker(gpu, ngpus_per_node, args):
                         'epoch': epoch + 1,
                         'arch': args.arch,
                         'state_dict': modeltmp.state_dict(),
-                        'best_acc1': best_acc1.to("cpu"),
-                    }, is_best.to("cpu"),filename=filename)
+                        'best_acc1': best_acc1,
+                    }, is_best,filename=filename)
 
                 loc = 'npu:{}'.format(args.gpu)
                 modeltmp.to(loc)

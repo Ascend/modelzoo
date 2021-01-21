@@ -397,9 +397,9 @@ def main_worker(gpu, ngpus_per_node, args):
             'arch': args.arch,
             'state_dict': modeltmp.state_dict(),
             # 'state_dict': model,
-            'best_acc1': best_acc1.to("cpu"),
+            'best_acc1': best_acc1,
             # 'optimizer' : optimizer.state_dict(),
-        }, is_best.to("cpu"), file_name)
+        }, is_best, file_name)
         modeltmp.to(CALCULATE_DEVICE)
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
