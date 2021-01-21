@@ -3,7 +3,7 @@
 
 ###   **概述** 
 
-迁移fcnt到ascend910平台
+迁移fcn到ascend910平台
 将结果与原论文进行比较
 
  |                | 论文   | ascend |
