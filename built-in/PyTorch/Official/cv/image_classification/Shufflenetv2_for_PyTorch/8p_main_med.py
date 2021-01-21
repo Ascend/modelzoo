@@ -396,7 +396,8 @@ def train(train_loader, train_loader_len, model, criterion, optimizer, epoch, ar
 
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % ngpus_per_node == 0):
-        print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}, TIME@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg, batch_time.avg))
+        if batch_time.avg > 0:
+            print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}, TIME@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg, batch_time.avg))
 
 
 def validate(val_loader, model, criterion, args, ngpus_per_node):
