@@ -1,0 +1,9 @@
+python mask_rcnn_main.py --mode=train_and_eval \
+--train_batch_size=2 \
+--training_file_pattern="/cache/coco_tfrecord/tfrecord/train2017*" \
+--resnet_checkpoint=/home/hiscv/lijing/ssd_model_0808/resnet34/model.ckpt-28152 \
+--validation_file_pattern="/cache/coco_tfrecord/tfrecord/val2017*" \
+--val_json_file="/cache/coco/data/coco/annotations/instances_val2017.json" \
+--eval_batch_size=2 \
+--gpu_num=1 \
+--model_dir=result
