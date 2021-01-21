@@ -1,0 +1,22 @@
+{
+  "op": [
+    {
+      "is_support": false,
+      "name": "OptimizeDataset/TensorDataset",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "TensorDataset"
+    },
+    {
+      "is_support": false,
+      "name": "save/SaveV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "SaveV2"
+    }
+  ]
+}
