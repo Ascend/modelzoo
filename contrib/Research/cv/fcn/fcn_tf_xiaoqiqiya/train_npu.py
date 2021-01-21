@@ -100,8 +100,6 @@ def read_data(tf_file, is_training):
 
 
 def check_data(images_batch, labels_batch, gpu):
-    os.environ["CUDA_VISIBLE_DEVICES"] = "%d" % gpu
-    with tf.device("/gpu:%d" % gpu):
         config = tf.ConfigProto(allow_soft_placement=True)
         with tf.Session(config=config) as sess:
             for i in range(100):
