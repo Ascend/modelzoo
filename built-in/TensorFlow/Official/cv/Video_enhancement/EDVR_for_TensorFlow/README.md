@@ -259,7 +259,12 @@ The inference results (images) will be saved in ``${cfg.output_dir}/test`` folde
 bash scripts/run_freeze.sh outputs/edvr/EDVR-600000
 ```
 
-The frozen pb file will be saved at ``${cfg.output_dir}/EDVR.pb``.
+The frozen pb file will be saved at ``${cfg.output_dir}/EDVR.pb``. 
+
+If one wants to use 4D ``[N*D, H, W, C]`` input instead of 5D ``[N, D, H, W, C]`` where ``D`` represents the number of 
+consecutive frames of EDVR, please 
+set ``model.input_format_dimension=4`` when freezing; additionally, if one wants to use unknown batchsize in pb model, please set the 
+``data.eval_batch_size=-1`` when freezing. The others can remain the same as the demo scripts.
 
 ## Precision & Performance
 
