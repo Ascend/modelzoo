@@ -53,6 +53,8 @@ class VSR(object):
         b, h, w = self.batch_size, self.in_size[0], self.in_size[1]
 
         if self.cfg.model.input_format_dimension == 5:
+            if b is None or b < 0:
+                b = None
             self.LR = tf.placeholder(tf.float32, shape=[b, self.num_frames, h, w, 3], name='L_input')
         elif self.cfg.model.input_format_dimension == 4:
             if b is None or b < 0:
