@@ -210,16 +210,16 @@ class VSR(object):
                 self.save(sess, (it + 1))
     
     def process_input_image(self, im_names, apply_scale=False):
-        try:
-            from skimage import io as sio
-            from skimage import transform as strans
-            im = sio.imread(im_names) / 255.
-            h, w, c = im.shape
-            scale = self.scale if apply_scale else 1
-            if h != self.cfg.data.eval_in_size[0]*scale or w != self.cfg.data.eval_in_size[1]*scale:
-                im = strans.resize(im, (self.cfg.data.eval_in_size[0]*scale, self.cfg.data.eval_in_size[1]*scale))
-        except ImportError:
-            im = imageio.imread(im_names) / 255.
+        # try:
+        #     from skimage import io as sio
+        #     from skimage import transform as strans
+        #     im = sio.imread(im_names) / 255.
+        #     h, w, c = im.shape
+        #     scale = self.scale if apply_scale else 1
+        #     if h != self.cfg.data.eval_in_size[0]*scale or w != self.cfg.data.eval_in_size[1]*scale:
+        #         im = strans.resize(im, (self.cfg.data.eval_in_size[0]*scale, self.cfg.data.eval_in_size[1]*scale))
+        # except ImportError:
+        im = imageio.imread(im_names) / 255.
         return im
 
     def evaluate(self, sess_cfg):
@@ -313,7 +313,7 @@ class VSR(object):
                 in_path = os.path.join(self.data_dir, 'images', vid['name'], meta['x{}_folder'.format(self.scale)])
             assert os.path.exists(in_path)
             lr_img_names = sorted(glob.glob(os.path.join(in_path, '*.png')))
-            lrImgs = np.array([self.process_input_image(i) / 255. for i in lr_img_names]).astype(np.float32)
+            lrImgs = np.array([self.process_input_image(i) for i in lr_img_names]).astype(np.float32)
 
             lr_list = []
             max_frame = lrImgs.shape[0]

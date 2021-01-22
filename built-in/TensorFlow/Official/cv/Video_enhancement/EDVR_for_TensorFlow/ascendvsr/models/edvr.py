@@ -65,8 +65,8 @@ class EDVR(VSR):
             l3_feat = ConvModule(l3_feat, self.mid_channels, act_cfg=act_cfg, name='feat_l3_conv2')
 
             l1_feat_shape = l1_feat.get_shape().as_list()
-            l2_feat_shape = l1_feat.get_shape().as_list()
-            l3_feat_shape = l1_feat.get_shape().as_list()
+            l2_feat_shape = l2_feat.get_shape().as_list()
+            l3_feat_shape = l3_feat.get_shape().as_list()
 
             l1_feat = tf.reshape(l1_feat, [-1, self.num_frames, *l1_feat_shape[1:]])
             l2_feat = tf.reshape(l2_feat, [-1, self.num_frames, *l2_feat_shape[1:]])
@@ -259,9 +259,11 @@ class EDVR(VSR):
             if self.with_tsa:
                 feat = self.tsa_fusion(aligned_feat)
             else:
+                aligned_feat_shape = aligned_feat.get_shape().as_list()
+                last_dim = aligned_feat_shape[-1] * aligned_feat_shape[1]
                 aligned_feat = tf.transpose(aligned_feat, [0, 2, 3, 1, 4])
                 aligned_feat = tf.reshape(aligned_feat,
-                                          [aligned_feat.shape[0], aligned_feat.shape[1], aligned_feat.shape[2], -1])
+                                          [-1, aligned_feat.shape[1], aligned_feat.shape[2], last_dim])
                 feat = Conv2D(aligned_feat, self.mid_channels, kernel_size=[1, 1], name='fusion')
 
             # reconstruction
@@ -280,19 +282,14 @@ class EDVR(VSR):
             losses = tf.maximum(tf.abs(SR - HR), eps)
         elif self.cfg.edvr.loss_type == 'l1':
             losses = tf.abs(SR - HR)
-            losses = tf.reduce_sum(losses, axis=[1,2,3])
         elif self.cfg.edvr.loss_type == 'l2':
-            # use tf.nn.l2_loss, instead of power. 
-            # Precision issue in tf.power on npu (cr. zounan) 
             losses = (SR - HR)**2
-            losses = tf.reduce_sum(losses, axis=[1, 2, 3])
-            # losses = tf.nn.l2_loss(SR - HR)
-            # losses = losses * 2 / SR.get_shape().as_list()[0]
         elif self.cfg.edvr.loss_type == 'charbonnier':
             losses = tf.sqrt((SR - HR)**2 + eps)
         else:
             raise ValueError
 
+        losses = tf.reduce_sum(losses, axis=[1, 2, 3])
         if reduction == 'mean':
             return tf.reduce_mean(losses, axis=axis)
         elif reduction == 'sum':
