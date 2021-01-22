@@ -78,4 +78,7 @@ fi
 python3 tools/main.py \
     --config-file configs/edvr.yaml \
     mode freeze \
+    model.input_format_dimension 4 \
+    model.convert_output_to_uint8 True \
+    data.eval_batch_size -1 \
     checkpoint ${CKPT}

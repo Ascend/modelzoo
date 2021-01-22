@@ -64,15 +64,13 @@ class EDVR(VSR):
             l3_feat = ConvModule(l2_feat, self.mid_channels, strides=[2, 2], act_cfg=act_cfg, name='feat_l3_conv1')
             l3_feat = ConvModule(l3_feat, self.mid_channels, act_cfg=act_cfg, name='feat_l3_conv2')
 
-            l1_feat = tf.reshape(l1_feat,
-                                 [int(l1_feat.shape[0]) // self.num_frames, self.num_frames,
-                                  int(l1_feat.shape[1]), int(l1_feat.shape[2]), -1])
-            l2_feat = tf.reshape(l2_feat,
-                                 [int(l2_feat.shape[0]) // self.num_frames, self.num_frames,
-                                  int(l2_feat.shape[1]), int(l2_feat.shape[2]), -1])
-            l3_feat = tf.reshape(l3_feat,
-                                 [int(l3_feat.shape[0]) // self.num_frames, self.num_frames,
-                                  int(l3_feat.shape[1]), int(l3_feat.shape[2]), -1])
+            l1_feat_shape = l1_feat.get_shape().as_list()
+            l2_feat_shape = l2_feat.get_shape().as_list()
+            l3_feat_shape = l3_feat.get_shape().as_list()
+
+            l1_feat = tf.reshape(l1_feat, [-1, self.num_frames, *l1_feat_shape[1:]])
+            l2_feat = tf.reshape(l2_feat, [-1, self.num_frames, *l2_feat_shape[1:]])
+            l3_feat = tf.reshape(l3_feat, [-1, self.num_frames, *l3_feat_shape[1:]])
 
             return l1_feat, l2_feat, l3_feat
 
@@ -131,7 +129,8 @@ class EDVR(VSR):
     def tsa_fusion(self, aligned_feat, act_cfg=dict(type='LeakyRelu', alpha=0.1)):
 
         with tf.variable_scope('tsa_fusion'):
-            n, t, h, w, c = list(map(int, aligned_feat.shape))
+            # n, t, h, w, c = list(map(int, aligned_feat.shape))
+            n, t, h, w, c = aligned_feat.get_shape().as_list()
             # temporal attention
             # embedding_ref = Conv2D(aligned_feat[:, self.num_frames // 2], self.mid_channels, name='temporal_attn1')
             aligned_feat_list = tf.split(aligned_feat, self.num_frames, axis=1)
@@ -140,7 +139,7 @@ class EDVR(VSR):
                             self.mid_channels, 
                             name='temporal_attn1')
             emb = Conv2D(tf.reshape(aligned_feat, [-1, h, w, c]), self.mid_channels, name='temporal_attn2')
-            emb = tf.reshape(emb, [n, t, h, w, -1])
+            emb = tf.reshape(emb, [-1, t, h, w, self.mid_channels])
             emb = tf.cast(emb, tf.float32)
             emb_list = tf_split(emb, self.num_frames, axis=1, keep_dims=False)
 
@@ -153,8 +152,10 @@ class EDVR(VSR):
             aligned_feat = corr_prob * aligned_feat
 
             # fusion
+            aligned_feat_shape = aligned_feat.get_shape().as_list()
+            last_dim = aligned_feat_shape[-1] * aligned_feat_shape[1]
             aligned_feat = tf.transpose(aligned_feat, [0, 2, 3, 1, 4])
-            aligned_feat = tf.reshape(aligned_feat, [n, h, w, -1])
+            aligned_feat = tf.reshape(aligned_feat, [-1, h, w, last_dim])
             feat = ConvModule(aligned_feat, self.mid_channels, kernel_size=(1, 1), act_cfg=act_cfg, name='feat_fusion')
 
             # spatial attention
@@ -220,6 +221,10 @@ class EDVR(VSR):
         # shape of x: [B,T_in,H,W,C]
         with tf.variable_scope('G') as scope:
             # x_center = x[:, self.num_frames // 2]
+            if self.cfg.model.input_format_dimension == 4:
+                x_shape = x.get_shape().as_list()
+                x = tf.reshape(x, [-1, self.num_frames, *x_shape[1:]])
+
             x_list = tf.split(x, self.num_frames, axis=1)
             x_center = tf.squeeze(x_list[self.num_frames//2], axis=1)
 
@@ -254,9 +259,11 @@ class EDVR(VSR):
             if self.with_tsa:
                 feat = self.tsa_fusion(aligned_feat)
             else:
+                aligned_feat_shape = aligned_feat.get_shape().as_list()
+                last_dim = aligned_feat_shape[-1] * aligned_feat_shape[1]
                 aligned_feat = tf.transpose(aligned_feat, [0, 2, 3, 1, 4])
                 aligned_feat = tf.reshape(aligned_feat,
-                                          [aligned_feat.shape[0], aligned_feat.shape[1], aligned_feat.shape[2], -1])
+                                          [-1, aligned_feat.shape[1], aligned_feat.shape[2], last_dim])
                 feat = Conv2D(aligned_feat, self.mid_channels, kernel_size=[1, 1], name='fusion')
 
             # reconstruction
@@ -275,18 +282,14 @@ class EDVR(VSR):
             losses = tf.maximum(tf.abs(SR - HR), eps)
         elif self.cfg.edvr.loss_type == 'l1':
             losses = tf.abs(SR - HR)
-            losses = tf.reduce_sum(losses, axis=[1,2,3])
         elif self.cfg.edvr.loss_type == 'l2':
-            # use tf.nn.l2_loss, instead of power. 
-            # Precision issue in tf.power on npu (cr. zounan) 
-            # losses = (SR - HR)**2
-            losses = tf.nn.l2_loss(SR - HR)
-            losses = losses * 2 / SR.get_shape().as_list()[0]
+            losses = (SR - HR)**2
         elif self.cfg.edvr.loss_type == 'charbonnier':
             losses = tf.sqrt((SR - HR)**2 + eps)
         else:
             raise ValueError
 
+        losses = tf.reduce_sum(losses, axis=[1, 2, 3])
         if reduction == 'mean':
             return tf.reduce_mean(losses, axis=axis)
         elif reduction == 'sum':
@@ -308,7 +311,7 @@ class EDVR(VSR):
             try:
                 constant_graph = graph_util.convert_variables_to_constants(
                     sess, sess.graph_def,
-                    ['G/reconstruction/add']
+                    [self.SR.name.split(':')[0]]
                 )
                 with tf.gfile.FastGFile(pb_path, mode='wb') as f:
                     f.write(constant_graph.SerializeToString())
@@ -343,7 +346,7 @@ class EDVR(VSR):
                 in_path = os.path.join(self.data_dir, 'images', vid['name'], meta['x{}_folder'.format(self.scale)])
             assert os.path.exists(in_path)
             lr_img_names = sorted(glob.glob(os.path.join(in_path, '*.png')))
-            lrImgs = np.array([self.process_input_image(i) / 255. for i in lr_img_names]).astype(np.float32)
+            lrImgs = np.array([self.process_input_image(i) for i in lr_img_names]).astype(np.float32)
 
             lr_list = []
             max_frame = lrImgs.shape[0]

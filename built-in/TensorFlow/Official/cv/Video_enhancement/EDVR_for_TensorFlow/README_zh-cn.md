@@ -268,6 +268,12 @@ bash scripts/run_freeze.sh outputs/edvr/EDVR-600000
 
 固化的pb文件会被保存为``${cfg.output_dir}/EDVR.pb``。
 
+如果固化时希望``batchsize``维度为``None``，以便推理时可以泛化到任意batchsize的场景，可以在固化时设置``data.eval_batch_size=-1``，脚本
+将自动调整batchsize维度为``None``；此外，如果需要固化pb文件支持4D输入``[N*D,H,W,C]``，而非5D输入``[N,D,H,W,C]``（此处``D``是EDVR
+输入连续帧数，区别于batchsize），可以在固化时选择设置``model.input_format_dimension=4``(默认为5)，脚本将在模型搭建时自动插入reshape
+算子进行转换，保证网络后续结构正确。模型默认输出数据类型为``tf.float32``，如需调整pb模型的输出节点数据类型为uint8，在固化时选择设置
+``model.convert_output_to_uint8=True``（默认为False）即可。
+
 ## 复现精度与性能
 
 在REDS4数据集上
