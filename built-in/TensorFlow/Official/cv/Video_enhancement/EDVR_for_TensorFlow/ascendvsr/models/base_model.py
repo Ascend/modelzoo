@@ -54,6 +54,8 @@ class VSR(object):
 
         if self.cfg.model.input_format_dimension == 5:
             if b is None or b < 0:
+                if self.is_train:
+                    raise ValueError('batchsize cannot be None or less then 0 during training.')
                 b = None
             self.LR = tf.placeholder(tf.float32, shape=[b, self.num_frames, h, w, 3], name='L_input')
         elif self.cfg.model.input_format_dimension == 4:
