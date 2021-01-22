@@ -74,6 +74,9 @@ class VSR(object):
             self.HR = tf.placeholder(tf.float32, shape=[b, h * 4, w * 4, 3], name='H_truth')
             self.loss = self.caculate_loss(self.SR, self.HR)
 
+        if self.cfg.model.convert_output_to_uint8:
+            self.SR = tf.cast(tf.clip_by_value(self.SR * 255, 0., 255.), tf.uint8)
+
     def caculate_loss(self, SR, HR, *kwargs):
         raise NotImplementedError
 

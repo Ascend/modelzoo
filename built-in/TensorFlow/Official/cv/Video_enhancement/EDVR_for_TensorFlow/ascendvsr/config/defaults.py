@@ -15,6 +15,7 @@ cfg.model.num_frames = 5
 # 4: 4D tensor, with shape [b*frames, h, w, c], used when model frozen
 # 5: 5D tensor, with shape [b, frames, h, w, c]
 cfg.model.input_format_dimension = 5
+cfg.model.convert_output_to_uint8 = False
 
 # ---------------------------------------------------------------------------- #
 # Data

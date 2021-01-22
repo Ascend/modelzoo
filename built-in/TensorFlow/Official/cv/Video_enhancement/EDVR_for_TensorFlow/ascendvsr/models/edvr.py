@@ -311,7 +311,7 @@ class EDVR(VSR):
             try:
                 constant_graph = graph_util.convert_variables_to_constants(
                     sess, sess.graph_def,
-                    ['G/reconstruction/add']
+                    [self.SR.name.split(':')[0]]
                 )
                 with tf.gfile.FastGFile(pb_path, mode='wb') as f:
                     f.write(constant_graph.SerializeToString())

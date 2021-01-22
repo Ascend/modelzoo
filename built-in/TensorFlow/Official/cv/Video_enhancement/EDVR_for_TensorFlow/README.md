@@ -264,7 +264,9 @@ The frozen pb file will be saved at ``${cfg.output_dir}/EDVR.pb``.
 If one wants to use 4D ``[N*D, H, W, C]`` input instead of 5D ``[N, D, H, W, C]`` where ``D`` represents the number of 
 consecutive frames of EDVR, please 
 set ``model.input_format_dimension=4`` when freezing; additionally, if one wants to use unknown batchsize in pb model, please set the 
-``data.eval_batch_size=-1`` when freezing. The others can remain the same as the demo scripts.
+``data.eval_batch_size=-1`` when freezing. The output node of the model is by default of ``fp32`` data type. One can set 
+``model.convert_output_to_uint8=True`` when freezing so that the scripts will add a cast op before output converting to 
+``tf.uint8``.
 
 ## Precision & Performance
 
