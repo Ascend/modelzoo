@@ -10,7 +10,9 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.import tensorflow as tf
+# limitations under the License.
+
+import tensorflow as tf
 def depth_to_space(x, scale, use_default=False):
     # Ascend implementation of tf.depth_to_space is not accurate so far
     # Thanks to Huang Wei h00573990
@@ -19,9 +21,10 @@ def depth_to_space(x, scale, use_default=False):
     else:
         # b, h, w, c = list(map(int, x.shape))
         b, h, w, c = x.get_shape().as_list()
-        out = tf.reshape(x, [b, h, w, scale, scale, -1])
+        c_scaled = c // (scale**2)
+        out = tf.reshape(x, [-1, h, w, scale, scale, c_scaled])
         out = tf.transpose(out, [0, 1, 3, 2, 4, 5])
-        out = tf.reshape(out, [b, h * scale, w * scale, -1])
+        out = tf.reshape(out, [-1, h * scale, w * scale, c_scaled])
     return out
 
 
