@@ -51,3 +51,7 @@ https://pjreddie.com/projects/pascal-voc-dataset-mirror/
 epoch=45
 batch_size=16
 lr=1e-5
+
+ **
+offline_inference**
+[offline_inference](https://gitee.com/xiaoqiqiyaya/modelzoo/tree/master/contrib/Research/cv/fcn/fcn_tf_xiaoqiqiya/offline_inference) 
