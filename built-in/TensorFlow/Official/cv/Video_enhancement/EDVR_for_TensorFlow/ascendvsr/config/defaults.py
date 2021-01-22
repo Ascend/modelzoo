@@ -11,7 +11,10 @@ cfg.model = CN()
 cfg.model.name = 'EDVR'
 cfg.model.scale = 4
 cfg.model.num_frames = 5
-
+# Options for the input dimension
+# 4: 4D tensor, with shape [b*frames, h, w, c], used when model frozen
+# 5: 5D tensor, with shape [b, frames, h, w, c]
+cfg.model.input_format_dimension = 5
 
 # ---------------------------------------------------------------------------- #
 # Data
@@ -31,7 +34,7 @@ cfg.data.eval_in_size = [180, 320]
 
 cfg.data.eval_in_patch = False
 cfg.data.eval_pad_size = 32
-
+cfg.data.read_mode = 'python'  # ['tf', 'python']
 
 # ---------------------------------------------------------------------------- #
 # Solver

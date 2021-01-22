@@ -134,8 +134,10 @@ class DeformableConvLayer(object):
             return 1. - tf.to_float(out_of_bound_mask)
 
         inputs = self._pad_input(inputs)
-        bs, in_h, in_w, _ = list(map(int, inputs.shape))
-        bs, out_h, out_w, _ = list(map(int, offset.shape))
+        # bs, in_h, in_w, _ = list(map(int, inputs.shape))
+        bs, in_h, in_w, _ = inputs.get_shape().as_list()
+        # bs, out_h, out_w, _ = list(map(int, offset.shape))
+        bs, out_h, out_w, _ = offset.get_shape().as_list()
 
         # get x, y axis offset. Swap the order to 'x,y' instead of 'y,x', align with npu dcn op
         x_off = offset[:, :, :, :offset.shape[-1] // 2]
@@ -234,7 +236,8 @@ class DeformableConvLayer(object):
     def _pad_input(self, x):
 
         if self.padding == 'same':
-            size = list(map(int, x.shape))[1:3]
+            size = x.get_shape().as_list()[1:3]
+            # size = list(map(int, x.shape))[1:3]
             pad = []
             for i in range(2):
                 dilated_filter_size = 1 + self.dilations[i] * (self.kernel_size[i] - 1)

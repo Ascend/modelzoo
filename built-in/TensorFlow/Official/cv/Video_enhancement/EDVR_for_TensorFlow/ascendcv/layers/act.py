@@ -44,7 +44,8 @@ class ActLayer(object):
             raise NotImplementedError
 
     def __call__(self, x):
-        shape = list(map(int, x.shape))
+        # shape = list(map(int, x.shape))
+        shape = x.get_shape().as_list()
         if len(shape) == 5:
             # TODO
             # Ascend currently do not support 5D relu

@@ -10,7 +10,8 @@ class DUFwP3D(DUF):
         sp = [[0, 0], [1, 1], [1, 1], [0, 0]]
         tp = [[0, 0], [1, 1], [0, 0], [0, 0]]
 
-        shape0 = list(map(int, x.shape))
+        # shape0 = list(map(int, x.shape))
+        shape0 = x.get_shape().as_list()
         x = tf.reshape(x, [shape0[0] * shape0[1], shape0[2], shape0[3], shape0[4]])
 
         x = Conv2D(tf.pad(x, sp, mode='CONSTANT'), 64, [3, 3], padding='valid', name='conv1')

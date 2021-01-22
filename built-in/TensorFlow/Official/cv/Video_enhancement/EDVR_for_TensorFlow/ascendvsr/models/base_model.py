@@ -51,7 +51,20 @@ class VSR(object):
 
     def build(self):
         b, h, w = self.batch_size, self.in_size[0], self.in_size[1]
-        self.LR = tf.placeholder(tf.float32, shape=[b, self.num_frames, h, w, 3], name='L_input')
+
+        if self.cfg.model.input_format_dimension == 5:
+            self.LR = tf.placeholder(tf.float32, shape=[b, self.num_frames, h, w, 3], name='L_input')
+        elif self.cfg.model.input_format_dimension == 4:
+            if b is None or b < 0:
+                if self.is_train:
+                    raise ValueError('batchsize cannot be None or less then 0 during training.')
+                self.LR = tf.placeholder(tf.float32, shape=[None, h, w, 3], name='L_input')
+            else:
+                self.LR = tf.placeholder(tf.float32, shape=[b*self.num_frames, h, w, 3], name='L_input')
+        else:
+            raise ValueError(f'Input format dimension only support 4 or 5, '
+                             f'but got {self.cfg.model.input_format_dimension}')
+
         self.SR = self.build_generator(self.LR)
         if self.is_train:
             self.HR = tf.placeholder(tf.float32, shape=[b, h * 4, w * 4, 3], name='H_truth')

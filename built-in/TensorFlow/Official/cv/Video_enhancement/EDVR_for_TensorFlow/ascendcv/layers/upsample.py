@@ -17,7 +17,8 @@ def depth_to_space(x, scale, use_default=False):
     if use_default:
         out = tf.depth_to_space(x, scale)
     else:
-        b, h, w, c = list(map(int, x.shape))
+        # b, h, w, c = list(map(int, x.shape))
+        b, h, w, c = x.get_shape().as_list()
         out = tf.reshape(x, [b, h, w, scale, scale, -1])
         out = tf.transpose(out, [0, 1, 3, 2, 4, 5])
         out = tf.reshape(out, [b, h * scale, w * scale, -1])
