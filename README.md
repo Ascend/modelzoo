@@ -65,7 +65,12 @@ Thank You!
 	- [MobileNetV2_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/MobileNetV2_for_PyTorch)
 	- [ResNet50_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/ResNet50_for_PyTorch)
 	- [Shufflenetv2_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/Shufflenetv2_for_PyTorch)
-	- [LSTM_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/LSTM_for_PyTorch) 
+	- [Faster_Mask_RCNN_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_object_detection/Faster_Mask_RCNN_for_PyTorch)
+	- [PSENet_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/scene_text_detection/PSENet_for_PyTorch)
+	- [GRU_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/GRU_for_PyTorch)
+	- [LSTM_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/LSTM_for_PyTorch)
+	- [Transformer_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/Transformer_for_PyTorch)
+
  
 - MindSpore
 	
