@@ -1,3 +1,0 @@
-GLOBAL_NET_SCOPE = 'Global_Net'
-GLOBAL_EP = 0
-FRAME_TOTAL = 0
