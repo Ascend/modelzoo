@@ -23,6 +23,7 @@
 * Tensorflow 1.15.0
 * Ascend910
 * gym[atari]
+* 推理环境CANN(20.0.0.RC1)+Ascend310(云服务器)
 
 ## 代码路径解释
 
