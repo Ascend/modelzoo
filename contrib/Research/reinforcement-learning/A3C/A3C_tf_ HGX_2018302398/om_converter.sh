@@ -1,0 +1,1 @@
+/home/HwHiAiUser/Ascend/ascend-toolkit/20.1.rc1.alpha001/atc/bin/atc --input_shape="s:1,42,42,1" --check_report=./om_model/network_analysis.report --input_format=NHWC --output="./om_model/a3c_Pong_model" --soc_version=Ascend310 --framework=3 --model="./pb_model/a3c_pong_model.pb"
