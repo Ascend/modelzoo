@@ -21,7 +21,7 @@
 
 
 ```
-xception
+iception
 └─ 
   ├─README.md
   ├─train_data 用于存放训练数据集 #obs://public-dataset/imagenet/orignal/train_tf/ 
