@@ -1,3 +1,3 @@
 source pt.sh
 
-python3.7 export2onnx.py
+python3.7 pthtar2onnx.py
