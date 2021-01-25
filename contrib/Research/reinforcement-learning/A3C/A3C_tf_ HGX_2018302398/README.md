@@ -72,7 +72,7 @@ A3C
 
 ### 3：使用CANN(20.1.alpha001版)中的atc工具，pb模型转换为om模型
 
-### 4：使用A3C/Ascend_Infer/A3C_Inferance.py脚本完成om模型部署推理
+### 4：使用A3C/Ascend_Infer/A3C_Inferance.py脚本完成om模型推理部署
 
 
 
