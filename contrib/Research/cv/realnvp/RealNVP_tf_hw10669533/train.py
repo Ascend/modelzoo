@@ -129,14 +129,6 @@ loss_gen_test.append(nn.loss(gen_par2, jacs2))
 
 # add gradients together and get training updates
 tf_lr = tf.placeholder(tf.float32, shape=[])
-# with tf.device('/gpu:0'):
-#     for i in range(1,args.nr_gpu):
-#         loss_gen[0] += loss_gen[i]
-#         loss_gen_test[0] += loss_gen_test[i]
-#         for j in range(len(grads[0])):
-#             grads[0][j] += grads[i][j]
-# training op
-# optimizer = nn.adam_updates(all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995)
 optimizer =tf.train.AdamOptimizer(learning_rate=tf_lr)
 optimizer=optimizer.minimize(loss_gen[0]/(args.nr_gpu*np.log(2.)*np.prod(obs_shape)*args.batch_size))
 ######
@@ -253,14 +245,6 @@ with tf.Session(config=config) as sess:
         if epoch % args.save_interval == 0:
 
             print ("Generating samples...")
-
-            # generate samples from the model
-            # # will fail on npu, may have problem unknown
-            # sampled_x = sample_from_model(sess)
-            # img_tile = plotting.img_tile(sampled_x, aspect_ratio=1.0, border_color=1.0, stretch=True)
-            # img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            # plotting.plt.savefig(os.path.join(args.save_dir,'%s_sample%d.png' % (args.data_set, epoch)))
-            # plotting.plt.close('all')
 
             # save params
             cwd = os.getcwd()  # current path

@@ -142,10 +142,6 @@ tf_lr = tf.placeholder(tf.float32, shape=[])
         #     grads[0][j] += grads[i][j]
 # training op
 optimizer = nn.adam_updates(all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995)
-# opt =tf.train.AdamOptimizer(learning_rate=tf_lr)
-# opt.minimize(loss_gen[0]/(args.nr_gpu*np.log(2.)*np.prod(obs_shape)*args.batch_size))
-######
-# convert loss to bits/dim
 bits_per_dim = loss_gen[0]/(args.nr_gpu*np.log(2.)*np.prod(obs_shape)*args.batch_size)
 bits_per_dim_test = loss_gen_test[0]/(args.nr_gpu*np.log(2.)*np.prod(obs_shape)*args.batch_size)
 
@@ -241,49 +237,4 @@ with tf.Session(config=config) as sess:
 
 
 
-        #
-        # # save params
-        # cwd = os.getcwd()  # current path
-        # t=str(time.time())
-        # os.makedirs("save_model_"+t,exist_ok=True)
-        # os.makedirs("save_testbpd_"+t,exist_ok=True)
-        #
-        # save_path = 'save_model_'+t+'/params_cifar.ckpt'
-        # osr_dir=os.path.join(cwd, 'save_model_'+t)
-        # osr=os.path.join(cwd, save_path)
-        #
-        # ret=saver.save(sess, osr) # main func  # output /home/work/workspace/device7/save_model/params_cifar.ckpt
-        # ck=tf.train.get_checkpoint_state(save_path)
-        #
-        #
-        # import boto3
-        # # import boto3.s3 as ss
-        # ACCESS_KEY = '7N2JK6JLDLW3DE3ESNWV'
-        # SECRET_KEY = 'cJfnmOiPNe3PSwqyadPMkPr7wyj4ltl6Ao8E6SRY'
-        # s3s = boto3.client(
-        #     's3',
-        #     aws_access_key_id=ACCESS_KEY,
-        #     aws_secret_access_key=SECRET_KEY,
-        #     endpoint_url='https://obs.cn-north-4.myhuaweicloud.com'
-        # )
-        # os.chdir(osr_dir)
-        # all_files = os.listdir(osr_dir)
-        # for ff in all_files:
-        #     print(os.path.abspath(ff))
-        #     if not os.path.isfile(os.path.abspath(ff)):
-        #         all_files.remove(ff)
-        #     s3s.upload_file(os.path.abspath(ff), 'realnvp', 'oo/tfcheck_'+t+'/'+os.path.basename(ff))
-        #
-        # save_nppath = 'save_testbpd_'+t+'/test_bpd_cifar.npz'
-        # osd = os.path.join(cwd , save_nppath)
-        # osd_dir = os.path.join(cwd , 'save_testbpd_'+t)
-        # np.savez(osd, test_bpd=np.array(test_bpd)) # main func
-        #
-        # os.chdir(osd_dir)
-        # all_files = os.listdir(osd_dir)
-        # for ff in all_files:
-        #     if not os.path.isfile(os.path.abspath(ff)):
-        #         all_files.remove(ff)
-        #     s3s.upload_file(os.path.abspath(ff), 'realnvp', 'oo/npcheck_'+t+'/'+os.path.basename(ff))
-        #
-        # os.chdir(cwd)
+   
