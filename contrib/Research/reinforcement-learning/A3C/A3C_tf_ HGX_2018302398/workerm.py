@@ -19,7 +19,7 @@ Definition of Worker, which is used as the basic structure to train a model.
 
 import tensorflow as tf
 import numpy as np
-from model import A3CNet
+from model import A3CNet_LSTM, A3CNet_DENSE, A3CNet_CONV
 from Params import *
 from envs import create_atari_env
 import time
@@ -32,7 +32,7 @@ import os
 class Worker(object):
     """Define the Worker class, it canbe used in model training"""
     
-    def __init__(self, sess, GameName, name, seed, rank, globalAC, OPT, coord, UPDATE_GLOBAL_ITER, MAX_GLOBAL_EP, GAMMA, ENTROPY_BETA, lstm=False):
+    def __init__(self, sess, GameName, name, seed, rank, globalAC, OPT, coord, UPDATE_GLOBAL_ITER, MAX_GLOBAL_EP, GAMMA, ENTROPY_BETA, lstm=True):
         """Initialize the object of the class Worker.
         Args:
             sess: the running session
@@ -51,12 +51,14 @@ class Worker(object):
         
         self.sess = sess
         self.name = name
-        
+        self.lstm = lstm
         self.env = create_atari_env(GameName)
         self.env.seed(seed + rank)
         shape = self.env.observation_space.shape
-        self.AC = A3CNet(self.env, name, sess, OPT, ENTROPY_BETA, globalAC, lstm, input_shape=[None, shape[1], shape[2], shape[0]])
-        
+        if lstm:
+            self.AC = A3CNet_LSTM(self.env, name, sess, OPT, ENTROPY_BETA, globalAC, input_shape=[None, shape[1], shape[2], shape[0]])
+        else:
+           self.AC = A3CNet_CONV(self.env, name, sess, OPT, ENTROPY_BETA, globalAC, input_shape=[None, shape[1], shape[2], shape[0]])
         self.coord = coord
         self.T0 = time.time()
         self.UPDATE_GLOBAL_ITER = UPDATE_GLOBAL_ITER
@@ -81,8 +83,8 @@ class Worker(object):
             os.makedirs(path)
         
         writer = tf.summary.FileWriter(path, self.sess.graph)
-        
-        lstm_state = self.AC.acnet.state_init
+        if self.lstm:
+            lstm_state = self.AC.acnet.state_init
         
         total_step = 1
         buffer_s, buffer_a, buffer_r = [], [], []
@@ -98,8 +100,10 @@ class Worker(object):
                 FRAME_TOTAL += 1
                 frames += 1
                 frame_local += 1
-
-                a, lstm_state = self.AC.choose_action(s, lstm_state)
+                if self.lstm:
+                    a, lstm_state = self.AC.choose_action(s, lstm_state)
+                else:
+                    a = self.AC.choose_action(s)
                 
                 s_, r, done, info = self.env.step(a)
                 ep_r += r
@@ -114,12 +118,14 @@ class Worker(object):
                 if total_step % self.UPDATE_GLOBAL_ITER == 0 or done:
                     if done:
                         v_s_ = 0
-                    else:
+                    elif self.lstm:
                         v_s_ = self.sess.run(self.AC.acnet.v, {
                                             self.AC.acnet.input: s_,
                                             self.AC.acnet.c_in: lstm_state[0],
                                             self.AC.acnet.h_in: lstm_state[1]})[0, 0]
-                        
+                    else:
+                        v_s_ = self.sess.run(self.AC.acnet.v, {
+                                            self.AC.acnet.input: s_})[0, 0]
                     buffer_v_target = []
                     for r in buffer_r[::-1]:    # reverse buffer r
                         v_s_ = r + self.GAMMA * v_s_
@@ -127,13 +133,21 @@ class Worker(object):
                     buffer_v_target.reverse()
 
                     buffer_s, buffer_a, buffer_v_target = np.vstack(buffer_s), np.array(buffer_a), np.vstack(buffer_v_target)
-                    feed_dict = {
-                        self.AC.acnet.input: buffer_s,
-                        self.AC.a_his: buffer_a,
-                        self.AC.v_target: buffer_v_target,
-                        self.AC.acnet.c_in: lstm_state[0],
-                        self.AC.acnet.h_in: lstm_state[1],
-                    }
+                    if self.lstm:
+                        feed_dict = {
+                            self.AC.acnet.input: buffer_s,
+                            self.AC.a_his: buffer_a,
+                            self.AC.v_target: buffer_v_target,
+                            self.AC.acnet.c_in: lstm_state[0],
+                            self.AC.acnet.h_in: lstm_state[1],
+                        }
+                    else:
+                        feed_dict = {
+                            self.AC.acnet.input: buffer_s,
+                            self.AC.a_his: buffer_a,
+                            self.AC.v_target: buffer_v_target,
+                        }
+                    
                     self.AC.update_global(feed_dict)
                     buffer_s, buffer_a, buffer_r = [], [], []
                     self.AC.pull_global()
@@ -157,23 +171,3 @@ class Worker(object):
                     break
 
                     #infer the performance of an model
-    def test_score(self, env, num, model):
-        """Use local model to perform on the games, and get the scores."""
-        
-        score_tot = 0
-        for i in range(num):
-            s = env.reset()
-            s = downSample(s)
-            ep_r = 0
-            while(True):
-                s = s[np.newaxis, :]
-                a = model.choose_action(s)
-                s_, r, done, info = env.step(a)
-                ep_r += r
-                s_ = downSample(s_)
-                s = s_
-                
-                if done:
-                    score_tot += ep_r
-                    break
-        return score_tot/num
