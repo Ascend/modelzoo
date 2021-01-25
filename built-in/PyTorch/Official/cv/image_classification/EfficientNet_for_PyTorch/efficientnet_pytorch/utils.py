@@ -609,12 +609,19 @@ def load_pretrained_weights(model, model_name, weights_path=None, load_fc=True, 
                         trained with advprop (valid when weights_path is None).
     """
     if isinstance(weights_path,str):
-        state_dict = torch.load(weights_path)
+        state_dict = torch.load(weights_path, map_location='cpu')
     else:
         # AutoAugment or Advprop (different preprocessing)
         url_map_ = url_map_advprop if advprop else url_map
         state_dict = model_zoo.load_url(url_map_[model_name])
-    
+    if 'state_dict' in state_dict:
+        state_dict = state_dict['state_dict']
+    if 'module.' in list(state_dict.keys())[0]:
+        state_dict_tmp = dict()
+        for k, v in state_dict.items():
+            state_dict_tmp[k[7:]] = v
+        state_dict = state_dict_tmp
+
     if load_fc:
         ret = model.load_state_dict(state_dict, strict=False)
         assert not ret.missing_keys, f'Missing keys when loading pretrained weights: {ret.missing_keys}'
