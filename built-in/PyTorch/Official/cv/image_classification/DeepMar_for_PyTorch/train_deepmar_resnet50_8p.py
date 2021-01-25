@@ -531,16 +531,16 @@ def main_worker(npu, npus_per_node, cfg):
         if not cfg.multiprocessing_distributed or (cfg.multiprocessing_distributed and cfg.rank % npus_per_node == 0):
             print("[npu id:", cfg.npu, "]", ' * FPS@all {:.3f}'.format(npus_per_node * cfg.batch_size / batch_time.avg))
         # model ckpt
-        if not cfg.multiprocessing_distributed or (cfg.multiprocessing_distributed and (
-                (epoch + 1) % cfg.epochs_per_save == 0 or epoch + 1 == cfg.total_epochs)):
-            ckpt_file = os.path.join(cfg.exp_dir, 'model', 'ckpt_epoch%d.pth' % (epoch + 1))
-            save_ckpt(modules_optims, epoch + 1, 0, ckpt_file)
-            save_checkpoint({
-                'epoch': epoch + 1,
-                'state_dict': model.state_dict(),
-                'optimizer': optimizer.state_dict(),
-                'amp': amp.state_dict()
-            })
+        if not cfg.multiprocessing_distributed or (cfg.multiprocessing_distributed and cfg.rank % npus_per_node == 0):
+            if (epoch + 1) % cfg.epochs_per_save == 0 or epoch + 1 == cfg.total_epochs:
+                ckpt_file = os.path.join(cfg.exp_dir, 'model', 'ckpt_epoch%d.pth' % (epoch + 1))
+                save_ckpt(modules_optims, epoch + 1, 0, ckpt_file)
+                save_checkpoint({
+                    'epoch': epoch + 1,
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'amp': amp.state_dict()
+                })
 
         ##########################
         # test on validation set #
