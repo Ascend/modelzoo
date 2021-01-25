@@ -29,21 +29,6 @@ import util
 import plotting
 
 
-# from npu_bridge.estimator import npu_ops
-# from npu_bridge.estimator.npu_unary_ops import npu_unary_ops
-# from npu_bridge.estimator.npu.npu_config import NPURunConfig
-# from npu_bridge.estimator.npu.npu_estimator import NPUEstimator,NPUEstimatorSpec
-# from npu_bridge.estimator.npu.npu_optimizer import NPUDistributedOptimizer
-# from npu_bridge.estimator.npu import npu_loss_scale_optimizer
-# from npu_bridge.estimator.npu import npu_loss_scale_manager
-# from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-# gpu_thread_count = 2
-# os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
-# os.environ['TF_GPU_THREAD_COUNT'] = str(gpu_thread_count)
-# os.environ['TF_USE_CUDNN_BATCHNORM_SPATIAL_PERSISTENT'] = '1'
-# os.environ['TF_ENABLE_WINOGRAD_NONFUSED'] = '1'
-
-
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
 # data I/O
@@ -79,12 +64,6 @@ pt.nn.MaxPool2d(2,2)
 args.data_dir="."
 args.save_dir=args.train_url
 
-# Used for training work, but no output!
-# args.data_dir=args.data_url
-# args.save_dir=args.train_url
-
-
-# initialize data loaders for train/test splits
 DataLoader = cifar10_data.DataLoader
 train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False)
@@ -156,16 +135,6 @@ print('starting training')
 test_bpd = []
 lr = args.learning_rate
 
-# config = tf.ConfigProto()
-# custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
-# custom_op.name =  "NpuOptimizer"
-# custom_op.parameter_map["use_off_line"].b = True
-# # custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_fp32_to_fp16")
-# custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("must_keep_origin_dtype")
-# config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
-# # config.graph_options.rewrite_options.optimizers.extend(["GradFusionOptimizer"])
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'  # level '1':all '2':w+e '3':e
-
 with tf.Session() as sess:
     for epoch in range(args.max_epochs):
         begin = time.time()
@@ -217,15 +186,7 @@ with tf.Session() as sess:
 
             print ("Generating samples...")
 
-            # generate samples from the model
-            # # will fail on npu, may have problem unknown
-            # sampled_x = sample_from_model(sess)
-            # img_tile = plotting.img_tile(sampled_x, aspect_ratio=1.0, border_color=1.0, stretch=True)
-            # img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            # plotting.plt.savefig(os.path.join(args.save_dir,'%s_sample%d.png' % (args.data_set, epoch)))
-            # plotting.plt.close('all')
-
-            # save params
+      
             cwd = os.getcwd()  # current path
             t=str(time.time())
             os.makedirs("save_model_"+t,exist_ok=True)

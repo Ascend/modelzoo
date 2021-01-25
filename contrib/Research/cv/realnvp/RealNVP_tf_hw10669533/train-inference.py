@@ -75,15 +75,11 @@ print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) #
 # fix random seed for reproducibility
 rng = np.random.RandomState(args.seed)
 tf.set_random_seed(args.seed)
-# tf.random.set_seed(args.seed)
-# import torch as pt
-# pt.nn.MaxPool2d(2,2)
+
 args.data_dir="/home/work/user-job-dir/code"
 args.save_dir=args.train_url
 
-# Used for training work, but no output!
-# args.data_dir=args.data_url
-# args.save_dir=args.train_url
+
 
 
 # initialize data loaders for train/test splits
@@ -117,16 +113,15 @@ grads = []
 loss_gen = []
 loss_gen_test = []
 all_params = tf.trainable_variables()
-######
-# for i in range(args.nr_gpu):
+
+
 xs.append(tf.placeholder(tf.float32, shape=(args.batch_size, ) + obs_shape))
-# with tf.device('/gpu:%d' % i):
-# train
+
 gen_par,jacs = model(xs[0])
 loss_gen.append(nn.loss(gen_par, jacs))
-# gradients
+
 grads.append(tf.gradients(loss_gen[0], all_params))
-# test
+
 gen_par2,jacs2 = model(xs[0])
 gen_par2=tf.cast(gen_par2,gen_par2.dtype,name="gen_par")
 jacs2=tf.cast(jacs2,jacs2.dtype,name="jac")
@@ -134,13 +129,6 @@ loss_gen_test.append(nn.loss(gen_par, jacs))
 
 # add gradients together and get training updates
 tf_lr = tf.placeholder(tf.float32, shape=[])
-# with tf.device('/gpu:0'):
-    # for i in range(1,args.nr_gpu):
-        # loss_gen[0] += loss_gen[i]
-        # loss_gen_test[0] += loss_gen_test[i]
-        # for j in range(len(grads[0])):
-        #     grads[0][j] += grads[i][j]
-# training op
 optimizer = nn.adam_updates(all_params, grads[0], lr=tf_lr, mom1=0.95, mom2=0.9995)
 bits_per_dim = loss_gen[0]/(args.nr_gpu*np.log(2.)*np.prod(obs_shape)*args.batch_size)
 bits_per_dim_test = loss_gen_test[0]/(args.nr_gpu*np.log(2.)*np.prod(obs_shape)*args.batch_size)
