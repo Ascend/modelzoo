@@ -48,9 +48,9 @@ https://pjreddie.com/projects/pascal-voc-dataset-mirror/
 
 
 ### 训练过程及结果
-epoch=45
+epoch=3
 batch_size=16
-lr=1e-5
+lr=1e-6
 
  **
 offline_inference**
