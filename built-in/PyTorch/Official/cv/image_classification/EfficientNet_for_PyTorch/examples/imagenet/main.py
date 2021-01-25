@@ -150,7 +150,7 @@ def main():
 
 def main_worker(npu, nnpus_per_node, args):
     args.npu = npu
-    
+    global cur_step
     if args.distributed:
         args.npu = args.process_device_map[npu]
 
@@ -318,6 +318,7 @@ def main_worker(npu, nnpus_per_node, args):
             break
 
 def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node):
+    global cur_step
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':6.4f')
@@ -332,7 +333,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node
     model.train()
 
     end = time.time()
+    step_per_epoch = len(train_loader)
     for i, (images, target) in enumerate(train_loader):
+        cur_step = epoch * step_per_epoch + i
         adjust_learning_rate_fraction_epoch(optimizer, epoch, args)
 
         # measure data loading time
