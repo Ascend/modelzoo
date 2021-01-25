@@ -9,56 +9,108 @@
 ## Requirements
 
 absl-py==0.10.0
+
 astor==0.8.1
+
 astunparse==1.6.3
+
 bleach==1.5.0
+
 cachetools==4.1.1
+
 certifi==2020.6.20
+
 chardet==3.0.4
+
 cloudpickle==1.6.0
+
 cycler==0.10.0
+
 decorator==4.4.2
+
 dm-tree==0.1.5
+
 enum34==1.1.10
+
 gast==0.2.2
+
 google-auth==1.22.1
+
 google-auth-oauthlib==0.4.1
+
 google-pasta==0.2.0
+
 grpcio==1.32.0
+
 h5py==2.10.0
+
 html5lib==0.9999999
+
 idna==2.10
+
 importlib-metadata==2.0.0
+
 Keras-Applications==1.0.8
+
 Keras-Preprocessing==1.1.2
+
 kiwisolver==1.2.0
+
 Markdown==3.3.1
+
 matplotlib==3.3.2
+
 mock==4.0.2
+
 numpy==1.18.5
+
 oauthlib==3.1.0
+
 opt-einsum==3.3.0
+
 Pillow==8.0.0
+
 protobuf==3.13.0
+
 pyasn1==0.4.8
+
 pyasn1-modules==0.2.8
+
 pyparsing==2.4.7
+
 python-dateutil==2.8.1
+
 requests==2.24.0
+
 requests-oauthlib==1.3.0
+
 rsa==4.6
+
 scipy==1.4.1
+
+
 six==1.15.0
+
 tensorboard==1.13.1
+
 tensorboard-plugin-wit==1.7.0
+
 tensorflow==1.13.1
+
 tensorflow-estimator==1.13.0
+
 tensorflow-probability==0.11.1
+
 tensorflow-tensorboard==0.4.0
+
 termcolor==1.1.0
+
 urllib3==1.25.10
+
 Werkzeug==1.0.1
+
 wrapt==1.12.1
+
 zipp==3.3.0
 
 ## 代码路径解释
@@ -95,19 +147,29 @@ checkpoint文件，model.py文件请从obs下载，链接如下：[Click here](h
 --num_gpus  		#运行时请将该参数设置为1，该参数仅用于适配华为npu。
 
 --data_url 			#Location for the dataset')
+
 --train_url 			#Location for parameter checkpoints and samples')
+
 --data_set 			#可指定数据集
+
 --save_interval 	#Every how many epochs to write checkpoint/samples?
+
 --load_params  	#Restore training from previous model checkpoint? 1 = Yes, 0 = No
 
 以下参数用于优化：
 
 --learning_rate	#Base learning rate
+
 --lr_decay			#Learning rate decay, applied every step of the optimization
+
 --batch_size		#Batch size during training per GPU
+
 --init_batch_size	#How much data to use for data-dependent initialization.
+
 --dropout_p		#Dropout strength (i.e. 1 - keep_prob). 0 = No dropout, higher = more dropout.
+
 --max_epochs	#How many epochs to run in total?
+
 --nr_gpu				#How many GPUs to distribute the training across?
 
 以下参数用于评估：
