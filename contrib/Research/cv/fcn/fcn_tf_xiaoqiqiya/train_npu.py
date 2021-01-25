@@ -133,7 +133,7 @@ def training_op(log, label, mask):
         return loss
 
     loss = focal_loss(log, label, mask)
-    optimizer = tf.train.GradientDescentOptimizer(0.00001)
+    optimizer = tf.train.GradientDescentOptimizer(0.000001)
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
         op = optimizer.minimize(loss)
