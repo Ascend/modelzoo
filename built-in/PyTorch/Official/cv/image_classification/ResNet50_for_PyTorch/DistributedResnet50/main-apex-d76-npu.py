@@ -515,7 +515,10 @@ def main_worker(gpu, ngpus_per_node, args):
             # ourselves based on the total number of GPUs we have
             # args.batch_size = int(args.batch_size / ngpus_per_node)
             # args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
-            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], broadcast_buffers=False)
+            if args.pretrained:
+                model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], broadcast_buffers=False, find_unused_parameters=True)
+            else:
+                model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], broadcast_buffers=False)
         else:
             print("[gpu id:",args.gpu,"]","============================test   args.gpu is not None   else==========================")
             model = torch.nn.parallel.DistributedDataParallel(model)
