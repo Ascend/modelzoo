@@ -21,9 +21,7 @@
 
 
 ## Requirement
-     **见requirement.txt** 
-
-
+**见requirement.txt**
 ## 代码路径解释
 
 ```shell
