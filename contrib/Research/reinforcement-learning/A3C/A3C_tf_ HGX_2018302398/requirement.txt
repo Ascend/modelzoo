@@ -1,0 +1,13 @@
+Train environment:
+Ascend 910
+
+Infer environment:
+Ascend310 + x86 server(ai1s.large.4) + CANN(20.1.alpha001)
+
+Python version: 3.7
+
+python packages:
+    Tensorflow==1.15.0
+    gym[atari]
+    gym==0.10.5
+    opencv-python
