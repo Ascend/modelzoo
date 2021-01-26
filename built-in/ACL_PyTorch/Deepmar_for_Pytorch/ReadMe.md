@@ -12,7 +12,7 @@
 
 6.postprocess_deepmar_pytorch.py：验证推理结果脚本，比对benchmark输出的分类结果和标签，给出Accuracy
 
-7.benchmark工具源码地址:https://gitee.com/ascend/cann-benchmark/tree/master/infer
+7.benchmark工具源码地址：https://gitee.com/ascend/cann-benchmark/tree/master/infer
 
 
 
