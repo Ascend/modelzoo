@@ -1,0 +1,25 @@
+I1211 22:14:32.907633 139837186770880 npu_train.py:169] Step 000610, model loss 0.9774, total loss 1.2546, 0.20 seconds/step, 40.39 examples/second
+2020-12-11 22:14:32.955812: I tf_adapter/kernels/geop_npu.cc:388] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp3_0, num_inputs:3, num_outputs:2
+2020-12-11 22:14:32.955923: I tf_adapter/kernels/geop_npu.cc:260] [GEOP] tf session direct9a0bd0157fcfe084, graph id: 11 no need to rebuild
+2020-12-11 22:14:32.956102: I tf_adapter/kernels/geop_npu.cc:580] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp3_0 ,tf session: direct9a0bd0157fcfe084 ,graph id: 11
+2020-12-11 22:14:32.956248: I tf_adapter/kernels/geop_npu.cc:593] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp3_0, ret_status:success ,tf session: direct9a0bd0157fcfe084 ,graph id: 11 [0 ms]
+2020-12-11 22:14:33.046128: I tf_adapter/kernels/geop_npu.cc:76] BuildOutputTensorInfo, num_outputs:2
+2020-12-11 22:14:33.046198: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:0, total_bytes:4, shape:, tensor_ptr:139815884752960, output139814184775424
+2020-12-11 22:14:33.046214: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:1, total_bytes:4, shape:, tensor_ptr:139815884753088, output139814656392608
+2020-12-11 22:14:33.046229: I tf_adapter/kernels/geop_npu.cc:573] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp3_0[ 90288us]
+2020-12-11 22:14:33.099135: I tf_adapter/kernels/geop_npu.cc:388] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp3_0, num_inputs:3, num_outputs:2
+2020-12-11 22:14:33.099240: I tf_adapter/kernels/geop_npu.cc:260] [GEOP] tf session direct9a0bd0157fcfe084, graph id: 11 no need to rebuild
+2020-12-11 22:14:33.099378: I tf_adapter/kernels/geop_npu.cc:580] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp3_0 ,tf session: direct9a0bd0157fcfe084 ,graph id: 11
+2020-12-11 22:14:33.099503: I tf_adapter/kernels/geop_npu.cc:593] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp3_0, ret_status:success ,tf session: direct9a0bd0157fcfe084 ,graph id: 11 [0 ms]
+2020-12-11 22:14:33.188521: I tf_adapter/kernels/geop_npu.cc:76] BuildOutputTensorInfo, num_outputs:2
+2020-12-11 22:14:33.188591: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:0, total_bytes:4, shape:, tensor_ptr:139815884753280, output139815884753056
+2020-12-11 22:14:33.188607: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:1, total_bytes:4, shape:, tensor_ptr:139815884753344, output139815884752480
+2020-12-11 22:14:33.188622: I tf_adapter/kernels/geop_npu.cc:573] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp3_0[ 89363us]
+2020-12-11 22:14:33.238391: I tf_adapter/kernels/geop_npu.cc:388] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp3_0, num_inputs:3, num_outputs:2
+2020-12-11 22:14:33.238510: I tf_adapter/kernels/geop_npu.cc:260] [GEOP] tf session direct9a0bd0157fcfe084, graph id: 11 no need to rebuild
+2020-12-11 22:14:33.238695: I tf_adapter/kernels/geop_npu.cc:580] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp3_0 ,tf session: direct9a0bd0157fcfe084 ,graph id: 11
+2020-12-11 22:14:33.238838: I tf_adapter/kernels/geop_npu.cc:593] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp3_0, ret_status:success ,tf session: direct9a0bd0157fcfe084 ,graph id: 11 [0 ms]
+2020-12-11 22:14:33.327949: I tf_adapter/kernels/geop_npu.cc:76] BuildOutputTensorInfo, num_outputs:2
+2020-12-11 22:14:33.328019: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:0, total_bytes:4, shape:, tensor_ptr:139815884747712, output139816106257936
+2020-12-11 22:14:33.328036: I tf_adapter/kernels/geop_npu.cc:103] BuildOutputTensorInfo, output index:1, total_bytes:4, shape:, tensor_ptr:139815884747776, output139816011292944
+2020-12-11 22:14:33.328051: I tf_adapter/kernels/geop_npu.cc:573] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp3_0[ 89520us]
