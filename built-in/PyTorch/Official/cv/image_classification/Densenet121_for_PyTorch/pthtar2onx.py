@@ -34,7 +34,7 @@ def proc_nodes_module(checkpoint, AttrName):
 def convert():
     checkpoint = torch.load("./Densenet121_Checkpoint.pth.tar", map_location='cpu')
     checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
-    model = densenet121(pretrained=false)
+    model = densenet121(pretrained=False)
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     print(model)
