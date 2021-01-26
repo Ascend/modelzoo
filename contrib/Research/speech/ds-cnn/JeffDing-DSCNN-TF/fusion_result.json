@@ -1,0 +1,143 @@
+{
+    "graphId": "1",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "14"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "7",
+            "match_times": "7"
+        }
+    }
+}{
+    "graphId": "11",
+    "graph_fusion": {
+        "ConstToAttrPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "PadFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "0"
+}{
+    "graphId": "21",
+    "graph_fusion": {
+        "ClipFusionRule0": {
+            "effect_times": "1",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "0"
+}{
+    "graphId": "31",
+    "graph_fusion": {
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "4",
+            "match_times": "8"
+        },
+        "ApplyAddOutputPass": {
+            "effect_times": "8",
+            "match_times": "8"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "10",
+            "match_times": "12"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "4",
+            "match_times": "4"
+        },
+        "DreluFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "MulGradFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "TbeEltwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}{
+    "graphId": "41",
+    "graph_fusion": {
+        "AReduceAllFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "6",
+            "match_times": "8"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "PackFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "TbeEltwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}{
+    "graphId": "42",
+    "graph_fusion": {
+        "AReduceAllFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "6",
+            "match_times": "8"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "PackFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "TbeEltwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}
