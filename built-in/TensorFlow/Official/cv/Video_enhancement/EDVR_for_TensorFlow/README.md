@@ -7,7 +7,6 @@ This is an EDVR implementation based on tensorflow, which supports running on NP
 - imageio
 - yacs
 - python3.7
-- scikit-image (optional)
 
 ## Structure
 
@@ -279,6 +278,7 @@ Evaluated on REDS4 dataset
 
 ## NOTES
 
-1. To run on GPU, one can simply set the ``cfg.device`` to ``GPU``. The rest remains the same. However, the project only support for a single GPU device.
+1. To run on GPU, one can simply set the ``cfg.device`` to ``GPU``, and make sure to set the implementation of 
+   deformable convolution to the composed by ``cfg.edvr.impl='tf'``. The rest remains the same. However, the project only support for a single GPU device.
 2. (**IMPORTANT**) The standalone *deformable convolution* operator is available after version C76B220 (included). Otherwise one can only use the composed tensorflow operator for deformable convolution, but the performance is rather poor compared to the former one. Setting ``cfg.edvr.impl`` to ``tf`` so that the deformable convolution will be running on GPU/CPU, while with ``cfg.edvr.impl='npu'``  the NPU deformable operator is used.
 

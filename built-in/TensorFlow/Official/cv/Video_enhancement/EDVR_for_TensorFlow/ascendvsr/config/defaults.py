@@ -85,5 +85,7 @@ cfg.rank_size = 1
 cfg.root_rank = 0
 
 cfg.output_dir = 'outputs/edvr'
+cfg.inference_result_dir = 'test'
 cfg.checkpoint = ''
 cfg.continue_training = False
+cfg.random_seed = 20210126
