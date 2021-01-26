@@ -6,3 +6,7 @@ export OPTION_EXEC_EXTERN_PLUGIN_PATH=$ASCEND_HOME/fwkacllib/lib64/plugin/opsker
 export PYTHONPATH=$ASCEND_HOME/fwkacllib/python/site-packages/:$ASCEND_HOME/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:$ASCEND_HOME/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
 
 source env_new.sh
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+export TASK_QUEUE_ENABLE=1
+export ASCEND_GLOBAL_LOG_LEVEL=3
+export PTCOPY_ENABLE=1
