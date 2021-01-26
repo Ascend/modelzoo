@@ -37,8 +37,12 @@ DEC_DROPOUT = 0.5
 CLIP = 1
 
 MAX = 2147483647
+
+
 def gen_seeds(num):
-    return torch.randint(1,MAX,size=(num,),dtype=torch.float)
+    return torch.randint(1, MAX, size=(num,), dtype=torch.float)
+
+
 seed_init = 0
 
 parser = argparse.ArgumentParser(description='PyTorch Seq2seq-GRU Training')
@@ -123,6 +127,7 @@ def main():
         # Simply call main_worker function
         main_worker(args.npu, ngpus_per_node, args)
 
+
 def main_worker(npu, ngpus_per_node, args):
     args.npu = args.process_device_map[npu]
     print('---------------args.npu', args.npu)
@@ -169,7 +174,7 @@ def main_worker(npu, ngpus_per_node, args):
     valid_iterator = Iterator(valid_data, batch_size=args.batch_size, device=device)
     test_iterator = Iterator(test_data, batch_size=args.batch_size, device=device)
 
-    seed_init = gen_seeds(32*1024*12).float().to(CALCULATE_DEVICE)
+    seed_init = gen_seeds(32 * 1024 * 12).float().to(CALCULATE_DEVICE)
 
     enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, ENC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
     dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, DEC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
@@ -199,8 +204,15 @@ def main_worker(npu, ngpus_per_node, args):
 
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
-    torch.save(model.state_dict(), 'seq2seq-gru-model.pth.tar')
+        if valid_loss < best_valid_loss:
+            best_valid_loss = valid_loss
+            torch.save(model.state_dict(), 'seq2seq-gru-model.pth.tar')
 
+        if not args.multiprocessing_distributed or (args.multiprocessing_distributed
+                                                    and args.rank % ngpus_per_node == 0):
+            print(f'Epoch：{epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
+            print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
+            print(f'\t  Val Loss: {valid_loss:.3f} |   Val PPL: {math.exp(valid_loss):7.3f}')
 
 
 def train(model, train_iterator, optimizer, criterion, epoch, args, ngpus_per_node, clip):
