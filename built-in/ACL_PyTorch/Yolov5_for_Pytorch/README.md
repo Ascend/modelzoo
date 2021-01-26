@@ -8,10 +8,11 @@
 6.  bin_to_predict_yolo_pytorch.py： benchmark输出bin文件解析脚本
 7.  map_calculate.py： 精度统计脚本
 8.  require.txt：脚本运行所需的第三方库
+9.  benchmark工具源码地址：https://gitee.com/ascend/cann-benchmark/tree/master/infer
 
 推理端到端步骤：
 
-（1） git clone 开源仓https://github.com/ultralytics/yolov5/， 并下载对应的权重文件，修改**models/export.py**脚本生成onnx文件
+（1） git clone 开源仓https://github.com/ultralytics/yolov5/， 并下载对应的权重文件，修改**models/export.py**脚本生成onnx文件，注意目前onnx版本须选择11
 
 ```
 git clone https://github.com/ultralytics/yolov5/releases
