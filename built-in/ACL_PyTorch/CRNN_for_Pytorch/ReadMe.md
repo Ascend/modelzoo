@@ -2,7 +2,7 @@
 
 - Pth转换om脚本，pth转换om脚本
 - ATC转换脚本atc_crnn.sh
-- benchmark工具源码地址:https://gitee.com/ascend/cann-benchmark/tree/master/infer
+- benchmark工具源码地址：https://gitee.com/ascend/cann-benchmark/tree/master/infer
 - ONNX模型lstm算子修改脚本lstm_revise.py
 - 测试数据集生成脚本parse_testdata.py
 - 推理后处理脚本postpossess_CRNN_pytorch.py
