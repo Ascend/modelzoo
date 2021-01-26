@@ -1,8 +1,0 @@
-__pycache__/
-.ipynb_checkpoints/
-ADEChallengeData2016
-cityscapes_dataset
-checkpoint
-*.npy
-model.ckpt-*
-
