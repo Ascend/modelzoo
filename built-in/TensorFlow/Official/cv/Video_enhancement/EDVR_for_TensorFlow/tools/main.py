@@ -68,7 +68,7 @@ if __name__ == '__main__':
     else:
         raise KeyError
 
-    set_global_random_seed(cfg.seed)
+    set_global_random_seed(cfg.random_seed)
     model = build_model(cfg)
 
     sess_cfg = get_sess_config(cfg.device, cfg.solver.xla, cfg.solver.mix_precision, cfg.rank_size>1)

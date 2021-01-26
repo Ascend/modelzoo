@@ -87,3 +87,4 @@ cfg.root_rank = 0
 cfg.output_dir = 'outputs/edvr'
 cfg.checkpoint = ''
 cfg.continue_training = False
+cfg.random_seed = 20210126

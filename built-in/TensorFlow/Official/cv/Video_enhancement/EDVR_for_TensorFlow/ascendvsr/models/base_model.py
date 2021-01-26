@@ -209,33 +209,46 @@ class VSR(object):
         ave_loss = None
         ave_time = None
         for it in range(recover_step, solver.total_step):
-            input_lr, input_hr = next(self.loader)
+            if self.read_mode == 'python':
+                input_lr, input_hr = next(self.loader)
 
-            st_time = time.time()
+                st_time = time.time()
+                _, cur_lr, loss_v = sess.run(
+                    [train_op, solver.lr_schedule.lr, self.loss],
+                    feed_dict={self.LR: input_lr, self.HR: input_hr, solver.lr_schedule.lr: solver.update_lr()})
+                onece_time = time.time() - st_time
+            elif self.read_mode == 'tf':
+                try:
+                    # lr, hr, fp, oh, ow = sess.run([self.LR, self.HR, flip, offh, offw])
+                    # print(f'Rank id: {os.environ["RANK_ID"]}')
+                    # print(f'\t {np.mean(lr):.04f}, {hr}, {fp}, {oh}, {ow}')
+                    st_time = time.time()
+                    _, cur_lr, loss_v = sess.run(
+                        [train_op, solver.lr_schedule.lr, self.loss],
+                        feed_dict={solver.lr_schedule.lr: solver.update_lr()})
+                    onece_time = time.time() - st_time
+                except tf.errors.OutOfRangeError:
+                    raise ValueError(f'End of the dateset in {step}')
 
-            _, cur_lr, loss_v = sess.run(
-                [train_op, solver.lr_schedule.lr, self.loss],
-                feed_dict={self.LR: input_lr, self.HR: input_hr, solver.lr_schedule.lr: solver.update_lr()})
-
-            onece_time = time.time() - st_time
             if ave_time is None or it < 20:
                 ave_time = onece_time
             else:
                 ave_time = ave_time * 0.995 + onece_time * 0.005
-            ave_time = onece_time
 
             ave_loss = ave_loss * 0.995 + loss_v * 0.005 if ave_loss is not None else loss_v
 
             if (it + 1) % self.solver.print_interval == 0 and \
-                not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
+                    not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
                 fps = self.batch_size / ave_time * self.cfg.rank_size
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-                        'Step:{}, lr:{:.8f}, loss:{:.08f}, time:{:.2f}ms, fps:{:.2f}'.format((it + 1), cur_lr, ave_loss, ave_time * 1000, fps))
+                      'Step:{}, lr:{:.8f}, loss:{:.08f}, session time:{:.2f}ms, session fps:{:.2f}, device_id: {}'.format(
+                          (it + 1), cur_lr, ave_loss, ave_time * 1000, fps, os.environ['RANK_ID']))
 
             if (it + 1) % self.solver.checkpoint_interval == 0 and \
-                not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
+                    not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
                 self.save(sess, (it + 1))
-    
+
+
     def process_input_image(self, im_names, apply_scale=False):
         # try:
         #     from skimage import io as sio
