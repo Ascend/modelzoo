@@ -10,7 +10,6 @@
 - imageio
 - yacs
 - python3.7
-- scikit-image (可选)
 
 ## 工程目录结构
 
@@ -285,6 +284,9 @@ bash scripts/run_freeze.sh outputs/edvr/EDVR-600000
 
 ## 注意事项
 
-1. 如需在GPU上进行训练，可将``cfg.device``设为``GPU``，其他可保持不变。需要注意的是，GPU版本暂只能在单卡上执行
-2. （**重要**）独立的*deformable convolution*算子在C76B220版本及其之后才有。更早的版本只能使用tf算子组装起来的算子，在NPU上性能较差。配置项``cfg.edvr.impl``可选择使用NPU独立算子（如果可以的话）还是tf组装算子。如果``cfg.edvr.impl=tf``使用tf组装算子，而``cfg.edvr.impl='npu'`` 将使用NPU独立算子。
+1. 如需在GPU上进行训练，可将``cfg.device``设为``GPU``，并将deformable convolution的实现配置成tf小算子组装
+   （设置``cfg.edvr.impl='tf'``），其他可保持不变。需要注意的是，GPU版本暂只能在单卡上执行
+2. （**重要**）独立的*deformable convolution*算子在C76B220版本及其之后才有。更早的版本只能使用tf算子组装起来的算子，在NPU上性能较差。
+   配置项``cfg.edvr.impl``可选择使用NPU独立算子（如果可以的话）还是tf组装算子。如果``cfg.edvr.impl=tf``使用tf组装算子，
+   而``cfg.edvr.impl='npu'`` 将使用NPU独立算子。
 
