@@ -9,6 +9,7 @@
 7.  map_calculate.py： 精度统计脚本
 8.  aipp.config JPEG输入配置文件
 9.  require.txt：脚本运行所需的第三方库
+10. benchmark工具源码地址：https://gitee.com/ascend/cann-benchmark/tree/master/infer
 
 推理端到端步骤：
 
