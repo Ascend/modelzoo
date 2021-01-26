@@ -6,6 +6,7 @@ import time
 import json
 import re
 import tensorflow as tf
+from tqdm import trange
 # from skimage import io as sio
 # from skimage import transform as strans
 
@@ -77,7 +78,7 @@ class VSR(object):
             self.loss = self.caculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
-            self.SR = tf.cast(tf.clip_by_value(self.SR * 255, 0., 255.), tf.uint8)
+            self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
 
     def build_v2(self):
         self.SR = self.build_generator(self.LR)
@@ -85,7 +86,7 @@ class VSR(object):
             self.loss = self.caculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
-            self.SR = tf.cast(tf.clip_by_value(self.SR * 255, 0., 255.), tf.uint8)
+            self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
 
     def caculate_loss(self, SR, HR, *kwargs):
         raise NotImplementedError
@@ -166,8 +167,8 @@ class VSR(object):
         if self.read_mode == 'python':
             self.minibatch = Minibatch(
                 data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
-                scale=self.scale, in_size=self.in_size, batch_in_images=self.cfg.data.batch_in_images)
-            self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.max_queue_size)
+                scale=self.scale, in_size=self.in_size)
+            self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.train_data_queue_size)
             self.build()
         elif self.read_mode == 'tf':
             self.minidata = DataLoader_tensorslice(
@@ -264,9 +265,7 @@ class VSR(object):
 
     def evaluate(self, sess_cfg):
         self.build()
-
         sess = tf.Session(config=sess_cfg)
-
         self.load(sess)
 
         set_file = os.path.join(self.data_dir, 'sets', self.set_file)
@@ -359,8 +358,8 @@ class VSR(object):
             if i > 0:
                 ave_time += onece_time
 
-            im_name = os.path.split(lr_names[0])[-1]
-            output_img_path = os.path.join(output_dir, im_name)
+            im_name = lr_names[0].split(os.path.sep)
+            output_img_path = os.path.join(output_dir, *im_name[-3:])
             writer.put_to_queue(output_img_path, sr)
 
         print(f'Writing images to files. This may take some time')
