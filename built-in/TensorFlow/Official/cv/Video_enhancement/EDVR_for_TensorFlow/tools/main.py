@@ -18,6 +18,7 @@ import sys
 sys.path.append('.')
 
 from ascendcv.runner.sess_config import get_sess_config
+from ascendcv.utils.misc import set_global_random_seed
 from ascendvsr.config import cfg
 from ascendvsr.models import build_model
 
@@ -67,6 +68,7 @@ if __name__ == '__main__':
     else:
         raise KeyError
 
+    set_global_random_seed(cfg.seed)
     model = build_model(cfg)
 
     sess_cfg = get_sess_config(cfg.device, cfg.solver.xla, cfg.solver.mix_precision, cfg.rank_size>1)

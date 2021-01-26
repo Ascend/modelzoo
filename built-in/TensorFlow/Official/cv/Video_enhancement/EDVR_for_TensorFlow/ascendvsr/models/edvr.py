@@ -297,28 +297,28 @@ class EDVR(VSR):
         else:
             raise NotImplementedError
 
-    def freeze(self, sess_cfg):
-        from tensorflow.python.framework import graph_util
-        self.build()
-
-        with tf.Session(config=sess_cfg) as sess:
-            print('[INFO] Loading trained model ...')
-            self.load(sess)
-            print('[INFO] Model loaded success.')
-            print('[INFO] Freeze model to pb files')
-
-            pb_path = os.path.join(self.output_dir, '{}.pb'.format(type(self).__name__))
-            try:
-                constant_graph = graph_util.convert_variables_to_constants(
-                    sess, sess.graph_def,
-                    [self.SR.name.split(':')[0]]
-                )
-                with tf.gfile.FastGFile(pb_path, mode='wb') as f:
-                    f.write(constant_graph.SerializeToString())
-                print('[INFO] Model frozen success.')
-            except Exception as e:
-                print('[ERROR] Failed to freeze model.')
-                print(e)
+    # def freeze(self, sess_cfg):
+    #     from tensorflow.python.framework import graph_util
+    #     self.build()
+    #
+    #     with tf.Session(config=sess_cfg) as sess:
+    #         print('[INFO] Loading trained model ...')
+    #         self.load(sess)
+    #         print('[INFO] Model loaded success.')
+    #         print('[INFO] Freeze model to pb files')
+    #
+    #         pb_path = os.path.join(self.output_dir, '{}.pb'.format(type(self).__name__))
+    #         try:
+    #             constant_graph = graph_util.convert_variables_to_constants(
+    #                 sess, sess.graph_def,
+    #                 [self.SR.name.split(':')[0]]
+    #             )
+    #             with tf.gfile.FastGFile(pb_path, mode='wb') as f:
+    #                 f.write(constant_graph.SerializeToString())
+    #             print('[INFO] Model frozen success.')
+    #         except Exception as e:
+    #             print('[ERROR] Failed to freeze model.')
+    #             print(e)
     
     def offline_inference(self, sess_cfg):
         sess = tf.Session(config=sess_cfg)

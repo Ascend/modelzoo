@@ -10,9 +10,10 @@ import tensorflow as tf
 # from skimage import transform as strans
 
 from ascendcv.runner.solver import build_solver
+from ascendcv.utils.writer import ImageWriter
 from ascendcv.runner.hccl_broadcast import broadcast_global_variables
 from ascendcv.utils.dataloader import PrefetchGenerator
-from ascendvsr.minibatch import Minibatch
+from ascendvsr.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
 
 
 class VSR(object):
@@ -48,6 +49,7 @@ class VSR(object):
         self.is_distributed = is_distributed
         self.checkpoint = checkpoint
         self.cfg = cfg
+        self.read_mode = cfg.data.read_mode
 
     def build(self):
         b, h, w = self.batch_size, self.in_size[0], self.in_size[1]
@@ -72,6 +74,14 @@ class VSR(object):
         self.SR = self.build_generator(self.LR)
         if self.is_train:
             self.HR = tf.placeholder(tf.float32, shape=[b, h * 4, w * 4, 3], name='H_truth')
+            self.loss = self.caculate_loss(self.SR, self.HR)
+
+        if self.cfg.model.convert_output_to_uint8:
+            self.SR = tf.cast(tf.clip_by_value(self.SR * 255, 0., 255.), tf.uint8)
+
+    def build_v2(self):
+        self.SR = self.build_generator(self.LR)
+        if self.is_train:
             self.loss = self.caculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
@@ -153,11 +163,21 @@ class VSR(object):
             return meta_graph.graph_def
     
     def train(self, sess_cfg):
-        self.minibatch = Minibatch(
-            data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
-            scale=self.scale, in_size=self.in_size)
-        self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.train_data_queue_size)
-        self.build()
+        if self.read_mode == 'python':
+            self.minibatch = Minibatch(
+                data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
+                scale=self.scale, in_size=self.in_size, batch_in_images=self.cfg.data.batch_in_images)
+            self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.max_queue_size)
+            self.build()
+        elif self.read_mode == 'tf':
+            self.minidata = DataLoader_tensorslice(
+                data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
+                scale=self.scale, in_size=self.in_size)
+            # self.LR, self.HR, flip, offh, offw = self.minidata.batch_list
+            self.LR, self.HR = self.minidata.batch_list
+            self.build_v2()
+        else:
+            raise ValueError
 
         vars_all = tf.trainable_variables()
 
@@ -294,60 +314,46 @@ class VSR(object):
 
     def inference(self, sess_cfg):
         self.build()
-
         sess = tf.Session(config=sess_cfg)
-
         self.load(sess)
 
-        set_file = os.path.join(self.data_dir, 'sets', self.set_file)
-        with open(set_file, 'r') as fid:
-            meta = json.load(fid)
-           
-        output_dir = os.path.join(self.output_dir, 'test')
-        
+        self.minibatch = TestMinibatch(
+            data_dir=self.data_dir, set_file='val.json', batch_size=self.batch_size, num_frames=self.num_frames,
+            scale=self.scale)
+        # self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.max_queue_size)
+        writer = ImageWriter(8, 64)
+
+        output_dir = os.path.join(self.output_dir, self.cfg.inference_result_dir)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+        print(f'Inference results path: {output_dir}')
         ave_time = 0
-        for vid in meta['videos']:
-            print('Inference {}'.format(vid['name']))
-            
-            try:
-                os.makedirs(os.path.join(output_dir, vid['name']), exist_ok=True)
-            except Exception:
-                pass
-            
-            if meta['prefix']:
-                in_path = os.path.join(self.data_dir, 'images', meta['x{}_folder'.format(self.scale)], vid['name'])
+        max_frame = len(self.minibatch)
+        for i in trange(max_frame):
+            # lr_names, lr = next(self.loader)
+            lr_names, lr = self.minibatch.get_next()
+            st_time = time.time()
+            if self.cfg.data.eval_in_patch:
+                sr = self._inference_stitching(
+                    sess,
+                    lr[0],
+                    patch_per_step=self.batch_size,
+                    patch_size=self.cfg.data.eval_in_size,
+                    pad=self.cfg.data.eval_pad_size)
             else:
-                in_path = os.path.join(self.data_dir, 'images', vid['name'], meta['x{}_folder'.format(self.scale)])
-            assert os.path.exists(in_path)
-            lr_img_names = sorted(glob.glob(os.path.join(in_path, '*.png')))
-            lrImgs = np.array([self.process_input_image(i) for i in lr_img_names]).astype(np.float32)
+                sr = self._inference_whole(sess, lr)
+            onece_time = time.time() - st_time
+            if i > 0:
+                ave_time += onece_time
 
-            lr_list = []
-            max_frame = lrImgs.shape[0]
-            for i in range(max_frame):
-                index = np.array([k for k in range(i - self.num_frames // 2, i + self.num_frames // 2 + 1)])
-                index = np.clip(index, 0, max_frame - 1).tolist()
-                lr_list.append(np.array([lrImgs[k] for k in index]))
-            lr_list = np.array(lr_list)
+            im_name = os.path.split(lr_names[0])[-1]
+            output_img_path = os.path.join(output_dir, im_name)
+            writer.put_to_queue(output_img_path, sr)
 
-            mse_vid = None
-            ave_time = 0
-            for i in range(max_frame):
-                st_time = time.time()
-                if self.cfg.data.eval_in_patch:
-                    sr = self._inference_stitching(sess, lr_list[i])
-                else:
-                    sr = self._inference_whole(sess, lr_list[i][None])
-                onece_time = time.time() - st_time
-                # ave_time = ave_time * 0.9 + onece_time * 0.1
-                if i > 0:
-                    ave_time += onece_time
-                # print('Done frame {}: runtime = {:.0f} ms/frame ({:.1f} FPS)'.format(i, ave_time * 1000, 1 / ave_time))
-                
-                im_name = os.path.split(lr_img_names[i])[-1]
-                output_img_path = os.path.join(output_dir, vid['name'], im_name)
-                imageio.imwrite(output_img_path, sr)
-            print(f'Inference time: {(ave_time / (max_frame-1))*1000:.2f}')
+        print(f'Writing images to files. This may take some time')
+        writer.end()
+        del writer
+        print(f'\tInference time: {(ave_time / (max_frame - 1)) * 1000:.2f}')
     
     def _inference_whole(self, sess, img):
         sr = sess.run(self.SR, feed_dict={self.LR: img})
@@ -360,7 +366,7 @@ class VSR(object):
 
         _, h, w, _ = img.shape
         ph, pw = patch_size
-        
+
         # image padding
         image_pad_right = int(float(h)/ph + 1) * ph - h
         image_pad_bottom = int(float(w)/pw + 1) * pw - w
@@ -377,7 +383,7 @@ class VSR(object):
         pad_r = patch_pad_right + image_pad_right
 
         img_paded = np.pad(img, ((0, 0),
-                                 (pad_t, pad_b), 
+                                 (pad_t, pad_b),
                                  (pad_l, pad_r),
                                  (0, 0)), constant_values=0.)
 
@@ -405,25 +411,25 @@ class VSR(object):
             img_patches_padded = np.concatenate([
                 np.zeros([batch_pad, *img_patches.shape[1:]], dtype=np.float32),
                 img_patches
-                ], axis=0)
+            ], axis=0)
         else:
             img_patches_padded = img_patches
 
         patch_sr = []
         for i in range(num_step):
-            batch_data = img_patches[i*patch_per_step:(i+1):patch_per_step]
+            batch_data = img_patches_padded[i * patch_per_step:(i + 1) * patch_per_step]
             if patch_per_step == 1 and batch_data.shape[0] != 1:
                 batch_data = batch_data[None, ...]
-            
+
             _patch_sr = sess.run(self.SR, feed_dict={self.LR: batch_data})
             patch_sr.extend(_patch_sr)
-        
+
         patch_sr = np.array(patch_sr)
-        patch_s_y = patch_pad_top*self.scale
-        patch_e_y = (patch_pad_top+ph)*self.scale
-        patch_s_x = patch_pad_left*self.scale
-        patch_e_x = (patch_pad_left+pw)*self.scale
-        
+        patch_s_y = patch_pad_top * self.scale
+        patch_e_y = (patch_pad_top + ph) * self.scale
+        patch_s_x = patch_pad_left * self.scale
+        patch_e_x = (patch_pad_left + pw) * self.scale
+
         patch_id = 0
         for split_j, split_i in product(range(num_split_y), range(num_split_x)):
             im_s_y = split_j * ph * self.scale
@@ -440,7 +446,27 @@ class VSR(object):
         return sr_all
 
     def freeze(self, sess_cfg):
-        raise NotImplementedError
+        from tensorflow.python.framework import graph_util
+        self.build()
+
+        with tf.Session(config=sess_cfg) as sess:
+            print('[INFO] Loading trained model ...')
+            self.load(sess)
+            print('[INFO] Model loaded success.')
+            print('[INFO] Freeze model to pb files')
+
+            pb_path = os.path.join(self.output_dir, '{}.pb'.format(type(self).__name__))
+            try:
+                constant_graph = graph_util.convert_variables_to_constants(
+                    sess, sess.graph_def,
+                    [self.SR.name.split(':')[0]]
+                )
+                with tf.gfile.FastGFile(pb_path, mode='wb') as f:
+                    f.write(constant_graph.SerializeToString())
+                print('[INFO] Model frozen success.')
+            except Exception as e:
+                print('[ERROR] Failed to freeze model.')
+                print(e)
     
     def offline_inference(self, sess_cfg):
         raise NotImplementedError
