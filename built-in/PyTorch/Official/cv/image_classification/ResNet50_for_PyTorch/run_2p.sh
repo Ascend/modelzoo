@@ -7,6 +7,8 @@ export GE_AICPU_FLAG=1
 ip=$(hostname -I |awk '{print $1}')
 device_id_list=0,1
 
+/usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_2p_job_${currtime}

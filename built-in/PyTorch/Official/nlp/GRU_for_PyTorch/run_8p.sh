@@ -1,5 +1,8 @@
 source npu_set_env.sh
 
+/usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
+
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_8p_job_${currtime}
