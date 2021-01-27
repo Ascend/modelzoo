@@ -1,6 +1,6 @@
 ## 模型功能
 
- 对图像中的物体进行识别分类。
+ 对图像中的物体进行检测。
 
 ## 原始模型
 
@@ -25,7 +25,7 @@ om模型下载地址：
 
 20.1版本模型：https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/VGG_SSD/vgg-ssd_framework_caffe_ascend310_aipp_0_batch_1_input_fp32_output_FP32_C75.om 
 
-使用ATC模型转换工具进行模型转换时可以参考如下指令，具体操作详情和参数设置可以参考  [ATC工具使用指导](https://support.huaweicloud.com/ti-atc-A200dk_3000/altasatc_16_002.html) 
+使用ATC模型转换工具进行模型转换时可以参考如下指令:
 
 ```
 atc --model="vgg_ssd.prototxt" --weight="vgg_ssd.caffemodel" --soc_version=Ascend310 --framework=0 --output="vgg-ssd_framework_caffe_ascend310_aipp_0_batch_1_input_fp32_output_FP32"
