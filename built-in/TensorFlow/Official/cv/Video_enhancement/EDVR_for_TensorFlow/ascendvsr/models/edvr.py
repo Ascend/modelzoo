@@ -49,12 +49,11 @@ class EDVR(VSR):
         self.num_blocks_reconstruction = edvr_cfg.num_blocks_reconstruction
 
     def feature_extraction(self, x, act_cfg=dict(type='LeakyRelu', alpha=0.1)):
-
         # extract LR features
-        with tf.variable_scope('extraction'):
+        with tf.variable_scope('extraction', reuse=tf.AUTO_REUSE):
             # L1
-            l1_feat = tf.reshape(x, [-1, x.shape[2], x.shape[3], x.shape[4]])
-            l1_feat = Conv2D(l1_feat, self.mid_channels, name='conv_first')
+            # l1_feat = tf.reshape(x, [-1, x.shape[2], x.shape[3], x.shape[4]])
+            l1_feat = Conv2D(x, self.mid_channels, name='conv_first')
             l1_feat = ActLayer(act_cfg)(l1_feat)
             l1_feat = ResBlockNoBN(num_blocks=self.num_blocks_extraction, mid_channels=self.mid_channels)(l1_feat)
             # L2
@@ -64,13 +63,13 @@ class EDVR(VSR):
             l3_feat = ConvModule(l2_feat, self.mid_channels, strides=[2, 2], act_cfg=act_cfg, name='feat_l3_conv1')
             l3_feat = ConvModule(l3_feat, self.mid_channels, act_cfg=act_cfg, name='feat_l3_conv2')
 
-            l1_feat_shape = l1_feat.get_shape().as_list()
-            l2_feat_shape = l2_feat.get_shape().as_list()
-            l3_feat_shape = l3_feat.get_shape().as_list()
-
-            l1_feat = tf.reshape(l1_feat, [-1, self.num_frames, *l1_feat_shape[1:]])
-            l2_feat = tf.reshape(l2_feat, [-1, self.num_frames, *l2_feat_shape[1:]])
-            l3_feat = tf.reshape(l3_feat, [-1, self.num_frames, *l3_feat_shape[1:]])
+            # l1_feat_shape = l1_feat.get_shape().as_list()
+            # l2_feat_shape = l2_feat.get_shape().as_list()
+            # l3_feat_shape = l3_feat.get_shape().as_list()
+            #
+            # l1_feat = tf.reshape(l1_feat, [-1, self.num_frames, *l1_feat_shape[1:]])
+            # l2_feat = tf.reshape(l2_feat, [-1, self.num_frames, *l2_feat_shape[1:]])
+            # l3_feat = tf.reshape(l3_feat, [-1, self.num_frames, *l3_feat_shape[1:]])
 
             return l1_feat, l2_feat, l3_feat
 
@@ -121,41 +120,32 @@ class EDVR(VSR):
             offset = ConvModule(offset, self.mid_channels, act_cfg=act_cfg, name='cas_offset_conv1')
             offset = ConvModule(offset, self.mid_channels, act_cfg=act_cfg, name='cas_offset_conv2')
             feat = DCNPack(feat, offset, self.mid_channels, kernel_size=[3, 3], padding='same',
-                           num_deform_groups=self.num_deform_groups, name='dcn_cas', dcn_version=self.cfg.edvr.dcn_version, impl=self.cfg.edvr.impl)
+                           num_deform_groups=self.num_deform_groups, name='dcn_cas',
+                           dcn_version=self.cfg.edvr.dcn_version, impl=self.cfg.edvr.impl)
             feat = ActLayer(act_cfg)(feat)
 
             return feat
 
     def tsa_fusion(self, aligned_feat, act_cfg=dict(type='LeakyRelu', alpha=0.1)):
-
-        with tf.variable_scope('tsa_fusion'):
-            # n, t, h, w, c = list(map(int, aligned_feat.shape))
-            n, t, h, w, c = aligned_feat.get_shape().as_list()
+        with tf.variable_scope('tsa_fusion', reuse=tf.AUTO_REUSE):
             # temporal attention
-            # embedding_ref = Conv2D(aligned_feat[:, self.num_frames // 2], self.mid_channels, name='temporal_attn1')
-            aligned_feat_list = tf.split(aligned_feat, self.num_frames, axis=1)
-            embedding_ref = Conv2D(
-                            tf.squeeze(aligned_feat_list[self.num_frames//2], axis=1), 
-                            self.mid_channels, 
-                            name='temporal_attn1')
-            emb = Conv2D(tf.reshape(aligned_feat, [-1, h, w, c]), self.mid_channels, name='temporal_attn2')
-            emb = tf.reshape(emb, [-1, t, h, w, self.mid_channels])
-            emb = tf.cast(emb, tf.float32)
-            emb_list = tf_split(emb, self.num_frames, axis=1, keep_dims=False)
+            embedding_ref = Conv2D(aligned_feat[self.num_frames//2], self.mid_channels, name='temporal_attn1')
 
             corr_l = []  # correlation list
             for i in range(self.num_frames):
-                emb_neighbor = emb_list[i]
-                corr = tf.reduce_sum(emb_neighbor * embedding_ref, axis=-1, keep_dims=True)  # (n, h, w, 1)
+                emb = Conv2D(aligned_feat[i], self.mid_channels, name='temporal_attn2')
+                emb = tf.cast(emb, tf.float32)
+                corr = tf.reduce_sum(emb * embedding_ref, axis=-1, keep_dims=True)  # (n, h, w, 1)
                 corr_l.append(corr)
             corr_prob = tf.nn.sigmoid(tf.stack(corr_l, axis=1))  # (n, t, h, w, 1)
+            aligned_feat = tf.stack(aligned_feat, axis=1)
             aligned_feat = corr_prob * aligned_feat
 
             # fusion
             aligned_feat_shape = aligned_feat.get_shape().as_list()
-            last_dim = aligned_feat_shape[-1] * aligned_feat_shape[1]
+            n, t, h, w, c = aligned_feat_shape
             aligned_feat = tf.transpose(aligned_feat, [0, 2, 3, 1, 4])
-            aligned_feat = tf.reshape(aligned_feat, [-1, h, w, last_dim])
+            aligned_feat = tf.reshape(aligned_feat, [-1, h, w, t*c])
             feat = ConvModule(aligned_feat, self.mid_channels, kernel_size=(1, 1), act_cfg=act_cfg, name='feat_fusion')
 
             # spatial attention
@@ -195,9 +185,8 @@ class EDVR(VSR):
             return feat
 
     def reconstruction(self, feat, x_center, act_cfg=dict(type='LeakyRelu', alpha=0.1)):
-
         # reconstruction
-        with tf.variable_scope('reconstruction'):
+        with tf.variable_scope('reconstruction', reuse=tf.AUTO_REUSE):
             out = ResBlockNoBN(num_blocks=self.num_blocks_reconstruction, mid_channels=self.mid_channels)(feat)
             out = Conv2D(out, self.mid_channels * 2 ** 2, name='upsample1')
             out = depth_to_space(out, 2)
@@ -217,7 +206,6 @@ class EDVR(VSR):
             return out
 
     def build_generator(self, x):
-
         # shape of x: [B,T_in,H,W,C]
         with tf.variable_scope('G') as scope:
             # x_center = x[:, self.num_frames // 2]
@@ -225,22 +213,21 @@ class EDVR(VSR):
                 x_shape = x.get_shape().as_list()
                 x = tf.reshape(x, [-1, self.num_frames, *x_shape[1:]])
 
-            x_list = tf.split(x, self.num_frames, axis=1)
-            x_center = tf.squeeze(x_list[self.num_frames//2], axis=1)
+            x_list = tf_split(x, self.num_frames, axis=1, keep_dims=False)
+            x_center = x_list[self.num_frames//2]
 
             # extract LR features
-            l1_feat, l2_feat, l3_feat = self.feature_extraction(x)
-            
-            l1_feat_list = tf_split(l1_feat, self.num_frames, 1, keep_dims=False)
-            l2_feat_list = tf_split(l2_feat, self.num_frames, 1, keep_dims=False)
-            l3_feat_list = tf_split(l3_feat, self.num_frames, 1, keep_dims=False)
+            # l1_feat, l2_feat, l3_feat = self.feature_extraction(x)
 
-            # pcd alignment
-            # ref_feats = [  # reference feature list
-            #     l1_feat[:, self.num_frames // 2],
-            #     l2_feat[:, self.num_frames // 2],
-            #     l3_feat[:, self.num_frames // 2]
-            # ]
+            l1_feat_list = []
+            l2_feat_list = []
+            l3_feat_list = []
+            for f in range(self.num_frames):
+                l1_feat, l2_feat, l3_feat = self.feature_extraction(x_list[f])
+                l1_feat_list.append(l1_feat)
+                l2_feat_list.append(l2_feat)
+                l3_feat_list.append(l3_feat)
+
             ref_feats = [  
                 l1_feat_list[self.num_frames//2],
                 l2_feat_list[self.num_frames//2],
@@ -254,11 +241,11 @@ class EDVR(VSR):
                     l3_feat_list[i]
                 ]
                 aligned_feat.append(self.pcd_align(neighbor_feats, ref_feats))
-            aligned_feat = tf.stack(aligned_feat, axis=1)  # (n, t, h, w, c)
 
             if self.with_tsa:
                 feat = self.tsa_fusion(aligned_feat)
             else:
+                aligned_feat = tf.stack(aligned_feat, axis=1)  # (n, t, h, w, c)
                 aligned_feat_shape = aligned_feat.get_shape().as_list()
                 last_dim = aligned_feat_shape[-1] * aligned_feat_shape[1]
                 aligned_feat = tf.transpose(aligned_feat, [0, 2, 3, 1, 4])

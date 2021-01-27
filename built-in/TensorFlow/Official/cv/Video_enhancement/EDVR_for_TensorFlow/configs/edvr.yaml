@@ -12,5 +12,7 @@ data:
 solver:
   mix_precision: False
   xla: False
+  lr_schedule:
+    total_steps: [1000]
 device: 'npu'
 output_dir: 'outputs/edvr'
