@@ -252,8 +252,7 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.fine_tuning:
         print("=> transfer learning + fine tuning(train only the last FC layer)")
         if args.arch == "resnet50":
-            model.classifier = nn.Linear(1024,101)
-            model.classifier.parameters()
+            model.parameters()
         else:
             print("Error: Fine-tuning is not supported on this architecture")
             exit(-1)

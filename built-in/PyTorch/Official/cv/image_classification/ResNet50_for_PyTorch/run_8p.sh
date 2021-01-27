@@ -4,6 +4,9 @@ export WHICH_OP=GEOP
 export NEW_GE_FE_ID=1
 export GE_AICPU_FLAG=1
 
+/usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
+
 ip=$(hostname -I |awk '{print $1}')
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
