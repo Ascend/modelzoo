@@ -178,9 +178,6 @@ def random_flip_ud(input, decision):
     return output
 
 
-def random_add_noise(input, decision):
-    pass
-
 def loading_img(output, num_frames):
     target_images = []
     for fi in range(num_frames):
@@ -221,10 +218,11 @@ def load_preprocess_tf(output, noise_aug, num_frames=7, in_size=[64,64], scale=4
             scale,
             lr_shape)
 
+    target_images = tf.stack(target_images)
     with tf.name_scope('noise_add'):
         target_images = noise_aug.apply_tf(target_images)
 
-    return tf.stack(target_images), target_images_hr
+    return target_images, target_images_hr
 
 
 class DataLoader_tensorslice():
