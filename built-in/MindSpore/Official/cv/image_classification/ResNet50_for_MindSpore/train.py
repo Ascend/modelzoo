@@ -178,12 +178,14 @@ if __name__ == '__main__':
     time_cb = TimeMonitor(data_size=step_size)
     loss_cb = LossMonitor()
     cb = [time_cb, loss_cb]
+    
+    # save_checkpoint
     if config.save_checkpoint:
-        config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * step_size,
-                                     keep_checkpoint_max=config.keep_checkpoint_max)
-        ckpt_cb = ModelCheckpoint(prefix="resnet", directory=ckpt_save_dir, config=config_ck)
-        cb += [ckpt_cb]
-
+        if int(os.getenv("DEVICE_ID"), 0) == 0:
+            config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * step_size,
+                                         keep_checkpoint_max=config.keep_checkpoint_max)
+            ckpt_cb = ModelCheckpoint(prefix="resnet", directory=ckpt_save_dir, config=config_ck)
+            cb += [ckpt_cb]
     # train model
     if args_opt.net == "se-resnet50":
         config.epoch_size = config.train_epoch_size
