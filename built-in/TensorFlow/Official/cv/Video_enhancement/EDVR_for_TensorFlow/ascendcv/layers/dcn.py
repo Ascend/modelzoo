@@ -14,6 +14,7 @@
 import math
 
 import tensorflow as tf
+import numpy as np
 
 from .conv import Conv2D
 from ..utils.misc import pair
@@ -101,7 +102,8 @@ class DeformableConvLayer(object):
             return self._call_npu(inputs, offset)
 
     def _call_npu(self, inputs, offset):
-        _, ih, iw, c = inputs.get_shape().as_list()
+        _, ih, iw, _ = inputs.get_shape().as_list()
+        c = offset.get_shape().as_list()[3]
         assert c == self.num_deform_groups*self.kernel_size[0]*self.kernel_size[1]*3
         offset_all = offset
 
