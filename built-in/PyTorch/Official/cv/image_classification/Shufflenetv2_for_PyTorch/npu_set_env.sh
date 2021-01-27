@@ -47,10 +47,7 @@ echo ${path_lib}
 export LD_LIBRARY_PATH=/usr/local/python3.7.5/lib/:${path_lib}:$LD_LIBRARY_PATH
 
 
-
-# ln -s /usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc /usr/local/bin/
-
 export SLOG_PRINT_TO_STDOUT=0
-#su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-
 export TASK_QUEUE_ENABLE=1
+export ASCEND_SLOG_PRINT_TO_STDOUT=3
+
