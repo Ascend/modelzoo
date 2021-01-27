@@ -111,7 +111,7 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         # Assign and sampler stage two
         self.bbox_assigner_sampler_for_rcnn = BboxAssignSampleForRcnn(config, self.train_batch_size,
                                                                       config.num_bboxes_stage2, True)
-        self.decode = P.BoundingBoxDecode(max_shape=(768, 1280), means=self.target_means, \
+        self.decode = P.BoundingBoxDecode(max_shape=(config.img_height, config.img_width), means=self.target_means, \
                                           stds=self.target_stds)
 
         # Roi
@@ -423,3 +423,13 @@ class Faster_Rcnn_Resnet50(nn.Cell):
             multi_level_anchors += (Tensor(anchors.astype(np.float16)),)
 
         return multi_level_anchors
+
+class FasterRcnn_Infer(nn.Cell):
+    def __init__(self, config):
+        super(FasterRcnn_Infer, self).__init__()
+        self.network = Faster_Rcnn_Resnet50(config)
+        self.network.set_train(False)
+
+    def construct(self, img_data, img_metas):
+        output = self.network(img_data, img_metas, None, None, None)
+        return output
