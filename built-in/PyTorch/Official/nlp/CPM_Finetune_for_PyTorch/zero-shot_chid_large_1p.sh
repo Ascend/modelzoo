@@ -1,11 +1,11 @@
 #!/bin/bash
 
 DATA_DIR="/data/chid/preprocessed/"
-CHECKPOINT_PATH="/data/checkpoints/CPM-large"
+CHECKPOINT_PATH="/data/checkpoints/CPM-large_1p"
 RESULTS_DIR="results/"
 MODEL_NAME="zeroshot-test"
 TOKENIZER_PATH="bpe_3w_new/"
-MPSIZE=2
+MPSIZE=1
 NLAYERS=32
 NHIDDEN=2560
 NATT=32
@@ -15,7 +15,7 @@ CUR_PATH=$(realpath $0)
 CUR_DIR=$(dirname ${CUR_PATH})
 DS_CONFIG="${CUR_DIR}/ds_finetune_large.json"
 
-python3.7 -m torch.distributed.launch --master_port ${1-1122} --nproc_per_node 4 zero-shot_chid.py \
+python3.7 -m torch.distributed.launch --master_port ${1-1122} --nproc_per_node 1 zero-shot_chid.py \
        --data_dir ${DATA_DIR} \
        --model-parallel-size ${MPSIZE} \
        --num-layers ${NLAYERS} \
