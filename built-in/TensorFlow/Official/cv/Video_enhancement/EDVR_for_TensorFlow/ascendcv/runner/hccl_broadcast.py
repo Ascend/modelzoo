@@ -15,7 +15,7 @@ import tensorflow as tf
 from npu_bridge.hccl import hccl_ops
 
 
-def broadcast_global_variables(root_rank, index):
+def broadcast_global_variables(root_rank):
     op_list = []
     for var in tf.global_variables():
         if "float" in var.dtype.name:

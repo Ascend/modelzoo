@@ -130,7 +130,8 @@ class VSR(object):
                 graph_def.ParseFromString(f.read())
 
                 # When reading some .pb, encounter the following problem:
-                # ValueError: Input 0 of node generator_1/dense/Assign was passed float from generator/dense/u:0 incompatible with expected float_ref.
+                # ValueError: Input 0 of node generator_1/dense/Assign was passed float from
+                # generator/dense/u:0 incompatible with expected float_ref.
                 # Solution: https://github.com/Byronnar/tensorflow-serving-yolov3/issues/77
                 with sess.graph.as_default():
                     # fix nodes
@@ -194,68 +195,48 @@ class VSR(object):
         
         npu_distributed = self.cfg.device == 'npu' and self.is_distributed
         if npu_distributed:
-            bcast_op = broadcast_global_variables(self.cfg.root_rank, os.environ['DEVICE_ID'])
+            bcast_op = broadcast_global_variables(self.cfg.root_rank)
             sess.run(bcast_op)
 
-        if not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
+        if not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
             tf.io.write_graph(sess.graph_def, self.output_dir, 'train_graph.pbtxt')
-            print(f'[INFO] Start training. Log device: {self.cfg.root_rank}')
+            print(f'[INFO] Start training. Log device: {int(os.environ["DEVICE_ID"])}')
 
         self.saver = tf.train.Saver(max_to_keep=100, keep_checkpoint_every_n_hours=1)
 
         ave_loss = None
-        ave_time = None
+        st_time = time.time()
         for it in range(recover_step, solver.total_step):
             if self.read_mode == 'python':
                 input_lr, input_hr = next(self.loader)
-
-                st_time = time.time()
                 _, cur_lr, loss_v = sess.run(
                     [train_op, solver.lr_schedule.lr, self.loss],
                     feed_dict={self.LR: input_lr, self.HR: input_hr, solver.lr_schedule.lr: solver.update_lr()})
-                onece_time = time.time() - st_time
             elif self.read_mode == 'tf':
                 try:
-                    # lr, hr, fp, oh, ow = sess.run([self.LR, self.HR, flip, offh, offw])
-                    # print(f'Rank id: {os.environ["RANK_ID"]}')
-                    # print(f'\t {np.mean(lr):.04f}, {hr}, {fp}, {oh}, {ow}')
-                    st_time = time.time()
                     _, cur_lr, loss_v = sess.run(
                         [train_op, solver.lr_schedule.lr, self.loss],
                         feed_dict={solver.lr_schedule.lr: solver.update_lr()})
-                    onece_time = time.time() - st_time
                 except tf.errors.OutOfRangeError:
                     raise ValueError(f'End of the dateset in {it}')
 
-            if ave_time is None or it < 20:
-                ave_time = onece_time
-            else:
-                ave_time = ave_time * 0.995 + onece_time * 0.005
-
+            once_time = time.time() - st_time
             ave_loss = ave_loss * 0.995 + loss_v * 0.005 if ave_loss is not None else loss_v
 
             if (it + 1) % self.solver.print_interval == 0 and \
                     not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
+                ave_time = once_time / self.solver.print_interval
                 fps = self.batch_size / ave_time * self.cfg.rank_size
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                       'Step:{}, lr:{:.8f}, loss:{:.08f}, session time:{:.2f}ms, session fps:{:.2f}, device_id: {}'.format(
                           (it + 1), cur_lr, ave_loss, ave_time * 1000, fps, os.environ['RANK_ID']))
+                st_time = time.time()
 
             if (it + 1) % self.solver.checkpoint_interval == 0 and \
                     not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
                 self.save(sess, (it + 1))
 
-
-    def process_input_image(self, im_names, apply_scale=False):
-        # try:
-        #     from skimage import io as sio
-        #     from skimage import transform as strans
-        #     im = sio.imread(im_names) / 255.
-        #     h, w, c = im.shape
-        #     scale = self.scale if apply_scale else 1
-        #     if h != self.cfg.data.eval_in_size[0]*scale or w != self.cfg.data.eval_in_size[1]*scale:
-        #         im = strans.resize(im, (self.cfg.data.eval_in_size[0]*scale, self.cfg.data.eval_in_size[1]*scale))
-        # except ImportError:
+    def process_input_image(self, im_names):
         im = imageio.imread(im_names) / 255.
         return im
 
@@ -269,7 +250,6 @@ class VSR(object):
             meta = json.load(fid)
 
         mse_acc = None
-        ave_time = 0
         for vid in meta['videos']:
             print('Evaluate {}'.format(vid['name']))
             if meta['prefix']:
@@ -283,7 +263,7 @@ class VSR(object):
             lrImgs = sorted(glob.glob(os.path.join(in_path, '*.png')))
             lrImgs = np.array([self.process_input_image(i) for i in lrImgs]).astype(np.float32)
             gtImgs = sorted(glob.glob(os.path.join(gt_path, '*.png')))
-            gtImgs = np.array([self.process_input_image(i, True) for i in gtImgs]).astype(np.float32)
+            gtImgs = np.array([self.process_input_image(i) for i in gtImgs]).astype(np.float32)
 
             lr_list = []
             max_frame = lrImgs.shape[0]
@@ -299,10 +279,8 @@ class VSR(object):
                 st_time = time.time()
                 sr = sess.run(self.SR, feed_dict={self.LR: lr_list[i][None]})
                 onece_time = time.time() - st_time
-                # ave_time = ave_time * 0.9 + onece_time * 0.1
                 if i > 0:
                     ave_time += onece_time
-                # print('Done frame {}: runtime = {:.0f} ms/frame ({:.1f} FPS)'.format(i, ave_time * 1000, 1 / ave_time))
                 sr = np.clip(sr * 255., 0, 255).squeeze()
                 gt = gtImgs[i] * 255.
                 mse_val = np.mean((gt - sr) ** 2)[None]

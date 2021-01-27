@@ -232,7 +232,7 @@ class DataLoader_tensorslice():
                  data_dir,
                  set_file='train.json',
                  batch_size=2,
-                 num_frames=7, 
+                 num_frames=7,
                  scale=4,
                  in_size=[32, 32],
                  drop_remainder=True,
