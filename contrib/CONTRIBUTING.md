@@ -16,7 +16,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 
-3、贡献者模型代码目录规则："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
+3、贡献者模型代码目录规则："modelzoo/contrib/框架/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
 
 4、从其他开源迁移的代码，请增加License声明
 
@@ -218,7 +218,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 6、测试用例开发参考：
 - [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
-- [离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
+- [离线推理](https://gitee.com/ascend/modelzoo/tree/master/TensorFlow/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **五、PR提交**
 
