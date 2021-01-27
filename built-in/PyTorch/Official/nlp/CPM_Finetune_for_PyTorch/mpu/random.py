@@ -158,7 +158,7 @@ class CudaRNGStatesTracker:
         if name in self.states_:
             raise Exception('npu rng state {} already exists'.format(name))
         # Get the current rng state.
-        orig_rng_state = torch.npu.get_rng_state()
+        orig_rng_state = torch.get_rng_state()
         # Set the new state and store it.
         torch.manual_seed(seed)
         self.states_[name] = torch.get_rng_state()
@@ -183,7 +183,7 @@ class CudaRNGStatesTracker:
             # Update the current rng state for later use.
             self.states_[name] = torch.get_rng_state()
             # And set the state to the original state we started with.
-            _set_npu_rng_state(orig_cuda_rng_state)
+            _set_npu_rng_state(orig_npu_rng_state)
 
 
 # RNG tracker object.

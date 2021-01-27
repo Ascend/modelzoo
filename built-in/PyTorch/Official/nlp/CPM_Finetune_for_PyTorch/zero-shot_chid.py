@@ -210,7 +210,7 @@ def main():
                 no_model_batch[k] = no_model_batch[k].to(device)
 
             output = model(**batch)
-            losses = mpu.vocab_parallel_cross_entropy(output.contiguous().float(), no_model_batch["labels"])
+            losses = mpu.vocab_parallel_cross_entropy(output.contiguous().float(), no_model_batch["labels"], args)
             loss_mask = no_model_batch["loss_mask"]
             loss = torch.sum(losses * loss_mask, dim=-1) / loss_mask.sum(dim=-1)
 
@@ -220,7 +220,7 @@ def main():
 
             sids = no_model_batch["sids"]
             sid_tensor_list = [torch.zeros_like(sids) for _ in range(mpu.get_data_parallel_world_size())]
-            if arg.model_parallel_size > 1:
+            if args.model_parallel_size > 1:
                 sid_tensor_list[0] = sids.cpu()
                 all_sids.extend(sid_tensor_list)
             else:
