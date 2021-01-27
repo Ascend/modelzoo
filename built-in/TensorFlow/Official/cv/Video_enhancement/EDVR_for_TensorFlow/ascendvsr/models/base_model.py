@@ -7,8 +7,6 @@ import json
 import re
 import tensorflow as tf
 from tqdm import trange
-# from skimage import io as sio
-# from skimage import transform as strans
 
 from ascendcv.runner.solver import build_solver
 from ascendcv.utils.writer import ImageWriter
@@ -157,7 +155,6 @@ class VSR(object):
                                 del node.input[1]
 
                 return graph_def
-
         except DecodeError:
             meta_graph = tf.saved_model.loader.load(
                 sess, [tf.saved_model.tag_constants.SERVING], os.path.dirname(pb_file))
@@ -174,7 +171,6 @@ class VSR(object):
             self.minidata = DataLoader_tensorslice(
                 data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
                 scale=self.scale, in_size=self.in_size)
-            # self.LR, self.HR, flip, offh, offw = self.minidata.batch_list
             self.LR, self.HR = self.minidata.batch_list
             self.build_v2()
         else:
@@ -229,7 +225,7 @@ class VSR(object):
                         feed_dict={solver.lr_schedule.lr: solver.update_lr()})
                     onece_time = time.time() - st_time
                 except tf.errors.OutOfRangeError:
-                    raise ValueError(f'End of the dateset in {step}')
+                    raise ValueError(f'End of the dateset in {it}')
 
             if ave_time is None or it < 20:
                 ave_time = onece_time
