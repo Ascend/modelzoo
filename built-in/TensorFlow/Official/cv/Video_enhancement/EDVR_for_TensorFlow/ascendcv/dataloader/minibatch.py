@@ -4,9 +4,9 @@ import imageio
 import numpy as np
 import random
 import json
-from multiprocessing import Process, Queue
-
 import tensorflow as tf
+
+from .augmentation import AugmentNoise
 
 
 class Minibatch(object):
@@ -110,11 +110,10 @@ class TestMinibatch(object):
             TestMinibatch.__instance = super().__new__(cls)
         return cls.__instance
 
-    def __init__(self, data_dir, set_file='val.json', batch_size=1, num_frames=5, scale=4, detect_scene_change=False):
+    def __init__(self, data_dir, set_file='val.json', batch_size=1, num_frames=5, scale=4):
         self.batch_size = batch_size
         self.num_frames = num_frames
         self.scale = scale
-        self.detect_scene_change = detect_scene_change
 
         set_file = os.path.join(data_dir, 'sets', set_file)
         with open(set_file, 'r') as fid:
@@ -154,12 +153,7 @@ class TestMinibatch(object):
         lrlist = [self.lrcliplist[idx] for idx in self.index[self.cur:self.cur + self.batch_size]]
         lr_names = [self.lrcliplist[idx][self.num_frames//2] for idx in self.index[self.cur:self.cur+self.batch_size]]
         # print(lr_names)
-        if self.detect_scene_change:
-            lr = [scene_change_compensation(
-                    np.array([imageio.imread(perimg)[..., :3] / 255. for perimg in pervid]).astype(np.float32))
-                    for pervid in lrlist]
-        else:
-            lr = [np.array([imageio.imread(perimg)[..., :3] / 255. for perimg in pervid]).astype(np.float32) for pervid in lrlist]
+        lr = [np.array([imageio.imread(perimg)[..., :3] / 255. for perimg in pervid]).astype(np.float32) for pervid in lrlist]
         lr = np.array(lr)
 
         self.cur += self.batch_size
@@ -183,6 +177,9 @@ def random_flip_ud(input, decision):
     output = tf.cond(tf.less(decision, 0.5), lambda: f2, lambda: f1)
     return output
 
+
+def random_add_noise(input, decision):
+    pass
 
 def loading_img(output, num_frames):
     target_images = []
@@ -209,26 +206,46 @@ def preprocess_img(target_images, target_images_hr, num_frames=7, in_size=[64,64
     target_images_hr = random_flip_ud(target_images_hr, flip_decision_ud)
 
     return target_images, target_images_hr
-    # return target_images, target_images_hr, flip_decision, offset_h, offset_w
 
-def load_preprocess_tf(output, num_frames=7, in_size=[64,64], scale=4, lr_shape=[540, 960]):
+
+def load_preprocess_tf(output, noise_aug, num_frames=7, in_size=[64,64], scale=4, lr_shape=[540, 960]):
     with tf.name_scope('loading'):
         target_images, target_images_hr = loading_img(output, num_frames)
 
     with tf.name_scope('data_preprocessing'):
-        target_images, target_images_hr = preprocess_img(target_images, target_images_hr, num_frames, in_size, scale, lr_shape)
-        # target_images, target_images_hr, flip, offh, offw = preprocess_img(target_images, target_images_hr, num_frames, in_size, scale, lr_shape)
+        target_images, target_images_hr = preprocess_img(
+            target_images,
+            target_images_hr,
+            num_frames,
+            in_size,
+            scale,
+            lr_shape)
+
+    with tf.name_scope('noise_add'):
+        target_images = noise_aug.apply_tf(target_images)
 
     return tf.stack(target_images), target_images_hr
 
 
 class DataLoader_tensorslice():
-    def __init__(self, data_dir, set_file='train.json', batch_size=2, num_frames=7, scale=4, in_size=[32, 32], drop_remainder=True):
+    def __init__(self,
+                 data_dir,
+                 set_file='train.json',
+                 batch_size=2,
+                 num_frames=7, 
+                 scale=4,
+                 in_size=[32, 32],
+                 drop_remainder=True,
+                 noise_options=None):
         self.batch_size = batch_size
         self.num_frames = num_frames
         self.scale = scale
         self.in_size = in_size
         self.drop_remainder = drop_remainder
+        if noise_options is not None:
+            self.noise_augmenter = AugmentNoise(noise_options)
+        else:
+            self.noise_augmenter = AugmentNoise(noise_type='clean')
 
         set_file = os.path.join(data_dir, 'sets', set_file)
         with open(set_file, 'r') as fid:
@@ -272,7 +289,7 @@ class DataLoader_tensorslice():
 
         video_dataset = video_dataset.shuffle(100000).repeat(300)
         video_dataset = video_dataset.map(
-            lambda x: load_preprocess_tf(x, self.num_frames, self.in_size, self.scale, self.lr_shape),
+            lambda x: load_preprocess_tf(x, self.noise_augmenter, self.num_frames, self.in_size, self.scale, self.lr_shape),
             num_parallel_calls=tf.data.experimental.AUTOTUNE)
         video_dataset = video_dataset.batch(self.batch_size, drop_remainder=True)
         video_dataset = video_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
@@ -293,7 +310,7 @@ def loading_test_img(output, num_frames):
 
 
 class DataLoader_tfTest():
-    def __init__(self, data_dir, set_file='val.json', batch_size=1, num_frames=7):
+    def __init__(self, data_dir, set_file='val.json', batch_size=1, num_frames=7, scale=4):
         self.batch_size = batch_size
         self.num_frames = num_frames
 
@@ -312,7 +329,7 @@ class DataLoader_tfTest():
             max_frames = len(inList)
             for i in range(max_frames):
                 index = np.array([k for k in range(i - self.num_frames // 2, i + self.num_frames // 2 + 1)])
-                index = np.clip(index, 0, max_frame - 1).tolist()
+                index = np.clip(index, 0, max_frames - 1).tolist()
                 self.lrcliplist.append([inList[k] for k in index])
 
             self.lr_shape = vid['x{}_shape'.format(scale)]

@@ -11,8 +11,8 @@ from tqdm import trange
 from ascendcv.runner.solver import build_solver
 from ascendcv.utils.writer import ImageWriter
 from ascendcv.runner.hccl_broadcast import broadcast_global_variables
-from ascendcv.utils.dataloader import PrefetchGenerator
-from ascendvsr.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
+from ascendcv.dataloader.dataloader import PrefetchGenerator
+from ascendcv.dataloader.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
 
 
 class VSR(object):
