@@ -77,7 +77,7 @@ class VSR(object):
             self.loss = self.calculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
-            self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
+            self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
 
     def build_v2(self):
         self.SR = self.build_generator(self.LR)
@@ -85,7 +85,7 @@ class VSR(object):
             self.loss = self.calculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
-            self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
+            self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
 
     def calculate_loss(self, SR, HR, *kwargs):
         raise NotImplementedError

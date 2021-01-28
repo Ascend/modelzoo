@@ -35,7 +35,7 @@ python3 tools/main.py \
     --config-file configs/edvr.yaml \
     solver.checkpoint_interval 5000 \
     solver.print_interval 20 \
-    solver.lr_schedule.total_steps [100]
+    solver.lr_schedule.total_steps [100] \
     rank_size ${DEVICE_RANK}
 
 echo "[INFO] test training done"
@@ -83,6 +83,7 @@ python3 tools/main.py \
     mode inference \
     data.data_dir 'data/reds' \
     data.eval_in_size 180,320 \
+    model.convert_output_to_uint8 True \
     checkpoint ${CKPT}
 
 
