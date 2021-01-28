@@ -46,6 +46,12 @@ from __future__ import print_function
 
 import math
 import os
+#os.environ['DUMP_GE_GRAPH']="2"
+#os.environ['PRINT_MODEL']="1"
+#os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
+#os.environ['ASCEND_GLOBAL_LOG_LEVEL']='3'
+#os.environ['ASCEND_GLOBAL_EVENT_ENABLE']='0'
+#os.environ['ASCEND_SLOG_PRINT_TO_STDOUT']='1'
 import random
 import time
 from absl import app
