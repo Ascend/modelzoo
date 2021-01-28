@@ -34,7 +34,7 @@ class GaussianNoise(NoiseAugmentation):
 
     def apply_numpy(self, clean_data):
         shape = clean_data.shape
-        noise = self.std * np.random.randn(shape) + self.mean
+        noise = self.std * np.random.randn(*shape) + self.mean
         noisy = np.clip(clean_data + noise, 0., 1.)
         return noisy
 
@@ -62,6 +62,7 @@ class SaltPepperNoise(NoiseAugmentation):
         num_pepper = np.ceil(self.amount * np.prod(shape) * (1. - self.salt_noise_ratio))
         coord = [np.random.randint(0, i - 1, int(num_pepper)) for i in shape]
         noisy[coord] = 0.
+        return noisy
 
     def apply_tf(self, clean_data):
         shape = clean_data.get_shape().as_list()
@@ -89,7 +90,7 @@ class SpeckleNoise(NoiseAugmentation):
 
     def apply_numpy(self, clean_data):
         shape = clean_data.shape
-        gauss = np.random.randn(shape)
+        gauss = np.random.randn(*shape)
         noisy = clean_data + clean_data * gauss
         noisy = np.clip(noisy, 0., 1.)
         return noisy
@@ -111,8 +112,8 @@ class GaussianProcessNoise(NoiseAugmentation):
 
     def apply_numpy(self, clean_data):
         shape = clean_data.shape
-        std = self.min_std + (self.max_std - self.min_std) * np.random.rand(shape)
-        noise = std * np.random.randn(shape) + self.mean
+        std = self.min_std + (self.max_std - self.min_std) * np.random.rand(*shape)
+        noise = std * np.random.randn(*shape) + self.mean
         noisy = np.clip(clean_data + noise, 0., 1.)
         return noisy
 
