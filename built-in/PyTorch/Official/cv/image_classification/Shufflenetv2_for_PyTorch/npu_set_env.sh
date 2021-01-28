@@ -47,7 +47,7 @@ echo ${path_lib}
 export LD_LIBRARY_PATH=/usr/local/python3.7.5/lib/:${path_lib}:$LD_LIBRARY_PATH
 
 
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
-export ASCEND_SLOG_PRINT_TO_STDOUT=3
+export ASCEND_GLOBAL_LOG_LEVEL=3
 
