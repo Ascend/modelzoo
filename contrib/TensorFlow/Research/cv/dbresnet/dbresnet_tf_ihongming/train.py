@@ -189,12 +189,11 @@ def main():
             if cfg.TRAIN.RESTORE:
                 train_logger.info('continue training from previous checkpoint')
                 ckpt = tf.train.get_checkpoint_state(cfg.TRAIN.RESTORE_CKPT_PATH)
-                train_logger.info('restore model path:', ckpt.model_checkpoint_path)
                 saver.restore(sess, ckpt.model_checkpoint_path)
                 train_logger.info("done")
             elif cfg.TRAIN.PRETRAINED_MODEL_PATH is not None:
                 sess.run(init)
-                train_logger.info('load pretrain model:{}', str(cfg.TRAIN.RESTORE_CKPT_PATH))
+                train_logger.info('loading pretrain model')
                 variable_restore_op = slim.assign_from_checkpoint_fn(cfg.TRAIN.PRETRAINED_MODEL_PATH,
                                                                      slim.get_trainable_variables(),
                                                                      ignore_missing_vars=True)
@@ -259,5 +258,6 @@ if __name__ == '__main__':
     cfg.TRAIN.MAX_STEPS = args.max_steps
     cfg.TRAIN.SAVE_CHECKPOINT_STEPS = args.save_steps
     cfg.PLATFORM = args.platform
-    cfg.TRAIN.LEARNING_RATE = args.lr
+    cfg.TRAIN.LEARNING_RATE = args.learning_rate
+
     main()

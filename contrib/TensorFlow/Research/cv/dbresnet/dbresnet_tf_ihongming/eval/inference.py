@@ -143,7 +143,7 @@ class DB():
 if __name__ == "__main__":
     args = get_args()
 
-    db = DB(args.ckptpath, args.gpuid)
+    db = DB(args.ckptpath)
 
     db.detect_img(args.imgpath, args.ispoly, args.show_res)
 
