@@ -4,8 +4,6 @@ DEVICE_RANK=$2
 
 # set env
 
-#AISERVER
-ulimit -c 0
 #export PRINT_MODEL=1
 export MOX_USE_NPU=1
 export FUSION_TENSOR_SIZE=2000000000
