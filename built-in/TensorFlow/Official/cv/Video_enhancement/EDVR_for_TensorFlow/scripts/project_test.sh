@@ -28,8 +28,7 @@ if [ ${DEVICE_RANK} -gt 1 ]; then
     export RANK_TABLE_FILE=scripts/${DEVICE_RANK}p.json
 fi
 
-echo "[INFO] test training. "
-echo "\tFor the given configuration, the step time should be about 200 ms (the 1st print should not count)."
+echo "[INFO] test training. For the given configuration, the step time should be about 200 ms (the 1st print should not count)."
 rm -rf kernel_meta
 
 python3 tools/main.py \
@@ -41,8 +40,7 @@ python3 tools/main.py \
 
 echo "[INFO] test training done"
 
-echo "[INFO] test evaluation. "
-echo "\tFor the given configuration, the inference time should be about 110 ms. The PSNR should be around 30.24dB."
+echo "[INFO] test evaluation. For the given configuration, the inference time should be about 110 ms (maybe less). The PSNR should be around 30.24dB."
 rm -rf kernel_meta
 
 python3 tools/main.py \
@@ -54,7 +52,7 @@ python3 tools/main.py \
 echo "[INFO] test evaluation done"
 
 echo "[INFO] test freeze. "
-echo "[INFO] (1/2) batchsize=1, input dim=5"
+echo "[INFO] (1/2) batchsize = 1, input dim = 5"
 rm -rf kernel_meta
 
 python3 tools/main.py \
@@ -65,7 +63,7 @@ python3 tools/main.py \
     data.eval_batch_size 1 \
     checkpoint ${CKPT}
 
-echo "[INFO] (2/2) batchsize=None, input dim=4"
+echo "[INFO] (2/2) batchsize = None, input dim = 4"
 rm -rf kernel_meta
 
 python3 tools/main.py \
@@ -78,8 +76,7 @@ python3 tools/main.py \
 
 echo "[INFO] test freeze done."
 
-echo "[INFO] test inference."
-echo "\tThe inference time is about 110ms"
+echo "[INFO] test inference. The inference time is about 110ms (maybe less)."
 echo "[INFO] (1/2) input dimension = 5, output dtype = uint8"
 python3 tools/main.py \
     --config-file configs/edvr.yaml \

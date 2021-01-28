@@ -74,7 +74,7 @@ class VSR(object):
         self.SR = self.build_generator(self.LR)
         if self.is_train:
             self.HR = tf.placeholder(tf.float32, shape=[b, h * 4, w * 4, 3], name='H_truth')
-            self.loss = self.caculate_loss(self.SR, self.HR)
+            self.loss = self.calculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
             self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
@@ -82,7 +82,7 @@ class VSR(object):
     def build_v2(self):
         self.SR = self.build_generator(self.LR)
         if self.is_train:
-            self.loss = self.caculate_loss(self.SR, self.HR)
+            self.loss = self.calculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
             self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
@@ -305,7 +305,7 @@ class VSR(object):
 
             im_name = lr_names[0].split(os.path.sep)
             output_img_path = os.path.join(output_dir, *im_name[-3:])
-            output_folder = os.path.split(output_img_path)
+            output_folder = os.path.split(output_img_path)[0]
             os.makedirs(output_folder, exist_ok=True)
             writer.put_to_queue(output_img_path, sr)
 
