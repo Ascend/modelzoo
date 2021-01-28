@@ -83,7 +83,5 @@ if __name__ == '__main__':
         model.inference(sess_cfg)
     elif cfg.mode == 'freeze':
         model.freeze(sess_cfg)
-    elif cfg.mode == 'offline_inference':
-        model.offline_inference(sess_cfg)
     else:
         raise KeyError

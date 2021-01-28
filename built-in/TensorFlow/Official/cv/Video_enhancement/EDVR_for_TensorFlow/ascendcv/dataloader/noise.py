@@ -4,8 +4,8 @@ import tensorflow as tf
 
 
 class NoiseAugmentation(object):
-    def __init__(self, random_seed):
-        self.random_seed = random_seed
+    def __init__(self, **kwargs):
+        self.random_seed = kwargs.get('random_seed', None)
 
         if self.random_seed is not None:
             np.random.seed(self.random_seed)
@@ -27,8 +27,8 @@ class NoiseAugmentation(object):
 
 
 class GaussianNoise(NoiseAugmentation):
-    def __init__(self, mean=0., std=0.05, random_seed=None):
-        super(GaussianNoise, self).__init__(random_seed)
+    def __init__(self, mean=0., std=0.05, **kwargs):
+        super(GaussianNoise, self).__init__(**kwargs)
         self.mean = mean
         self.std = std
 
@@ -46,8 +46,8 @@ class GaussianNoise(NoiseAugmentation):
 
 
 class SaltPepperNoise(NoiseAugmentation):
-    def __init__(self, amount=0.005, salt_ratio=0.5, random_seed=None):
-        super(SaltPepperNoise, self).__init__(random_seed)
+    def __init__(self, amount=0.005, salt_ratio=0.5, **kwargs):
+        super(SaltPepperNoise, self).__init__(**kwargs)
         self.amount = amount
         self.salt_noise_ratio = salt_ratio
 
@@ -84,8 +84,8 @@ class SaltPepperNoise(NoiseAugmentation):
 
 
 class SpeckleNoise(NoiseAugmentation):
-    def __init__(self, random_seed=None):
-        super(SpeckleNoise, self).__init__(random_seed)
+    def __init__(self, **kwargs):
+        super(SpeckleNoise, self).__init__(**kwargs)
 
     def apply_numpy(self, clean_data):
         shape = clean_data.shape
@@ -103,8 +103,8 @@ class SpeckleNoise(NoiseAugmentation):
 
 
 class GaussianProcessNoise(NoiseAugmentation):
-    def __init__(self, mean=0., min_std=0.01, max_std=0.1, random_seed=None):
-        super(GaussianProcessNoise, self).__init__(random_seed)
+    def __init__(self, mean=0., min_std=0.01, max_std=0.1, **kwargs):
+        super(GaussianProcessNoise, self).__init__(**kwargs)
         self.mean = mean
         self.min_std = min_std
         self.max_std = max_std
@@ -125,8 +125,8 @@ class GaussianProcessNoise(NoiseAugmentation):
 
 
 class NoNoise(NoiseAugmentation):
-    def __init__(self):
-        super(NoNoise, self).__init__(random_seed=None)
+    def __init__(self, **kwargs):
+        super(NoNoise, self).__init__(**kwargs)
 
     def apply_numpy(self, clean_data):
         return clean_data
@@ -136,8 +136,8 @@ class NoNoise(NoiseAugmentation):
 
 
 class NoiseSequential(NoiseAugmentation):
-    def __init__(self, list_of_noise_aug, random_seed=None):
-        super(NoiseSequential, self).__init__(random_seed)
+    def __init__(self, list_of_noise_aug, **kwargs):
+        super(NoiseSequential, self).__init__(**kwargs)
         self.noise_components = list_of_noise_aug
 
     def apply_numpy(self, clean_data):
@@ -160,6 +160,7 @@ NOISE_AUGMENTER_MAP = {
 }
 
 
-def get_noise_augmenter(noise_type, **kwargs):
+def get_noise_augmenter(**kwargs):
+    noise_type = kwargs.get('noise_type', 'clean')
     noise_augmenter = NOISE_AUGMENTER_MAP[noise_type]
     return noise_augmenter(**kwargs)

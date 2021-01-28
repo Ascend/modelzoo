@@ -87,7 +87,7 @@ class VSR(object):
         if self.cfg.model.convert_output_to_uint8:
             self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
 
-    def caculate_loss(self, SR, HR, *kwargs):
+    def calculate_loss(self, SR, HR, *kwargs):
         raise NotImplementedError
 
     def build_generator(self, x):

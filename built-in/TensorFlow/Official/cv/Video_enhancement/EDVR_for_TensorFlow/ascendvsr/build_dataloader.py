@@ -9,9 +9,8 @@ from ascendvsr.config.utils import convert_to_dict
 
 
 def build_train_dataloader(read_mode, batch_size, scale, set_file, num_frames, in_size, data_config):
-    noise_type = data_config.noise.type
     noise_options = convert_to_dict(data_config.noise, [])
-    noise_augmenter = get_noise_augmenter(noise_type, **noise_options)
+    noise_augmenter = get_noise_augmenter(**noise_options)
 
     if read_mode == 'python':
         minibatch = Minibatch(

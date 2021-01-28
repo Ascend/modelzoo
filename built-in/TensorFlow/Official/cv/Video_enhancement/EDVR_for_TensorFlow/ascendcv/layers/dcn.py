@@ -336,7 +336,7 @@ def DCNPack(x, extra_feat, out_channels, kernel_size=(3, 3), strides=(1, 1), pad
 
             sigmoid_offset = tf.nn.sigmoid(conv_offset)
             weight = np.ones((1, 1, 1, num_deform_groups*kernel_size[0]*kernel_size[1]*3)).astype(np.float32)
-            weight[..., num_deform_groups*kernel_size[0]*kernel_size[1]*3:] = 0.
+            weight[..., num_deform_groups*kernel_size[0]*kernel_size[1]*2:] = 0.
             weight = tf.convert_to_tensor(weight)
 
             input_offset_mask = weight * conv_offset + (1. - weight) * sigmoid_offset

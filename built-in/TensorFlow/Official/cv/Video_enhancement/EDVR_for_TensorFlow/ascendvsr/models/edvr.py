@@ -258,7 +258,7 @@ class EDVR(VSR):
 
             return out
 
-    def caculate_loss(self, SR, HR, eps=1e-6, reduction='mean', axis=None):
+    def calculate_loss(self, SR, HR, **kwargs):
         eps = self.cfg.edvr.loss_margin
         reduction = self.cfg.edvr.loss_reduction
         
@@ -274,13 +274,13 @@ class EDVR(VSR):
         elif self.cfg.edvr.loss_type == 'charbonnier':
             losses = tf.sqrt((SR - HR)**2 + eps)
         else:
-            raise ValueError
+            raise NotImplementedError
 
         losses = tf.reduce_sum(losses, axis=[1, 2, 3])
         if reduction == 'mean':
-            return tf.reduce_mean(losses, axis=axis)
+            return tf.reduce_mean(losses, axis=0)
         elif reduction == 'sum':
-            return tf.reduce_sum(losses, axis=axis)
+            return tf.reduce_sum(losses, axis=0)
         else:
             raise NotImplementedError
 
@@ -306,56 +306,4 @@ class EDVR(VSR):
     #         except Exception as e:
     #             print('[ERROR] Failed to freeze model.')
     #             print(e)
-    
-    def offline_inference(self, sess_cfg):
-        sess = tf.Session(config=sess_cfg)
-        output_node = sess.graph.get_tensor_by_name('G/reconstruction/add')
-        input_node = sess.graph.get_tensor_by_name('L_input')
-        
-        set_file = os.path.join(self.data_dir, 'sets', self.set_file)
-        with open(set_file, 'r') as fid:
-            meta = json.load(fid)
-           
-        output_dir = os.path.join(self.output_dir, 'test')
-        
-        ave_time = 0
-        for vid in meta['videos']:
-            print('Inference {}'.format(vid['name']))
-            
-            try:
-                os.makedirs(os.path.join(output_dir, vid['name']), exist_ok=True)
-            except Exception:
-                pass
-            
-            if meta['prefix']:
-                in_path = os.path.join(self.data_dir, 'images', meta['x{}_folder'.format(self.scale)], vid['name'])
-            else:
-                in_path = os.path.join(self.data_dir, 'images', vid['name'], meta['x{}_folder'.format(self.scale)])
-            assert os.path.exists(in_path)
-            lr_img_names = sorted(glob.glob(os.path.join(in_path, '*.png')))
-            lrImgs = np.array([self.process_input_image(i) for i in lr_img_names]).astype(np.float32)
-
-            lr_list = []
-            max_frame = lrImgs.shape[0]
-            for i in range(max_frame):
-                index = np.array([k for k in range(i - self.num_frames // 2, i + self.num_frames // 2 + 1)])
-                index = np.clip(index, 0, max_frame - 1).tolist()
-                lr_list.append(np.array([lrImgs[k] for k in index]))
-            lr_list = np.array(lr_list)
-
-            mse_vid = None
-            ave_time = 0
-            for i in range(max_frame):
-                st_time = time.time()
-                sr = sess.run(output_node, feed_dict={input_node: img})
-                sr = np.clip(sr * 255., 0, 255).squeeze()
-                sr = np.round(sr).astype(np.uint8)
-                onece_time = time.time() - st_time
-                if i > 0:
-                    ave_time += onece_time
-
-                im_name = os.path.split(lr_img_names[i])[-1]
-                output_img_path = os.path.join(output_dir, vid['name'], im_name)
-                imageio.imwrite(output_img_path, sr)
-            print(f'Inference time: {(ave_time / (max_frame-1))*1000:.2f}')
         

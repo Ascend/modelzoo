@@ -38,12 +38,12 @@ cfg.data.eval_pad_size = 32
 cfg.data.read_mode = 'python'  # ['tf', 'python']
 
 cfg.data.noise = CN()
-cfg.data.noise.type = 'clean'  # see ascendcv.dataloader.noise.py for more options
+cfg.data.noise.noise_type = 'clean'  # see ascendcv.dataloader.noise.py for more options
 cfg.data.noise.random_seed = None
 
 # gaussian noise params
 cfg.data.noise.mean = 0.
-cfg.data.noise.std = 0.
+cfg.data.noise.std = 0.05
 # salt-pepper noise params
 cfg.data.noise.amount = 0.005
 cfg.data.noise.salt_ratio = 0.5
