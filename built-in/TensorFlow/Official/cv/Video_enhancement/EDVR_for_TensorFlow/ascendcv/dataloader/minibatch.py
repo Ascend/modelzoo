@@ -6,8 +6,6 @@ import random
 import json
 import tensorflow as tf
 
-from .augmentation import AugmentNoise
-
 
 class Minibatch(object):
     __instance = None
@@ -17,12 +15,21 @@ class Minibatch(object):
             Minibatch.__instance = super().__new__(cls)
         return cls.__instance
 
-    def __init__(self, data_dir, set_file='train.json', batch_size=2, num_frames=7, scale=4, in_size=[32, 32], drop_remainder=True):
+    def __init__(self,
+                 data_dir,
+                 set_file='train.json',
+                 batch_size=2,
+                 num_frames=7,
+                 scale=4,
+                 in_size=[32, 32],
+                 drop_remainder=True,
+                 noise_augmenter=None):
         self.batch_size = batch_size
         self.num_frames = num_frames
         self.scale = scale
         self.in_size = in_size
         self.drop_remainder = drop_remainder
+        self.noise_augmenter = noise_augmenter
 
         set_file = os.path.join(data_dir, 'sets', set_file)
         with open(set_file, 'r') as fid:
@@ -97,6 +104,9 @@ class Minibatch(object):
         if random.randint(0, 1):
             lr = np.transpose(lr, [0, 1, 3, 2, 4])
             hr = np.transpose(hr, [0, 1, 3, 2, 4])
+
+        if self.noise_augmenter is not None:
+            lr = self.noise_augmenter.apply_np(lr)
 
         self.cur += self.batch_size
 
@@ -219,8 +229,9 @@ def load_preprocess_tf(output, noise_aug, num_frames=7, in_size=[64,64], scale=4
             lr_shape)
 
     target_images = tf.stack(target_images)
-    with tf.name_scope('noise_add'):
-        target_images = noise_aug.apply_tf(target_images)
+    if noise_aug is not None:
+        with tf.name_scope('noise_add'):
+            target_images = noise_aug.apply_tf(target_images)
 
     return target_images, target_images_hr
 
@@ -234,16 +245,13 @@ class DataLoader_tensorslice():
                  scale=4,
                  in_size=[32, 32],
                  drop_remainder=True,
-                 noise_options=None):
+                 noise_augmenter=None):
         self.batch_size = batch_size
         self.num_frames = num_frames
         self.scale = scale
         self.in_size = in_size
         self.drop_remainder = drop_remainder
-        if noise_options is not None:
-            self.noise_augmenter = AugmentNoise(noise_options)
-        else:
-            self.noise_augmenter = AugmentNoise(noise_type='clean')
+        self.noise_augmenter = noise_augmenter
 
         set_file = os.path.join(data_dir, 'sets', set_file)
         with open(set_file, 'r') as fid:

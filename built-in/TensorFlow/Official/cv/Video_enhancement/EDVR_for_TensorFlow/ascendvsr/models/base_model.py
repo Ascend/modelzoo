@@ -11,8 +11,9 @@ from tqdm import trange
 from ascendcv.runner.solver import build_solver
 from ascendcv.utils.writer import ImageWriter
 from ascendcv.runner.hccl_broadcast import broadcast_global_variables
-from ascendcv.dataloader.dataloader import PrefetchGenerator
-from ascendcv.dataloader.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
+# from ascendcv.dataloader.dataloader import PrefetchGenerator
+from ascendvsr.build_dataloader import build_train_dataloader, build_test_dataloader
+# from ascendcv.dataloader.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
 
 
 class VSR(object):
@@ -76,7 +77,7 @@ class VSR(object):
             self.loss = self.caculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
-            self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
+            self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
 
     def build_v2(self):
         self.SR = self.build_generator(self.LR)
@@ -84,7 +85,7 @@ class VSR(object):
             self.loss = self.caculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
-            self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
+            self.SR = tf.cast(tf.squeeze(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.))), tf.uint8)
 
     def caculate_loss(self, SR, HR, *kwargs):
         raise NotImplementedError
@@ -123,64 +124,26 @@ class VSR(object):
                 raise ValueError
         return recover_step
     
-    def load_from_pb(self, sess):
-        try:
-            with open(self.checkpoint, 'rb') as f:
-                graph_def = GraphDef()
-                graph_def.ParseFromString(f.read())
-
-                # When reading some .pb, encounter the following problem:
-                # ValueError: Input 0 of node generator_1/dense/Assign was passed float from
-                # generator/dense/u:0 incompatible with expected float_ref.
-                # Solution: https://github.com/Byronnar/tensorflow-serving-yolov3/issues/77
-                with sess.graph.as_default():
-                    # fix nodes
-                    for node in graph_def.node:
-                        if node.op == 'RefSwitch':
-                            node.op = 'Switch'
-                            for index in range(len(node.input)):
-                                if 'moving_' in node.input[index]:
-                                    node.input[index] = node.input[index] + '/read'
-                        elif node.op == 'AssignSub':
-                            node.op = 'Sub'
-                            if 'use_locking' in node.attr: del node.attr['use_locking']
-                        elif node.op == 'AssignAdd':
-                            node.op = 'Add'
-                            if 'use_locking' in node.attr: del node.attr['use_locking']
-                        elif node.op == 'Assign':
-                            node.op = 'Identity'
-                            if 'use_locking' in node.attr: del node.attr['use_locking']
-                            if 'validate_shape' in node.attr: del node.attr['validate_shape']
-                            if len(node.input) == 2:
-                                node.input[0] = node.input[1]
-                                del node.input[1]
-
-                return graph_def
-        except DecodeError:
-            meta_graph = tf.saved_model.loader.load(
-                sess, [tf.saved_model.tag_constants.SERVING], os.path.dirname(pb_file))
-            return meta_graph.graph_def
-    
     def train(self, sess_cfg):
+        dataloader = build_train_dataloader(
+            read_mode=self.read_mode,
+            batch_size=self.batch_size,
+            scale=self.scale,
+            set_file=self.set_file,
+            num_frames=self.num_frames,
+            in_size=self.in_size,
+            data_config=self.cfg.data
+        )
         if self.read_mode == 'python':
-            self.minibatch = Minibatch(
-                data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
-                scale=self.scale, in_size=self.in_size)
-            self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.train_data_queue_size)
             self.build()
         elif self.read_mode == 'tf':
-            self.minidata = DataLoader_tensorslice(
-                data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
-                scale=self.scale, in_size=self.in_size)
-            self.LR, self.HR = self.minidata.batch_list
+            self.LR, self.HR = dataloader
             self.build_v2()
         else:
             raise ValueError
 
         vars_all = tf.trainable_variables()
-
         solver = build_solver(self.solver, self.device, self.is_distributed)
-
         train_op = solver.opt.minimize(self.loss, var_list=vars_all)
 
         # Init variables
@@ -208,7 +171,7 @@ class VSR(object):
         st_time = time.time()
         for it in range(recover_step, solver.total_step):
             if self.read_mode == 'python':
-                input_lr, input_hr = next(self.loader)
+                input_lr, input_hr = next(dataloader)
                 _, cur_lr, loss_v = sess.run(
                     [train_op, solver.lr_schedule.lr, self.loss],
                     feed_dict={self.LR: input_lr, self.HR: input_hr, solver.lr_schedule.lr: solver.update_lr()})
@@ -277,7 +240,11 @@ class VSR(object):
             ave_time = 0
             for i in range(max_frame):
                 st_time = time.time()
-                sr = sess.run(self.SR, feed_dict={self.LR: lr_list[i][None]})
+                if self.cfg.model.input_format_dimension == 5:
+                    lr_input = lr_list[i][None]
+                else:
+                    lr_input = lr_list[i]
+                sr = sess.run(self.SR, feed_dict={self.LR: lr_input})
                 onece_time = time.time() - st_time
                 if i > 0:
                     ave_time += onece_time
@@ -303,9 +270,13 @@ class VSR(object):
         sess = tf.Session(config=sess_cfg)
         self.load(sess)
 
-        self.minibatch = TestMinibatch(
-            data_dir=self.data_dir, set_file='val.json', batch_size=self.batch_size, num_frames=self.num_frames,
-            scale=self.scale)
+        dataloader = build_test_dataloader(
+            batch_size=self.batch_size,
+            scale=self.scale,
+            set_file=self.set_file,
+            num_frames=self.num_frames,
+            data_config=self.cfg.data
+        )
         # self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.max_queue_size)
         writer = ImageWriter(8, 64)
 
@@ -314,10 +285,10 @@ class VSR(object):
             os.makedirs(output_dir, exist_ok=True)
         print(f'Inference results path: {output_dir}')
         ave_time = 0
-        max_frame = len(self.minibatch)
+        max_frame = len(dataloader)
         for i in trange(max_frame):
             # lr_names, lr = next(self.loader)
-            lr_names, lr = self.minibatch.get_next()
+            lr_names, lr = dataloader.get_next()
             st_time = time.time()
             if self.cfg.data.eval_in_patch:
                 sr = self._inference_stitching(
@@ -342,9 +313,12 @@ class VSR(object):
         print(f'\tInference time: {(ave_time / (max_frame - 1)) * 1000:.2f}')
     
     def _inference_whole(self, sess, img):
+        if self.cfg.model.input_format_dimension == 4:
+            img = np.reshape(img, [-1, *img.shape[2:]])
         sr = sess.run(self.SR, feed_dict={self.LR: img})
-        sr = np.clip(sr * 255., 0, 255).squeeze()
-        sr = np.round(sr).astype(np.uint8)
+        if not self.cfg.model.convert_output_to_uint8:
+            sr = np.clip(sr * 255., 0, 255).squeeze()
+            sr = np.round(sr).astype(np.uint8)
         return sr
 
     def _inference_stitching(self, sess, img, patch_per_step=1, patch_size=(180, 320), pad=32):
@@ -404,8 +378,10 @@ class VSR(object):
         patch_sr = []
         for i in range(num_step):
             batch_data = img_patches_padded[i * patch_per_step:(i + 1) * patch_per_step]
-            if patch_per_step == 1 and batch_data.shape[0] != 1:
+            if patch_per_step == 1 and batch_data.shape[0] != 1 and self.cfg.model.input_format_dimension == 5:
                 batch_data = batch_data[None, ...]
+            elif self.cfg.model.input_format_dimension == 4:
+                batch_data = np.reshape(batch_data, [-1, *batch_data.shape[2:]])
 
             _patch_sr = sess.run(self.SR, feed_dict={self.LR: batch_data})
             patch_sr.extend(_patch_sr)

@@ -37,6 +37,21 @@ cfg.data.eval_in_patch = False
 cfg.data.eval_pad_size = 32
 cfg.data.read_mode = 'python'  # ['tf', 'python']
 
+cfg.data.noise = CN()
+cfg.data.noise.type = 'clean'  # see ascendcv.dataloader.noise.py for more options
+cfg.data.noise.random_seed = None
+
+# gaussian noise params
+cfg.data.noise.mean = 0.
+cfg.data.noise.std = 0.
+# salt-pepper noise params
+cfg.data.noise.amount = 0.005
+cfg.data.noise.salt_ratio = 0.5
+# speckle noise params => no options
+# gaussian process noise params
+cfg.data.noise.min_std = 0.01
+cfg.data.noise.max_std = 0.1
+
 # ---------------------------------------------------------------------------- #
 # Solver
 # ---------------------------------------------------------------------------- #
