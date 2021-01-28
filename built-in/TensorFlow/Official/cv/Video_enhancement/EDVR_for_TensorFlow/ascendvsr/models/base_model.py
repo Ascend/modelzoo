@@ -278,7 +278,7 @@ class VSR(object):
             data_config=self.cfg.data
         )
         # self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.max_queue_size)
-        writer = ImageWriter(8, 64)
+        writer = ImageWriter(self.cfg.writer_num_threads, self.cfg.writer_queue_size)
 
         output_dir = os.path.join(self.output_dir, self.cfg.inference_result_dir)
         if not os.path.exists(output_dir):
@@ -305,12 +305,14 @@ class VSR(object):
 
             im_name = lr_names[0].split(os.path.sep)
             output_img_path = os.path.join(output_dir, *im_name[-3:])
+            output_folder = os.path.split(output_img_path)
+            os.makedirs(output_folder, exist_ok=True)
             writer.put_to_queue(output_img_path, sr)
 
-        print(f'Writing images to files. This may take some time')
+        print(f'Writing images to files. This may take some time. Please DO NOT manually interrupt !!!')
         writer.end()
         del writer
-        print(f'\tInference time: {(ave_time / (max_frame - 1)) * 1000:.2f}')
+        print(f'\tInference time: {(ave_time / (max_frame - 1)) * 1000:.2f} ms/image')
     
     def _inference_whole(self, sess, img):
         if self.cfg.model.input_format_dimension == 4:

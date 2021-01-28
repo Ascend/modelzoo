@@ -104,3 +104,7 @@ cfg.inference_result_dir = 'test'
 cfg.checkpoint = ''
 cfg.continue_training = False
 cfg.random_seed = 20210126
+
+cfg.writer_num_threads = 8
+# -1 for infinite queue size. Consider a finite one when the output image is large.
+cfg.writer_queue_size = -1
