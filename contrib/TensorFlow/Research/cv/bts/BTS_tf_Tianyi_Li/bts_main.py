@@ -21,14 +21,15 @@ import argparse
 import time
 import datetime
 import sys
-
+os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
+os.environ['ASCEND_GLOBAL_LOG_LEVEL']='3'
+os.environ['ASCEND_GLOBAL_EVENT_ENABLE']='0'
+os.environ['ASCEND_SLOG_PRINT_TO_STDOUT']='1'
 from tensorflow.python import pywrap_tensorflow
 from bts_dataloader import *
 
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-from npu_bridge.estimator.npu import npu_scope
-
 
 def convert_arg_line_to_args(arg_line):
     for arg in arg_line.split():
@@ -225,15 +226,14 @@ def train(params):
 
         #config = tf.ConfigProto(allow_soft_placement=True)
         #config.gpu_options.allow_growth = True
+        #sess = tf.Session(config=config)
+
         config = tf.ConfigProto(allow_soft_placement=True)
-        config.gpu_options.allow_growth = True # 尝试
         custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name =  "NpuOptimizer"
         custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-        #custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
-        #custom_op.parameter_map["mix_compile_mode"].b =  True # with npu_scope.without_npu_compile_scope():
+        custom_op.parameter_map["enable_data_pre_proc"].b = False
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
-        
         sess = tf.Session(config=config)
 
         summary_writer = tf.summary.FileWriter(args.log_directory + '/' + args.model_name, sess.graph)
