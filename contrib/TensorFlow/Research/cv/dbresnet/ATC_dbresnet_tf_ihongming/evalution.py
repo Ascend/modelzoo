@@ -27,8 +27,8 @@ from shapely.geometry import Polygon
 
 from db_config import cfg
 from DetectionIoUEvaluator import DetectionIoUEvaluator
-from postprocess.post_process import SegDetectorRepresenter
-from postprocess.utils import load_each_image_lable
+from post_process import SegDetectorRepresenter
+from utils import load_each_image_lable
 
 
 def make_dir(dir):
