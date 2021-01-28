@@ -22,9 +22,9 @@ import time
 import datetime
 import sys
 os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
-os.environ['ASCEND_GLOBAL_LOG_LEVEL']='3'
-os.environ['ASCEND_GLOBAL_EVENT_ENABLE']='0'
-os.environ['ASCEND_SLOG_PRINT_TO_STDOUT']='1'
+#os.environ['ASCEND_GLOBAL_LOG_LEVEL']='3'
+#os.environ['ASCEND_GLOBAL_EVENT_ENABLE']='0'
+#os.environ['ASCEND_SLOG_PRINT_TO_STDOUT']='1'
 from tensorflow.python import pywrap_tensorflow
 from bts_dataloader import *
 
@@ -227,13 +227,12 @@ def train(params):
         #config = tf.ConfigProto(allow_soft_placement=True)
         #config.gpu_options.allow_growth = True
         #sess = tf.Session(config=config)
-
         config = tf.ConfigProto(allow_soft_placement=True)
         custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name =  "NpuOptimizer"
         custom_op.parameter_map["use_off_line"].b = True # 必须显示开启，在昇腾AI处理器执行训练
-        custom_op.parameter_map["enable_data_pre_proc"].b = False
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 必须显示关闭remap
+        custom_op.parameter_map["enable_data_pre_proc"].b = False
         sess = tf.Session(config=config)
 
         summary_writer = tf.summary.FileWriter(args.log_directory + '/' + args.model_name, sess.graph)
