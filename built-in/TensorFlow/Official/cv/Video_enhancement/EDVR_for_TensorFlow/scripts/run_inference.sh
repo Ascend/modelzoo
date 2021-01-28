@@ -36,4 +36,5 @@ python3 tools/main.py \
     mode inference \
     data.data_dir 'data/reds' \
     data.eval_in_size 180,320 \
+    model.convert_output_to_uint8 True \
     checkpoint ${CKPT}

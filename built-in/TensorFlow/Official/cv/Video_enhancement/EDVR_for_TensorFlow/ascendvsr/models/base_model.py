@@ -319,9 +319,10 @@ class VSR(object):
             img = np.reshape(img, [-1, *img.shape[2:]])
         sr = sess.run(self.SR, feed_dict={self.LR: img})
         if not self.cfg.model.convert_output_to_uint8:
-            sr = np.clip(sr * 255., 0, 255).squeeze()
+            sr = np.clip(sr * 255., 0, 255)
             sr = np.round(sr).astype(np.uint8)
-        return sr
+
+        return sr.squeeze()
 
     def _inference_stitching(self, sess, img, patch_per_step=1, patch_size=(180, 320), pad=32):
         from itertools import product
