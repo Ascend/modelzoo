@@ -1,0 +1,14 @@
+
+tools_path="/home/HwHiAiUser/tools"
+project_path="/home/HwHiAiUser/dbresnet"
+
+python3.7  $tools_path/img2bin/img2bin.py -i $1 -w 800 -h 800 -f RGB -a NHWC -t float32 \
+                                        -m [122.67891434,116.66876762,104.00698793] \
+                                        -c [0.00392156862745,0.00392156862745,0.00392156862745] -o $project_path/tmp
+
+output="output/"
+model="model/db_resnet.om"
+
+rm -rf $output/*
+
+./msame --model $model --input tmp/$2.bin --output $output
