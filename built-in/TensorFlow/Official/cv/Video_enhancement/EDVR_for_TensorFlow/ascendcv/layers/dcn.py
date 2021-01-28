@@ -14,6 +14,7 @@
 import math
 
 import tensorflow as tf
+import numpy as np
 
 from .conv import Conv2D
 from ..utils.misc import pair
@@ -94,21 +95,17 @@ class DeformableConvLayer(object):
             pads = [0, 0, 0, 0]
         return pads   
  
-    def __call__(self, inputs, offset, mask=None):
+    def __call__(self, inputs, offset):
         if self.impl == 'tf':
-            return self._call_tf(inputs, offset, mask)
+            return self._call_tf(inputs, offset)
         elif self.impl == 'npu':
-            return self._call_npu(inputs, offset, mask)
+            return self._call_npu(inputs, offset)
 
-    def _call_npu(self, inputs, offset, mask=None):
+    def _call_npu(self, inputs, offset):
         _, ih, iw, _ = inputs.get_shape().as_list()
-        if mask is not None:
-            offset_all = tf.concat([offset, mask], axis=-1)
-        else: 
-            # currently modulation must be valid
-            # The exception will be removed once the forward supports dcn_v1
-            raise ValueError 
-            offset_all = offset
+        c = offset.get_shape().as_list()[3]
+        assert c == self.num_deform_groups*self.kernel_size[0]*self.kernel_size[1]*3
+        offset_all = offset
 
         pads = self._cal_pads(ih, iw)
         out = deformable_conv2d(
@@ -126,7 +123,7 @@ class DeformableConvLayer(object):
             out = tf.nn.bias_add(out, self.bias)
         return out
 
-    def _call_tf(self, inputs, offset, mask=None):
+    def _call_tf(self, inputs, offset):
         def _get_in_bound_mask(x_, y_):
             out_of_bound_x = tf.logical_or(tf.greater(x_, in_w-1), tf.less(x_, 0))
             out_of_bound_y = tf.logical_or(tf.greater(y_, in_h-1), tf.less(y_, 0))
@@ -137,11 +134,15 @@ class DeformableConvLayer(object):
         # bs, in_h, in_w, _ = list(map(int, inputs.shape))
         bs, in_h, in_w, _ = inputs.get_shape().as_list()
         # bs, out_h, out_w, _ = list(map(int, offset.shape))
-        bs, out_h, out_w, _ = offset.get_shape().as_list()
+        bs, out_h, out_w, c = offset.get_shape().as_list()
+
+        assert c == self.num_deform_groups*self.kernel_size[0]*self.kernel_size[1]*3
+        c3 = c // 3
 
         # get x, y axis offset. Swap the order to 'x,y' instead of 'y,x', align with npu dcn op
-        x_off = offset[:, :, :, :offset.shape[-1] // 2]
-        y_off = offset[:, :, :, offset.shape[-1] // 2:]
+        x_off = offset[:, :, :, :c3]
+        y_off = offset[:, :, :, c3:c3*2]
+        mask = offset[:, :, :, c3*2:]
 
         # for dense_image_warp, should be in 'y,x' order, as is the common sense by researchers
         # y_off = offset[:, :, :, :offset.shape[-1] // 2]
@@ -323,21 +324,35 @@ def DCNPack(x, extra_feat, out_channels, kernel_size=(3, 3), strides=(1, 1), pad
                             use_bias=use_bias, trainable=trainable, name='conv_offset')
             offset = tf.cast(offset, tf.float32)
             mask = None
+            raise Not
         elif dcn_version == 'v2':
             conv_offset = Conv2D(extra_feat, num_deform_groups * 3 * kernel_size[0] * kernel_size[1],
                                  kernel_size=kernel_size, strides=strides, padding=padding, dilations=dilations,
                                  use_bias=use_bias, trainable=trainable, name='conv_offset')
             conv_offset = tf.cast(conv_offset, tf.float32)
-            offset = conv_offset[:, :, :, :num_deform_groups * 2 * kernel_size[0] * kernel_size[1]]
-            mask = conv_offset[:, :, :, num_deform_groups * 2 * kernel_size[0] * kernel_size[1]:]
-            mask = tf.nn.sigmoid(mask)
+            # offset = conv_offset[:, :, :, :num_deform_groups * 2 * kernel_size[0] * kernel_size[1]]
+            # mask = conv_offset[:, :, :, num_deform_groups * 2 * kernel_size[0] * kernel_size[1]:]
+            # mask = tf.nn.sigmoid(mask)
+
+            sigmoid_offset = tf.nn.sigmoid(conv_offset)
+            weight = np.ones((1, 1, 1, num_deform_groups*kernel_size[0]*kernel_size[1]*3)).astype(np.float32)
+            weight[..., num_deform_groups*kernel_size[0]*kernel_size[1]*2:] = 0.
+            weight = tf.convert_to_tensor(weight)
+
+            input_offset_mask = weight * conv_offset + (1. - weight) * sigmoid_offset
         else:
             raise NotImplementedError
+
+        # out = DeformableConvLayer(
+        #     in_channels=int(x.shape[-1]), out_channels=out_channels,
+        #     kernel_size=kernel_size, strides=strides, padding=padding, dilations=dilations,
+        #     use_bias=use_bias, num_groups=num_groups, num_deform_groups=num_deform_groups,
+        #     trainable=trainable, impl=impl)(x, offset, mask)
 
         out = DeformableConvLayer(
             in_channels=int(x.shape[-1]), out_channels=out_channels,
             kernel_size=kernel_size, strides=strides, padding=padding, dilations=dilations,
             use_bias=use_bias, num_groups=num_groups, num_deform_groups=num_deform_groups,
-            trainable=trainable, impl=impl)(x, offset, mask)
+            trainable=trainable, impl=impl)(x, input_offset_mask)
 
         return out
