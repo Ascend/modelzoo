@@ -40,7 +40,19 @@ import tensorflow as tf
 from config.db_config import cfg
 
 
-def learning_rate_with_decay(start_lr=0.0007, power=0.9):
+def learning_rate_with_decay(start_lr=0.007, power=0.9):
+    total_stpes = cfg.TRAIN.MAX_STEPS
+    steps_per_epoch = 1255//8
+    
+    def learning_rate_fn(global_step):
+        global_step = tf.cast(global_step//steps_per_epoch, tf.float32)   
+        rate = tf.math.pow((1.0 - (global_step / 1201)), power)
+        return tf.cast(start_lr, tf.float32) * rate
+
+    return learning_rate_fn
+
+
+def learning_rate_step_decay(start_lr=0.007, power=0.9):
     total_stpes = cfg.TRAIN.MAX_STEPS
     
     def learning_rate_fn(global_step):
@@ -62,24 +74,21 @@ def learning_rate_with_exponential_decay():
     return learning_rate_fn
 
 
-
-
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import tqdm
     
-
     init = tf.global_variables_initializer()
     lrs = []
 
     with tf.Session() as sess:
         sess.run(init)
         learning_rate_fn = learning_rate_with_decay()
-        for global_step in tqdm.tqdm(range(1200)):  # 用局部的global_step代替
-            lr = sess.run(learning_rate_fn(global_step * 200))
+        for global_step in tqdm.tqdm(range(1200)):  
+            lr,epo,rate = sess.run(learning_rate_fn(global_step * 156))
             lrs.append(lr)
+            print(epo,"_______",lr,"_______",rate)
 
         plt.plot(range(1200), lrs, color="r", linestyle="-", linewidth=1)
         plt.savefig("test.png", dpi=120)
-
     

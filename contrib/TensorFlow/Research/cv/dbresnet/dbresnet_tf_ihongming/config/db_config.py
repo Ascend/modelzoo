@@ -31,8 +31,8 @@ import easydict
 edict = easydict.EasyDict
 
 cfg = edict()
-cfg.root = './logs_adam_paperlr'
-cfg.PLATFORM = 'GPU'
+cfg.root = './logs'
+cfg.PLATFORM = 'NPU'
 
 cfg.TRAIN = edict()
 cfg.TRAIN.FLAG = True
@@ -40,8 +40,8 @@ cfg.TRAIN.FLAG = True
 # 训练
 cfg.TRAIN.VIS_GPU = '0'
 cfg.TRAIN.BATCH_SIZE = 8
-cfg.TRAIN.MAX_STEPS = 240000
-cfg.TRAIN.LEARNING_RATE = 0.0007
+cfg.TRAIN.MAX_STEPS = 187200
+cfg.TRAIN.LEARNING_RATE = 0.007
 cfg.TRAIN.LOSS_ALPHA = 1.0
 cfg.TRAIN.LOSS_BETA = 10.0
 
@@ -66,18 +66,19 @@ cfg.LR = 'paper_decay'
 cfg.ADAM_DECAY_STEP = 10000
 cfg.ADAM_DECAY_RATE = 0.9
 
-cfg.TRAIN.OPT = 'adam'
+cfg.TRAIN.OPT = 'sgd'
 cfg.TRAIN.MOVING_AVERAGE_DECAY = 0.9
+cfg.lr= 'exponential_decay'
 
 cfg.TRAIN.RESTORE = None
-cfg.TRAIN.RESTORE_CKPT_PATH = os.path.join('./logs_adam_mask', 'ckpt')
-cfg.TRAIN.model_checkpoint_path='./logs_adam_mask/ckpt/DB_resnet_v1_50_sgd_model.ckpt-123000'
+cfg.TRAIN.RESTORE_CKPT_PATH = None
+cfg.TRAIN.model_checkpoint_path= None
 cfg.TRAIN.PRETRAINED_MODEL_PATH = None
 
 cfg.EVAL = edict()
 cfg.EVAL.NUM_READERS = 1
-cfg.EVAL.IMG_DIR = './datasets/total_text/test_images'
-cfg.EVAL.LABEL_DIR = './datasets/total_text/test_gts'
+cfg.EVAL.IMG_DIR = '../datasets/total_text/test_images'
+cfg.EVAL.LABEL_DIR = '../datasets/total_text/test_gts'
 
 cfg.K = 50
 cfg.BACKBONE = 'resnet_v1_50'
