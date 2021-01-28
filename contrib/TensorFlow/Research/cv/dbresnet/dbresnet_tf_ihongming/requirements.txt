@@ -1,3 +1,4 @@
+imgaug
 anyconfig==0.9.11
 munch==2.5.0
 pyclipper==1.2.0

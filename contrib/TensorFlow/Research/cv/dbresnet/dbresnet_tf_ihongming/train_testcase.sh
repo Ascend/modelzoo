@@ -15,7 +15,7 @@ python3.7 train.py -m $max_steps \
     2>&1 | tee train.log
 
 end_time=`date +%s`
-key1="[GEOP]"
+key1="total loss"
 
 if [ `grep -c "$key1" "train.log"` -ne '0' ] ;then
    echo "Run testcase success!"
