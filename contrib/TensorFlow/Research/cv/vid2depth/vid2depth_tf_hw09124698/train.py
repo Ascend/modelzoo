@@ -46,15 +46,6 @@ from __future__ import print_function
 
 import math
 import os
-#os.environ['GLOBAL_LOG_LEVEL']='3'
-#os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-#os.environ['SLOG_PRINT_TO_STDOUT']='1'
-#os.environ['DUMP_GE_GRAPH']="1"
-#os.environ['PRINT_MODEL']="1"
-#os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
-#os.environ['ASCEND_GLOBAL_LOG_LEVEL']='1'
-#os.environ['ASCEND_GLOBAL_EVENT_ENABLE']='0'
-#os.environ['ASCEND_SLOG_PRINT_TO_STDOUT']='1'
 import random
 import time
 from absl import app
@@ -148,10 +139,8 @@ def train(train_model, pretrained_ckpt, checkpoint_dir, train_steps,
   custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
   custom_op.name =  "NpuOptimizer"
   custom_op.parameter_map["use_off_line"].b = True 
-  custom_op.parameter_map["enable_data_pre_proc"].b = False
   config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
   custom_op.parameter_map["mix_compile_mode"].b =  True
-  # custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
 
   with sv.managed_session(config=config) as sess:
     if pretrained_ckpt is not None:
