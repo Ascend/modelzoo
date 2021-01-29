@@ -9,6 +9,8 @@ DBNet是一个基于分割的场景文本检测模型，能够对弯曲文本具
 ## 3、转om模型
 obs链接：obs://dbresnet50/db_resnet.om
 
+百度网盘链接：https://pan.baidu.com/s/1lWKqM53EBf-SXeSd8R8ZNQ [提取码：rb57] 
+
 ATC转换命令：
 ```
 /home/HwHiAiUser/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="input_images:1,800,800,3" --check_report=/home/HwHiAiUser/modelzoo/db_resnet/device/network_analysis.report --input_format=NHWC --output="/home/HwHiAiUser/modelzoo/db_resnet/device/db_resnet" --soc_version=Ascend310 --framework=3 --model="/home/HwHiAiUser/db_resnet.pb" 
@@ -34,8 +36,12 @@ Inference average time without first time: 33.595283 ms
 ## 7、精度测试：
 
 ### 7.1 下载Totaltext数据集
-下载totaltext数据集，并放至./datasets中，以下obs目录中只包含测试集
+下载totaltext数据集，解压放至./datasets中，以下obs目录中只包含测试集
+
 obs链接：obs://dbresnet50/totaltext/
+
+百度网盘 :https://pan.baidu.com/s/1lcbr7kPSr_zzrKkEUBrMXQ [提取码：acwh]
+
 
 ### 7.2 执行推理和精度计算的python脚本 
 python3.7 evalution.py 2>&1 | tee eval.log
