@@ -36,9 +36,9 @@ Inference average time without first time: 33.595283 ms
 ## 7、精度测试：
 
 ### 7.1 下载Totaltext数据集
-下载totaltext数据集，解压放至./datasets中，以下obs目录中只包含测试集
+下载totaltext数据集，解压放至./datasets中
 
-obs链接：obs://dbresnet50/totaltext/
+obs链接：obs://dbresnet50/totaltext.zip
 
 百度网盘 :https://pan.baidu.com/s/1lcbr7kPSr_zzrKkEUBrMXQ [提取码：acwh]
 
