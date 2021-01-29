@@ -595,12 +595,12 @@ def get_pytorch_val_loader(data_path, batch_size, workers=5, _worker_init_fn=Non
     else:
         val_sampler = None
 
-        dataloader_fn = MultiEpochsDataLoader  # torch.utils.data.DataLoader
-        val_loader = dataloader_fn(
-            val_dataset,
-            sampler=val_sampler,
-            batch_size=batch_size, shuffle=(val_sampler is None),
-            num_workers=workers, worker_init_fn=_worker_init_fn, pin_memory=True, collate_fn=fast_collate)
+    dataloader_fn = MultiEpochsDataLoader  # torch.utils.data.DataLoader
+    val_loader = dataloader_fn(
+        val_dataset,
+        sampler=val_sampler,
+        batch_size=batch_size, shuffle=(val_sampler is None),
+        num_workers=workers, worker_init_fn=_worker_init_fn, pin_memory=True, collate_fn=fast_collate)
 
     return val_loader
 
