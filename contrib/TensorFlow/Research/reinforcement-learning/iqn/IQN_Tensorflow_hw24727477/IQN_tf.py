@@ -27,7 +27,6 @@
 # limitations under the License.
 
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 import gym
 import numpy as np
 from replay_memory import ReplayBuffer, PrioritizedReplayBuffer
@@ -113,6 +112,7 @@ PRED_PATH = os.path.join(args.train_url, 'iqn_pred_net_' + args.games)
 TARGET_PATH = os.path.join(args.train_url, 'iqn_target_net_' + args.games)
 RESULT_PATH = os.path.join(args.train_url, 'result')
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 config = tf.ConfigProto()
 custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
 custom_op.name = "NpuOptimizer"
