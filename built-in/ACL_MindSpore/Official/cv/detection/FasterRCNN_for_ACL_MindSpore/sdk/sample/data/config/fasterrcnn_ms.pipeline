@@ -26,7 +26,7 @@
         "mxpi_modelinfer0": {
             "props": {
                 "parentName": "mxpi_imageresize0",
-                "modelPath": "data/models/fasterrcnn/fasterrcnn_mindspore_1.1.om",
+                "modelPath": "data/models/fasterrcnn/fasterrcnn_mindspore_1.4.om",
                 "postProcessConfigPath": "data/models/fasterrcnn/faster_rcnn_coco2017.cfg",
                 "labelPath": "data/models/fasterrcnn/coco2017.names",
                 "postProcessLibPath": "../../../lib/libmsfasterrcnnpostprocessor.so"

@@ -29,41 +29,39 @@ const int DEFAULT_MAX_PER_IMG_MS_MASK = 128;
 const float DEFAULT_THR_BINARY_MASK = 0.5;
 const int DEFAULT_MASK_SIZE_MS_MASK = 28;
 const std::string PREDICT_RESULT_PATH = "predict_result.json";
-} // namespace
+}  // namespace
 
 namespace MxBase {
 
 class MSMaskRcnnPostProcessor : public MxBase::ObjectPostProcessorBase {
 public:
-    APP_ERROR Init(const std::string& configPath, const std::string& labelPath, MxBase::ModelDesc modelDesc) override;
-    APP_ERROR Process(
-        std::vector<std::shared_ptr<void>>& featLayerData,
-        std::vector<ObjDetectInfo>& objInfos,
-        const bool useMpPictureCrop,
-        MxBase::PostImageInfo postImageInfo) override;
+    APP_ERROR Init(const std::string &configPath, const std::string &labelPath, MxBase::ModelDesc modelDesc) override;
+    APP_ERROR Process(std::vector<std::shared_ptr<void>> &featLayerData,
+                      std::vector<ObjDetectInfo> &objInfos,
+                      const bool useMpPictureCrop,
+                      MxBase::PostImageInfo postImageInfo) override;
     APP_ERROR DeInit() override;
 
-    static void FreeMaskMemory(std::vector<ObjDetectInfo>& objInfos);
+    static void FreeMaskMemory(std::vector<ObjDetectInfo> &objInfos);
 
 private:
     APP_ERROR CheckMSModelCompatibility();
 
-    void ObjectDetectionOutput(
-        std::vector<std::shared_ptr<void>>& featLayerData,
-        std::vector<ObjDetectInfo>& objInfos,
-        ImageInfo& imgInfo) override;
+    void ObjectDetectionOutput(std::vector<std::shared_ptr<void>> &featLayerData,
+                               std::vector<ObjDetectInfo> &objInfos,
+                               ImageInfo &imgInfo) override;
 
-    void GetValidDetBoxes(
-        std::vector<std::shared_ptr<void>>& featLayerData,
-        std::vector<MxBase::DetectBox>& detBoxes,
-        ImageInfo& imgInfo) const;
+    void GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData,
+                          std::vector<MxBase::DetectBox> &detBoxes,
+                          ImageInfo &imgInfo) const;
 
-    void ConvertObjInfoFromDetectBox(
-        std::vector<MxBase::DetectBox>& detBoxes,
-        std::vector<ObjDetectInfo>& objInfos,
-        ImageInfo& imgInfo);
+    void ConvertObjInfoFromDetectBox(std::vector<MxBase::DetectBox> &detBoxes,
+                                     std::vector<ObjDetectInfo> &objInfos,
+                                     ImageInfo &imgInfo);
 
-    APP_ERROR MaskPostProcess(ObjDetectInfo& objInfo, void* maskPtr, ImageInfo& imgInfo);
+    APP_ERROR MaskPostProcess(ObjDetectInfo &objInfo, void *maskPtr, ImageInfo &imgInfo);
+
+    APP_ERROR ReadConfigParams();
 
 private:
     int classNum_ = DEFAULT_CLASS_NUM_MS_MASK;
@@ -76,5 +74,5 @@ private:
     bool saveResultToJson_ = true;
 };
 
-} // namespace MxBase
-#endif // INFER_MSMASKRCNNPOSTPROCESS_H
+}  // namespace MxBase
+#endif  // INFER_MSMASKRCNNPOSTPROCESS_H

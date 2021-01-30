@@ -30,13 +30,13 @@ export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME
 
 
 imagePath=$1
-pipLineCfg="data/config/maskrcnn_ms.pipeline"
+pipeLineCfg="data/config/maskrcnn_ms.pipeline"
 
 # remove last result
 rm -rf predict_result.json
 
 # run
-./main -i ${imagePath} -c ${pipLineCfg}
+./main -i ${imagePath} -c ${pipeLineCfg}
 
 # draw
-python3.7 draw_predict.py ${imagePath} ${pipLineCfg}
+python3.7 draw_predict.py --image=${imagePath} --pipeline=${pipeLineCfg}

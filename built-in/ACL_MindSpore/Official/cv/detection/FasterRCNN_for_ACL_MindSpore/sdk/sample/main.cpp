@@ -26,24 +26,25 @@
 
 namespace {
 const std::string STREAM_NAME = "im_fasterrcnn";
-} // namespace
+}  // namespace
 
 namespace {
-APP_ERROR ReadFile(const std::string& filePath, MxStream::MxstDataInput& dataBuffer) {
-    char c[PATH_MAX + 1] = {0x00};
+APP_ERROR ReadFile(const std::string &filePath, MxStream::MxstDataInput &dataBuffer)
+{
+    char c[PATH_MAX + 1] = { 0x00 };
     size_t count = filePath.copy(c, PATH_MAX + 1);
     if (count != filePath.length()) {
         LogError << "Failed to copy file path(" << c << ").";
         return APP_ERR_COMM_FAILURE;
     }
     // Get the absolute path of input file
-    char path[PATH_MAX + 1] = {0x00};
+    char path[PATH_MAX + 1] = { 0x00 };
     if ((strlen(c) > PATH_MAX) || (realpath(c, path) == nullptr)) {
         LogError << "Failed to get image, the image path is (" << filePath << ").";
         return APP_ERR_COMM_NO_EXIST;
     }
     // Open file with reading mode
-    FILE* fp = fopen(path, "rb");
+    FILE *fp = fopen(path, "rb");
     if (fp == nullptr) {
         LogError << "Failed to open file (" << path << ").";
         return APP_ERR_COMM_OPEN_FAIL;
@@ -58,6 +59,7 @@ APP_ERROR ReadFile(const std::string& filePath, MxStream::MxstDataInput& dataBuf
         dataBuffer.dataPtr = new (std::nothrow) uint32_t[fileSize];
         if (dataBuffer.dataPtr == nullptr) {
             LogError << "allocate memory with \"new uint32_t\" failed.";
+            fclose(fp);
             return APP_ERR_COMM_FAILURE;
         }
 
@@ -73,7 +75,8 @@ APP_ERROR ReadFile(const std::string& filePath, MxStream::MxstDataInput& dataBuf
     return APP_ERR_COMM_FAILURE;
 }
 
-std::string ReadPipelineConfig(const std::string& pipelineConfigPath) {
+std::string ReadPipelineConfig(const std::string &pipelineConfigPath)
+{
     std::ifstream file(pipelineConfigPath.c_str(), std::ifstream::binary);
     if (!file) {
         LogError << pipelineConfigPath << " file dose not exist.";
@@ -89,10 +92,11 @@ std::string ReadPipelineConfig(const std::string& pipelineConfigPath) {
     return pipelineConfig;
 }
 
-} // namespace
+}  // namespace
 
-APP_ERROR GetRealPath(std::string& srcPath, std::string& realPath) {
-    char path[PATH_MAX + 1] = {0};
+APP_ERROR GetRealPath(std::string &srcPath, std::string &realPath)
+{
+    char path[PATH_MAX + 1] = { 0 };
     if ((srcPath.size() > PATH_MAX) || (realpath(srcPath.c_str(), path) == nullptr)) {
         LogError << "Failed to get realpath: (" << srcPath << ").";
         return APP_ERR_COMM_NO_EXIST;
@@ -101,18 +105,18 @@ APP_ERROR GetRealPath(std::string& srcPath, std::string& realPath) {
     return APP_ERR_OK;
 }
 
-APP_ERROR GetOptions(int argc, char* argv[], std::string& imagePath, std::string& configPath) {
+APP_ERROR GetOptions(int argc, char *argv[], std::string &imagePath, std::string &configPath)
+{
     std::string srcImage;
     std::string srcConfig;
 
     int opt;
     int option_index = 0;
     std::string optString = "hi:c:f:";
-    static struct option long_options[] = {
-        {"help", no_argument, nullptr, 'h'},
-        {"image", required_argument, nullptr, 'i'},
-        {"config", required_argument, nullptr, 'c'},
-        {nullptr, 0, nullptr, 0}};
+    static struct option long_options[] = { { "help", no_argument, nullptr, 'h' },
+                                            { "image", required_argument, nullptr, 'i' },
+                                            { "config", required_argument, nullptr, 'c' },
+                                            { nullptr, 0, nullptr, 0 } };
 
     while ((opt = getopt_long(argc, argv, optString.c_str(), long_options, &option_index)) != -1) {
         switch (opt) {
@@ -129,7 +133,7 @@ APP_ERROR GetOptions(int argc, char* argv[], std::string& imagePath, std::string
                              "Args:\n"
                              "    -h --help         help message\n"
                              "    -i --image        The image used for inference.\n"
-                             "    -c --config       The path of the pipline file, "
+                             "    -c --config       The path of the pipeline file, "
                              "default is ../pipeline/Sample.pipeline.\n";
                 return APP_ERR_COMM_FAILURE;
         }
@@ -157,10 +161,11 @@ struct ObjectInfo {
     std::string label;
 };
 
-APP_ERROR DrawRectangle(std::string& imgPath, std::vector<ObjectInfo>& detects) {
+APP_ERROR DrawRectangle(std::string &imgPath, std::vector<ObjectInfo> &detects)
+{
     cv::Mat srcImg = cv::imread(imgPath);
     cv::RNG rng(5004);
-    for (auto& det : detects) {
+    for (auto &det : detects) {
         cv::Rect rect(det.x0, det.y0, det.x1 - det.x0, det.y1 - det.y0);
         cv::Scalar color(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(100, 255));
         cv::rectangle(srcImg, rect, color, 2);
@@ -171,7 +176,8 @@ APP_ERROR DrawRectangle(std::string& imgPath, std::vector<ObjectInfo>& detects) 
     return APP_ERR_OK;
 }
 
-APP_ERROR WriteResult(std::string& imgPath, std::stringstream& result) {
+APP_ERROR WriteResult(std::string &imgPath, std::stringstream &result)
+{
     namespace pt = boost::property_tree;
     pt::ptree root;
     pt::json_parser::read_json(result, root);
@@ -193,7 +199,7 @@ APP_ERROR WriteResult(std::string& imgPath, std::stringstream& result) {
             it->second.get<float>("y1"),
         };
         pt::ptree clsPt = it->second.get_child("classVec");
-        for (auto& subPt : clsPt) {
+        for (auto &subPt : clsPt) {
             detObj.classId = subPt.second.get<int>("classId");
             detObj.label = subPt.second.get<std::string>("className");
             detObj.confidence = subPt.second.get<float>("confidence");
@@ -212,7 +218,8 @@ APP_ERROR WriteResult(std::string& imgPath, std::stringstream& result) {
     return APP_ERR_OK;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[])
+{
     // read image file and build stream input
     MxStream::MxstDataInput dataBuffer;
     std::string imgPath, pipelinePath;
@@ -254,14 +261,14 @@ int main(int argc, char* argv[]) {
         return ret;
     }
     // get stream output
-    MxStream::MxstDataOutput* output = mxStreamManager.GetResult(streamName, inPluginId);
+    MxStream::MxstDataOutput *output = mxStreamManager.GetResult(streamName, inPluginId);
     if (output == nullptr) {
         LogError << "Failed to get pipeline output.";
         return ret;
     }
 
-    std::string((char*)output->dataPtr, output->dataSize);
-    std::stringstream result(std::string((char*)output->dataPtr, output->dataSize));
+    std::string((char *)output->dataPtr, output->dataSize);
+    std::stringstream result(std::string((char *)output->dataPtr, output->dataSize));
     // LogInfo << "Results:" << result.get();
 
     ret = WriteResult(imgPath, result);

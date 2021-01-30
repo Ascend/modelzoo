@@ -26,7 +26,7 @@
         "mxpi_modelinfer0": {
             "props": {
                 "parentName": "mxpi_imageresize0",
-                "modelPath": "data/models/maskrcnn/maskrcnn_mindspore_1.1.om",
+                "modelPath": "data/models/maskrcnn/maskrcnn_mindspore_1.3.om",
                 "postProcessConfigPath": "data/models/maskrcnn/mask_rcnn_coco2017.cfg",
                 "labelPath": "data/models/maskrcnn/coco2017.names",
                 "postProcessLibPath": "../../../lib/libmsmaskrcnnpostprocessor.so"

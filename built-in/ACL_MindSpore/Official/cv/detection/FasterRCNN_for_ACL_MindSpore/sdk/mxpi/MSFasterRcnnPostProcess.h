@@ -25,14 +25,14 @@ const int DEFAULT_CLASS_NUM_MS_FASTER = 80;
 const float DEFAULT_IOU_THRESH_MS_FASTER = 0.5;
 const int DEFAULT_MAX_PER_IMG_MS_FASTER = 128;
 const int DEFAULT_RPN_MAX_NUM_MS_FASTER = 1000;
-} // namespace
+}  // namespace
 
 namespace MxBase {
 
 class MSFasterRcnnPostProcessor : public MxBase::ObjectPostProcessorBase {
 public:
     APP_ERROR
-    Init(const std::string& configPath, const std::string& labelPath, MxBase::ModelDesc modelDesc) override;
+    Init(const std::string &configPath, const std::string &labelPath, MxBase::ModelDesc modelDesc) override;
 
     /*
      * @description: Do nothing temporarily.
@@ -50,29 +50,27 @@ public:
      * coordinates.
      * @return: ErrorCode.
      */
-    APP_ERROR Process(
-        std::vector<std::shared_ptr<void>>& featLayerData,
-        std::vector<ObjDetectInfo>& objInfos,
-        const bool useMpPictureCrop,
-        MxBase::PostImageInfo postImageInfo) override;
+    APP_ERROR Process(std::vector<std::shared_ptr<void>> &featLayerData,
+                      std::vector<ObjDetectInfo> &objInfos,
+                      const bool useMpPictureCrop,
+                      MxBase::PostImageInfo postImageInfo) override;
 
 private:
     APP_ERROR CheckMSModelCompatibility();
 
-    void ObjectDetectionOutput(
-        std::vector<std::shared_ptr<void>>& featLayerData,
-        std::vector<ObjDetectInfo>& objInfos,
-        ImageInfo& imgInfo) override;
+    void ObjectDetectionOutput(std::vector<std::shared_ptr<void>> &featLayerData,
+                               std::vector<ObjDetectInfo> &objInfos,
+                               ImageInfo &imgInfo) override;
 
-    void GetValidDetBoxes(
-        std::vector<std::shared_ptr<void>>& featLayerData,
-        std::vector<MxBase::DetectBox>& detBoxes,
-        ImageInfo& imgInfo) const;
+    void GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData,
+                          std::vector<MxBase::DetectBox> &detBoxes,
+                          ImageInfo &imgInfo) const;
 
-    void ConvertObjInfoFromDetectBox(
-        std::vector<MxBase::DetectBox>& detBoxes,
-        std::vector<ObjDetectInfo>& objInfos,
-        ImageInfo& imgInfo) const;
+    void ConvertObjInfoFromDetectBox(std::vector<MxBase::DetectBox> &detBoxes,
+                                     std::vector<ObjDetectInfo> &objInfos,
+                                     ImageInfo &imgInfo) const;
+
+    APP_ERROR ReadConfigParams();
 
 private:
     float scoreThresh_ = DEFAULT_SCORE_THRESH_MS_FASTER;
@@ -82,6 +80,6 @@ private:
     int rpnMaxNum_ = DEFAULT_RPN_MAX_NUM_MS_FASTER;
 };
 
-} // namespace MxBase
+}  // namespace MxBase
 
-#endif // INFER_MSFASTERRCNNPOSTPROCESS_H
+#endif  // INFER_MSFASTERRCNNPOSTPROCESS_H

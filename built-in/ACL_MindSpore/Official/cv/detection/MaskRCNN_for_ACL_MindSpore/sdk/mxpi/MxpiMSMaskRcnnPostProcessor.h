@@ -22,13 +22,12 @@
 
 class MxpiMSMaskRcnnPostProcessor : public MxPlugins::MxpiObjectPostProcessorBase {
 public:
-    APP_ERROR Init(const std::string& configPath, const std::string& labelPath, MxBase::ModelDesc modelDesc);
+    APP_ERROR Init(const std::string &configPath, const std::string &labelPath, MxBase::ModelDesc modelDesc);
     APP_ERROR DeInit() override;
-    APP_ERROR Process(
-        std::shared_ptr<void>& metaDataPtr,
-        MxBase::PostProcessorImageInfo postProcessorImageInfo,
-        std::vector<MxTools::MxpiMetaHeader>& headerVec,
-        std::vector<std::vector<MxBase::BaseTensor>>& tensors) override;
+    APP_ERROR Process(std::shared_ptr<void> &metaDataPtr,
+                      MxBase::PostProcessorImageInfo postProcessorImageInfo,
+                      std::vector<MxTools::MxpiMetaHeader> &headerVec,
+                      std::vector<std::vector<MxBase::BaseTensor>> &tensors) override;
 
 private:
     MxBase::MSMaskRcnnPostProcessor postProcessorInstance_;
@@ -38,4 +37,4 @@ extern "C" {
 std::shared_ptr<MxPlugins::MxpiModelPostProcessorBase> GetInstance();
 }
 
-#endif // MXPLUGINS_MASKRCNNPOSTPROCESSOR_H
+#endif  // MXPLUGINS_MASKRCNNPOSTPROCESSOR_H

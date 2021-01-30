@@ -21,10 +21,10 @@
  * @param labelPath config path and label path.
  * @return APP_ERROR error code.
  */
-APP_ERROR MxpiMSFasterRcnnPostProcessor::Init(
-    const std::string& configPath,
-    const std::string& labelPath,
-    MxBase::ModelDesc modelDesc) {
+APP_ERROR MxpiMSFasterRcnnPostProcessor::Init(const std::string &configPath,
+                                              const std::string &labelPath,
+                                              MxBase::ModelDesc modelDesc)
+{
     LogInfo << "Begin to initialize MxpiMSFasterRcnnPostProcessor.";
     APP_ERROR ret = postProcessorInstance_.Init(configPath, labelPath, modelDesc);
     if (ret != APP_ERR_OK) {
@@ -39,7 +39,8 @@ APP_ERROR MxpiMSFasterRcnnPostProcessor::Init(
  * @description: Do nothing temporarily.
  * @return: APP_ERROR error code.
  */
-APP_ERROR MxpiMSFasterRcnnPostProcessor::DeInit() {
+APP_ERROR MxpiMSFasterRcnnPostProcessor::DeInit()
+{
     LogInfo << "Begin to deinitialize MxpiMSFasterRcnnPostProcessor.";
     LogInfo << "End to deinitialize MxpiMSFasterRcnnPostProcessor.";
     return APP_ERR_OK;
@@ -54,11 +55,11 @@ APP_ERROR MxpiMSFasterRcnnPostProcessor::DeInit() {
  * @param: tensors Output tensors of modelInfer.
  * @return: APP_ERROR error code.
  */
-APP_ERROR MxpiMSFasterRcnnPostProcessor::Process(
-    std::shared_ptr<void>& metaDataPtr,
-    MxBase::PostProcessorImageInfo postProcessorImageInfo,
-    std::vector<MxTools::MxpiMetaHeader>& headerVec,
-    std::vector<std::vector<MxBase::BaseTensor>>& tensors) {
+APP_ERROR MxpiMSFasterRcnnPostProcessor::Process(std::shared_ptr<void> &metaDataPtr,
+                                                 MxBase::PostProcessorImageInfo postProcessorImageInfo,
+                                                 std::vector<MxTools::MxpiMetaHeader> &headerVec,
+                                                 std::vector<std::vector<MxBase::BaseTensor>> &tensors)
+{
     APP_ERROR ret = MxPlugins::MxpiObjectPostProcessorBase::Process(
         metaDataPtr, postProcessorImageInfo, headerVec, tensors, postProcessorInstance_);
     if (ret != APP_ERR_OK) {
@@ -68,7 +69,8 @@ APP_ERROR MxpiMSFasterRcnnPostProcessor::Process(
     return APP_ERR_OK;
 }
 
-std::shared_ptr<MxPlugins::MxpiModelPostProcessorBase> GetInstance() {
+std::shared_ptr<MxPlugins::MxpiModelPostProcessorBase> GetInstance()
+{
     LogInfo << "Begin to get MxpiMSFasterRcnnPostProcessor instance.";
     auto instance = std::make_shared<MxpiMSFasterRcnnPostProcessor>();
     LogInfo << "End to get MxpiMSFasterRcnnPostProcessor instance.";

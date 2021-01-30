@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
 import json
 import logging
 import os
-import sys
 
 import cv2
 import matplotlib as mpl
 import matplotlib.colors as mplc
 import matplotlib.figure as mplf
 import matplotlib.image as mpi
-import matplotlib.patches as mplp
 import numpy as np
 
 RESULT_TEMP_FILE = "predict_result.json"
@@ -261,7 +260,9 @@ def drew_label(img_path, label_map):
 
 
 if __name__ == "__main__":
-    inp_img_path = sys.argv[1]
-    pipeline_cfg = sys.argv[2]
-    g_label_map = get_label_map(pipeline_cfg)
-    drew_label(inp_img_path, g_label_map)
+    parser = argparse.ArgumentParser(description="Draw inference result on the image.")
+    parser.add_argument('--image', type=str, required=True, help="The origin image.")
+    parser.add_argument('--pipeline', type=str, required=True, help="The pipeline file.")
+    args_opt = parser.parse_args()
+    g_label_map = get_label_map(args_opt.pipeline)
+    drew_label(args_opt.image, g_label_map)
