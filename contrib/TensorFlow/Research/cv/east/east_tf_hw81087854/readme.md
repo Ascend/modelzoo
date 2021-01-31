@@ -1,80 +1,54 @@
 # EAST: An Efficient and Accurate Scene Text Detector
+原始模型参考[github链接](https://github.com/argman/EAST),迁移训练代码到NPU
 
-### Introduction
-This is a tensorflow re-implementation of [EAST: An Efficient and Accurate Scene Text Detector](https://arxiv.org/abs/1704.03155v2).
-The features are summarized blow:
-+ Online demo
-	+ http://east.zxytim.com/
-	+ Result example: http://east.zxytim.com/?r=48e5020a-7b7f-11e7-b776-f23c91e0703e
-	+ CAVEAT: There's only one cpu core on the demo server. Simultaneous access will degrade response time.
-+ Only **RBOX** part is implemented.
-+ A fast Locality-Aware NMS in C++ provided by the paper's author.
-+ The pre-trained model provided achieves **80.83** F1-score on ICDAR 2015
-	Incidental Scene Text Detection Challenge using only training images from ICDAR 2015 and 2013.
-  see [here](http://rrc.cvc.uab.es/?ch=4&com=evaluation&view=method_samples&task=1&m=29855&gtv=1) for the detailed results.
-+ Differences from original paper
-	+ Use ResNet-50 rather than PVANET
-	+ Use dice loss (optimize IoU of segmentation) rather than balanced cross entropy
-	+ Use linear learning rate decay rather than staged learning rate decay
-+ Speed on 720p (resolution of 1280x720) images:
-	+ Now
-		+ Graphic card: GTX 1080 Ti
-		+ Network fprop: **~50 ms**
-		+ NMS (C++): **~6ms**
-		+ Overall: **~16 fps**
-	+ Then
-		+ Graphic card: K40
-		+ Network fprop: ~150 ms
-		+ NMS (python): ~300ms
-		+ Overall: ~2 fps
+## Requirements
+- Tensorflow 1.15.0.
+- Ascend910
+- 其他依赖参考requirements.txt
+- 数据集，下面有百度网盘下载链接，提取码1234
 
-Thanks for the author's ([@zxytim](https://github.com/zxytim)) help!
-Please cite his [paper](https://arxiv.org/abs/1704.03155v2) if you find this useful.
-
-### Contents
-1. [Installation](#installation)
-2. [Download](#download)
-2. [Demo](#demo)
-3. [Test](#train)
-4. [Train](#test)
-5. [Examples](#examples)
-
-### Installation
-1. Any version of tensorflow version > 1.0 should be ok.
-
-### Download
-1. Models trained on ICDAR 2013 (training set) + ICDAR 2015 (training set): [BaiduYun link](http://pan.baidu.com/s/1jHWDrYQ) [GoogleDrive](https://drive.google.com/open?id=0B3APw5BZJ67ETHNPaU9xUkVoV0U)
-2. Resnet V1 50 provided by tensorflow slim: [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz)
-
-### GPU Train
-If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image
-and run
-
-```
-python multigpu_train.py \
---gpu_list=0  \
---input_size=512 \
---batch_size_per_gpu=14 \
---checkpoint_path=./checkpoint/ \
---text_scale=512 \
---training_data_path=./ocr/icdar2015/ \
---geometry=RBOX \
---learning_rate=0.0001 \
---num_readers=24 \
---pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
-```
-or excute the shell:
-```
-bash train_gpu.sh
+## 代码路径解释
+```shell
+.
+|-- LICENSE
+|-- __init__.py
+|-- checkpoint            ----存放训练ckpt的路径
+|-- data_util.py          ----训练数据处理，多进程
+|-- demo_images           ----样例图片
+|-- deploy.sh
+|-- eval.py               ----推理入口py
+|-- eval.sh               ----推理shell，计算icdar2015测试集的精度、召唤率、F1 Score
+|-- evaluation            ----精度计算相关的py，新增
+|-- icdar.py              ----icdar数据集处理，返回图片+
+|-- lanms                 ----nms组件
+|-- locality_aware_nms.py
+|-- model.py              ----模型定义
+|-- multigpu_train.py     ----GPU训练
+|-- nets
+|-- npu_train.py          ----NPU训练
+|-- ocr                   ----数据集目录
+|   |-- ch4_test_images   ----测试集
+|   `-- icdar2015         ----训练集
+|-- output                ----输出目录
+|-- pretrain_model        ----backbone
+|-- readme.md
+|-- requirements.txt
+|-- run_demo_server.py
+|-- static
+|-- templates
+|-- train_npu.sh          ----NPU训练入口shell
+|-- train_testcase.sh
+`-- training_samples
 ```
 
-If you have more than one gpu, you can pass gpu ids to gpu_list(like --gpu_list=0,1,2,3)
+## 准备数据和Backbone模型
+Icdar2015、Icdar2013可以去官网下载，或者直接从百度网盘里面获取，Backbone使用Resnet50_v1 [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz) 
 
-**Note: you should change the gt text file of icdar2015's filename to img_\*.txt instead of gt_img_\*.txt(or you can change the code in icdar.py), and some extra characters should be removed from the file.
-See the examples in training_samples/**
+存放目录参考上面的解释
 
-### NPU Train
-If you want to train on NPU , use this command:
+
+### NPU训练
+在NPU上面，启动训练，使用下面的命令:
 ```
 python npu_train.py \
 --input_size=512 \
@@ -87,13 +61,13 @@ python npu_train.py \
 --num_readers=24 \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
-or excute the shell:
+或者直接执行shell:
 ```
 bash train_npu.sh
 ```
 
-### Contrast of Total Loss on GPU and NPU
-With the same hyper-parameters of:
+### TotalLoss趋势比对（NPU vs GPU）
+数据集和超参相同时:
 ```
 --input_size=512 \
 --batch_size_per_gpu=14 \
@@ -105,24 +79,24 @@ With the same hyper-parameters of:
 --num_readers=24 \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
-After finished 100000steps and takes 9hours on NPU,Total loss of NPU is very close to GPU's :\
+10000个Step，NPU大概花费10小时，TotalLoss收敛趋势基本一致 :\
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0114/232451_0023bcbd_8432352.png "屏幕截图.png")
 
-the blue one is NPU's total loss and the red one is GPU's total loss.
+蓝色是NPU，红色是GPU.
 
-### Evaluation
-Requirements:
+### 精度评估
+首先确保安装依赖:
 ```
 apt-get install zip
 pip3.7 install Polygon3
 ```
-Please edit the "lanms/Makefile" for your own python env **python3.7-config**:
+ - 注意需根据实际python环境编辑"lanms/Makefile"文件， 示例**python3.7-config**:
 ```
 CXXFLAGS = -I include  -std=c++11 -O3 $(shell python3.7-config --cflags)
 LDFLAGS = $(shell python3.7-config --ldflags)
 ```
 
-When train was finished, you can start evaluation by run the shell script：
+等训练10000个step结束之后，可以使用eval.sh来评估模型的精度，使用的icdar2015测试集：
 ```
 bash eval.sh
 ```
@@ -147,19 +121,21 @@ cd ../
 python3.7 evaluation/script.py -g=./evaluation/gt.zip -s=${output_dir}/results.zip
 ```
 
-### Contrast of Precision and Recall of GPU and NPU:
-with the same train dataset(1000 images) and test dataset(500 images) of Icdar2015([BaiduYun link](https://pan.baidu.com/s/12qlSPPZl2a8rAIqeMAMyUA) 
-) and the same hyper-parameters:
+### 精度、召回率、F1 Score比对（NPU vs GPU）:
+相同的训练集 icdar2015 (1000 images) 和测试集(500 images)([BaiduYun link，提取码1234](https://pan.baidu.com/s/12qlSPPZl2a8rAIqeMAMyUA) 
+) 和相同的超参，NPU的精度优于GPU（看Hmean，即为F1 Score）:
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | GPU | 0.826     | 0.771  | 0.797 |
 | NPU | 0.834     | 0.767  | 0.799 |
 
-NPU Checkpoints: ([BaiduYun link](https://pan.baidu.com/s/19qRk67W3R4x_5wDbPwmWIA) )\
-GPU Checkpoints: ([BaiduYun link](https://pan.baidu.com/s/1k77-11IJUBpXC90FpIoaqA) )
+NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/19qRk67W3R4x_5wDbPwmWIA) )\
+GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1k77-11IJUBpXC90FpIoaqA) )
 
-### Train with Icdar2013+Icdar2015
-With the same hyper-parameters of:
+### 使用Icdar2013+Icdar2015训练
+需要注意到，原始的github实现中，使用的icdar2013+icdar2015数据集进行训练，所以尝试增加icdar2013训练集：
+
+相同的超参:
 ```
 --input_size=512 \
 --batch_size_per_gpu=14 \
@@ -171,28 +147,26 @@ With the same hyper-parameters of:
 --num_readers=24 \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
-After finished 100000steps and takes 12hours on NPU,Total loss of NPU is very close to GPU's :
+10000个Step，NPU大概花费12小时，TotalLoss收敛趋势基本一致 :
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0118/233452_f06f1fb1_8432352.png "屏幕截图.png")
 
-the blue one is NPU's total loss and the red one is GPU's total loss.
+蓝色是NPU，红色是GPU.
 
-Contrast of Precision and Recall:\
-with the same train dataset(icdar2013+icdar2015: 229+1000 images) and test dataset(icdar2015: 500 images) of Icdar2015([BaiduYun link](https://pan.baidu.com/s/1DsEqwvOagZRadPWAyZKhUw) 
-) and the same hyper-parameters:
+精度、召回率和F1 Score对比:\
+相同的数据集：训练集 （icdar2013+icdar2015: 229+1000 images) 和测试集(icdar2015: 500 images) ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1DsEqwvOagZRadPWAyZKhUw) 
+) 和相同的超参:
 
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | GPU | 0.842     | 0.766  | 0.803 |
 | NPU | 0.842     | 0.779  | 0.809 |
 
-NPU Checkpoints: ([BaiduYun link](https://pan.baidu.com/s/1UEBTfrC-cxpmIEII7H7Dqw) )\
-GPU Checkpoints: ([BaiduYun link](https://pan.baidu.com/s/16rZs6z3YqdzNZCTF-40UDA) )
+NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1UEBTfrC-cxpmIEII7H7Dqw) )\
+GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1_p0lHKWCWk0n0SjXMLkl6w) )
 
-### Test
-run
+### 图片测试
+使用eval.py可以测试你自己的图片
 ```
 python eval.py --test_data_path=/tmp/images/ --gpu_list=0 --checkpoint_path=/tmp/east_icdar2015_resnet_v1_50_rbox/ \
 --output_dir=/tmp/
 ```
-
-a text file will be then written to the output path.
