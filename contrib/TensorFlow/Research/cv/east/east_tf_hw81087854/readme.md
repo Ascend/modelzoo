@@ -79,7 +79,7 @@ bash train_npu.sh
 --num_readers=24 \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
-10000个Step，NPU大概花费10小时，TotalLoss收敛趋势基本一致 :\
+10w个Step，NPU大概花费10小时，TotalLoss收敛趋势基本一致 :\
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0114/232451_0023bcbd_8432352.png "屏幕截图.png")
 
 蓝色是NPU，红色是GPU.
@@ -135,7 +135,7 @@ GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1k77-1
 ### 使用Icdar2013+Icdar2015训练
 需要注意到，原始的github实现中，使用的icdar2013+icdar2015数据集进行训练，所以尝试增加icdar2013训练集：
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0131/214657_f59d66b0_8432352.png "屏幕截图.png")
-使用原作者提供预训练模型，精度评估，F1 Score为0.8076：
+原作者提供预训练模型，精度评估，F1 Score为0.8076：
 ```
 {"precision": 0.8464379947229551, "recall": 0.772267693789119, "hmean": 0.8076535750251763, "AP": 0}
 ```
@@ -152,7 +152,7 @@ GPU、NPU使用相同的超参:
 --num_readers=24 \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
-10000个Step，NPU大概花费12小时，TotalLoss收敛趋势基本一致 :
+从头训练，10w个Step，NPU大概花费12小时，TotalLoss收敛趋势基本一致 :
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0118/233452_f06f1fb1_8432352.png "屏幕截图.png")
 
 蓝色是NPU，红色是GPU.
