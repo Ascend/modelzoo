@@ -183,7 +183,7 @@ with the same train dataset(icdar2013+icdar2015: 229+1000 images) and test datas
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | GPU | 0.842     | 0.766  | 0.803 |
-| NPU | 0.849     | 0.766  | 0.805 |
+| NPU | 0.842     | 0.779  | 0.809 |
 
 NPU Checkpoints: ([BaiduYun link](https://pan.baidu.com/s/1UEBTfrC-cxpmIEII7H7Dqw) )\
 GPU Checkpoints: ([BaiduYun link](https://pan.baidu.com/s/16rZs6z3YqdzNZCTF-40UDA) )
