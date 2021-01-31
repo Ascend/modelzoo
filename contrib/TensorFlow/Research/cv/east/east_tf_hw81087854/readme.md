@@ -134,8 +134,13 @@ GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1k77-1
 
 ### 使用Icdar2013+Icdar2015训练
 需要注意到，原始的github实现中，使用的icdar2013+icdar2015数据集进行训练，所以尝试增加icdar2013训练集：
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0131/214657_f59d66b0_8432352.png "屏幕截图.png")
+使用原作者提供预训练模型，精度评估，F1 Score为0.8076：
+```
+{"precision": 0.8464379947229551, "recall": 0.772267693789119, "hmean": 0.8076535750251763, "AP": 0}
+```
 
-相同的超参:
+GPU、NPU使用相同的超参:
 ```
 --input_size=512 \
 --batch_size_per_gpu=14 \
