@@ -19,7 +19,7 @@
 |-- eval.py               ----推理入口py
 |-- eval.sh               ----推理shell，计算icdar2015测试集的精度、召唤率、F1 Score
 |-- evaluation            ----精度计算相关的py，新增
-|-- icdar.py              ----icdar数据集处理，返回图片+
+|-- icdar.py              ----icdar数据集处理，返回图片+bbox
 |-- lanms                 ----nms组件
 |-- locality_aware_nms.py
 |-- model.py              ----模型定义
@@ -96,7 +96,7 @@ CXXFLAGS = -I include  -std=c++11 -O3 $(shell python3.7-config --cflags)
 LDFLAGS = $(shell python3.7-config --ldflags)
 ```
 
-等训练10000个step结束之后，可以使用eval.sh来评估模型的精度，使用的icdar2015测试集：
+等训练10w个step结束之后，可以使用eval.sh来评估模型的精度，使用的icdar2015测试集：
 ```
 bash eval.sh
 ```
