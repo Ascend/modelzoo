@@ -1,4 +1,7 @@
-python npu_train.py \
+export TF_CPP_MIN_LOG_LEVEL=2
+export RANK_SIZE=1
+
+python3.7 npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
 --checkpoint_path=./checkpoint/ \
