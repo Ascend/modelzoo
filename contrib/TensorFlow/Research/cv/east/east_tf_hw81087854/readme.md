@@ -158,7 +158,7 @@ GPU、NPU使用相同的超参:
 
 蓝色是NPU，红色是GPU.
 
-#### 精度、召回率和F1 Score对比:\
+#### 精度、召回率和F1 Score对比:
 相同的数据集：训练集 （icdar2013+icdar2015: 229+1000 images) 和测试集(icdar2015: 500 images) ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1DsEqwvOagZRadPWAyZKhUw) 
 ) 和相同的超参:
 
