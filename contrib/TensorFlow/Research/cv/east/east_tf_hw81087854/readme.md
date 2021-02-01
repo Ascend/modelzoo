@@ -17,7 +17,7 @@
 |-- demo_images           ----样例图片
 |-- deploy.sh
 |-- eval.py               ----推理入口py
-|-- eval.sh               ----推理shell，计算icdar2015测试集的精度、召唤率、F1 Score
+|-- eval.sh               ----推理shell，计算icdar2015测试集的精度、召回率、F1 Score
 |-- evaluation            ----精度计算相关的py，新增
 |-- icdar.py              ----icdar数据集处理，返回图片+bbox
 |-- lanms                 ----nms组件
@@ -50,6 +50,7 @@ Icdar2015、Icdar2013可以去官网下载，或者直接从百度网盘里面�
 ### NPU训练
 在NPU上面，启动训练，使用下面的命令:
 ```
+export RANK_SIZE=1
 python npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
