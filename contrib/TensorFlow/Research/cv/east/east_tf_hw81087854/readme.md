@@ -51,7 +51,7 @@ Icdar2015、Icdar2013可以去官网下载，或者直接从百度网盘里面�
 在NPU上面，启动训练，使用下面的命令:
 ```
 export RANK_SIZE=1
-python npu_train.py \
+python3.7 npu_train.py \
 --input_size=512 \
 --batch_size_per_gpu=14 \
 --checkpoint_path=./checkpoint/ \
@@ -158,7 +158,7 @@ GPU、NPU使用相同的超参:
 
 蓝色是NPU，红色是GPU.
 
-精度、召回率和F1 Score对比:\
+#### 精度、召回率和F1 Score对比:\
 相同的数据集：训练集 （icdar2013+icdar2015: 229+1000 images) 和测试集(icdar2015: 500 images) ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1DsEqwvOagZRadPWAyZKhUw) 
 ) 和相同的超参:
 
