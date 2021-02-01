@@ -50,7 +50,7 @@ def dbnet(image_input, input_size=640, k=50, is_training=True, scope="resnet_v1_
         in3 = tf.nn.conv2d(C3, filter=filter_in3, strides=[1, 1, 1, 1], padding='SAME', name='in3')
 
         filter_in4 = tf.get_variable("filter_in4", [1, 1, 512, 256],
-                                     initializer=tf.initializers.he_normal())
+                                     initializer=tf.truncated_normal_initializer(stddev=0.1))
         in4 = tf.nn.conv2d(C4, filter=filter_in4, strides=[1, 1, 1, 1], padding='SAME', name='in4')
 
         filter_in5 = tf.get_variable("filter_in5", [1, 1, 2048, 256],

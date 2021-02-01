@@ -43,10 +43,8 @@ from networks.losses import db_loss, db_acc
 from networks.learning_rate import learning_rate_with_decay, learning_rate_with_exponential_decay
 
 warnings.filterwarnings("ignore")
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
-import npu_bridge
+import npu_bridge 
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
 def make_dir(dir):
@@ -117,17 +115,14 @@ def main():
 
     global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
 
-    # learning_rate = tf.train.exponential_decay(cfg.TRAIN.LEARNING_RATE, global_step, decay_steps=10000, decay_rate=0.9,staircase=True)
-
     if cfg.LR == 'exponential_decay':
         learning_rate_fn = learning_rate_with_exponential_decay()
     elif cfg.LR == 'paper_decay':
-        learning_rate_fn = learning_rate_with_decay(start_lr=0.0007, power=0.9)
+        learning_rate_fn = learning_rate_with_decay(start_lr=0.0035, power=0.9)
     else:
         assert 0, 'error Learning_rate'
 
     learning_rate = learning_rate_fn(global_step)
-
     tf.summary.scalar('learning rate', learning_rate)
 
     if cfg.TRAIN.OPT == 'adam':
@@ -156,6 +151,8 @@ def main():
             grads = opt.compute_gradients(total_loss)
             apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
         elif cfg.PLATFORM == "NPU":
+            # grads = opt.compute_gradients(total_loss)
+            # apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
             loss_scaling = 2 ** 12
             grads = opt.compute_gradients(total_loss * loss_scaling)
             grads = [(grad / loss_scaling, var) for grad, var in grads]
@@ -165,23 +162,17 @@ def main():
             assert 0, 'Wrong Platform!'
 
     summary_op = tf.summary.merge_all()
-
     variable_averages = tf.train.ExponentialMovingAverage(cfg.TRAIN.MOVING_AVERAGE_DECAY, global_step)
     variables_averages_op = variable_averages.apply(tf.trainable_variables())
-
     with tf.control_dependencies([variables_averages_op, apply_gradient_op, batch_norm_updates_op]):
         train_op = tf.no_op(name='train_op')
 
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=cfg.TRAIN.SAVE_MAX)
-
     train_logs_dir = os.path.join(cfg.TRAIN.TRAIN_LOGS, 'train')
-
     make_dir(train_logs_dir)
-
     train_summary_writer = tf.summary.FileWriter(train_logs_dir, tf.get_default_graph())
-
     init = tf.global_variables_initializer()
-
+    
     if cfg.PLATFORM == "GPU":
         config = tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.allow_growth = True
@@ -198,12 +189,11 @@ def main():
             if cfg.TRAIN.RESTORE:
                 train_logger.info('continue training from previous checkpoint')
                 ckpt = tf.train.get_checkpoint_state(cfg.TRAIN.RESTORE_CKPT_PATH)
-                train_logger.info('restore model path:', ckpt.model_checkpoint_path)
                 saver.restore(sess, ckpt.model_checkpoint_path)
                 train_logger.info("done")
             elif cfg.TRAIN.PRETRAINED_MODEL_PATH is not None:
                 sess.run(init)
-                train_logger.info('load pretrain model:{}', str(cfg.TRAIN.RESTORE_CKPT_PATH))
+                train_logger.info('loading pretrain model')
                 variable_restore_op = slim.assign_from_checkpoint_fn(cfg.TRAIN.PRETRAINED_MODEL_PATH,
                                                                      slim.get_trainable_variables(),
                                                                      ignore_missing_vars=True)
@@ -259,13 +249,15 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Change db_config file')
 
-    parser.add_argument('--max_steps', '-m', default=240000, type=int, help='max_steps integer')
+    parser.add_argument('--max_steps', '-m', default=188250, type=int, help='max_steps integer')
     parser.add_argument('--save_steps', '-s', default=3000, type=int, help='save_steps integer')
+    parser.add_argument('--learning_rate', '-lr', default=0.0035, type=float, help='learning rate')
     parser.add_argument('--platform', '-p', default="NPU", type=str, help='NPU or GPU')
 
     args = parser.parse_args()
     cfg.TRAIN.MAX_STEPS = args.max_steps
     cfg.TRAIN.SAVE_CHECKPOINT_STEPS = args.save_steps
     cfg.PLATFORM = args.platform
+    cfg.TRAIN.LEARNING_RATE = args.learning_rate
 
     main()

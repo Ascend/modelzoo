@@ -48,9 +48,6 @@ def balanced_crossentropy_loss(pred, gt, mask, topk_mask, negative_ratio=3.):
 
 
 def dice_loss(pred, gt, mask, weights):
-    # pred = pred[..., 0]
-    # weights = (weights - tf.reduce_min(weights)) / (tf.reduce_max(weights) - tf.reduce_min(weights) + 1e-6) + 1.
-    # mask = mask * weights
     intersection = tf.reduce_sum(pred * gt * mask)
     union = tf.reduce_sum(pred * mask) + tf.reduce_sum(gt * mask) + 1e-6
     loss = 1 - 2.0 * intersection / union
@@ -58,7 +55,6 @@ def dice_loss(pred, gt, mask, weights):
 
 
 def l1_loss(pred, gt, mask):
-    # pred = pred[..., 0]
     mask_sum = tf.reduce_sum(mask)
     loss = K.backend.switch(mask_sum > 0, tf.reduce_sum(tf.abs(pred - gt) * mask) / (mask_sum + 1e-6), tf.constant(0.))
     return loss
