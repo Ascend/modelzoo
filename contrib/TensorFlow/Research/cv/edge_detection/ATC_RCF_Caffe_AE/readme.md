@@ -59,6 +59,6 @@ Batch: 1, shape: 3,512,512 不带AIPP，平均推理性能37.429556 ms
 ## 精度测试
 
 待完善
-
 推理效果
-
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0202/105056_596c8382_8113712.jpeg "ori.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0202/105106_6052b95e_8113712.jpeg "out_ori.jpg")
