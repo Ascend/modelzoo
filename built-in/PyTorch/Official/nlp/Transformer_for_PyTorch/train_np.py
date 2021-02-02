@@ -216,7 +216,7 @@ def train(args, trainer, datasets, epoch_itr):
     batch_time = AverageMeter('Time', ':6.3f')
     sentence_s = AverageMeter('Sentence/s', ':6.3f')
     losses = AverageMeter('Loss', ':.4f')
-    progress = ProgressMeter(int(num_batches/args.distributed_world_size),
+    progress = ProgressMeter(int(num_batches/args.distributed_world_size/update_freq),
                              [batch_time, sentence_s,losses],
                              prefix = "Epoch: [{}]".format(epoch_itr.epoch))
 
@@ -238,14 +238,14 @@ def train(args, trainer, datasets, epoch_itr):
             if loss != None:
                 losses.update(loss)
 
-        if i >= 2:
+        if i >= 4:
             t = time.time()
             batch_time.update((t - end)/update_freq)
             sentence_s.update(args.max_sentences/(t-end)*args.distributed_world_size)
             end = time.time()
-        if i < 2:
+        if i < 4:
             end = time.time()
-        if i >= 2:
+        if i >= 4:
             if args.distributed_world_size > 1 and args.distributed_rank == 0:
                 progress.display(int((i+1)/update_freq))
 

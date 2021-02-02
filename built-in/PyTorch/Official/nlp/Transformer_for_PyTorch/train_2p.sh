@@ -1,6 +1,6 @@
 #! /bin/bash
 DATA_DIR=./data/dataset/wmt14_en_de_joined_dict/
-MODELDIR="./checkpoints_8p/"
+MODELDIR="./checkpoints_2p/"
 mkdir -p "$MODELDIR"
 LOGFILE="$MODELDIR/log"
 STAT_FILE="log.txt"
@@ -37,4 +37,6 @@ python3 train_np.py $DATA_DIR \
   --stat-file $STAT_FILE\
   --log-interval 1\
   --amp\
-  --amp-level O2
+  --amp-level O2\
+  --distributed-world-size 2\
+  --update-freq 4
