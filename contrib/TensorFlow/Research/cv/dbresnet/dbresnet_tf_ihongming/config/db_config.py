@@ -32,7 +32,7 @@ edict = easydict.EasyDict
 
 cfg = edict()
 cfg.root = './logs'
-cfg.PLATFORM = 'GPU'
+cfg.PLATFORM = 'NPU'
 
 cfg.TRAIN = edict()
 cfg.TRAIN.FLAG = True
@@ -44,8 +44,8 @@ cfg.TRAIN.LEARNING_RATE = 0.007
 
 # 存储目录
 cfg.TRAIN.SAVE_CHECKPOINT_STEPS = 3000
-cfg.TRAIN.SAVE_SUMMARY_STEPS = 20
-cfg.TRAIN.SAVE_MAX = 1000
+cfg.TRAIN.SAVE_SUMMARY_STEPS = 200
+cfg.TRAIN.SAVE_MAX = 100
 cfg.TRAIN.DATA_DIR = './datasets/total_text'
 cfg.TRAIN.TRAIN_LOGS = os.path.join(cfg.root, 'tf_logs')
 cfg.TRAIN.CHECKPOINTS_OUTPUT_DIR = os.path.join(cfg.root, 'ckpt')
