@@ -18,8 +18,9 @@ edict = easydict.EasyDict
 
 cfg = edict()
 cfg.FILTER_MIN_AREA = 1e-4
+cfg.EPSILON_RATIO = 0.001
 
 cfg.EVAL = edict()
 cfg.EVAL.NUM_READERS = 1
-cfg.EVAL.IMG_DIR = '../datasets/total_text/test_images'
-cfg.EVAL.LABEL_DIR = '../datasets/total_text/test_gts'
+cfg.EVAL.IMG_DIR = './datasets/total_text/test_images'
+cfg.EVAL.LABEL_DIR = './datasets/total_text/test_gts'

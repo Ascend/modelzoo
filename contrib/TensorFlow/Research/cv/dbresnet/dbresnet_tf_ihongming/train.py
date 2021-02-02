@@ -249,9 +249,9 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Change db_config file')
 
-    parser.add_argument('--max_steps', '-m', default=188250, type=int, help='max_steps integer')
+    parser.add_argument('--max_steps', '-m', default=187200, type=int, help='max_steps integer')
     parser.add_argument('--save_steps', '-s', default=3000, type=int, help='save_steps integer')
-    parser.add_argument('--learning_rate', '-lr', default=0.0035, type=float, help='learning rate')
+    parser.add_argument('--learning_rate', '-lr', default=0.007, type=float, help='learning rate')
     parser.add_argument('--platform', '-p', default="NPU", type=str, help='NPU or GPU')
 
     args = parser.parse_args()
