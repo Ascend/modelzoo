@@ -53,7 +53,7 @@ python3 -u train_1p.py \
 
 ```
 
-python3 train_8p.py $DATA_DIR \
+python3 train_np.py $DATA_DIR \
   --arch transformer_wmt_en_de \
   --share-all-embeddings \
   --optimizer adam \
