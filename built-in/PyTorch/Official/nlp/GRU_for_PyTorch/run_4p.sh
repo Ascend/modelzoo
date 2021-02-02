@@ -5,7 +5,7 @@ source npu_set_env.sh
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
-train_log_dir=${currentDir}/result/training_8p_job_${currtime}
+train_log_dir=${currentDir}/result/training_4p_job_${currtime}
 mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
@@ -20,11 +20,11 @@ python3.7 ${currentDir}/gru_8p.py \
         --dist-backend 'hccl' \
         --multiprocessing-distributed \
         --world-size 1 \
-        --batch-size 4096 \
+        --batch-size 2048 \
         --epoch 10 \
         --rank 0 \
-        --device-list '0,1,2,3,4,5,6,7' \
+        --device-list '0,1,2,3' \
         --amp \
         --bleu-npu 0 \
-        --ckptpath ./seq2seq-gru-model.pth.tar > ./gru_8p.log 2>&1 &
+        --ckptpath ./seq2seq-gru-model.pth.tar   > ./gru_4p.log 2>&1 &
 

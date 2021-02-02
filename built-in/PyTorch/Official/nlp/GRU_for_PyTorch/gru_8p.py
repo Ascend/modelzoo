@@ -79,6 +79,7 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
                          'multi node data parallel training')
 parser.add_argument('--npu', default=0, type=int,
                     help='NPU id to use.')
+
 parser.add_argument('--addr', default='10.136.181.115', type=str,
                     help='master addr')
 parser.add_argument('--device-list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
@@ -89,6 +90,10 @@ parser.add_argument('--loss-scale', default=32., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+parser.add_argument('--ckptpath', default='./seq2seq-gru-model.pth.tar', type=str,
+                    help='loss scale using in amp, default -1 means dynamic')
+parser.add_argument('--bleu-npu', default=0, type=int,
+                    help='NPU id to use.')
 
 
 def main():
@@ -127,6 +132,60 @@ def main():
         # Simply call main_worker function
         main_worker(args.npu, ngpus_per_node, args)
 
+    bleu_score_start(args)
+
+
+def bleu_score_start(args):
+    CALCULATE_DEVICE = "npu:{}".format(args.bleu_npu)
+    torch.npu.set_device(CALCULATE_DEVICE)
+    # parpare dataset
+    SRC = Field(tokenize=tokenize_de,
+                init_token='<sos>',
+                eos_token='<eos>',
+                lower=True, fix_length=46)
+
+    TRG = Field(tokenize=tokenize_en,
+                init_token='<sos>',
+                eos_token='<eos>',
+                lower=True, fix_length=46)
+
+    train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'),
+                                                        fields=(SRC, TRG))
+    SRC.build_vocab(train_data, min_freq=2)
+    TRG.build_vocab(train_data, min_freq=2)
+    INPUT_DIM = len(SRC.vocab)
+    OUTPUT_DIM = len(TRG.vocab)
+
+    device = CALCULATE_DEVICE
+
+    train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
+        (train_data, valid_data, test_data),
+        batch_size=args.batch_size,
+        device=device)
+
+    seed_init = gen_seeds(32 * 1024 * 12).float().to(CALCULATE_DEVICE)
+
+    enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, ENC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
+    dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, DEC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
+
+    model = Seq2Seq(enc, dec, device).to(CALCULATE_DEVICE)
+    model.apply(init_weights)
+
+    print(f'The model has {count_parameters(model):,} trainable parameters')
+    optimizer = optim.Adam(model.parameters())
+    if args.amp:
+        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
+    TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
+    criterion = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX).to(CALCULATE_DEVICE)
+    best_valid_loss = float('inf')
+
+    # load model
+    checkpoint = torch.load(args.ckptpath, map_location='cpu')
+    model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()})
+
+    bleu_score = calculate_bleu(test_data, SRC, TRG, model, device)
+    print(f'BLEU score = {bleu_score * 100:.4f}')
+
 
 def main_worker(npu, ngpus_per_node, args):
     args.npu = args.process_device_map[npu]
@@ -134,9 +193,6 @@ def main_worker(npu, ngpus_per_node, args):
 
     CALCULATE_DEVICE = "npu:{}".format(args.npu)
     torch.npu.set_device(CALCULATE_DEVICE)
-
-    os.environ['KERNEL_NAME_ID'] = str(args.npu)
-    print("--npu id:", args.npu, "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     args.batch_size = int(args.batch_size / ngpus_per_node)
     args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
@@ -204,12 +260,12 @@ def main_worker(npu, ngpus_per_node, args):
 
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            torch.save(model.state_dict(), 'seq2seq-gru-model.pth.tar')
-
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % ngpus_per_node == 0):
+            if valid_loss < best_valid_loss:
+                best_valid_loss = valid_loss
+                torch.save(model.state_dict(), 'seq2seq-gru-model.pth.tar')
+
             print(f'Epoch：{epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s')
             print(f'\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}')
             print(f'\t  Val Loss: {valid_loss:.3f} |   Val PPL: {math.exp(valid_loss):7.3f}')
@@ -443,7 +499,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[npu id:", os.environ['KERNEL_NAME_ID'], "]", '\t'.join(entries))
+        print("[npu id:", '0', "]", '\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
