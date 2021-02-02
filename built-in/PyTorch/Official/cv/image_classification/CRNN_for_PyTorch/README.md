@@ -14,6 +14,12 @@ Host侧训练步骤
 3.DEVICE_ID是用哪张卡，END_EPOCH是训练多少epoch，BATCH_SIZE_PER_GPU是batchsize<br>
 4.执行bash run_1p.sh开启单p训练<br>
 5.把8p_config.yaml里的ADDR修改成训练服务器ip，执行bash run_8p.sh开启8p训练<br>
+6.新增anycard脚本支持1p，2p，4p和8p训练，需要修改对应脚本如下：<br>
+(1)run_anycard.sh修改for训练里的seq序列<br>  1p:0 0   2p:0 1   4p:0 3   8p:0 7 <br>
+(2)LMDB_anycard_config.yaml修改TRAIN.BATCH_SIZE_PER_GPU和DISTRIBUTED.DEVICE_LIST参数<br>
+TRAIN.BATCH_SIZE_PER_GPU  1p:2560  2p:5120  4p:10240  8p:20480 <br>
+DISTRIBUTED.DEVICE_LIST  1p:0/1/2/3/4/5/6/7   2p:0,1/2,3/4,5/6,7  4p:0,1,2,3/4,5,6,7  8p:0,1,2,3,4,5,6,7
+
 
 
 Docker侧训练步骤

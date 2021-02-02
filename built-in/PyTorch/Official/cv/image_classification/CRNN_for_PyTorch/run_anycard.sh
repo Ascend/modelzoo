@@ -15,7 +15,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-for i in $(seq 0 7)
+for i in $(seq 0 3)
 do
-python3.7 ${currentDir}/main_8p.py --cfg ${currentDir}/LMDB_8p_config.yaml --npu ${i} > ./crnn_8p_${i}_npu.log 2>&1 &
+python3.7 ${currentDir}/main_anycard.py --cfg ${currentDir}/LMDB_anycard_config.yaml --npu ${i} > ./crnn_8p_${i}_npu.log 2>&1 &
 done

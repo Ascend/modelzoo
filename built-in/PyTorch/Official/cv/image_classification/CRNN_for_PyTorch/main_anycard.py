@@ -40,13 +40,14 @@ def main():
     if config.DISTRIBUTED.DIST_URL == "env://" and config.DISTRIBUTED.WORLD_SIZE == -1:
         config.DISTRIBUTED.WORLD_SIZE = int(os.environ["WORLD_SIZE"])
 
-    # process_device_map = utils.device_id_to_process_device_map(config.DISTRIBUTED.DEVICE_LIST)
+    process_device_map = utils.device_id_to_process_device_map(config.DISTRIBUTED.DEVICE_LIST)
 
-    npus_per_node = 8
-    # if config.DISTRIBUTED.DEVICE_LIST !='':
-    #     npus_per_node = len(process_device_map)
-    # else:
-    #     npus_per_node = torch.npu.device_count()
+    if config.DISTRIBUTED.DEVICE_LIST != '':
+        npus_per_node = len(process_device_map)
+    else:
+        npus_per_node = torch.npu.device_count()
+
+    card_id = process_device_map[int(npu)]
 
     if config.DISTRIBUTED.MULTIPROCESSING_DISTRIBUTED:
         # Since we have ngpus_per_node processes per node, the total world_size needs to be adjusted accordingly
@@ -55,7 +56,7 @@ def main():
 
 
     if npu is not None:
-        print("[npu id:", npu, "]", "Use NPU: {} for training".format(npu))
+        print("[npu id:", card_id, "]", "Use NPU: {} for training".format(card_id))
 
     if config.DISTRIBUTED.DIST_URL == "env://" and config.DISTRIBUTED.RANK == -1:
         config.DISTRIBUTED.RANK = int(os.environ["RANK"])
@@ -79,7 +80,7 @@ def main():
     model = crnn.get_crnn(config)
 
     # get device
-    device = torch.device("npu:{}".format(npu))
+    device = torch.device("npu:{}".format(card_id))
     torch.npu.set_device(device)
     model = model.to(device)
 
@@ -142,20 +143,20 @@ def main():
     )
 
     # Wrap the model, data parallel
-    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[npu], broadcast_buffers=False)
+    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[card_id], broadcast_buffers=False)
 
     converter = utils.strLabelConverter(config.DATASET.ALPHABETS)
-    if distributed and npu == 0:
+    if distributed and config.DISTRIBUTED.RANK % npus_per_node == 0:
         checkpoint_dir, log_dir = utils.create_output_folder(config)
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
         train(config, train_loader, train_dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node,
-              npu)
+              card_id)
         acc = validate(config, val_loader, val_dataset, converter, model, criterion, device, epoch)
         is_best = acc > best_acc
         best_acc = max(acc, best_acc)
         print("is best:", is_best)
         print("best acc is:", best_acc)
-        if distributed and npu == 0:
+        if distributed and config.DISTRIBUTED.RANK % npus_per_node == 0:
             if config.TRAIN.AMP:
                 torch.save(
                     {
@@ -177,7 +178,7 @@ def main():
                 )
 
 
-def train(config, train_loader, dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node, npu):
+def train(config, train_loader, dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node, card_id):
     utils.seed_everything()
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
@@ -219,7 +220,7 @@ def train(config, train_loader, dataset, converter, model, criterion, optimizer,
                 data_time=data_time, fps=fps, loss=losses)
             print(msg)
         end = time.time()
-    print("[npu id:", npu, "]",
+    print("[npu id:", card_id, "]",
           ' * FPS@all {:.3f}'.format(npus_per_node * config.TRAIN.BATCH_SIZE_PER_GPU * 1000 / batch_time.avg))
 
 
