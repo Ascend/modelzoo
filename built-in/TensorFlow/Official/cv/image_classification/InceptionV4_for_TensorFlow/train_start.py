@@ -145,9 +145,9 @@ def frozen_model(args):
     logits = tf.cast(logits, tf.float32)
 
     with tf.Session() as sess:
-        #save unfrozen graph
+        # save unfrozen graph
         tf.train.write_graph(sess.graph_def, '/cache/model', 'model.pb')
-        #start to froze graph
+        # start to froze graph
         freeze_graph.freeze_graph(
 		        input_graph='/cache/model/model.pb',
 		        input_saver='',
@@ -163,6 +163,12 @@ def frozen_model(args):
 
 
 def main():
+    """
+    1、prepare dataset
+    2、train and evaluate
+    3、frozen the ckpt model
+    4、copy log and obs to obs storage
+    """
     input_args = parse_args()
     data_path = "/cache/data"
     model_output_path = "/cache/model"
