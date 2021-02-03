@@ -100,10 +100,14 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
 注意：
 
 1. 第一次运行生成MindRecord文件，耗时较长。
-2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。
-3. VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
+2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/official/cv/resnet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet50的权重文件转换为可加载的权重文件。
+3. BACKBONE_MODEL是通过modelzoo中的[resnet50](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/official/cv/resnet)脚本训练的。PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
 
 ```shell
+
+# 权重文件转换
+python convert_checkpoint.py --ckpt_file=[BACKBONE_MODEL]
+
 # 单机训练
 sh run_standalone_train_ascend.sh [PRETRAINED_MODEL]
 
@@ -210,7 +214,7 @@ sh run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 
 Notes:
 
-1. 运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用[hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)生成该文件。
+1. 运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用[hccl_tools](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/utils/hccl_tools)生成该文件。
 2. PRETRAINED_MODEL应该是训练好的ResNet-50检查点。如果需要加载训练好的FasterRcnn的检查点，需要对train.py作如下修改:
 
 ```python
@@ -341,7 +345,7 @@ sh run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
 | 速度 | 1卡：190毫秒/步；8卡：200毫秒/步 |
 | 总时间 | 1卡：37.17小时；8卡：4.89小时 |
 | 参数(M) | 250 |
-| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
+| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/official/cv/faster_rcnn) |
 
 ### 评估性能
 
@@ -359,4 +363,4 @@ sh run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo)。

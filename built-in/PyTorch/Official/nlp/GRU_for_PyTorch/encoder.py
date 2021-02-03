@@ -18,7 +18,7 @@ class Encoder(nn.Module):
         embedded = self.embedding(src)
 
         if self.training:
-            embedded, _, _ = torch.dropoutV2(embedded, self.seed, p=self.prob)
+            embedded, _, _ = torch.npu_dropoutV2(embedded, self.seed, p=self.prob)
 
         outputs, hidden = self.rnn(embedded)  # no cell state!
 
