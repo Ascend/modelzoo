@@ -6,18 +6,18 @@
 
 原始模型网络下载地址 ：
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/image_HDR_enhance/model.pb
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/image_HDR_enhance/image_HDR_enhance.pb
 
 ## om模型
 
 om模型下载地址：
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/image_HDR_enhance/model.om
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/image_HDR_enhance/image_HDR_enhance.om
 
 使用ATC模型转换工具进行模型转换时可以参考如下指令
 
 ```
-atc --model=./model.pb --framework=3 --output=./model --soc_version=Ascend310 --input_shape="input:1,512,512,3" --input_format=NHWC --output_type=FP32
+atc --model=./image_HDR_enhance.pb --framework=3 --output=./image_HDR_enhance --soc_version=Ascend310 --input_shape="input:1,512,512,3" --input_format=NHWC --output_type=FP32
 ```
 
 ## 使用msame工具推理
@@ -31,7 +31,7 @@ atc --model=./model.pb --framework=3 --output=./model --soc_version=Ascend310 --
 使用msame推理工具，参考如下命令，发起推理性能测试： 
 
 ```
-./msame --model model.om  --output output/ --loop 10
+./msame --model image_HDR_enhance.om  --output output/ --loop 10
 ```
 
 性能测试数据为：
