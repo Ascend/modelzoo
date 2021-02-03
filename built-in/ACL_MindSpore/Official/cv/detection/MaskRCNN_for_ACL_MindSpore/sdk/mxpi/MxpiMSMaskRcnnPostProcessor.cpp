@@ -21,10 +21,8 @@
  * @param labelPath config path and label path.
  * @return APP_ERROR error code.
  */
-APP_ERROR MxpiMSMaskRcnnPostProcessor::Init(const std::string &configPath,
-                                            const std::string &labelPath,
-                                            MxBase::ModelDesc modelDesc)
-{
+APP_ERROR MxpiMSMaskRcnnPostProcessor::Init(const std::string &configPath, const std::string &labelPath,
+                                            MxBase::ModelDesc modelDesc) {
     LogInfo << "Begin to initialize MxpiMSMaskRcnnPostProcessor.";
     APP_ERROR ret = postProcessorInstance_.Init(configPath, labelPath, modelDesc);
     if (ret != APP_ERR_OK) {
@@ -39,8 +37,7 @@ APP_ERROR MxpiMSMaskRcnnPostProcessor::Init(const std::string &configPath,
  * @description: Do nothing temporarily.
  * @return: APP_ERROR error code.
  */
-APP_ERROR MxpiMSMaskRcnnPostProcessor::DeInit()
-{
+APP_ERROR MxpiMSMaskRcnnPostProcessor::DeInit() {
     LogInfo << "Begin to deinitialize MxpiMSMaskRcnnPostProcessor.";
     LogInfo << "End to deinitialize MxpiMSMaskRcnnPostProcessor.";
     return APP_ERR_OK;
@@ -58,10 +55,9 @@ APP_ERROR MxpiMSMaskRcnnPostProcessor::DeInit()
 APP_ERROR MxpiMSMaskRcnnPostProcessor::Process(std::shared_ptr<void> &metaDataPtr,
                                                MxBase::PostProcessorImageInfo postProcessorImageInfo,
                                                std::vector<MxTools::MxpiMetaHeader> &headerVec,
-                                               std::vector<std::vector<MxBase::BaseTensor>> &tensors)
-{
-    APP_ERROR ret = MxPlugins::MxpiObjectPostProcessorBase::Process(
-        metaDataPtr, postProcessorImageInfo, headerVec, tensors, postProcessorInstance_);
+                                               std::vector<std::vector<MxBase::BaseTensor>> &tensors) {
+    APP_ERROR ret = MxPlugins::MxpiObjectPostProcessorBase::Process(metaDataPtr, postProcessorImageInfo, headerVec,
+                                                                    tensors, postProcessorInstance_);
     if (ret != APP_ERR_OK) {
         LogError << GetError(ret) << "Fail to Process MxpiMSMaskRcnnPostProcessor.";
         return ret;
@@ -69,8 +65,7 @@ APP_ERROR MxpiMSMaskRcnnPostProcessor::Process(std::shared_ptr<void> &metaDataPt
     return APP_ERR_OK;
 }
 
-std::shared_ptr<MxPlugins::MxpiModelPostProcessorBase> GetInstance()
-{
+std::shared_ptr<MxPlugins::MxpiModelPostProcessorBase> GetInstance() {
     LogInfo << "Begin to get MxpiMSMaskRcnnPostProcessor instance.";
     auto instance = std::make_shared<MxpiMSMaskRcnnPostProcessor>();
     LogInfo << "End to get MxpiMSMaskRcnnPostProcessor instance.";

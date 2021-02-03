@@ -15,6 +15,7 @@
  */
 
 #include "MSFasterRcnnPostProcess.h"
+
 #include "acl/acl.h"
 
 namespace {
@@ -28,8 +29,7 @@ const int OUTPUT_MASK_INDEX = 2;
 }  // namespace
 
 namespace MxBase {
-APP_ERROR MSFasterRcnnPostProcessor::CheckMSModelCompatibility()
-{
+APP_ERROR MSFasterRcnnPostProcessor::CheckMSModelCompatibility() {
     if (outputTensorShapes_.size() != OUTPUT_TENSOR_SIZE) {
         LogError << "The size of output tensor is wrong, output size(" << outputTensorShapes_.size() << ")";
         return APP_ERR_OUTPUT_NOT_MATCH;
@@ -68,8 +68,7 @@ APP_ERROR MSFasterRcnnPostProcessor::CheckMSModelCompatibility()
     return APP_ERR_OK;
 }
 
-APP_ERROR MSFasterRcnnPostProcessor::ReadConfigParams()
-{
+APP_ERROR MSFasterRcnnPostProcessor::ReadConfigParams() {
     APP_ERROR ret = configData_.GetFileValue<int>("CLASS_NUM", classNum_);
     if (ret != APP_ERR_OK) {
         LogWarn << GetError(ret) << "No CLASS_NUM in config file, default value(" << classNum_ << ").";
@@ -108,10 +107,8 @@ APP_ERROR MSFasterRcnnPostProcessor::ReadConfigParams()
  * @param labelPath config path and label path.
  * @return APP_ERROR error code.
  */
-APP_ERROR MSFasterRcnnPostProcessor::Init(const std::string &configPath,
-                                          const std::string &labelPath,
-                                          MxBase::ModelDesc modelDesc)
-{
+APP_ERROR MSFasterRcnnPostProcessor::Init(const std::string &configPath, const std::string &labelPath,
+                                          MxBase::ModelDesc modelDesc) {
     LogInfo << "Begin to initialize MSFasterRcnnPostProcessor.";
     APP_ERROR ret = LoadConfigDataAndLabelMap(configPath, labelPath);
     if (ret != APP_ERR_OK) {
@@ -143,31 +140,26 @@ APP_ERROR MSFasterRcnnPostProcessor::Init(const std::string &configPath,
  * @description: Do nothing temporarily.
  * @return: APP_ERROR error code.
  */
-APP_ERROR MSFasterRcnnPostProcessor::DeInit()
-{
+APP_ERROR MSFasterRcnnPostProcessor::DeInit() {
     LogInfo << "Begin to deinitialize MSFasterRcnnPostProcessor.";
     LogInfo << "End to deinitialize MSFasterRcnnPostProcessor.";
     return APP_ERR_OK;
 }
 
 APP_ERROR MSFasterRcnnPostProcessor::Process(std::vector<std::shared_ptr<void>> &featLayerData,
-                                             std::vector<ObjDetectInfo> &objInfos,
-                                             const bool useMpPictureCrop,
-                                             MxBase::PostImageInfo postImageInfo)
-{
+                                             std::vector<ObjDetectInfo> &objInfos, const bool useMpPictureCrop,
+                                             MxBase::PostImageInfo postImageInfo) {
     LogDebug << "Begin to process MSFasterRcnnPostProcessor.";
     ObjectPostProcessorBase::Process(featLayerData, objInfos, useMpPictureCrop, postImageInfo);
     LogDebug << "End to process MSFasterRcnnPostProcessor.";
     return APP_ERR_OK;
 }
 
-static bool CompareDetectBoxes(const MxBase::DetectBox &box1, const MxBase::DetectBox &box2)
-{
+static bool CompareDetectBoxes(const MxBase::DetectBox &box1, const MxBase::DetectBox &box2) {
     return box1.prob > box2.prob;
 }
 
-static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t kVal)
-{
+static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t kVal) {
     std::sort(detBoxes.begin(), detBoxes.end(), CompareDetectBoxes);
     if (detBoxes.size() <= kVal) {
         return;
@@ -178,9 +170,7 @@ static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t 
 }
 
 void MSFasterRcnnPostProcessor::GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData,
-                                                 std::vector<MxBase::DetectBox> &detBoxes,
-                                                 ImageInfo &imgInfo) const
-{
+                                                 std::vector<MxBase::DetectBox> &detBoxes, ImageInfo &imgInfo) const {
     auto *bboxPtr = static_cast<aclFloat16 *>(featLayerData[OUTPUT_BBOX_INDEX].get());  // 1 * 80000 * 5
     auto *labelPtr = static_cast<int32_t *>(featLayerData[OUTPUT_CLASS_INDEX].get());   // 1 * 80000 * 1
     auto *maskPtr = static_cast<bool *>(featLayerData[OUTPUT_MASK_INDEX].get());        // 1 * 80000 * 1
@@ -216,8 +206,7 @@ void MSFasterRcnnPostProcessor::GetValidDetBoxes(std::vector<std::shared_ptr<voi
 
 void MSFasterRcnnPostProcessor::ConvertObjInfoFromDetectBox(std::vector<MxBase::DetectBox> &detBoxes,
                                                             std::vector<ObjDetectInfo> &objInfos,
-                                                            ImageInfo &imgInfo) const
-{
+                                                            ImageInfo &imgInfo) const {
     float widthScale = (float)imgInfo.imgWidth / (float)imgInfo.modelWidth;
     float heightScale = (float)imgInfo.imgHeight / (float)imgInfo.modelHeight;
     LogDebug << "Number of objects found : " << detBoxes.size() << " "
@@ -251,9 +240,7 @@ void MSFasterRcnnPostProcessor::ConvertObjInfoFromDetectBox(std::vector<MxBase::
  * @return: void
  */
 void MSFasterRcnnPostProcessor::ObjectDetectionOutput(std::vector<std::shared_ptr<void>> &featLayerData,
-                                                      std::vector<ObjDetectInfo> &objInfos,
-                                                      ImageInfo &imgInfo)
-{
+                                                      std::vector<ObjDetectInfo> &objInfos, ImageInfo &imgInfo) {
     LogDebug << "MSFasterRcnnPostProcessor start to write results.";
 
     std::vector<MxBase::DetectBox> detBoxes;

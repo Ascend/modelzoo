@@ -50,24 +50,19 @@ public:
      * coordinates.
      * @return: ErrorCode.
      */
-    APP_ERROR Process(std::vector<std::shared_ptr<void>> &featLayerData,
-                      std::vector<ObjDetectInfo> &objInfos,
-                      const bool useMpPictureCrop,
-                      MxBase::PostImageInfo postImageInfo) override;
+    APP_ERROR Process(std::vector<std::shared_ptr<void>> &featLayerData, std::vector<ObjDetectInfo> &objInfos,
+                      const bool useMpPictureCrop, MxBase::PostImageInfo postImageInfo) override;
 
 private:
     APP_ERROR CheckMSModelCompatibility();
 
-    void ObjectDetectionOutput(std::vector<std::shared_ptr<void>> &featLayerData,
-                               std::vector<ObjDetectInfo> &objInfos,
+    void ObjectDetectionOutput(std::vector<std::shared_ptr<void>> &featLayerData, std::vector<ObjDetectInfo> &objInfos,
                                ImageInfo &imgInfo) override;
 
-    void GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData,
-                          std::vector<MxBase::DetectBox> &detBoxes,
+    void GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData, std::vector<MxBase::DetectBox> &detBoxes,
                           ImageInfo &imgInfo) const;
 
-    void ConvertObjInfoFromDetectBox(std::vector<MxBase::DetectBox> &detBoxes,
-                                     std::vector<ObjDetectInfo> &objInfos,
+    void ConvertObjInfoFromDetectBox(std::vector<MxBase::DetectBox> &detBoxes, std::vector<ObjDetectInfo> &objInfos,
                                      ImageInfo &imgInfo) const;
 
     APP_ERROR ReadConfigParams();

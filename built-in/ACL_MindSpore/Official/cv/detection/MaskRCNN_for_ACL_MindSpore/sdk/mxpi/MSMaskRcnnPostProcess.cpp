@@ -15,9 +15,11 @@
  */
 
 #include "MSMaskRcnnPostProcess.h"
+
 #include <boost/property_tree/json_parser.hpp>
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/opencv.hpp>
+
 #include "acl/acl.h"
 
 namespace {
@@ -39,8 +41,7 @@ const int RIGHTBOTX = 3;
 
 namespace MxBase {
 
-APP_ERROR MSMaskRcnnPostProcessor::ReadConfigParams()
-{
+APP_ERROR MSMaskRcnnPostProcessor::ReadConfigParams() {
     APP_ERROR ret = configData_.GetFileValue<int>("CLASS_NUM", classNum_);
     if (ret != APP_ERR_OK) {
         LogWarn << GetError(ret) << "No CLASS_NUM in config file, default value(" << classNum_ << ").";
@@ -93,8 +94,8 @@ APP_ERROR MSMaskRcnnPostProcessor::ReadConfigParams()
 }
 
 APP_ERROR
-MSMaskRcnnPostProcessor::Init(const std::string &configPath, const std::string &labelPath, MxBase::ModelDesc modelDesc)
-{
+MSMaskRcnnPostProcessor::Init(const std::string &configPath, const std::string &labelPath,
+                              MxBase::ModelDesc modelDesc) {
     LogInfo << "Begin to initialize MSMaskRcnnPostProcessor.";
     APP_ERROR ret = LoadConfigDataAndLabelMap(configPath, labelPath);
     if (ret != APP_ERR_OK) {
@@ -126,26 +127,22 @@ MSMaskRcnnPostProcessor::Init(const std::string &configPath, const std::string &
  * @description: Do nothing temporarily.
  * @return: APP_ERROR error code.
  */
-APP_ERROR MSMaskRcnnPostProcessor::DeInit()
-{
+APP_ERROR MSMaskRcnnPostProcessor::DeInit() {
     LogInfo << "Begin to deinitialize MSMaskRcnnPostProcessor.";
     LogInfo << "End to deinitialize MSMaskRcnnPostProcessor.";
     return APP_ERR_OK;
 }
 
 APP_ERROR MSMaskRcnnPostProcessor::Process(std::vector<std::shared_ptr<void>> &featLayerData,
-                                           std::vector<ObjDetectInfo> &objInfos,
-                                           const bool useMpPictureCrop,
-                                           MxBase::PostImageInfo postImageInfo)
-{
+                                           std::vector<ObjDetectInfo> &objInfos, const bool useMpPictureCrop,
+                                           MxBase::PostImageInfo postImageInfo) {
     LogDebug << "Begin to process MSMaskRcnnPostProcessor.";
     ObjectPostProcessorBase::Process(featLayerData, objInfos, useMpPictureCrop, postImageInfo);
     LogDebug << "End to process MSMaskRcnnPostProcessor.";
     return APP_ERR_OK;
 }
 
-void MSMaskRcnnPostProcessor::FreeMaskMemory(std::vector<ObjDetectInfo> &objInfos)
-{
+void MSMaskRcnnPostProcessor::FreeMaskMemory(std::vector<ObjDetectInfo> &objInfos) {
     for (auto &obj : objInfos) {
         if (obj.maskPtr == nullptr) {
             continue;
@@ -155,8 +152,7 @@ void MSMaskRcnnPostProcessor::FreeMaskMemory(std::vector<ObjDetectInfo> &objInfo
     }
 }
 
-APP_ERROR MSMaskRcnnPostProcessor::CheckMSModelCompatibility()
-{
+APP_ERROR MSMaskRcnnPostProcessor::CheckMSModelCompatibility() {
     if (outputTensorShapes_.size() != OUTPUT_TENSOR_SIZE) {
         LogError << "The size of output tensor is wrong, output size(" << outputTensorShapes_.size() << ")";
         return APP_ERR_OUTPUT_NOT_MATCH;
@@ -207,13 +203,11 @@ APP_ERROR MSMaskRcnnPostProcessor::CheckMSModelCompatibility()
     return APP_ERR_OK;
 }
 
-static bool CompareDetectBoxes(const MxBase::DetectBox &box1, const MxBase::DetectBox &box2)
-{
+static bool CompareDetectBoxes(const MxBase::DetectBox &box1, const MxBase::DetectBox &box2) {
     return box1.prob > box2.prob;
 }
 
-static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t kVal)
-{
+static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t kVal) {
     std::sort(detBoxes.begin(), detBoxes.end(), CompareDetectBoxes);
     if (detBoxes.size() <= kVal) {
         return;
@@ -224,9 +218,7 @@ static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t 
 }
 
 void MSMaskRcnnPostProcessor::GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData,
-                                               std::vector<MxBase::DetectBox> &detBoxes,
-                                               ImageInfo &imgInfo) const
-{
+                                               std::vector<MxBase::DetectBox> &detBoxes, ImageInfo &imgInfo) const {
     LogInfo << "Begin to GetValidDetBoxes Mask GetValidDetBoxes.";
     auto *bboxPtr = static_cast<aclFloat16 *>(featLayerData[OUTPUT_BBOX_INDEX].get());           // 1 * 80000 * 5
     auto *labelPtr = static_cast<int32_t *>(featLayerData[OUTPUT_CLASS_INDEX].get());            // 1 * 80000 * 1
@@ -262,8 +254,7 @@ void MSMaskRcnnPostProcessor::GetValidDetBoxes(std::vector<std::shared_ptr<void>
     GetDetectBoxesTopK(detBoxes, maxPerImg_);
 }
 
-APP_ERROR GetMaskSize(const ObjDetectInfo &objInfo, ImageInfo &imgInfo, cv::Size &maskSize)
-{
+APP_ERROR GetMaskSize(const ObjDetectInfo &objInfo, ImageInfo &imgInfo, cv::Size &maskSize) {
     int width = std::ceil(std::min<float>(objInfo.x1 - objInfo.x0 + 1, (float)imgInfo.imgWidth - objInfo.x0));
     int height = std::ceil(std::min<float>(objInfo.y1 - objInfo.y0 + 1, (float)imgInfo.imgHeight - objInfo.y0));
     if (width < 1 || height < 1) {
@@ -277,8 +268,7 @@ APP_ERROR GetMaskSize(const ObjDetectInfo &objInfo, ImageInfo &imgInfo, cv::Size
     return APP_ERR_OK;
 }
 
-APP_ERROR MSMaskRcnnPostProcessor::MaskPostProcess(ObjDetectInfo &objInfo, void *maskPtr, ImageInfo &imgInfo)
-{
+APP_ERROR MSMaskRcnnPostProcessor::MaskPostProcess(ObjDetectInfo &objInfo, void *maskPtr, ImageInfo &imgInfo) {
     // resize
     cv::Mat maskMat(maskSize_, maskSize_, CV_32FC1);
     // maskPtr aclFloat16 to float
@@ -323,9 +313,7 @@ APP_ERROR MSMaskRcnnPostProcessor::MaskPostProcess(ObjDetectInfo &objInfo, void 
 }
 
 void MSMaskRcnnPostProcessor::ConvertObjInfoFromDetectBox(std::vector<MxBase::DetectBox> &detBoxes,
-                                                          std::vector<ObjDetectInfo> &objInfos,
-                                                          ImageInfo &imgInfo)
-{
+                                                          std::vector<ObjDetectInfo> &objInfos, ImageInfo &imgInfo) {
     float widthScale = (float)imgInfo.imgWidth / (float)imgInfo.modelWidth;
     float heightScale = (float)imgInfo.imgHeight / (float)imgInfo.modelHeight;
     LogDebug << "Number of objects found : " << detBoxes.size() << " "
@@ -365,8 +353,7 @@ void MSMaskRcnnPostProcessor::ConvertObjInfoFromDetectBox(std::vector<MxBase::De
     }
 }
 
-APP_ERROR WriteResultToJson(const std::vector<ObjDetectInfo> &objInfos, ImageInfo &imgInfo)
-{
+APP_ERROR WriteResultToJson(const std::vector<ObjDetectInfo> &objInfos, ImageInfo &imgInfo) {
     if (objInfos.empty()) {
         LogWarn << "The predict result is empty.";
         return APP_ERR_OK;
@@ -419,9 +406,7 @@ APP_ERROR WriteResultToJson(const std::vector<ObjDetectInfo> &objInfos, ImageInf
  * @return: void
  */
 void MSMaskRcnnPostProcessor::ObjectDetectionOutput(std::vector<std::shared_ptr<void>> &featLayerData,
-                                                    std::vector<ObjDetectInfo> &objInfos,
-                                                    ImageInfo &imgInfo)
-{
+                                                    std::vector<ObjDetectInfo> &objInfos, ImageInfo &imgInfo) {
     LogDebug << "MSMaskRcnnPostProcessor start to write results.";
 
     std::vector<MxBase::DetectBox> detBoxes;
