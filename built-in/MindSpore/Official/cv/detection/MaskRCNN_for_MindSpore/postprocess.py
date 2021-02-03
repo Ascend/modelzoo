@@ -41,6 +41,13 @@ def get_resizeRatio(img_size):
 
     return resize_ratio
 
+
+def scale_bbox(all_bbox, img_meta):
+    all_img_meta = np.array([img_meta[3], img_meta[2], img_meta[3], img_meta[2]])
+    all_bbox[:, 0:4] = all_bbox[:, 0:4] / all_img_meta
+    return all_bbox
+
+
 def get_eval_result(ann_file, img_path):
     max_num = 128
     result_path = "./result_Files/"
@@ -75,6 +82,8 @@ def get_eval_result(ann_file, img_path):
         all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
         all_labels_tmp_mask = all_label_squee[all_mask_squee]
         all_mask_fb_tmp_mask = all_mask_fb_squee[all_mask_squee, :, :]
+
+        scale_bbox(all_bboxes_tmp_mask, img_metas)
 
         if all_bboxes_tmp_mask.shape[0] > max_num:
             inds = np.argsort(-all_bboxes_tmp_mask[:, -1])

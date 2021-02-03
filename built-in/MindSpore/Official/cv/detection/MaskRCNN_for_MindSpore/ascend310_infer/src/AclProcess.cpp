@@ -291,7 +291,8 @@ int AclProcess::ModelInfer(std::map<double, double> *costTime_map) {
         return ret;
     }
 
-    std::vector<void *> inputBuffers({resizeOutData->data, imInfo_dst});
+    // std::vector<void *> inputBuffers({resizeOutData->data, imInfo_dst});
+    std::vector<void *> inputBuffers({resizeOutData->data});
     std::vector<size_t> inputSizes({resizeOutData->dataSize, 4*2});
 
     for (size_t i = 0; i < modelInfo_.outputNum; i++) {
