@@ -40,8 +40,7 @@ atc --model=caffe_model/deploy_vel_ascend.prototxt --weight=caffe_model/vel_hw_i
 使用msame推理工具，参考如下命令，发起推理性能测试： 
 
 ```
-./msame --model chineseocr.om  --output output/ --loop 10
-./msame --model /home/HwHiAiUser/bobeexu/vessel2/model/retina-unet.om  --output /home/HwHiAiUser/bobeexu/out --outfmt TXT --loop 100
+./msame --model /home/HwHiAiUser/vessel2/model/retina-unet.om  --output /home/HwHiAiUser/out --outfmt TXT --loop 100
 ```
 
 性能测试数据为：
