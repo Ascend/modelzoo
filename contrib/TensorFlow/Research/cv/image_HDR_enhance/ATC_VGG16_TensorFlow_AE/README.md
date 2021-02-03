@@ -1,27 +1,100 @@
+## 模型功能
 
-图像HDR增强系统在华为200dk平台的部署代码说明
+该模型图像边缘检测
 
+## 原始模型
 
+原始模型网络下载地址 ：
 
-文件说明：
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/image_HDR_enhance/model.pb
 
-1. input: 测试图像文件夹
-2. target：目标图像文件夹
+## om模型
 
-3. model：离线模型文件夹，存放离线模型文件model.om
+om模型下载地址：
 
-4. hdr_main.py: 模型推理主程序
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/image_HDR_enhance/model.om
 
+使用ATC模型转换工具进行模型转换时可以参考如下指令
 
+```
+atc --model=./model.pb --framework=3 --output=./model --soc_version=Ascend310 --input_shape="input:1,512,512,3" --input_format=NHWC --output_type=FP32
+```
 
-运行流程：（环境：华为开发板200dk,并且已经部署好相关python3环境）
+## 使用msame工具推理
 
-1. 在本地ubuntu18.04的Mindstudio开发环境中对模型训练得到的model.pb文件进行模型转换，得到model.om文件，放到model/文件夹下
+参考 https://gitee.com/ascend/tools/tree/master/msame, 获取msame推理工具及使用方法。
 
-2. 将整个hdr_200dk文件夹拷贝到华为开发板200dk的/home/HwHiAiUser/HIAI_PROJECTS/文件夹下，命令：scp -r PycharmProjects/hdr_200dk  HwHiAiUser@192.168.0.101:/home/HwHiAiUser/HIAI_PROJECTS/，文件夹位置和开发板ip地址根据实际情况填写
+获取到msame可执行文件之后，将待检测om文件放在model文件夹，然后进行性能测试。
 
-3. 登录华为200dk开发板，进入/home/HwHiAiUser/HIAI_PROJECTS/hdr_200dk/文件夹下，运行hdr_main.py文件，命令：python3 hdr_main.py，得到输出图像，在output文件夹下
+## 性能测试
 
-4. 将output文件夹拷贝回本地电脑PycharmProjects/hdr_200dk/文件夹下，查看图像的HDR增强效果，命令：scp -r HwHiAiUser@192.168.0.101:/home/HwHiAiUser/HIAI_PROJECTS/hdr_200dk/output PycharmProjects/hdr_200dk/
+使用msame推理工具，参考如下命令，发起推理性能测试： 
 
+```
+./msame --model model.om  --output output/ --loop 10
+```
 
+性能测试数据为：
+
+```
+loop:10
+******************************
+Test Start!
+[INFO] acl init success
+[sudo] password for HwHiAiUser: 
+[INFO] open device 0 success
+[INFO] create context success
+[INFO] create stream success
+[INFO] get run mode success
+[INFO] malloc buffer for mem , require size is 217977856
+[INFO] malloc buffer for weight,  require size is 829952
+[INFO] load model /home/HwHiAiUser/caoliang/hdr_200dk/model/model.om success
+[INFO] create model description success
+[INFO] create model output success
+[INFO] model execute success
+Inference time: 92.675ms
+[INFO] model execute success
+Inference time: 92.618ms
+[INFO] model execute success
+Inference time: 92.595ms
+[INFO] model execute success
+Inference time: 92.627ms
+[INFO] model execute success
+Inference time: 92.524ms
+[INFO] model execute success
+Inference time: 92.43ms
+[INFO] model execute success
+Inference time: 92.703ms
+[INFO] model execute success
+Inference time: 92.818ms
+[INFO] model execute success
+Inference time: 92.622ms
+[INFO] model execute success
+Inference time: 92.529ms
+output//20210203_072604
+[INFO] output data success
+Inference average time: 92.614100 ms
+Inference average time without first time: 92.607333 ms
+[INFO] unload model success, model Id is 1
+[INFO] Execute sample success.
+Test Finish!
+******************************
+[INFO] end to destroy stream
+[INFO] end to destroy context
+[INFO] end to reset device is 0
+[INFO] end to finalize acl
+```
+
+Batch: 1, shape: 3,512,512 不带AIPP，平均推理性能92.614100 ms
+
+## 精度测试
+
+### 推理效果
+
+推理前：
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0203/151356_05b30074_8083019.png "a4962.png")
+
+推理后：
+
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0203/151626_0c89672a_8083019.png "a4962.png")
