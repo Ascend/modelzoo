@@ -289,11 +289,11 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         if self.training:
             output += (rpn_loss, rcnn_loss, rpn_cls_loss, rpn_reg_loss, rcnn_cls_loss, rcnn_reg_loss)
         else:
-            output = self.get_det_bboxes(rcnn_cls_loss, rcnn_reg_loss, rcnn_masks, bboxes_all, img_metas)
+            output = self.get_det_bboxes(rcnn_cls_loss, rcnn_reg_loss, rcnn_masks, bboxes_all)
 
         return output
 
-    def get_det_bboxes(self, cls_logits, reg_logits, mask_logits, rois, img_metas):
+    def get_det_bboxes(self, cls_logits, reg_logits, mask_logits, rois):
         """Get the actual detection box."""
         scores = self.softmax(cls_logits)
 
@@ -304,20 +304,16 @@ class Faster_Rcnn_Resnet50(nn.Cell):
             out_boxes_i = self.decode(rois, reg_logits_i)
             boxes_all += (out_boxes_i,)
 
-        img_metas_all = self.split(img_metas)
         scores_all = self.split(scores)
         mask_all = self.split(self.cast(mask_logits, mstype.int32))
 
         boxes_all_with_batchsize = ()
         for i in range(self.test_batch_size):
-            scale = self.split_shape(self.squeeze(img_metas_all[i]))
-            scale_h = scale[2]
-            scale_w = scale[3]
             boxes_tuple = ()
             for j in range(self.num_classes):
                 boxes_tmp = self.split(boxes_all[j])
-                out_boxes_h = boxes_tmp[i] / scale_h
-                out_boxes_w = boxes_tmp[i] / scale_w
+                out_boxes_h = boxes_tmp[i]
+                out_boxes_w = boxes_tmp[i]
                 boxes_tuple += (self.select(self.bbox_mask, out_boxes_w, out_boxes_h),)
             boxes_all_with_batchsize += (boxes_tuple,)
 
@@ -430,6 +426,6 @@ class FasterRcnn_Infer(nn.Cell):
         self.network = Faster_Rcnn_Resnet50(config)
         self.network.set_train(False)
 
-    def construct(self, img_data, img_metas):
-        output = self.network(img_data, img_metas, None, None, None)
+    def construct(self, img_data):
+        output = self.network(img_data, None, None, None, None)
         return output

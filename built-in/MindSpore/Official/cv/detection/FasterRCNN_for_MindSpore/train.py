@@ -24,7 +24,7 @@ import numpy as np
 import mindspore.common.dtype as mstype
 from mindspore import context, Tensor, Parameter
 from mindspore.communication.management import init
-from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor, LossMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -145,4 +145,8 @@ if __name__ == '__main__':
         cb += [ckpoint_cb]
 
     model = Model(net)
-    model.train(config.epoch_size, dataset, callbacks=cb)
+    if config.dataset_sink_mode:
+        model.train(config.epoch_size, dataset, callbacks=cb)
+    else:
+        cb.append(LossMonitor(config.steps_of_echo_loss))
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=False)

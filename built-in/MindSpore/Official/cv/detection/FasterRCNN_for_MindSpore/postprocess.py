@@ -14,7 +14,9 @@
 # ============================================================================
 """post process for 310 inference"""
 import argparse
+
 import numpy as np
+from PIL import Image
 from pycocotools.coco import COCO
 
 from src.config import config
@@ -28,6 +30,27 @@ parser.add_argument("--ann_file", type=str, required=True, help="ann file.")
 parser.add_argument("--img_path", type=str, required=True, help="image file path.")
 args = parser.parse_args()
 
+
+def get_imgSize(file_name):
+    img = Image.open(file_name)
+    return img.size
+
+
+def get_resizeRatio(img_size):
+    org_width, org_height = img_size
+    resize_ratio = dst_width / org_width
+    if resize_ratio > dst_height / org_height:
+        resize_ratio = dst_height / org_height
+
+    return resize_ratio
+
+
+def scale_bbox(all_bbox, img_meta):
+    all_img_meta = np.array([img_meta[3], img_meta[2], img_meta[3], img_meta[2]])
+    all_bbox[:, 0:4] = all_bbox[:, 0:4] / all_img_meta
+    return all_bbox
+
+
 def get_eval_result(ann_file, img_path):
     max_num = 128
     result_path = "./result_Files/"
@@ -39,6 +62,10 @@ def get_eval_result(ann_file, img_path):
 
     for img_id in img_ids:
         file_id = str(img_id).zfill(12)
+        file = img_path + "/" + file_id + ".jpg"
+        img_size = get_imgSize(file)
+
+        img_metas = np.array([img_size[1], img_size[0], dst_height / img_size[1], dst_width / img_size[0]])
 
         bbox_result_file = result_path + file_id + "_0.bin"
         label_result_file = result_path + file_id + "_1.bin"
@@ -54,6 +81,8 @@ def get_eval_result(ann_file, img_path):
 
         all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
         all_labels_tmp_mask = all_label_squee[all_mask_squee]
+
+        scale_bbox(all_bboxes_tmp_mask, img_metas)
 
         if all_bboxes_tmp_mask.shape[0] > max_num:
             inds = np.argsort(-all_bboxes_tmp_mask[:, -1])
