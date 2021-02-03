@@ -174,11 +174,11 @@ def main():
     model_output_path = "/cache/model"
 
     if not os.path.exists(data_path):
-        os.makedirs(data_path, exist_ok=True)
+        os.makedirs(data_path, 0o755)
     mox.file.copy_parallel(input_args.data_url, data_path)
 
     if not os.path.exists(model_output_path):
-        os.makedirs(model_output_path, exist_ok=True)
+        os.makedirs(model_output_path, 0o755)
     input_args.global_batch_size = input_args.batch_size * input_args.rank_size
     input_args.data_dir = data_path
     session = cs.CreateSession()
