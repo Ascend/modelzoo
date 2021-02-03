@@ -63,4 +63,5 @@ Batch: 1, shape: 3,512,512，平均推理性能13.405190 ms
 
 推理效果
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0111/120031_a9284a67_8113712.png "1.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0203/163317_ba680af8_1656526.jpeg "result.jpg")
+
