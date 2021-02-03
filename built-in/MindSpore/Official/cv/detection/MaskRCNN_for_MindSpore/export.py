@@ -47,7 +47,5 @@ if __name__ == '__main__':
     bs = config.test_batch_size
 
     img = Tensor(np.zeros([args.batch_size, 3, config.img_height, config.img_width], np.float16))
-    img_metas = Tensor(np.zeros([args.batch_size, 4], np.float16))
 
-    input_data = [img, img_metas]
-    export(net, *input_data, file_name=args.file_name, file_format=args.file_format)
+    export(net, img, file_name=args.file_name, file_format=args.file_format)
