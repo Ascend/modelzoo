@@ -110,8 +110,8 @@ pip install mmcv=0.2.14
 
     注：
     1. 为加快数据预处理速度，MindSpore提供了MindRecord数据格式。因此，训练前首先需要生成基于COCO2017数据集的MindRecord文件。COCO2017原始数据集转换为MindRecord格式大概需要4小时。
-    2. 进行分布式训练前，需要提前创建JSON格式的[hccl配置文件](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)。
-    3. PRETRAINED_CKPT是一个ResNet50检查点，通过ImageNet2012训练。
+    2. 进行分布式训练前，需要提前创建JSON格式的[hccl配置文件](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/official/cv/resnet)。
+    3. PRETRAINED_CKPT是一个ResNet50检查点，通过ImageNet2012训练。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/official/cv/resnet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet50的权重文件转换为可加载的权重文件。
 
 4. 执行评估脚本。
    训练结束后，按照如下步骤启动评估：
@@ -199,6 +199,7 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH]
       └─rpn.py                            # 区域候选网络
     ├─aipp.cfg                            #aipp 配置文件
     ├─config.py                           # 网络配置
+    ├─convert_checkpoint.py               # 转换预训练checkpoint文件
     ├─dataset.py                          # 数据集工具
     ├─lr_schedule.py                      # 学习率生成器
     ├─network_define.py                   # MaskRCNN的网络定义
@@ -552,34 +553,34 @@ Accumulating evaluation results...
 
 ### 训练性能
 
-| 参数                 | MaskRCNN                                                  |
-
-| 模型版本              | V1                                                          |
-| 资源                   | Ascend 910；CPU： 2.60GHz，192核；内存：755G              |
-| 上传日期              | 2020-08-01                                 |
-| MindSpore版本          | 0.6.0-alpha                                                 |
-| 数据集                    | COCO2017                                                    |
-| 训练参数        | epoch=12，batch_size=2                                   |
-| 优化器                  | SGD                                                         |
-| 损失函数              | Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss   |
-| 速度                      | 单卡：250毫秒/步；8P: 260毫秒/步                        |
-| 总时长                 | 单卡：52小时；8卡：6.6小时                             |
-| 参数（M）             | 280                                                         |
-| 脚本                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn> |
+| 参数                  | MaskRCNN                                                  |
+| -------------------   | --------------------------------------------------------- |
+| 模型版本              | V1                                                        |
+| 资源                  | Ascend 910；CPU： 2.60GHz，192核；内存：755G              |
+| 上传日期              | 2020-08-01                                                |
+| MindSpore版本         | 0.6.0-alpha                                               |
+| 数据集                | COCO2017                                                  |
+| 训练参数              | epoch=12，batch_size=2                                    |
+| 优化器                | SGD                                                       |
+| 损失函数              | Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss                |
+| 速度                  | 单卡：250毫秒/步；8P: 260毫秒/步                          |
+| 总时长                | 单卡：52小时；8卡：6.6小时                                |
+| 参数（M）             | 280                                                       |
+| 脚本                  | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn> |
 
 ### 评估性能
 
-| 参数          | MaskRCNN                    |
-| ------------------- | --------------------------- |
-| 模型版本       | V1                          |
-| 资源            | Ascend 910                  |
-| 上传日期       | 2020-08-01 |
-| MindSpore版本   | 0.6.0-alpha                 |
-| 数据集             | COCO2017                    |
-| 批次大小          | 2                           |
-| 输出             | mAP                         |
-| 精确度            | 交并比（IoU）=0.50:0.95 32.4%         |
-| 推理模型 | 254M（.ckpt文件）           |
+| 参数                  | MaskRCNN                      |
+| --------------------- | ----------------------------- |
+| 模型版本              | V1                            |
+| 资源                  | Ascend 910                    |
+| 上传日期              | 2020-08-01                    |
+| MindSpore版本         | 0.6.0-alpha                   |
+| 数据集                | COCO2017                      |
+| 批次大小              | 2                             |
+| 输出                  | mAP                           |
+| 精确度                | 交并比（IoU）=0.50:0.95 32.4% |
+| 推理模型              | 254M（.ckpt文件）             |
 
 # 随机情况说明
 
