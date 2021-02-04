@@ -60,5 +60,5 @@ Batch: 1, shape: 1 * 840 * 840，不带AIPP，平均推理性能24.17ms
 
 推理效果
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/130550_fe58ad5a_8070502.png "butterfly_GT_bicubic.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/130608_3af2bdf9_8070502.png "butterfly_GT_SRCNN.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/134017_6855c78d_8070502.png "head_GT_bicubic.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/134032_1e2707df_8070502.png "head_GT_SRCNN.png")
