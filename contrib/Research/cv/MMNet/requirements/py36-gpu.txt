@@ -1,3 +1,0 @@
-# Deep learning
-tensorflow-gpu==1.6.0
--r py36-common.txt

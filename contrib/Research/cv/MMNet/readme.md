@@ -1,23 +1,31 @@
 # MMNet
 ## 模型简介
+MMNet致力于解决移动设备上人像自动抠图的问题，旨在以最小的模型性能降级在移动设备上获得实时推断。我们的MMNet模型基于具有线性瓶颈块的多分支扩张卷积，性能优于最新模型，并且速度提高了几个数量级。 在小米Mi 5设备上，模型可以加速四倍以达到30 FPS，并且梯度误差会适度增加。 在相同条件下，我们的模型的参数数量要少一个数量级，并且比Mobile DeepLabv3快，同时保持可比的性能。
 
 ## 结果
 
 
 ## Requirements
-
+- Tensorflow 1.15.0
+- Ascend 910
+- humanfriendly
+- overload
+- deprecation
 ---
 ## 数据准备
 ### 预训练模型
 
-```  
+``` 
+``` 
 ### 数据集下载
+请从该[项目主页](http://xiaoyongshen.me/webpage_portrait/index.html)下载数据集并
+将其解压到当前目录下
 
 
 ### Fintuned 模型
  
 ```
-
+```
 
 在GPU上复现的模型在
 ```
@@ -26,16 +34,40 @@
 
 ## 训练
 ### 参数说明
-
+```
+--checkpoint_path 加载预训练的模型路径
+--train_dir 保存checkpoint的文件夹路径
+--batch_size 训练的batch_size大小
+--dataset_path 数据集文件夹路径
+--learning_rate 学习率大小
+--step_save_checkpoint 保存checkpoint的迭代间隔
+--augmentation_methodmax_to_keep 数据增广方法
+--max_epoch_from_restore 加载模型后最大训练epoch数
+```
 ### 运行命令
-
+```
+sh ./scripts/train.sh /path/to/dataset /path/to/training/directory
+```
+例：
+```
+sh ./scripts/train.sh ./dataset/ ./results/train/
+```
 
 ## 测试 
 ### 参数说明
-
+```
+--dataset_path 数据集文件夹路径
+--checkpoint_path 需要测试的checkpoint的路径
+```
 
 ### 运行命令
-
+```
+sh ./scripts/validate.sh /path/to/dataset /path/to/training/directory
+```
+例：
+```
+sh ./scripts/validate.sh ./dataset/ ./results/train/
+```
 
 ## 离线推理
 ### 1、原始模型转PB模型
