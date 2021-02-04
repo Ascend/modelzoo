@@ -191,12 +191,12 @@ class Evaluator(object):
         g.add_argument(
             "--inference_output",
             type=str,
-            default="none",
+            default="prob_mask",
         )
         g.add_argument(
             "--inference_output_dirname",
             type=str,
-            default=None,
+            default='inference_out',
         )
 
         g.add_argument("--valid_type", default="loop", type=str, choices=["loop", "once"])

@@ -2,9 +2,10 @@
 set -eux
 
 dataset_path=${1}
-checkpoint_path=${2:-mmnet-traindir}
+ckpt=${2}
+# checkpoint_path=${2:-mmnet-traindir}
 
-python evaluate.py \
+python -W ignore offline_infer/convert_ckpt2pb.py \
     --num_classes 2 \
     --task_type matting \
     --output_name output/score \
@@ -14,7 +15,6 @@ python evaluate.py \
     --target_eval_shape 800 600 \
     --no-save_evaluation_image \
     --batch_size 1 \
-    --checkpoint_path ${checkpoint_path} \
     --dataset_path ${dataset_path} \
     --dataset_split_name test \
     --convert_to_pb \
@@ -30,3 +30,4 @@ python evaluate.py \
     --lambda_aux_loss 1 \
     MMNetModel \
     --width_multiplier 1.0 \
+    --ckpt_convert ${ckpt}

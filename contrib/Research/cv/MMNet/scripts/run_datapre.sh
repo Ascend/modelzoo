@@ -2,9 +2,9 @@
 set -eux
 
 dataset_path=${1}
-checkpoint_path=${2:-mmnet-traindir}
+# checkpoint_path=${2:-mmnet-traindir}
 
-python evaluate.py \
+python -W ignore  offline_infer/datapre.py \
     --num_classes 2 \
     --task_type matting \
     --output_name output/score \
@@ -14,7 +14,6 @@ python evaluate.py \
     --target_eval_shape 800 600 \
     --no-save_evaluation_image \
     --batch_size 1 \
-    --checkpoint_path ${checkpoint_path} \
     --dataset_path ${dataset_path} \
     --dataset_split_name test \
     --convert_to_pb \
