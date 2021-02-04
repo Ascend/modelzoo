@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2018 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2021 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -164,10 +164,10 @@ def frozen_model(args):
 
 def main():
     """
-    1、prepare dataset
-    2、train and evaluate
-    3、frozen the ckpt model
-    4、copy log and obs to obs storage
+    1.prepare dataset
+    2.train and evaluate
+    3.frozen the ckpt model
+    4.copy log and obs to obs storage
     """
     input_args = parse_args()
     data_path = "/cache/data"
@@ -203,7 +203,7 @@ def main():
     if not ckpt_list:
         print("ckpt file not generated.")
         return
-    ckpt_list.sort(key=lambda fn: os.path.getmtime(fn))
+    ckpt_list.sort(key=os.path.getmtime)
     ckpt_model = ckpt_list[-1].rsplit(".", 1)[0]
     print("====================%s" % ckpt_model)
     frozen_args = {'ckpt_path': ckpt_model,
