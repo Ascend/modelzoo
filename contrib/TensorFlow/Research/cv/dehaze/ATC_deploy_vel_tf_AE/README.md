@@ -52,7 +52,7 @@ Test Finish!
 
 ```
 
- Batch：1,shape1: 1 * 512 * 512 * 3,不带AIPP ，平均推理性能 40.924848 ms
+ Batch：1,shape: 512 * 512 * 3,不带AIPP ，平均推理性能 40.924848 ms
 
 ## 精度测试!
 
