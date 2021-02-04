@@ -66,6 +66,4 @@ Batch: 1, shape: 1 * 3 * 800 * 1408，带AIPP，平均推理性能173ms
 待完善
 
 推理效果
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/190750_3f7a88b9_5578318.jpeg "crowd.jpg")
-
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/190803_b8e8381a_5578318.jpeg "out_crowd.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/191142_a0256907_5578318.png "1612437078(1).png")
