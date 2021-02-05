@@ -8,7 +8,7 @@
 
  |                | 论文   | ascend |
 |----------------|------|--------|
-| miou | 0.627 | 0.632  |
+| miou | 0.627 | 0.6259  |
 
 ###  Requirements
 
@@ -48,9 +48,9 @@ https://pjreddie.com/projects/pascal-voc-dataset-mirror/
 
 
 ### 训练过程及结果
-epoch=3
-batch_size=16
-lr=1e-6
+epoch=9
+batch_size=32
+lr=1e-5
 
  **
 offline_inference**
