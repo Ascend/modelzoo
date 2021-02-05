@@ -43,14 +43,14 @@ atc --model=./frozen_graph_noDWT_V2.pb --input_shape="degradated_image:1,256,256
 
 ```
 [INFO] output data success
-Inference average time: 10.212930 ms
-Inference average time without first time: 10.209758 ms
+Inference average time: 22.149870 ms
+Inference average time without first time: 22.147222 ms
 [INFO] unload model success, model Id is 1
 [INFO] Execute sample success.
 Test Finish!
 ```
 
-Batch: 1, shape: 1 * 256 * 256，不带AIPP，平均推理性能10.21ms
+Batch: 1, shape: 1 * 256 * 256，不带AIPP，平均推理性能22.15ms
 
 ## 精度测试
 
