@@ -133,11 +133,14 @@ def training_op(log, label, mask):
         return loss
 
     loss = focal_loss(log, label, mask)
-    optimizer = tf.train.GradientDescentOptimizer(0.000001)
+    optimizer = tf.train.AdamOptimizer(0.00001)
+    loss_scaling = 2 ** 10
+    grads = optimizer.compute_gradients(loss * loss_scaling)
+    grads = [(grad / loss_scaling, var) for grad, var in grads]
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
-        op = optimizer.minimize(loss)
-        return op, loss
+        train_op = optimizer.apply_gradients(grads)
+        return train_op, loss
 
 
 def evaluating_op(log, label, num_classes=21):
