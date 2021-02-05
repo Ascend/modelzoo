@@ -22,8 +22,8 @@ MMNet致力于解决移动设备上人像抠图的问题，旨在以最小的模
     </tr>
     <tr>
         <td>Reproduce on Ascend 910</td>
-        <td>-</td>
-        <td>-</td>
+        <td>13.26</td>
+        <td>21.64</td>
     </tr>
 </table>
 
@@ -36,8 +36,7 @@ MMNet致力于解决移动设备上人像抠图的问题，旨在以最小的模
 ---
 ## 数据准备
 ### 数据集下载
-请从该[项目主页](http://xiaoyongshen.me/webpage_portrait/index.html)下载数据集并
-将其解压到当前目录下
+请从该[项目主页](http://xiaoyongshen.me/webpage_portrait/index.html)下载数据集并将其解压到当前目录下
 
 ### GPU复现的模型
 ```
