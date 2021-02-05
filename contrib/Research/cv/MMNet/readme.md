@@ -3,7 +3,28 @@
 MMNet致力于解决移动设备上人像自动抠图的问题，旨在以最小的模型性能降级在移动设备上获得实时推断。我们的MMNet模型基于具有线性瓶颈块的多分支扩张卷积，性能优于最新模型，并且速度提高了几个数量级。 在小米Mi 5设备上，模型可以加速四倍以达到30 FPS，并且梯度误差会适度增加。 在相同条件下，我们的模型的参数数量要少一个数量级，并且比Mobile DeepLabv3快，同时保持可比的性能。
 
 ## 结果
-
+<table>
+    <tr>
+        <td></td>
+        <td>Gradient(1e-3) &#8595</td>
+        <td>MAD(1e-2) &#8595</td>
+    </tr>
+    <tr>
+        <td>Report in paper</td>
+        <td>2.88</td>
+        <td>2.47</td>
+    </tr>
+    <tr>
+        <td>Reproduce on GPU</td>
+        <td>4.23</td>
+        <td>2.31</td>
+    </tr>
+    <tr>
+        <td>Reproduce on Ascend 910</td>
+        <td>-</td>
+        <td>-</td>
+    </tr>
+</table>
 
 ## Requirements
 - Tensorflow 1.15.0
@@ -13,24 +34,35 @@ MMNet致力于解决移动设备上人像自动抠图的问题，旨在以最小
 - deprecation
 ---
 ## 数据准备
-### 预训练模型
-
-``` 
-``` 
 ### 数据集下载
 请从该[项目主页](http://xiaoyongshen.me/webpage_portrait/index.html)下载数据集并
 将其解压到当前目录下
 
+### GPU复现的模型
+```
+百度网盘：
+链接: https://pan.baidu.com/s/11RGrZ7ByovcXSCunDO9JlA 
+提取码: 68kp
 
-### Fintuned 模型
- 
-```
+或OBS链接：
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/gpu/checkpoint
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/gpu/MMNetModel-1593500.data-00000-of-00001
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/gpu/MMNetModel-1593500.meta
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/gpu/MMNetModel-1593500.index
 ```
 
-在GPU上复现的模型在
-```
+### NPU复现的模型
+``` 
+百度网盘：
+链接: https://pan.baidu.com/s/1Rs0m-QbzLDlowJ_M5oGJAA 
+提取码: 5sbi
 
-```
+或OBS链接：
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/npu/checkpoint
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/npu/MMNetModel-2124500.data-00000-of-00001
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/npu/MMNetModel-2124500.meta
+https://mmnet.obs.cn-north-4.myhuaweicloud.com/pretrained/npu/MMNetModel-2124500.index
+``` 
 
 ## 训练
 ### 参数说明
