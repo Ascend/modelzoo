@@ -1,5 +1,0 @@
-deprecation
-humanfriendly
-overload
-pandas
-Pillow
