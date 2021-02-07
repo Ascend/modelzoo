@@ -140,6 +140,15 @@ GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1k77-1
 ```
 {"precision": 0.8464379947229551, "recall": 0.772267693789119, "hmean": 0.8076535750251763, "AP": 0}
 ```
+Icdar2013数据集标签格式转换：
+
+因为Icdar2013的标签bbox格式为[xmin,ymin,xmax,ymax]，需要将标注格式转换为[x1,y1,x2,y2,x3,y3,x4,y4]格式才可以在使用，可以使用下面的脚本转换：
+```
+#需要根据实际的路径编辑修改下py文件里面的标签路径
+python3 convert_gt_icdar2013_to_2015.py
+```
+或者可以直接下载下面百度云盘里面的数据集，已经做好格式转换。
+
 
 GPU、NPU使用相同的超参:
 ```
