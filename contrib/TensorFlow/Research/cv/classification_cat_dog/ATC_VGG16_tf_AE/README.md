@@ -60,3 +60,6 @@ Batch: 1, shape: 224* 224*3 ，带AIPP，平均推理性能4.287111
 
 推理效果
 
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0207/095553_540f4b9a_8113712.jpeg "dog.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0207/095543_7ae9285b_8113712.jpeg "cat.jpg")
+
