@@ -8,15 +8,15 @@ from decoder import Decoder
 from seq2seq import Seq2Seq
 
 # hyperparameter
-CALCULATE_DEVICE="npu:0"
-device=CALCULATE_DEVICE
+CALCULATE_DEVICE = "npu:0"
+device = CALCULATE_DEVICE
 ENC_EMB_DIM = 256
 DEC_EMB_DIM = 256
 HID_DIM = 512
 ENC_DROPOUT = 0.5
 DEC_DROPOUT = 0.5
-INPUT_DIM=7854
-OUTPUT_DIM=5893
+INPUT_DIM = 7854
+OUTPUT_DIM = 5893
 CLIP = 1
 MAX = 2147483647
 seed_init = 0
