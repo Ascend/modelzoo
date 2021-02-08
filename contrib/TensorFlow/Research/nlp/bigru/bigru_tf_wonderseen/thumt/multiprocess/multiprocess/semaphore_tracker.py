@@ -1,3 +1,5 @@
+# Copyright (c) 2006-2008, R Oudkerk
+# Licensed to PSF under a Contributor Agreement.
 #
 # On Unix we run a server process which keeps track of unlinked
 # semaphores. The server ignores SIGINT and SIGTERM and reads from a
