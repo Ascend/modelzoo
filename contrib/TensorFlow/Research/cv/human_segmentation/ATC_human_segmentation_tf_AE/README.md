@@ -8,6 +8,7 @@
 
 
 原始模型网络下载地址 ：
+
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/insert_op.cfg
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/human512_3c_binary_512x512.pb
@@ -57,6 +58,5 @@ Batch: 1, shape: 512 * 512 * 3，带AIPP，平均推理性能 115.150800 ms
 待完善
 
 推理效果
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/165014_670daf4e_7401379.png "data.png")
-
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0204/165038_1ce38e65_7401379.png "out_data.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0208/142001_cf375ae5_5302634.jpeg "source.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0208/142016_523427e1_5302634.png "target.png")
