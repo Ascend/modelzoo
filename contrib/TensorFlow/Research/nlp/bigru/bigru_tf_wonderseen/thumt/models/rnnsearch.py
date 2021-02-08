@@ -482,10 +482,9 @@ def model_infer_graph(features, mode, params, msame=False):
         t = 0
 
         ## uncessary for NPU
-        # zero_value = tf.zeros([params.eval_batch_size, memory.shape[-1].value], dtype)
+        # zero_value = tf.zeros([EVAL_BATCH_SIZE, memory.shape[-1].value], dtype)
 
         target_outputs = []
-
 
         if "target" in features:
             if len(features["target"].get_shape().as_list()) == 2:
@@ -494,12 +493,12 @@ def model_infer_graph(features, mode, params, msame=False):
                 target = features["target"]
         else:
             target = tf.ones([params.eval_batch_size], dtype=tf.int32)*BOS_ID
-
+        
         ## Here is a non-incremental decoding
         while t < params.eval_decode_length-1:
             ## RNN style
             # if t == 0:
-            #     inp_t = tf.zeros([params.eval_batch_size, params.embedding_size], dtype)
+            #     inp_t = tf.zeros([EVAL_BATCH_SIZE, params.embedding_size], dtype)
             # else:
             #     tgt_inputs = tf.nn.embedding_lookup(tgt_emb, target)
             #     inp_t = tf.nn.bias_add(tgt_inputs, tgt_bias)
@@ -508,15 +507,15 @@ def model_infer_graph(features, mode, params, msame=False):
             inp_t = tf.nn.bias_add(tgt_inputs, tgt_bias)
 
             ## uncessary for NPU
-            # inp_t = tf.reshape(inp_t, [params.eval_batch_size, params.embedding_size])
+            # inp_t = tf.reshape(inp_t, [EVAL_BATCH_SIZE, params.embedding_size])
             
             results = layers.attention.attention(state, memory, bias, output_size, cache={"key": cache_key}, reuse=tf.AUTO_REUSE)
             alpha = results["weight"]
             context = results["value"]
             
             ## uncessary for NPU
-            # context = tf.reshape(context, [params.eval_batch_size, 2*output_size])
-            # state = tf.reshape(state, [params.eval_batch_size, output_size])
+            # context = tf.reshape(context, [EVAL_BATCH_SIZE, 2*output_size])
+            # state = tf.reshape(state, [EVAL_BATCH_SIZE, output_size])
 
             cell_input = [inp_t, context]
             cell_output, new_state = cell(cell_input, state)
@@ -544,7 +543,8 @@ def model_infer_graph(features, mode, params, msame=False):
             target_outputs.append(tf.nn.log_softmax(logit))
             t += 1
 
-        target_outputs = tf.stack(target_outputs, axis=1, name="logit_sequence")
+        target_outputs = tf.stack(target_outputs, axis=1)
+
     return target_outputs
 
 
