@@ -11,8 +11,6 @@ import thumt.layers as layers
 import thumt.losses as losses
 import thumt.utils as utils
 from thumt.models.model import NMTModel
-
-
 from thumt.parameter_config import *
 
  
@@ -43,6 +41,8 @@ def _gru_encoder(cell, inputs, sequence_length, initial_state, dtype=None, max_l
         input_ta = tf.TensorArray(dtype, time_steps, tensor_array_name="input_array") # dymanic
         output_ta = tf.TensorArray(dtype, time_steps, tensor_array_name="output_array") # dymanic
         input_ta = input_ta.unstack(tf.transpose(inputs, [1, 0, 2]))
+
+
         def loop_func(t, out_ta, state): # dymanic
             inp_t = input_ta.read(t) # dymanic
             cell_output, new_state = cell(inp_t, state)
@@ -361,15 +361,14 @@ def model_training_graph(features, mode, params):
         ## RNN style
         # shifted_tgt_inputs = tf.pad(tgt_inputs, [[0, 0], [1, 0], [0, 0]])
         # shifted_tgt_inputs = shifted_tgt_inputs[:, :-1, :]
+
         ## Transformer style
         shifted_tgt_inputs = tgt_inputs[:, :-1, :]
         
-
         ## Decoder
         decoder_output = _decoder(cell, shifted_tgt_inputs, encoder_output["annotation"],
                               length, initial_state, dtype=dtype, mode=mode,
                               max_length=params.train_decode_length)
-
 
         ## Shift output
         ## RNN style
@@ -384,7 +383,6 @@ def model_training_graph(features, mode, params):
         ## Transformer style
         shifted_outputs = decoder_output["outputs"]
 
-
         maxout_features = [
             shifted_tgt_inputs,
             shifted_outputs,
@@ -396,7 +394,6 @@ def model_training_graph(features, mode, params):
         if params.dropout and not params.use_variational_dropout:
             readout = tf.nn.dropout(readout, 1.0 - params.dropout)
 
-
         ## Prediction
         logits = layers.nn.linear(readout, tgt_vocab_size, True, False, scope="softmax")
 
@@ -404,8 +401,6 @@ def model_training_graph(features, mode, params):
     ## labels
     # labels = features["target"] # RNN style
     labels = features["target"][:, 1:] # Transformer style
-
-
     logits = tf.reshape(logits, [-1, tgt_vocab_size])
     ce = losses.smoothed_softmax_cross_entropy_with_logits(
         logits=logits,
