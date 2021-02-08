@@ -298,7 +298,8 @@ def main(args):
             predictions = tf.argmax(eval_fn(placeholders, params), axis=-1, name='translation')
             print(predictions.name)
 
-            ckpt_path = "bi-gru/train/model.ckpt-263002"
+            ckpt_path = "/data/tianda_BiGRU_tf_Wonderseen_with_sos_gru_refiner/bi-gru/train/eval/model.ckpt-545000"
+            
             with tf.Session() as sess:
                 tf.train.write_graph(sess.graph_def, './msame/pb_model', 'model.pb')    # 默认，不需要修改
                 freeze_graph.freeze_graph(
@@ -318,7 +319,7 @@ def main(args):
         need_output = False ## sometimes not necessary to output the model output
         with tf.Graph().as_default():
 
-            ckpt_path = "bi-gru/train/"
+            ckpt_path = "/data/tianda_BiGRU_tf_Wonderseen_with_sos_gru_refiner/bi-gru/train/"
 
             ## data pipeline
             input_fn = lambda: eval_input_fn(eval_inputs, params)
