@@ -1,6 +1,33 @@
 #!/usr/bin/env python
 # coding=utf-8
 # Copyright 2017-2019 The THUMT Authors
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -298,7 +325,8 @@ def main(args):
             predictions = tf.argmax(eval_fn(placeholders, params), axis=-1, name='translation')
             print(predictions.name)
 
-            ckpt_path = "bi-gru/train/model.ckpt-263002"
+            ckpt_path = "/data/tianda_BiGRU_tf_Wonderseen_with_sos_gru_refiner/bi-gru/train/eval/model.ckpt-545000"
+            
             with tf.Session() as sess:
                 tf.train.write_graph(sess.graph_def, './msame/pb_model', 'model.pb')    # 默认，不需要修改
                 freeze_graph.freeze_graph(
@@ -318,7 +346,7 @@ def main(args):
         need_output = False ## sometimes not necessary to output the model output
         with tf.Graph().as_default():
 
-            ckpt_path = "bi-gru/train/"
+            ckpt_path = "/data/tianda_BiGRU_tf_Wonderseen_with_sos_gru_refiner/bi-gru/train/"
 
             ## data pipeline
             input_fn = lambda: eval_input_fn(eval_inputs, params)
