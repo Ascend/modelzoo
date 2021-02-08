@@ -11,19 +11,19 @@
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/insert_op.cfg
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/human512_3c_binary_512x512.pb
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/human_segmentation.pb
 
 
 ## om模型
 
 om模型下载地址：
 
-https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/human512_3c_binary_512x512.om
+https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/human_segmentation/human_segmentation.om
 
 使用ATC模型转换工具进行模型转换时可以参考如下指令：
 
 ```
-atc --input_shape="input_rgb:1,512,512,3" --input_format=NHWC --output=human512_3c_binary_512x512 --soc_version=Ascend310 --insert_op_conf=./insert_op.cfg --framework=3 --model=./human512_3c_binary_512x512.pb
+atc --input_shape="input_rgb:1,512,512,3" --input_format=NHWC --output=human_segmentation --soc_version=Ascend310 --insert_op_conf=./insert_op.cfg --framework=3 --model=./human_segmentation.pb
 ```
 
 ## 使用msame工具推理
@@ -37,7 +37,7 @@ atc --input_shape="input_rgb:1,512,512,3" --input_format=NHWC --output=human512_
 使用msame推理工具，参考如下命令，发起推理性能测试： 
 
 ```
-./msame --model human512_3c_binary_512x512.om  --output output/ --loop 10
+./msame --model human_segmentation.om  --output output/ --loop 10
 ```
 
 性能测试数据为：
