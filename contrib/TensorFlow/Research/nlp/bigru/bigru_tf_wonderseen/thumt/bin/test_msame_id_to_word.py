@@ -8,7 +8,6 @@ import os
 
 import numpy as np
 import tensorflow as tf
-import thumt.data.dataset as dataset
 import thumt.data.vocab as vocabulary
 import thumt.models as models
 
@@ -240,8 +239,8 @@ def main(args):
 
 
     print("############### MSAME BLEU testing #############")
-    print("Golden Translation at:", msame_golden_dir)
-    print("BiGRU Translation at:", msame_output_dir)
+    print("Golden Translation at: %s" % msame_golden_dir)
+    print("BiGRU Translation at: %s" % msame_output_dir)
     print("BLEU =", bleu.bleu(decoded_symbols, decoded_refs)*100.)
 
 if __name__ == "__main__":
