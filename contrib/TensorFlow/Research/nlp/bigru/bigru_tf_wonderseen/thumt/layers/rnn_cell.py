@@ -89,7 +89,7 @@ class LegacyGRUCell(tf.nn.rnn_cell.RNNCell):
             r = tf.nn.sigmoid(self.dense(self.linear1, all_inputs, self._num_units, False))
             u = tf.nn.sigmoid(self.dense(self.linear2, all_inputs, self._num_units, False))
             all_inputs = list(inputs) + [r * state]
-            c = tf.nn.sigmoid(self.dense(self.linear3, all_inputs, self._num_units, True))
+            c = self.dense(self.linear3, all_inputs, self._num_units, True)
 
             new_state = (1.0 - u) * state + u * tf.tanh(c)
 
