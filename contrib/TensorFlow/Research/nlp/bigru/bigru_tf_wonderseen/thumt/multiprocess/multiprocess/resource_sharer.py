@@ -1,3 +1,5 @@
+# Copyright (c) 2006-2008, R Oudkerk
+# Licensed to PSF under a Contributor Agreement.
 #
 # We use a background thread for sharing fds on Unix, and for sharing sockets on
 # Windows.
