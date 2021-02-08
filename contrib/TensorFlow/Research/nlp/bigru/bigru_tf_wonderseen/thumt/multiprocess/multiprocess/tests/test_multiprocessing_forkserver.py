@@ -1,3 +1,5 @@
+# Copyright (c) 2006-2008, R Oudkerk
+# Licensed to PSF under a Contributor Agreement.
 import unittest
 import __init__ as _test_multiprocessing
 
