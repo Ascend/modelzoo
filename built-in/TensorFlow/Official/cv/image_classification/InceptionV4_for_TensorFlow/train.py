@@ -108,7 +108,14 @@ def parse_args():
                         help="""name of log file""")
     parser.add_argument('--log_dir', default='./model',
                         help="""log directory""")
- 
+
+    parser.add_argument('--num_classes', default=1000, type=int,
+                        help="the number class of dataset")
+
+    # pre_train model path
+    parser.add_argument("--restore_path", default="inceptionv4_tensorflow_1.3",
+                        help="restore path")
+
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
