@@ -113,7 +113,7 @@ def parse_args():
                         help="the number class of dataset")
 
     # pre_train model path
-    parser.add_argument("--restore_path", default="inceptionv4_tensorflow_1.3",
+    parser.add_argument("--restore_path", default=None,
                         help="restore path")
 
     args, unknown_args = parser.parse_known_args()

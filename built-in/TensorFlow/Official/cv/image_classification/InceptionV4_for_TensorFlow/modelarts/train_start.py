@@ -117,7 +117,7 @@ def parse_args():
     parser.add_argument("--log_name", default = "inception_v4.log",
                         help = "name of log file")
 
-    parser.add_argument("--restore_path", default = "inceptionv4_tensorflow_1.3",
+    parser.add_argument("--restore_path", default = None,
                         help = "restore path")
 
     parser.add_argument('--num_classes', default = 1000, type = int,
