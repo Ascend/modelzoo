@@ -105,7 +105,7 @@ python train_npu.py --env_name PongDeterministic-v4 --threads_num 16 --model_nam
 
 python train_npu.py --env_name TutankhamDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP 5000 --lr 0.0005 --LSTM --model_name a3c_Tutankham_model_lstm
 
-python train_cpu.py --env_name AlienDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP 20000 --model_name a3c_Alien_model_lstm --lr 0.0005 --LSTM --UPDATE_GLOBAL_ITER 512
+python train_npu.py --env_name AlienDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP 20000 --model_name a3c_Alien_model_lstm --lr 0.0005 --LSTM --UPDATE_GLOBAL_ITER 512
 ```
 
 ### 2：A3C/model_Converter.py
