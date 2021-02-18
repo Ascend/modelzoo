@@ -43,7 +43,7 @@ class Model(object):
         self.layers = layers
         self.logger = logger  
 
-    def get_estimator_model_func(self, features, labels, mode, params=None):
+    def get_estimator_model_func(self, features, labels, mode):
         labels = tf.reshape(labels, (-1,))
     
         inputs = features
@@ -53,10 +53,16 @@ class Model(object):
 
         if is_training:
             with slim.arg_scope(inception_v4.inception_v4_arg_scope(weight_decay=self.args.weight_decay)):
-                top_layer, end_points = inception_v4.inception_v4(inputs=features, num_classes=self.args.num_classes, dropout_keep_prob=0.8, is_training = True)
+                top_layer, end_points = inception_v4.inception_v4(inputs=features,
+                                                                  num_classes=self.args.num_classes,
+                                                                  dropout_keep_prob=0.8,
+                                                                  is_training = True)
         else:
             with slim.arg_scope(inception_v4.inception_v4_arg_scope()):
-                top_layer, end_points = inception_v4.inception_v4(inputs=features, num_classes=self.args.num_classes, dropout_keep_prob=1.0, is_training = False)
+                top_layer, end_points = inception_v4.inception_v4(inputs=features,
+                                                                  num_classes=self.args.num_classes,
+                                                                  dropout_keep_prob=1.0,
+                                                                  is_training = False)
 
         logits = top_layer
         predicted_classes = tf.argmax(logits, axis=1, output_type=tf.int32)
