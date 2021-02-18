@@ -118,7 +118,7 @@ def main():
     if cfg.LR == 'exponential_decay':
         learning_rate_fn = learning_rate_with_exponential_decay()
     elif cfg.LR == 'paper_decay':
-        learning_rate_fn = learning_rate_with_decay(start_lr=0.0035, power=0.9)
+        learning_rate_fn = learning_rate_with_decay(start_lr=cfg.TRAIN.LEARNING_RATE, power=0.9)
     else:
         assert 0, 'error Learning_rate'
 
@@ -148,7 +148,9 @@ def main():
         batch_norm_updates_op = tf.group(*tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope))
 
         if cfg.PLATFORM == "GPU":
-            grads = opt.compute_gradients(total_loss)
+            loss_scaling = 2 ** 12
+            grads = opt.compute_gradients(total_loss * loss_scaling)
+            grads = [(grad / loss_scaling, var) for grad, var in grads]
             apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
         elif cfg.PLATFORM == "NPU":
             # grads = opt.compute_gradients(total_loss)
@@ -156,7 +158,7 @@ def main():
             loss_scaling = 2 ** 12
             grads = opt.compute_gradients(total_loss * loss_scaling)
             grads = [(grad / loss_scaling, var) for grad, var in grads]
-            grads = [(tf.clip_by_value(grad, -1., 1.), var) for grad, var in grads if grad is not None]
+            # grads = [(tf.clip_by_value(grad, -1., 1.), var) for grad, var in grads if grad is not None]
             apply_gradient_op = opt.apply_gradients(grads, global_step=global_step)
         else:
             assert 0, 'Wrong Platform!'
@@ -249,9 +251,9 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Change db_config file')
 
-    parser.add_argument('--max_steps', '-m', default=188250, type=int, help='max_steps integer')
+    parser.add_argument('--max_steps', '-m', default=187200, type=int, help='max_steps integer')
     parser.add_argument('--save_steps', '-s', default=3000, type=int, help='save_steps integer')
-    parser.add_argument('--learning_rate', '-lr', default=0.0035, type=float, help='learning rate')
+    parser.add_argument('--learning_rate', '-lr', default=0.007, type=float, help='learning rate')
     parser.add_argument('--platform', '-p', default="NPU", type=str, help='NPU or GPU')
 
     args = parser.parse_args()

@@ -44,9 +44,9 @@ obs链接：obs://dbresnet50/totaltext.zip
 
 
 ### 7.2 执行推理和精度计算的python脚本 
-python3.7 evalution.py 2>&1 | tee eval.log
+bash run.sh
 
-主要参数设置
+evalution文件主要参数设置
 ```
 imgpath 测试数据集地址
 show_res 是否对推理结果进行可视化 True/False
