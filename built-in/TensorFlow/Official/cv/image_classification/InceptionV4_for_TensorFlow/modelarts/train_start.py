@@ -116,7 +116,13 @@ def parse_args():
                         help = "log directory")
     parser.add_argument("--log_name", default = "inception_v4.log",
                         help = "name of log file")
- 
+
+    parser.add_argument("--restore_path", default = None,
+                        help = "restore path")
+
+    parser.add_argument('--num_classes', default = 1000, type = int,
+                        help="the number class of dataset")
+
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -138,7 +144,7 @@ def frozen_model(args):
     # build inference graph
     with slim.arg_scope(inception_v4.inception_v4_arg_scope()):
         top_layer, end_points = inception_v4.inception_v4(inputs=inputs,
-                                                          num_classes=1000,
+                                                          num_classes=args.get('num_classes'),
                                                           dropout_keep_prob=1.0,
                                                           is_training = False)
     logits = top_layer
@@ -179,6 +185,12 @@ def main():
 
     if not os.path.exists(model_output_path):
         os.makedirs(model_output_path, 0o755)
+
+    # pre_train model path
+    pretrained_model_dir = os.path.join(data_path, "ckpt",
+                                        input_args.restore_path)
+    input_args.restore_path = pretrained_model_dir
+
     input_args.global_batch_size = input_args.batch_size * input_args.rank_size
     input_args.data_dir = data_path
     session = cs.CreateSession()
@@ -206,8 +218,9 @@ def main():
     ckpt_list.sort(key=os.path.getmtime)
     ckpt_model = ckpt_list[-1].rsplit(".", 1)[0]
     print("====================%s" % ckpt_model)
-    frozen_args = {'ckpt_path': ckpt_model,
-                    'output_graph': '/cache/model/inception_v4_tf.pb'}
+    frozen_args = {'num_classes': input_args.num_classes,
+                   'ckpt_path': ckpt_model,
+                   'output_graph': '/cache/model/inception_v4_tf.pb'}
 
     frozen_model(frozen_args)
     # copy model to train_url

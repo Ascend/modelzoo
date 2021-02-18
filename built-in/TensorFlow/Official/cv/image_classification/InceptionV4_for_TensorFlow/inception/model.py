@@ -43,7 +43,7 @@ class Model(object):
         self.layers = layers
         self.logger = logger  
 
-    def get_estimator_model_func(self, features, labels, mode, params=None):
+    def get_estimator_model_func(self, features, labels, mode):
         labels = tf.reshape(labels, (-1,))
     
         inputs = features
@@ -53,16 +53,22 @@ class Model(object):
 
         if is_training:
             with slim.arg_scope(inception_v4.inception_v4_arg_scope(weight_decay=self.args.weight_decay)):
-                top_layer, end_points = inception_v4.inception_v4(inputs=features, num_classes=1000, dropout_keep_prob=0.8, is_training = True)
+                top_layer, end_points = inception_v4.inception_v4(inputs=features,
+                                                                  num_classes=self.args.num_classes,
+                                                                  dropout_keep_prob=0.8,
+                                                                  is_training = True)
         else:
             with slim.arg_scope(inception_v4.inception_v4_arg_scope()):
-                top_layer, end_points = inception_v4.inception_v4(inputs=features, num_classes=1000, dropout_keep_prob=1.0, is_training = False)
+                top_layer, end_points = inception_v4.inception_v4(inputs=features,
+                                                                  num_classes=self.args.num_classes,
+                                                                  dropout_keep_prob=1.0,
+                                                                  is_training = False)
 
         logits = top_layer
         predicted_classes = tf.argmax(logits, axis=1, output_type=tf.int32)
         logits = tf.cast(logits, tf.float32)
 
-        labels_one_hot = tf.one_hot(labels, depth=1000)
+        labels_one_hot = tf.one_hot(labels, depth=self.args.num_classes)
         
         loss = tf.losses.softmax_cross_entropy(
             logits=logits, onehot_labels=labels_one_hot, label_smoothing=self.args.label_smoothing)
@@ -82,6 +88,15 @@ class Model(object):
 
         assert (mode == tf.estimator.ModeKeys.TRAIN)
 
+        print('==================num_classes: %d' % self.args.num_classes)
+        if os.path.exists("{}.meta".format(self.args.restore_path)):
+            print('==================restore_path: %s' % self.args.restore_path)
+            variables_to_restore = tf.contrib.slim.get_variables_to_restore(
+                exclude=['InceptionV4/Logits/Logits',
+                         'InceptionV4/AuxLogits/Aux_logits'])
+            tf.train.init_from_checkpoint(self.args.restore_path,
+                                          {v.name.split(':')[0]: v for v in
+                                           variables_to_restore})
         batch_size = tf.shape(inputs)[0]
 
         global_step = tf.train.get_global_step()
