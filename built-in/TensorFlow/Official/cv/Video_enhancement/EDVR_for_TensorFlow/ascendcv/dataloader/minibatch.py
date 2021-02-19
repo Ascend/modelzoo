@@ -105,9 +105,6 @@ class Minibatch(object):
             lr = np.transpose(lr, [0, 1, 3, 2, 4])
             hr = np.transpose(hr, [0, 1, 3, 2, 4])
 
-        if self.noise_augmenter is not None:
-            lr = self.noise_augmenter.apply_np(lr)
-
         self.cur += self.batch_size
 
         return lr, hr[:, 0]
@@ -288,7 +285,7 @@ class DataLoader_tensorslice():
     def build_iterator_namein(self):
         video_dataset = tf.data.Dataset.from_tensor_slices(self.lrcliplist)
         rank_size = int(os.environ['RANK_SIZE'])
-        rank_id = int(os.environ['RANK_ID'])
+        rank_id = int(os.environ['DEVICE_ID'])
         if rank_size > 1:
             print(f'Shard on rank_id {rank_id}')
             video_dataset = video_dataset.shard(rank_size, rank_id)
@@ -347,7 +344,7 @@ class DataLoader_tfTest():
     def build_iterator_namein(self):
         video_dataset = tf.data.Dataset.from_tensor_slices(self.lrcliplist)
         rank_size = int(os.environ['RANK_SIZE'])
-        rank_id = int(os.environ['RANK_ID'])
+        rank_id = int(os.environ['DEVICE_ID'])
         if rank_size > 1:
             print(f'Shard on rank_id {rank_id}')
             video_dataset = video_dataset.shard(rank_size, rank_id)
