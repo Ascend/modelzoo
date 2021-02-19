@@ -161,7 +161,7 @@ class VSR(object):
             bcast_op = broadcast_global_variables(self.cfg.root_rank)
             sess.run(bcast_op)
 
-        if not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
+        if not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
             tf.io.write_graph(sess.graph_def, self.output_dir, 'train_graph.pbtxt')
             print(f'[INFO] Start training. Log device: {int(os.environ["DEVICE_ID"])}')
 
@@ -187,16 +187,16 @@ class VSR(object):
             ave_loss = ave_loss * 0.995 + loss_v * 0.005 if ave_loss is not None else loss_v
 
             if (it + 1) % self.solver.print_interval == 0 and \
-                    not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
+                    not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
                 ave_time = once_time / self.solver.print_interval
                 fps = self.batch_size / ave_time * self.cfg.rank_size
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                       'Step:{}, lr:{:.8f}, loss:{:.08f}, session time:{:.2f}ms, session fps:{:.2f}, device_id: {}'.format(
-                          (it + 1), cur_lr, ave_loss, ave_time * 1000, fps, os.environ['RANK_ID']))
+                          (it + 1), cur_lr, ave_loss, ave_time * 1000, fps, os.environ['DEVICE_ID']))
                 st_time = time.time()
 
             if (it + 1) % self.solver.checkpoint_interval == 0 and \
-                    not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
+                    not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
                 self.save(sess, (it + 1))
 
     def process_input_image(self, im_names):
