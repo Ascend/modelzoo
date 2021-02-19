@@ -1,76 +1,74 @@
 # PSENet: Shape Robust Text Detection with Progressive Scale Expansion Network
+原始模型参考[github链接](https://github.com/liuheng92/tensorflow_PSENet),迁移训练代码到NPU
 
-### Introduction
-This is a tensorflow re-implementation of [PSENet: Shape Robust Text Detection with Progressive Scale Expansion Network](https://arxiv.org/abs/1806.02559).
+## Requirements
+- Tensorflow 1.15.0.
+- Ascend910
+- 其他依赖参考requirements.txt
+- 数据集，下面有百度网盘下载链接，提取码1234
 
-Thanks for the author's ([@whai362](https://github.com/whai362)) awesome work!
-
-### Installation
-1. Any version of tensorflow version > 1.0 should be ok.
-2. python 2 or 3 will be ok.
-
-### Download
-trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): 
-
-[baiduyun](https://pan.baidu.com/s/14tQHf9MjuD0lSmwkoZhnCg)  extract code: pffd
-
-[google drive](https://drive.google.com/file/d/1TjJvtwMp8hJXQhn6Yz2lbPdvBGH-ZQ8u/view?usp=sharing)
-
-This model is not as good as article's, it's just a reference.
-You can finetune on it or you can do a lot of optimization based on this code. 
-
-| Database | Precision (%) | Recall (%) | F-measure (%) | 
-| - | - | - | - |
-| ICDAR 2015(val) | 74.61 | 80.93 | 77.64 |
-
-
-### Train
-If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image, and **make sure that gt text and image file have the same names**.
-
-Then run train.py like:
-
-```
-python train.py --gpu_list=0 --input_size=512 --batch_size_per_gpu=8 --checkpoint_path=./resnet_v1_50/ \
---training_data_path=./data/ocr/icdar2015/
-```
-
-If you have more than one gpu, you can pass gpu ids to gpu_list(like --gpu_list=0,1,2,3)
-
-**Note:**
-1. right now , only support icdar2017 data format input, like (116,1179,206,1179,206,1207,116,1207,"###"),
-but you can modify data_provider.py to support polygon format input
-2. Already support polygon shrink by using pyclipper module
-3. this re-implementation is just for fun, but I'll continue to improve this code.
-4. re-implementation pse algorithm by using c++
-***(if you use python2, just run it, if python3, please replace python-config with python3-config in makefile)***
-
-### Test
-run eval.py like:
-```
-python eval.py --test_data_path=./tmp/images/ --gpu_list=0 --checkpoint_path=./resnet_v1_50/ \
---output_dir=./tmp/
+## 代码路径解释
+```shell
+.
+├── checkpoint        ----存放训练ckpt的路径
+├── eval.py           ----推理入口py     
+├── eval.sh           ----推理shell，计算icdar2015测试集的精度、召回率、F1 Score
+├── evaluation        ----精度计算相关的py，新增
+├── LICENSE
+├── nets              ----网络模型定义，包含backbone
+│   ├── __init__.py
+│   ├── model.py
+│   ├── __pycache__
+│   └── resnet
+├── npu_train.py      ----NPU训练
+├── ocr               ----数据集存放目录
+│   ├── ch4_test_images  --test图片
+│   └── icdar2015        --train图片
+├── pretrain_model    ----backbone
+├── pse               ----后处理PSE代码
+│   ├── include
+│   ├── __init__.py
+│   ├── Makefile
+│   ├── pse.cpp
+│   ├── pse.so
+│   └── __pycache__
+├── readme.md
+├── train_npu.sh     ----NPU训练入口shell
+├── train.py         ----GPU训练
+└── utils            ----数据集读取和预处理
+    ├── data_provider
+    ├── __init__.py
+    ├── __pycache__
+    └── utils_tool.py
 ```
 
-a text file and result image will be then written to the output path.
+## 准备数据和Backbone模型
+Icdar2015、Icdar2017可以去官网下载，或者直接从百度网盘里面获取，Backbone使用Resnet50_v1 [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz) [BaiduYun link，提取码1234](https://pan.baidu.com/s/1gh8q0WWoqWXHHtIumUG_Mg) 
 
-### Examples
-![result0](figure/result0.jpg)
-![result1](figure/result1.jpg)
-![result2](figure/result2.jpg)
-![result3](figure/result3.jpg)
-![result4](figure/result4.jpg)
-![result5](figure/result5.jpg)
+存放目录参考上面的解释。
 
-### About issues
-If you encounter any issue check issues first, or you can open a new issue.
+## 一些说明
+1、原始Github链接中，作者给出的预训练模型基于Icdar2015+Icdar2017数据集训练，Icdar2015测试集评估，
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0219/235136_f88bf050_8432352.png "屏幕截图.png")
+精度数据：
+|     | Precision | Recall | Hmean |
+|-----|-----------|--------|-------|
+| GPU | 0.766     | 0.677  | 0.719 |
 
-### Reference
-1. http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz
-2. https://github.com/CharlesShang/FastMaskRCNN
-3. https://github.com/whai362/PSENet/issues/15
-4. https://github.com/argman/EAST
+2、给出的训练超参也是基于预训练模型进行Finetune的超参：
+```
+tf.app.flags.DEFINE_integer('input_size', 512, '')
+tf.app.flags.DEFINE_integer('batch_size_per_gpu', 8, '')
+tf.app.flags.DEFINE_integer('num_readers', 32, '')
+tf.app.flags.DEFINE_float('learning_rate', 0.00001, '')
+tf.app.flags.DEFINE_integer('max_steps', 100000, '')
+tf.app.flags.DEFINE_float('moving_average_decay', 0.997, '')
+tf.app.flags.DEFINE_string('gpu_list', '0', '')
+tf.app.flags.DEFINE_string('checkpoint_path', './resnet_train/', '')
+tf.app.flags.DEFINE_boolean('restore', False, 'whether to resotre from checkpoint')
+tf.app.flags.DEFINE_integer('save_checkpoint_steps', 1000, '')
+tf.app.flags.DEFINE_integer('save_summary_steps', 100, '')
+tf.app.flags.DEFINE_string('pretrained_model_path', None, '')
+```
+3、本次实现，重新调整超参，使用Resnet50_v1预训练模型作为BackBone，使用Icdar2015和Icdar2015+Icdar2017数据集重新进行训练。
 
-### Acknowledge
-[@rkshuai](https://github.com/rkshuai) found a bug about concat features in model.py.
-
-**If this repository helps you，please star it. Thanks.**
