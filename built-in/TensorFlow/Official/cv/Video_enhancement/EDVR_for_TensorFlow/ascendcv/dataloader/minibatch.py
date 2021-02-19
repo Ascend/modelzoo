@@ -105,9 +105,6 @@ class Minibatch(object):
             lr = np.transpose(lr, [0, 1, 3, 2, 4])
             hr = np.transpose(hr, [0, 1, 3, 2, 4])
 
-        if self.noise_augmenter is not None:
-            lr = self.noise_augmenter.apply_np(lr)
-
         self.cur += self.batch_size
 
         return lr, hr[:, 0]
