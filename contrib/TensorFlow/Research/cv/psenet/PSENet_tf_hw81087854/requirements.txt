@@ -1,2 +1,2 @@
 pyclipper
-Pologon3
+Polygon3
