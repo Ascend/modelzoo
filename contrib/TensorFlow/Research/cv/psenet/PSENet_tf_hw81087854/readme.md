@@ -134,7 +134,7 @@ python3.7 evaluation/script.py -g=./evaluation/gt.zip -s=${output_dir}/results.z
 | GPU | 0.460     | 0.355  | 0.401 |
 | NPU | 0.459     | 0.371  | 0.410 |
 
-NPU和GPU的Events文件（ckpt精度太低就不存放了）([BaiduYun link，提取码1234](https://pan.baidu.com/s/1rxc7WabhieyXYvaNM9pQUw）)
+NPU和GPU的Events文件（ckpt精度太低就不存放了）([BaiduYun link，提取码1234](https://pan.baidu.com/s/1rxc7WabhieyXYvaNM9pQUw))
 
 ### 精度提升
 发现精度与预期相差太大之后，阅读原作者的代码，发现应该要带上BackBone的预训练模型进行训练：
@@ -155,7 +155,7 @@ python3.7 train_npu.py \
 |-----|-----------|--------|-------|
 | NPU | 0.606     | 0.621  | 0.613 |
 
-icdar2015+icdar2017数据集[BaiduYun link，提取码1234](https://pan.baidu.com/s/1bmKVFuiDTpWg_TiYLDhnMg)\
+icdar2015+icdar2017数据集([BaiduYun link，提取码1234](https://pan.baidu.com/s/1bmKVFuiDTpWg_TiYLDhnMg))\
 NPU训练约15hours，超参如下：
 ```
 export TF_CPP_MIN_LOG_LEVEL=2
@@ -186,6 +186,7 @@ python3.7 npu_train.py \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
 TotalLoss趋势比对（NPU vs GPU）：
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0220/002637_fe59b040_8432352.png "屏幕截图.png")
 
 红色是GPU，绿色是NPU
@@ -196,4 +197,4 @@ TotalLoss趋势比对（NPU vs GPU）：
 | GPU | 0.764     | 0.714  | 0.738 |
 | NPU | 0.730     | 0.742  | 0.736 |
 
-GPU和NPU的ckpt&events：[BaiduYun link，提取码1234]（https://pan.baidu.com/s/1oDi54CifBtWVIp6XsFluFQ)
+GPU和NPU的ckpt&events：[BaiduYun link，提取码1234](https://pan.baidu.com/s/1oDi54CifBtWVIp6XsFluFQ)
