@@ -32,6 +32,11 @@ import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 
+from npu_bridge.estimator.npu import npu_scope
+from npu_bridge.estimator import npu_ops
+from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+import argparse
+
 from model import VQVAE, _mnist_arch, PixelCNN
 
 def main(config,
@@ -105,6 +110,12 @@ def main(config,
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Run!
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
+
+    custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name =  "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True 
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+
     sess = tf.Session(config=config)
     sess.graph.finalize()
     sess.run(init_op)
@@ -161,6 +172,10 @@ def extract_z(MODEL,
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Run!
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
+    custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name =  "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True 
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
     sess = tf.Session(config=config)
     sess.graph.finalize()
     sess.run(init_op)
@@ -247,6 +262,10 @@ def train_prior(config,
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Run!
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
+    custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name =  "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True 
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
     sess = tf.Session(config=config)
     sess.graph.finalize()
     sess.run(init_op)

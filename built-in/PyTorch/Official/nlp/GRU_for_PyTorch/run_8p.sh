@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 source npu_set_env.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
@@ -24,5 +25,7 @@ python3.7 ${currentDir}/gru_8p.py \
         --epoch 10 \
         --rank 0 \
         --device-list '0,1,2,3,4,5,6,7' \
-        --amp   > ./gru_8p.log 2>&1 &
+        --amp \
+        --bleu-npu 0 \
+        --ckptpath ./seq2seq-gru-model.pth.tar > ./gru_8p.log 2>&1 &
 

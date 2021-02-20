@@ -14,7 +14,8 @@ export HEARTBEAT=1
 export CONITNUE_TRAIN=true
 export LOG_DIR=./log
 
-
+export ASCEND_GLOBAL_EVENT_LEVEL=0
+export ASCEND_GLOBAL_LOG_LEVEL=3
 export TF_CPP_MIN_LOG_LEVEL=3
 
 # Turn profiling on
@@ -35,4 +36,5 @@ python3 tools/main.py \
     mode inference \
     data.data_dir 'data/reds' \
     data.eval_in_size 180,320 \
+    model.convert_output_to_uint8 True \
     checkpoint ${CKPT}

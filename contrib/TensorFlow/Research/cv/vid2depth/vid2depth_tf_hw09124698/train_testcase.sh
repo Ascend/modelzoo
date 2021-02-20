@@ -5,7 +5,7 @@ execpath=${PWD}
 rm -rf *.pbtxt
 ulimit -c 0
 unzip outdata.zip
-python3 train.py --data_dir ./outdata/ --seq_length 3 --reconstr_weight 0.85 --smooth_weight 0.05 --ssim_weight 0.15 --icp_weight 0 --checkpoint_dir ./checkpoints > train.log 2>&1
+python3.7 train.py --data_dir ./outdata/ --seq_length 3 --reconstr_weight 0.85 --smooth_weight 0.05 --ssim_weight 0.15 --icp_weight 0 --train_steps 1 --summary_freq 1 --checkpoint_dir ./checkpoints > train.log 2>&1
 
 key1="\[GEOP\]"  #功能检查字
 

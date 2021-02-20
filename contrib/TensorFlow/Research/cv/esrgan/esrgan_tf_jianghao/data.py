@@ -29,7 +29,7 @@
 import random
 import pathlib
 import tensorflow as tf
-from .utils import paired_random_crop, augment
+from utils import paired_random_crop, augment
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 
 

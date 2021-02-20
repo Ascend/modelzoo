@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 source npu_set_env.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error

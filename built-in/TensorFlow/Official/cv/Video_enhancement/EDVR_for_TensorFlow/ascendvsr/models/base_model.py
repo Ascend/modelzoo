@@ -7,14 +7,13 @@ import json
 import re
 import tensorflow as tf
 from tqdm import trange
-# from skimage import io as sio
-# from skimage import transform as strans
 
 from ascendcv.runner.solver import build_solver
 from ascendcv.utils.writer import ImageWriter
 from ascendcv.runner.hccl_broadcast import broadcast_global_variables
-from ascendcv.utils.dataloader import PrefetchGenerator
-from ascendvsr.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
+# from ascendcv.dataloader.dataloader import PrefetchGenerator
+from ascendvsr.build_dataloader import build_train_dataloader, build_test_dataloader
+# from ascendcv.dataloader.minibatch import Minibatch, TestMinibatch, DataLoader_tensorslice
 
 
 class VSR(object):
@@ -75,7 +74,7 @@ class VSR(object):
         self.SR = self.build_generator(self.LR)
         if self.is_train:
             self.HR = tf.placeholder(tf.float32, shape=[b, h * 4, w * 4, 3], name='H_truth')
-            self.loss = self.caculate_loss(self.SR, self.HR)
+            self.loss = self.calculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
             self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
@@ -83,12 +82,12 @@ class VSR(object):
     def build_v2(self):
         self.SR = self.build_generator(self.LR)
         if self.is_train:
-            self.loss = self.caculate_loss(self.SR, self.HR)
+            self.loss = self.calculate_loss(self.SR, self.HR)
 
         if self.cfg.model.convert_output_to_uint8:
             self.SR = tf.cast(tf.round(tf.clip_by_value(self.SR * 255, 0., 255.)), tf.uint8)
 
-    def caculate_loss(self, SR, HR, *kwargs):
+    def calculate_loss(self, SR, HR, *kwargs):
         raise NotImplementedError
 
     def build_generator(self, x):
@@ -125,65 +124,26 @@ class VSR(object):
                 raise ValueError
         return recover_step
     
-    def load_from_pb(self, sess):
-        try:
-            with open(self.checkpoint, 'rb') as f:
-                graph_def = GraphDef()
-                graph_def.ParseFromString(f.read())
-
-                # When reading some .pb, encounter the following problem:
-                # ValueError: Input 0 of node generator_1/dense/Assign was passed float from generator/dense/u:0 incompatible with expected float_ref.
-                # Solution: https://github.com/Byronnar/tensorflow-serving-yolov3/issues/77
-                with sess.graph.as_default():
-                    # fix nodes
-                    for node in graph_def.node:
-                        if node.op == 'RefSwitch':
-                            node.op = 'Switch'
-                            for index in range(len(node.input)):
-                                if 'moving_' in node.input[index]:
-                                    node.input[index] = node.input[index] + '/read'
-                        elif node.op == 'AssignSub':
-                            node.op = 'Sub'
-                            if 'use_locking' in node.attr: del node.attr['use_locking']
-                        elif node.op == 'AssignAdd':
-                            node.op = 'Add'
-                            if 'use_locking' in node.attr: del node.attr['use_locking']
-                        elif node.op == 'Assign':
-                            node.op = 'Identity'
-                            if 'use_locking' in node.attr: del node.attr['use_locking']
-                            if 'validate_shape' in node.attr: del node.attr['validate_shape']
-                            if len(node.input) == 2:
-                                node.input[0] = node.input[1]
-                                del node.input[1]
-
-                return graph_def
-
-        except DecodeError:
-            meta_graph = tf.saved_model.loader.load(
-                sess, [tf.saved_model.tag_constants.SERVING], os.path.dirname(pb_file))
-            return meta_graph.graph_def
-    
     def train(self, sess_cfg):
+        dataloader = build_train_dataloader(
+            read_mode=self.read_mode,
+            batch_size=self.batch_size,
+            scale=self.scale,
+            set_file=self.set_file,
+            num_frames=self.num_frames,
+            in_size=self.in_size,
+            data_config=self.cfg.data
+        )
         if self.read_mode == 'python':
-            self.minibatch = Minibatch(
-                data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
-                scale=self.scale, in_size=self.in_size)
-            self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.train_data_queue_size)
             self.build()
         elif self.read_mode == 'tf':
-            self.minidata = DataLoader_tensorslice(
-                data_dir=self.data_dir, set_file=self.set_file, batch_size=self.batch_size, num_frames=self.num_frames,
-                scale=self.scale, in_size=self.in_size)
-            # self.LR, self.HR, flip, offh, offw = self.minidata.batch_list
-            self.LR, self.HR = self.minidata.batch_list
+            self.LR, self.HR = dataloader
             self.build_v2()
         else:
             raise ValueError
 
         vars_all = tf.trainable_variables()
-
         solver = build_solver(self.solver, self.device, self.is_distributed)
-
         train_op = solver.opt.minimize(self.loss, var_list=vars_all)
 
         # Init variables
@@ -198,68 +158,48 @@ class VSR(object):
         
         npu_distributed = self.cfg.device == 'npu' and self.is_distributed
         if npu_distributed:
-            bcast_op = broadcast_global_variables(self.cfg.root_rank, os.environ['DEVICE_ID'])
+            bcast_op = broadcast_global_variables(self.cfg.root_rank)
             sess.run(bcast_op)
 
         if not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
             tf.io.write_graph(sess.graph_def, self.output_dir, 'train_graph.pbtxt')
-            print(f'[INFO] Start training. Log device: {self.cfg.root_rank}')
+            print(f'[INFO] Start training. Log device: {int(os.environ["DEVICE_ID"])}')
 
         self.saver = tf.train.Saver(max_to_keep=100, keep_checkpoint_every_n_hours=1)
 
         ave_loss = None
-        ave_time = None
+        st_time = time.time()
         for it in range(recover_step, solver.total_step):
             if self.read_mode == 'python':
-                input_lr, input_hr = next(self.loader)
-
-                st_time = time.time()
+                input_lr, input_hr = next(dataloader)
                 _, cur_lr, loss_v = sess.run(
                     [train_op, solver.lr_schedule.lr, self.loss],
                     feed_dict={self.LR: input_lr, self.HR: input_hr, solver.lr_schedule.lr: solver.update_lr()})
-                onece_time = time.time() - st_time
             elif self.read_mode == 'tf':
                 try:
-                    # lr, hr, fp, oh, ow = sess.run([self.LR, self.HR, flip, offh, offw])
-                    # print(f'Rank id: {os.environ["RANK_ID"]}')
-                    # print(f'\t {np.mean(lr):.04f}, {hr}, {fp}, {oh}, {ow}')
-                    st_time = time.time()
                     _, cur_lr, loss_v = sess.run(
                         [train_op, solver.lr_schedule.lr, self.loss],
                         feed_dict={solver.lr_schedule.lr: solver.update_lr()})
-                    onece_time = time.time() - st_time
                 except tf.errors.OutOfRangeError:
-                    raise ValueError(f'End of the dateset in {step}')
+                    raise ValueError(f'End of the dateset in {it}')
 
-            if ave_time is None or it < 20:
-                ave_time = onece_time
-            else:
-                ave_time = ave_time * 0.995 + onece_time * 0.005
-
+            once_time = time.time() - st_time
             ave_loss = ave_loss * 0.995 + loss_v * 0.005 if ave_loss is not None else loss_v
 
             if (it + 1) % self.solver.print_interval == 0 and \
-                    not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
+                    not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
+                ave_time = once_time / self.solver.print_interval
                 fps = self.batch_size / ave_time * self.cfg.rank_size
                 print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
                       'Step:{}, lr:{:.8f}, loss:{:.08f}, session time:{:.2f}ms, session fps:{:.2f}, device_id: {}'.format(
-                          (it + 1), cur_lr, ave_loss, ave_time * 1000, fps, os.environ['RANK_ID']))
+                          (it + 1), cur_lr, ave_loss, ave_time * 1000, fps, os.environ['DEVICE_ID']))
+                st_time = time.time()
 
             if (it + 1) % self.solver.checkpoint_interval == 0 and \
-                    not (npu_distributed and int(os.environ['RANK_ID']) != self.cfg.root_rank):
+                    not (npu_distributed and int(os.environ['DEVICE_ID']) != self.cfg.root_rank):
                 self.save(sess, (it + 1))
 
-
-    def process_input_image(self, im_names, apply_scale=False):
-        # try:
-        #     from skimage import io as sio
-        #     from skimage import transform as strans
-        #     im = sio.imread(im_names) / 255.
-        #     h, w, c = im.shape
-        #     scale = self.scale if apply_scale else 1
-        #     if h != self.cfg.data.eval_in_size[0]*scale or w != self.cfg.data.eval_in_size[1]*scale:
-        #         im = strans.resize(im, (self.cfg.data.eval_in_size[0]*scale, self.cfg.data.eval_in_size[1]*scale))
-        # except ImportError:
+    def process_input_image(self, im_names):
         im = imageio.imread(im_names) / 255.
         return im
 
@@ -273,7 +213,6 @@ class VSR(object):
             meta = json.load(fid)
 
         mse_acc = None
-        ave_time = 0
         for vid in meta['videos']:
             print('Evaluate {}'.format(vid['name']))
             if meta['prefix']:
@@ -287,7 +226,7 @@ class VSR(object):
             lrImgs = sorted(glob.glob(os.path.join(in_path, '*.png')))
             lrImgs = np.array([self.process_input_image(i) for i in lrImgs]).astype(np.float32)
             gtImgs = sorted(glob.glob(os.path.join(gt_path, '*.png')))
-            gtImgs = np.array([self.process_input_image(i, True) for i in gtImgs]).astype(np.float32)
+            gtImgs = np.array([self.process_input_image(i) for i in gtImgs]).astype(np.float32)
 
             lr_list = []
             max_frame = lrImgs.shape[0]
@@ -301,12 +240,14 @@ class VSR(object):
             ave_time = 0
             for i in range(max_frame):
                 st_time = time.time()
-                sr = sess.run(self.SR, feed_dict={self.LR: lr_list[i][None]})
+                if self.cfg.model.input_format_dimension == 5:
+                    lr_input = lr_list[i][None]
+                else:
+                    lr_input = lr_list[i]
+                sr = sess.run(self.SR, feed_dict={self.LR: lr_input})
                 onece_time = time.time() - st_time
-                # ave_time = ave_time * 0.9 + onece_time * 0.1
                 if i > 0:
                     ave_time += onece_time
-                # print('Done frame {}: runtime = {:.0f} ms/frame ({:.1f} FPS)'.format(i, ave_time * 1000, 1 / ave_time))
                 sr = np.clip(sr * 255., 0, 255).squeeze()
                 gt = gtImgs[i] * 255.
                 mse_val = np.mean((gt - sr) ** 2)[None]
@@ -329,21 +270,25 @@ class VSR(object):
         sess = tf.Session(config=sess_cfg)
         self.load(sess)
 
-        self.minibatch = TestMinibatch(
-            data_dir=self.data_dir, set_file='val.json', batch_size=self.batch_size, num_frames=self.num_frames,
-            scale=self.scale)
+        dataloader = build_test_dataloader(
+            batch_size=self.batch_size,
+            scale=self.scale,
+            set_file=self.set_file,
+            num_frames=self.num_frames,
+            data_config=self.cfg.data
+        )
         # self.loader = PrefetchGenerator(self.minibatch, self.cfg.data.num_threads, self.cfg.data.max_queue_size)
-        writer = ImageWriter(8, 64)
+        writer = ImageWriter(self.cfg.writer_num_threads, self.cfg.writer_queue_size)
 
         output_dir = os.path.join(self.output_dir, self.cfg.inference_result_dir)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
         print(f'Inference results path: {output_dir}')
         ave_time = 0
-        max_frame = len(self.minibatch)
+        max_frame = len(dataloader)
         for i in trange(max_frame):
             # lr_names, lr = next(self.loader)
-            lr_names, lr = self.minibatch.get_next()
+            lr_names, lr = dataloader.get_next()
             st_time = time.time()
             if self.cfg.data.eval_in_patch:
                 sr = self._inference_stitching(
@@ -360,18 +305,24 @@ class VSR(object):
 
             im_name = lr_names[0].split(os.path.sep)
             output_img_path = os.path.join(output_dir, *im_name[-3:])
+            output_folder = os.path.split(output_img_path)[0]
+            os.makedirs(output_folder, exist_ok=True)
             writer.put_to_queue(output_img_path, sr)
 
-        print(f'Writing images to files. This may take some time')
+        print(f'Writing images to files. This may take some time. Please DO NOT manually interrupt !!!')
         writer.end()
         del writer
-        print(f'\tInference time: {(ave_time / (max_frame - 1)) * 1000:.2f}')
+        print(f'\tInference time: {(ave_time / (max_frame - 1)) * 1000:.2f} ms/image')
     
     def _inference_whole(self, sess, img):
+        if self.cfg.model.input_format_dimension == 4:
+            img = np.reshape(img, [-1, *img.shape[2:]])
         sr = sess.run(self.SR, feed_dict={self.LR: img})
-        sr = np.clip(sr * 255., 0, 255).squeeze()
-        sr = np.round(sr).astype(np.uint8)
-        return sr
+        if not self.cfg.model.convert_output_to_uint8:
+            sr = np.clip(sr * 255., 0, 255)
+            sr = np.round(sr).astype(np.uint8)
+
+        return sr.squeeze()
 
     def _inference_stitching(self, sess, img, patch_per_step=1, patch_size=(180, 320), pad=32):
         from itertools import product
@@ -430,8 +381,10 @@ class VSR(object):
         patch_sr = []
         for i in range(num_step):
             batch_data = img_patches_padded[i * patch_per_step:(i + 1) * patch_per_step]
-            if patch_per_step == 1 and batch_data.shape[0] != 1:
+            if patch_per_step == 1 and batch_data.shape[0] != 1 and self.cfg.model.input_format_dimension == 5:
                 batch_data = batch_data[None, ...]
+            elif self.cfg.model.input_format_dimension == 4:
+                batch_data = np.reshape(batch_data, [-1, *batch_data.shape[2:]])
 
             _patch_sr = sess.run(self.SR, feed_dict={self.LR: batch_data})
             patch_sr.extend(_patch_sr)

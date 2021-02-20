@@ -20,5 +20,5 @@ python3.7 ${currentDir}/densenet121_1p_main.py \
         --print-freq 1 \
         --eval-freq 5 \
         --batch-size 256 \
-        --epoch 90 \
+        --epochs 90 \
         --data /data/imagenet/ > ./densenet121_1p.log 2>&1 &

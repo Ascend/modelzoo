@@ -1,6 +1,33 @@
 # coding=utf-8
+#!/usr/bin/env python
 # Copyright 2017-2019 The THUMT Authors
-
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -11,8 +38,6 @@ import thumt.layers as layers
 import thumt.losses as losses
 import thumt.utils as utils
 from thumt.models.model import NMTModel
-
-
 from thumt.parameter_config import *
 
  
@@ -43,6 +68,8 @@ def _gru_encoder(cell, inputs, sequence_length, initial_state, dtype=None, max_l
         input_ta = tf.TensorArray(dtype, time_steps, tensor_array_name="input_array") # dymanic
         output_ta = tf.TensorArray(dtype, time_steps, tensor_array_name="output_array") # dymanic
         input_ta = input_ta.unstack(tf.transpose(inputs, [1, 0, 2]))
+
+
         def loop_func(t, out_ta, state): # dymanic
             inp_t = input_ta.read(t) # dymanic
             cell_output, new_state = cell(inp_t, state)
@@ -361,15 +388,14 @@ def model_training_graph(features, mode, params):
         ## RNN style
         # shifted_tgt_inputs = tf.pad(tgt_inputs, [[0, 0], [1, 0], [0, 0]])
         # shifted_tgt_inputs = shifted_tgt_inputs[:, :-1, :]
+
         ## Transformer style
         shifted_tgt_inputs = tgt_inputs[:, :-1, :]
         
-
         ## Decoder
         decoder_output = _decoder(cell, shifted_tgt_inputs, encoder_output["annotation"],
                               length, initial_state, dtype=dtype, mode=mode,
                               max_length=params.train_decode_length)
-
 
         ## Shift output
         ## RNN style
@@ -384,7 +410,6 @@ def model_training_graph(features, mode, params):
         ## Transformer style
         shifted_outputs = decoder_output["outputs"]
 
-
         maxout_features = [
             shifted_tgt_inputs,
             shifted_outputs,
@@ -396,7 +421,6 @@ def model_training_graph(features, mode, params):
         if params.dropout and not params.use_variational_dropout:
             readout = tf.nn.dropout(readout, 1.0 - params.dropout)
 
-
         ## Prediction
         logits = layers.nn.linear(readout, tgt_vocab_size, True, False, scope="softmax")
 
@@ -404,8 +428,6 @@ def model_training_graph(features, mode, params):
     ## labels
     # labels = features["target"] # RNN style
     labels = features["target"][:, 1:] # Transformer style
-
-
     logits = tf.reshape(logits, [-1, tgt_vocab_size])
     ce = losses.smoothed_softmax_cross_entropy_with_logits(
         logits=logits,
@@ -482,10 +504,9 @@ def model_infer_graph(features, mode, params, msame=False):
         t = 0
 
         ## uncessary for NPU
-        # zero_value = tf.zeros([params.eval_batch_size, memory.shape[-1].value], dtype)
+        # zero_value = tf.zeros([EVAL_BATCH_SIZE, memory.shape[-1].value], dtype)
 
         target_outputs = []
-
 
         if "target" in features:
             if len(features["target"].get_shape().as_list()) == 2:
@@ -494,12 +515,12 @@ def model_infer_graph(features, mode, params, msame=False):
                 target = features["target"]
         else:
             target = tf.ones([params.eval_batch_size], dtype=tf.int32)*BOS_ID
-
+        
         ## Here is a non-incremental decoding
         while t < params.eval_decode_length-1:
             ## RNN style
             # if t == 0:
-            #     inp_t = tf.zeros([params.eval_batch_size, params.embedding_size], dtype)
+            #     inp_t = tf.zeros([EVAL_BATCH_SIZE, params.embedding_size], dtype)
             # else:
             #     tgt_inputs = tf.nn.embedding_lookup(tgt_emb, target)
             #     inp_t = tf.nn.bias_add(tgt_inputs, tgt_bias)
@@ -508,15 +529,15 @@ def model_infer_graph(features, mode, params, msame=False):
             inp_t = tf.nn.bias_add(tgt_inputs, tgt_bias)
 
             ## uncessary for NPU
-            # inp_t = tf.reshape(inp_t, [params.eval_batch_size, params.embedding_size])
+            # inp_t = tf.reshape(inp_t, [EVAL_BATCH_SIZE, params.embedding_size])
             
             results = layers.attention.attention(state, memory, bias, output_size, cache={"key": cache_key}, reuse=tf.AUTO_REUSE)
             alpha = results["weight"]
             context = results["value"]
             
             ## uncessary for NPU
-            # context = tf.reshape(context, [params.eval_batch_size, 2*output_size])
-            # state = tf.reshape(state, [params.eval_batch_size, output_size])
+            # context = tf.reshape(context, [EVAL_BATCH_SIZE, 2*output_size])
+            # state = tf.reshape(state, [EVAL_BATCH_SIZE, output_size])
 
             cell_input = [inp_t, context]
             cell_output, new_state = cell(cell_input, state)
@@ -544,7 +565,8 @@ def model_infer_graph(features, mode, params, msame=False):
             target_outputs.append(tf.nn.log_softmax(logit))
             t += 1
 
-        target_outputs = tf.stack(target_outputs, axis=1, name="logit_sequence")
+        target_outputs = tf.stack(target_outputs, axis=1)
+
     return target_outputs
 
 

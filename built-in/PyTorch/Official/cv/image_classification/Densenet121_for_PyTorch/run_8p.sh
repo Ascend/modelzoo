@@ -20,7 +20,7 @@ python3.7 ${currentDir}/densenet121_8p_main.py \
         --print-freq 1 \
         --eval-freq 5 \
         --batch-size 2048 \
-        --epoch 90 \
+        --epochs 90 \
         --dist-url 'tcp://127.0.0.1:50000' \
         --dist-backend 'hccl' \
         --multiprocessing-distributed \

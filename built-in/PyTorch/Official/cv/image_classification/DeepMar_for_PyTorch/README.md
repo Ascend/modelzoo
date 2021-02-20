@@ -14,9 +14,10 @@
 
 ```
 	1.安装环境
-	2.修改多P脚本中字段"save_dir"为当前磁盘的数据集路径
-	3.修改run_8p.sh字段"addr"为当前主机ip地址
-	4.cd到run_8p.sh文件的目录，执行bash run_8p.sh等多卡脚本， 进行多卡训练	
+	2.修改run_8p.sh字段"save_dir"为当前磁盘的数据集路径
+	3.修改run_8p.sh字段"traintest_split_file"为数据集路径/peta_partition.pkl
+	4.修改run_8p.sh字段"addr"为当前主机ip地址
+	5.cd到run_8p.sh文件的目录，执行bash run_8p.sh等多卡脚本， 进行多卡训练	
 ```
 
 ### 二、Docker容器训练

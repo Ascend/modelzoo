@@ -4,8 +4,6 @@ DEVICE_RANK=$2
 
 # set env
 
-#AISERVER
-ulimit -c 0
 #export PRINT_MODEL=1
 export MOX_USE_NPU=1
 export FUSION_TENSOR_SIZE=2000000000
@@ -16,7 +14,8 @@ export HEARTBEAT=1
 export CONITNUE_TRAIN=true
 export LOG_DIR=./log
 
-
+export ASCEND_GLOBAL_EVENT_LEVEL=0
+export ASCEND_GLOBAL_LOG_LEVEL=3
 export TF_CPP_MIN_LOG_LEVEL=3
 
 # Turn profiling on

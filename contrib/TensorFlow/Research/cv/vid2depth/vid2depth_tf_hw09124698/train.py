@@ -46,13 +46,12 @@ from __future__ import print_function
 
 import math
 import os
-#os.environ['SLOG_PRINT_TO_STDOUT']="0"
-#os.environ['GLOBAL_LOG_LEVEL']='3'
-#os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-#os.environ['SLOG_PRINT_TO_STDOUT']='1'
 #os.environ['DUMP_GE_GRAPH']="2"
-#os.environ['PRINT_MODEL']="0"
+#os.environ['PRINT_MODEL']="1"
 #os.environ['EXPERIMENTAL_DYNAMIC_PARTITION']="1"
+#os.environ['ASCEND_GLOBAL_LOG_LEVEL']='3'
+#os.environ['ASCEND_GLOBAL_EVENT_ENABLE']='0'
+#os.environ['ASCEND_SLOG_PRINT_TO_STDOUT']='1'
 import random
 import time
 from absl import app
@@ -88,8 +87,8 @@ flags.DEFINE_string('pretrained_ckpt', None, 'Path to checkpoint with '
                     'pretrained weights.  Do not include .data* extension.')
 flags.DEFINE_string('checkpoint_dir', DEFAULT_CHECKPOINT_DIR,
                     'Directory to save model checkpoints.')
-flags.DEFINE_integer('train_steps', 1, 'Number of training steps.')
-flags.DEFINE_integer('summary_freq', 1, 'Save summaries every N steps.')
+flags.DEFINE_integer('train_steps', 200000, 'Number of training steps.')
+flags.DEFINE_integer('summary_freq', 100, 'Save summaries every N steps.')
 flags.DEFINE_bool('legacy_mode', False, 'Whether to limit losses to using only '
                   'the middle frame in sequence as the target frame.')
 FLAGS = flags.FLAGS
@@ -140,14 +139,15 @@ def train(train_model, pretrained_ckpt, checkpoint_dir, train_steps,
                          max_to_keep=MAX_TO_KEEP)
   sv = tf.train.Supervisor(logdir=checkpoint_dir, save_summaries_secs=0,
                            saver=None)
-  config = tf.ConfigProto(allow_soft_placement=True)
-  config.gpu_options.allow_growth = True
+  # config = tf.ConfigProto(allow_soft_placement=True)
+  # config.gpu_options.allow_growth = True
+  config = tf.ConfigProto()
   custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
   custom_op.name =  "NpuOptimizer"
   custom_op.parameter_map["use_off_line"].b = True 
   config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
   custom_op.parameter_map["mix_compile_mode"].b =  True
-  custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+
   with sv.managed_session(config=config) as sess:
     if pretrained_ckpt is not None:
       logging.info('Restoring pretrained weights from %s', pretrained_ckpt)
