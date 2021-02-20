@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""prof_demo.py
+"""demo.py
 """
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
 
 
 def build_model(arch, loc):
@@ -59,25 +57,21 @@ if __name__ == '__main__':
 
     # 2.构建模型并加载权重
     model = build_model(arch, loc)
+    ckpt = torch.load("checkpoint.pth", map_location=loc)
+    # model.load_state_dict(ckpt['state_dict'])
+    state_dict_old = ckpt['state_dict']
+    state_dict = {}
+    for key, value in state_dict_old.items():
+        key = key[7:]
+        state_dict[key] = value
+    model.load_state_dict(state_dict)
 
     # 3.预处理
     input_tensor = pre_process(raw_data)
     input_tensor = input_tensor.to(loc)
 
-    # 4. 执行forward+profiling
-    # GPU环境将入参use_npu=True改为use_cuda=True
-    with torch.autograd.profiler.profile(record_shapes=True, use_npu=True) as prof:
-        output_tensor = model(input_tensor)
-        target = torch.randn(output_tensor.size()) # 用随机值代替
-        target = target.to(loc)
-        criterion = nn.MSELoss().to(loc)
-        loss = criterion(output_tensor, target) # 使用均方误差损失
-        optimizer = optim.SGD(model.parameters(), lr=0.01)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-    print(prof.key_averages().table())
-    prof.export_chrome_trace("shufflenet_v2_npu.prof")
+    # 4. 执行forward
+    output_tensor = model(input_tensor)
 
     # 5. 后处理
     result = post_process(output_tensor)
