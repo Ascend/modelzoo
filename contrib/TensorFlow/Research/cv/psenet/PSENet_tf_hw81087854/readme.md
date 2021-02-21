@@ -73,7 +73,7 @@ tf.app.flags.DEFINE_string('pretrained_model_path', None, '')
 ```
 3、本次实现，重新调整超参，使用Resnet50_v1预训练模型作为BackBone，使用Icdar2015和Icdar2015+Icdar2017数据集分别重新进行训练。
 
-### NPU训练
+## NPU训练
 因为第一次启动训练的时候，并不了解原作者的意图，参考原代码的训练，没有使用Backbone和预训练模型：
 ```
 export TF_CPP_MIN_LOG_LEVEL=2
