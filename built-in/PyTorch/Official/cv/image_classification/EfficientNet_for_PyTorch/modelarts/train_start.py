@@ -71,8 +71,10 @@ parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
 parser.add_argument('--pretrained_weight', default='', type=str, metavar='PATH',
                     help='path to pretrained weight')
-parser.add_argument('--num_classes', default=1000, type=int,
+# -------------modelarts transfer leanrning---------------------
+parser.add_argument('--num_classes', default=10, type=int,
                     help='number of class')
+# ------------modelarts transfer learning-----------------------
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -120,6 +122,9 @@ parser.add_argument('--data_url',
                     help='path to dataset')
 
 cur_step = 0
+CACHE_TRAINING_URL = "/cache/training/"
+CACHE_DATA_URL = "/cache/data_url"
+CACHE_MODEL_URL = "/cache/model"
 
 
 def device_id_to_process_device_map(device_list):
@@ -136,8 +141,6 @@ def device_id_to_process_device_map(device_list):
 
 def main():
     args = parser.parse_args()
-    # args.npu = int(os.getenv('DEVICE_ID'))
-    # print("---------npu id------------:", args.npu)
 
     if args.dist_url == "env://" and args.world_size == -1:
         args.world_size = int(os.environ["WORLD_SIZE"])
@@ -184,6 +187,11 @@ def main_worker(npu, nnpus_per_node, args):
     # create model
     if 'efficientnet' in args.arch:  # NEW
         if args.pretrained:
+            # ------------------modelarts modification----------------------
+            os.makedirs(CACHE_MODEL_URL, exist_ok=True)
+            mox.file.copy_parallel(args.pretrained_weight, os.path.join(CACHE_MODEL_URL, "checkpoint.pth"))
+            # ------------------modelarts modification---------------------
+            args.pretrained_weight = os.path.join(CACHE_MODEL_URL, "checkpoint.pth")
             model = EfficientNet.from_pretrained(args.arch, advprop=args.advprop, weights_path=args.pretrained_weight,
                                                  num_classes=args.num_classes)
             print("=> using pre-trained model '{}'".format(args.arch))
@@ -237,7 +245,7 @@ def main_worker(npu, nnpus_per_node, args):
 
     # Data loading code
     # -------modelarts modification-------
-    real_path = '/cache/data_url'
+    real_path = CACHE_DATA_URL
     if not os.path.exists(real_path):
         os.makedirs(real_path)
     mox.file.copy_parallel(args.data_url, real_path)
@@ -456,13 +464,13 @@ def validate(val_loader, model, criterion, args, nnpus_per_node):
 def save_checkpoint(state, filename='checkpoint.pth'):
     args = parser.parse_args()
 
-    if not os.path.exists("/cache/training"):
-        os.makedirs("/cache/training")
+    if not os.path.exists(CACHE_TRAINING_URL):
+        os.makedirs(CACHE_TRAINING_URL)
 
-    torch.save(state, "/cache/training/" + filename)
+    torch.save(state, CACHE_TRAINING_URL + filename)
 
     # --------------modelarts modification----------
-    mox.file.copy_parallel('/cache/training/', args.train_url)
+    mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
     # --------------modelarts modification end----------
 
 
