@@ -39,7 +39,7 @@ def proc_node_module(checkpoint, attr_name):
 
 def convert():
     """
-    pth文件转换成onnx文件
+    pth文件转换成onnx文件，输出onnx
     """
     checkpoint = torch.load("./checkpoint.pth", map_location='cpu')
     checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
