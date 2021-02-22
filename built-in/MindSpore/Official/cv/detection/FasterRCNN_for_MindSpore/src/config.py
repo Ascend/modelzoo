@@ -131,7 +131,7 @@ config = ed({
     "keep_checkpoint_max": 10,
     "save_checkpoint_path": "./",
     "dataset_sink_mode": True,
-    "steps_of_echo_loss": 10,       # Takes effect when dataset_sink_mode == False
+    "steps_of_echo_loss": 100,       # Takes effect when dataset_sink_mode == False
 
     "mindrecord_dir": "../MindRecord_COCO_TRAIN",
     "coco_root": "./cocodataset/",
