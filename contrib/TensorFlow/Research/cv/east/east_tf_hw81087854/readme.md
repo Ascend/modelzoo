@@ -174,7 +174,7 @@ GPU、NPU使用相同的超参:
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | GPU | 0.842     | 0.766  | 0.803 |
-| NPU | 0.842     | 0.779  | 0.809 |
+| NPU | 0.853     | 0.773  | 0.811 |
 
 NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1jVMvmWgKrj2hOkvV2_0VOw) )\
 GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1dfZj6dgoQhqCrcNB9jBRvQ) )
