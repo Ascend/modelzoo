@@ -19,26 +19,42 @@ import torch.onnx
 from collections import OrderedDict
 from efficientnet_pytorch.model import EfficientNet
 
-def proc_node_module(checkpoint,AttrName):
+
+def proc_node_module(checkpoint, attr_name):
+    """
+    修改模型名称
+    :param checkpoint 待加载模型文件
+    :param attr_name 模型属性
+    :return 新的模型属性字典
+    """
     new_state_dict = OrderedDict()
-    for k,v in checkpoint[AttrName].items():
-        if(k[0:7] == "module."):
+    for k, v in checkpoint[attr_name].items():
+        if k[0:7] == "module.":
             name = k[7:]
         else:
             name = k[0:]
         new_state_dict[name] = v
     return new_state_dict
+
+
 def convert():
+    """
+    pth文件转换成onnx文件
+    """
     checkpoint = torch.load("./checkpoint.pth", map_location='cpu')
     checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
     model = EfficientNet.from_name("efficientnet-b0")
     model.set_swish(memory_efficient=False)
     model.load_state_dict(checkpoint['state_dict'])
-    model.eval();
+    model.eval()
 
     input_names = ["actual_input_1"]
     output_names = ["output1"]
-    dummy_input = torch.randn(16,3,224,224)
-    torch.onnx.export(model, dummy_input, "efficientnet_npu_16.onnx", input_names = input_names, output_names = output_names, opset_version=11)
+    dummy_input = torch.randn(16, 3, 224, 224)
+    torch.onnx.export(model, dummy_input, "efficientnet_npu_16.onnx",
+                      input_names=input_names, output_names=output_names,
+                      opset_version=11)
+
+
 if __name__ == "__main__":
     convert()
