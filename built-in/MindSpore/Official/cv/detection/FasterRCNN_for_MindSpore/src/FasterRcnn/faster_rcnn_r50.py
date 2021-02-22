@@ -85,7 +85,9 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         # Fpn
         self.fpn_ncek = FeatPyramidNeck(config.fpn_in_channels,
                                         config.fpn_out_channels,
-                                        config.fpn_num_outs)
+                                        config.fpn_num_outs,
+                                        config.img_height,
+                                        config.img_width)
 
         # Rpn and rpn loss
         self.gt_labels_stage1 = Tensor(np.ones((self.train_batch_size, config.num_gts)).astype(np.uint8))
