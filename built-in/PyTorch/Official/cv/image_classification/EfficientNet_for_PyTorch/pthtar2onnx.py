@@ -22,10 +22,10 @@ from efficientnet_pytorch.model import EfficientNet
 
 def proc_node_module(checkpoint, attr_name):
     """
-    修改模型名称
-    :param checkpoint 待加载模型文件
-    :param attr_name 模型属性
-    :return 新的模型属性字典
+    modify state_dict
+    :param checkpoint: loaded model file
+    :param attr_name: key state_dict
+    :return: new state_dict
     """
     new_state_dict = OrderedDict()
     for k, v in checkpoint[attr_name].items():
@@ -39,7 +39,7 @@ def proc_node_module(checkpoint, attr_name):
 
 def convert():
     """
-    pth文件转换成onnx文件，输出onnx
+    convert pth file to onnx file and output onnx file
     """
     checkpoint = torch.load("./checkpoint.pth", map_location='cpu')
     checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
