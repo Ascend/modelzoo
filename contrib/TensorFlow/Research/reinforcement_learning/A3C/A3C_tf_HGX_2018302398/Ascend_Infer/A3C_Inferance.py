@@ -73,7 +73,7 @@ def parse_args():
                         help="""path of input model""")
     parser.add_argument('--game_name', default='PongDeterministic-v4',
                         help="""name of the game""")
-    parser.add_argument('--test_num', default=10,
+    parser.add_argument('--test_num', type=int, default=10,
                         help="""number of the cases being tested""")
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:

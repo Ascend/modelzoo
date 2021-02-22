@@ -45,8 +45,6 @@ Thank You!
     - [CTPN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CTPN_for_TensorFlow)
     - [CRNN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow)
             
-        
-	
 	 -Research 
 		
 	- [BigGAN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image__synthesis/BigGAN_for_TensorFlow)
@@ -62,7 +60,23 @@ Thank You!
 	- [PPO_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/PPO_for_TensorFlow)
 	- [QMIX_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/reinforcement-learning/QMIX_for_TensorFlow)
 	- [Jasper_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
-	 
+	- [MobileNetv3_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/mobilenetv3-large/mobilenetv3-large_tf_backseason)
+	- [PWCNet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/pwcnet/PWCNet_tf_wosaisai)
+	- [Bi-GRU_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/nlp/bigru/bigru_tf_wonderseen)
+	- [ALBERT_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/nlp/albert/ALBERT_tf_gehuibin)
+	- [WideResnet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/wideresnet/wideresnet_tf_xiaoqiqi)
+	- [Resnet152_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/resnet152/resnet152_tf_xiaoqiqiya)
+	- [Xception_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/xception/xception_tf_xiaoqiqiya)
+	- [Doubleunet_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/doubleunet/doubleunet_tf_hw34064571)
+	- [DeepLabv2_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/deeplabv2/deeplabv2_tf_zjw374)
+	- [ShuffleNet_V1_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/shufflenetv1/shufflenetv1_tf_zjw375)
+	- [ShuffleNet_V2_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/shufflenetv2/shufflenetv2_tf_uestclzx)
+	- [I-AutoRec_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/recommendation/i-autorec/i-autorec_tf_hw517456128)
+	- [GAT_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/graph/gat/gat_tf_hw517456128)
+	- [TextING_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/nlp/texting/texting_tf_hw517456128)
+	- [DeblurGAN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/deblur_gan/deblurgan_tf_jianghao)
+	- [ESRGAN_for_TensorFlow](https://gitee.com/ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/esrgan/esrgan_tf_jianghao)
+
 - PyTorch
 
      -Official

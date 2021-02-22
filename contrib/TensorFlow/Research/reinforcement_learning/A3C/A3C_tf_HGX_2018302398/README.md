@@ -6,22 +6,29 @@
 
 迁移强化学习模型A3C到ascend910平台，将Ascend平台训练结果的精度和论文在cpu上的训练结果进行对比。
 
-| 测试游戏 | 论文得分收敛值 | 论文训练时间 | Ascend得分收敛值 | Ascend训练时间 |
-| -------- | -------------- | ------------ | ---------------- | -------------- |
-| Pong     | 11.4           | 1 day        | 17.4             | 1.5 hour       |
-| Alien    | 945            | 4 day        |                  |                |
+| 测试游戏  | 论文得分收敛值 | 论文训练时间 | Ascend得分收敛值 | Ascend训练时间 |
+| --------- | -------------- | ------------ | ---------------- | -------------- |
+| Pong      | 11.4           | 1 day        | 17.4             | 1.5 hours      |
+| Tutankham | 144            | 4 days       | 200              | 6.5 hours      |
+| Alien     | 945            | 4 days       | 950              | 6 hours        |
 
 推理性能对比：
 
-| 测试游戏 | GPU推理pb模型速度(NVIDIA T4) | npu推理om模型速度(Ascend310) |
-| -------- | ---------------------------- | ---------------------------- |
-| Pong     | 2.63 s                       | 2.21 s                       |
-| Alien    |                              |                              |
+| 测试游戏  | GPU推理pb模型速度(NVIDIA T4) | npu推理om模型速度(Ascend310) |
+| --------- | ---------------------------- | ---------------------------- |
+| Pong      | 2.63 s                       | 2.21 s                       |
+| Tutankham |                              |                              |
+| Alien     |                              |                              |
 
 
 
 ## Requirement
-**见requirement.txt**
+
+* Tensorflow 1.15.0
+* Ascend910
+* gym[atari]
+* gym=0.10.5
+
 ## 代码路径解释
 
 ```shell
@@ -67,7 +74,7 @@ A3C
 
 ### 3：使用CANN(20.1.alpha001版)中的atc工具，pb模型转换为om模型
 
-### 4：使用A3C/Ascend_Infer/A3C_Inferance.py脚本完成om模型推理部署
+### 4：使用A3C/Ascend_Infer/A3C_Inferance.py脚本完成om模型部署推理
 
 
 
@@ -94,8 +101,11 @@ A3C
 #### 示例
 
 ```bash
-python train.py --env_name PongDeterministic-v4 --threads_num 16
-python train.py --env_name AlienDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP 3500 --lr 0.0006
+python train_npu.py --env_name PongDeterministic-v4 --threads_num 16 --model_name a3c_Pong_model
+
+python train_npu.py --env_name TutankhamDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP 7000 --lr 0.0005 --LSTM --model_name a3c_Tutankham_model_lstm
+
+python train_npu.py --env_name AlienDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP 22000 --model_name a3c_Alien_model_lstm --lr 0.0005 --LSTM --UPDATE_GLOBAL_ITER 512
 ```
 
 ### 2：A3C/model_Converter.py
@@ -114,6 +124,7 @@ python train.py --env_name AlienDeterministic-v4 --threads_num 8 --MAX_GLOBAL_EP
 
 ``` bash
 python model_Converter.py --output_path ./pb_model --input_path ./mdoel --model_name model_Pong_Conv --type conv --env_name PongDeterministic-v4
+
 python model_Converter.py --output_path ./pb_model --input_path ./mdoel --model_name model_Alien_Conv --type lstm --env_name AlienDeterministic-v4
 ```
 
