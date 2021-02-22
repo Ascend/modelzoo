@@ -465,7 +465,7 @@ def save_checkpoint(state, filename='checkpoint.pth'):
     args = parser.parse_args()
 
     if not os.path.exists(CACHE_TRAINING_URL):
-        os.makedirs(CACHE_TRAINING_URL)
+        os.makedirs(CACHE_TRAINING_URL, 0o755)
 
     torch.save(state, CACHE_TRAINING_URL + filename)
 
