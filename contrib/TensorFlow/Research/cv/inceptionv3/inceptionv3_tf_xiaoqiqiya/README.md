@@ -21,7 +21,7 @@
 
 
 ```
-xception
+iception
 └─ 
   ├─README.md
   ├─train_data 用于存放训练数据集 #obs://public-dataset/imagenet/orignal/train_tf/ 
@@ -82,3 +82,7 @@ epoch--------------------该值只在do_train 为True时有效，表示训练轮
 		tf_data_list.append(os.path.join(filepath,i)) 
 	return tf_data_list  
 以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
+
+ **offline_inference
+** 
+[offline_inference](https://gitee.com/xiaoqiqiyaya/modelzoo/tree/master/contrib/Research/cv/inceptionv3/inceptionv3_tf_xiaoqiqiya/offline_inference)

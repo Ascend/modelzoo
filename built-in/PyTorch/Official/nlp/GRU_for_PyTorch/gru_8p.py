@@ -181,7 +181,7 @@ def bleu_score_start(args):
 
     # load model
     checkpoint = torch.load(args.ckptpath, map_location='cpu')
-    model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()})
+    model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint.items()})
 
     bleu_score = calculate_bleu(test_data, SRC, TRG, model, device)
     print(f'BLEU score = {bleu_score * 100:.4f}')
@@ -312,12 +312,12 @@ def train(model, train_iterator, optimizer, criterion, epoch, args, ngpus_per_no
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
         optimizer.step()
 
+        batch_time.update(time.time() - end)
         if i % args.print_freq == 0:
             if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                         and args.rank % ngpus_per_node == 0):
                 progress.display(i)
 
-        batch_time.update(time.time() - end)
         epoch_loss += loss.item()
         end = time.time()
 
@@ -472,6 +472,7 @@ class AverageMeter(object):
         self.name = name
         self.fmt = fmt
         self.reset()
+        self.start_count_index = 5
 
     def reset(self):
         self.val = 0
@@ -481,9 +482,10 @@ class AverageMeter(object):
 
     def update(self, val, n=1):
         self.val = val
-        self.sum += val * n
         self.count += n
-        self.avg = self.sum / self.count
+        if self.count > (self.start_count_index * n):
+            self.sum += val * n
+            self.avg = self.sum / (self.count - self.start_count_index * n)
 
     def __str__(self):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'

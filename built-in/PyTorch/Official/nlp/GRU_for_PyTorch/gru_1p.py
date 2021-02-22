@@ -148,7 +148,7 @@ def main_worker(args):
 
         start_time = time.time()
 
-        train_loss = train(model, train_iterator, optimizer, criterion, args, CLIP)
+        train_loss = train(model, train_iterator, optimizer, criterion, args, CLIP, epoch)
         valid_loss = evaluate(model, valid_iterator, criterion)
 
         end_time = time.time()
@@ -173,15 +173,20 @@ def main_worker(args):
     print(f'BLEU score = {bleu_score * 100:.4f}')
 
 
-def train(model, iterator, optimizer, criterion, args, clip):
+def train(model, iterator, optimizer, criterion, args, clip, epoch):
     model.train()
+    batch_time = AverageMeter('Time', ':6.3f')
+    data_time = AverageMeter('Data', ':6.3f')
+    losses = AverageMeter('Loss', ':.4e')
+    progress = ProgressMeter(len(iterator),
+                             [batch_time, data_time, losses],
+                             prefix="Epoch: [{}]".format(epoch))
     epoch_loss = 0
 
     end = time.time()
     for i, batch in enumerate(iterator):
 
-        start = time.time()
-        data_time = start - end
+        data_time.update(time.time() - end)
 
         src = batch.src.to(CALCULATE_DEVICE)
         trg = batch.trg.to(CALCULATE_DEVICE)
@@ -198,6 +203,7 @@ def train(model, iterator, optimizer, criterion, args, clip):
         trg = trg[1:].view(-1)
 
         loss = criterion(output, trg)
+        losses.update(loss.item())
         if args.amp:
             with amp.scale_loss(loss, optimizer) as scaled_loss:
                 scaled_loss.backward()
@@ -206,13 +212,12 @@ def train(model, iterator, optimizer, criterion, args, clip):
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
         optimizer.step()
 
-        batch_time = time.time() - start
-        print('loss: %.4f' % loss.item(), 'batch_time:%.8f' % batch_time, 'data_time:%.8f' % data_time,
-              'FPS:%.8f' % (args.batch_size / batch_time))
+        batch_time.update(time.time() - end)
+        progress.display(i)
 
         epoch_loss += loss.item()
         end = time.time()
-
+    print("[npu id:", args.npu, "]",'* FPS@all {:.3f}'.format(args.batch_size / batch_time.avg))
     return epoch_loss / len(iterator)
 
 
@@ -332,6 +337,48 @@ def calculate_bleu(data, src_field, trg_field, model, device, max_len=50):
 
     return bleu_score(pred_trgs, trgs)
 
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+
+    def __init__(self, name, fmt=':f'):
+        self.name = name
+        self.fmt = fmt
+        self.reset()
+        self.start_count_index = 5
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.count += n
+        if self.count > (self.start_count_index * n):
+            self.sum += val * n
+            self.avg = self.sum / (self.count - self.start_count_index * n)
+
+    def __str__(self):
+        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
+        return fmtstr.format(**self.__dict__)
+
+
+class ProgressMeter(object):
+    def __init__(self, num_batches, meters, prefix=""):
+        self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
+        self.meters = meters
+        self.prefix = prefix
+
+    def display(self, batch):
+        entries = [self.prefix + self.batch_fmtstr.format(batch)]
+        entries += [str(meter) for meter in self.meters]
+        print("[npu id:", '0', "]", '\t'.join(entries))
+
+    def _get_batch_fmtstr(self, num_batches):
+        num_digits = len(str(num_batches // 1))
+        fmt = '{:' + str(num_digits) + 'd}'
+        return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
 if __name__ == "__main__":
     main()

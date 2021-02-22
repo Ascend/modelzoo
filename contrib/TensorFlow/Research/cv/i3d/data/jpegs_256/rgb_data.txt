@@ -1,0 +1,2 @@
+ucf101数据的rgb类型数据下载链接为：
+https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/jepgs_256.zip

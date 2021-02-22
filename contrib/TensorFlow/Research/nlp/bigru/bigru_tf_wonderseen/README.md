@@ -105,7 +105,7 @@ bigru
    python thumt/scripts/shuffle_corpus.py --corpus corpus.tc.32k.de corpus.tc.32k.en --suffix shuf
    ```
 
-6. 经过以上预处理后的语料和词表，请统一转移至/thumt/data/。
+6. 经过以上预处理后的语料和词表，请统一转移至路径：thumt/data/。
 
 ### （2）执行训练
 
@@ -127,9 +127,9 @@ bigru
 
 提供训练好的checkpoint (model.ckpt-263002，BLEU值为26.7624)，请放到 train/ 路径下：
 
-百度云：[链接](https://pan.baidu.com/s/1-z7CX7F_FujKHrSdzfvs6g )
+百度云：[链接](https://pan.baidu.com/s/1QUupKKZa9RgeGTzsGteVGA)
 
-提取码：zal9 
+提取码：gru1
 
 
 ## 六、性能
@@ -149,7 +149,7 @@ bigru
 
 |             | original-GPU | dynamic-GPU | static-GPU | static-NPU |
 | ----------- | ------------ | ----------- | ---------- | ---------- |
-| beam_size=1 | -            | 26.76       | 27.20      | 26.76      |
+| beam_size=1 | -            | 26.76       | 27.20      | 27.20      |
 | beam_size=4 | -            | 27.54       | -          | -          |
 | unknown     | 28.53        | -           | -          | -          |
 
@@ -179,7 +179,7 @@ vi thumt/bin/ckpt2pb.py +301
 
 ```python
             ...
-            ckpt_path = "bi-gru/train/model.ckpt-263002"# 263002改成所要测试的ckpt名字
+            ckpt_path = "bi-gru/train/model.ckpt-545000"# 263002改成所要测试的ckpt名字
             with tf.Session() as sess:
             ...
 ```
@@ -197,7 +197,7 @@ cd msame
 ############### MSAME BLEU testing #############
 Golden Translation at: msame/golden/references/
 BiGRU Translation at: msame/output_offline/
-BLEU = 26.759709157237165
+BLEU = 27.19809791662936
 ```
 
 ## 九、GPU迁移NPU经验
