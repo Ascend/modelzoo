@@ -162,7 +162,8 @@ GPU、NPU使用相同的超参:
 --num_readers=24 \
 --pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
 ```
-从头训练，10w个Step，NPU大概花费12小时，TotalLoss收敛趋势基本一致 :
+从头训练，10w个Step，NPU大概花费12小时，TotalLoss收敛趋势基本一致 : 
+
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0118/233452_f06f1fb1_8432352.png "屏幕截图.png")
 
 蓝色是NPU，红色是GPU.
@@ -177,7 +178,7 @@ GPU、NPU使用相同的超参:
 | NPU | 0.853     | 0.773  | 0.811 |
 
 NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1jVMvmWgKrj2hOkvV2_0VOw) )\
-GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1dfZj6dgoQhqCrcNB9jBRvQ) )
+GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/10Fw-tYdXPGW-TfpvMxKVOg) )
 
 ### 图片测试
 使用eval.py可以测试你自己的图片
