@@ -30,6 +30,8 @@ from typing import List
 import os 
 
 import tensorflow as tf
+import sys
+sys.path.append('.')
 
 from common.tf_utils import ckpt_iterator
 import common.utils as utils

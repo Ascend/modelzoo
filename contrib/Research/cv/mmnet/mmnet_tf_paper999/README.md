@@ -126,6 +126,7 @@ bash scripts/run_datapre.sh path/to/dataset
 #example:
 # bash scripts/run_datapre.sh /home/nankai/dataset/mmnet 
 ```
+预处理好的数据集可以在： https://mmnet-qer.obs.cn-north-4.myhuaweicloud.com/Bin.zip 获取。
 
 
 ### 4、准备msame推理工具
