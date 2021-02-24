@@ -18,6 +18,7 @@
 import argparse
 import ast
 import mindspore.nn as nn
+import mindspore.nn.dynamic_lr as dynamic_lr
 from mindspore import context, Tensor
 from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
@@ -29,7 +30,7 @@ from src.ssd import SSD300, SSDWithLossCell, TrainingWrapper, ssd_mobilenet_v2, 
 from src.config import config
 from src.dataset import create_ssd_dataset, create_mindrecord
 from src.lr_schedule import get_lr
-from src.init_params import init_net_param, filter_checkpoint_parameter
+from src.init_params import init_net_param, filter_parameter_by_network_shape
 
 set_seed(1)
 
@@ -45,7 +46,7 @@ def get_args():
     parser.add_argument("--device_num", type=int, default=1, help="Use device nums, default is 1.")
     parser.add_argument("--lr", type=float, default=0.05, help="Learning rate, default is 0.05.")
     parser.add_argument("--mode", type=str, default="sink", help="Run sink mode or not, default is sink.")
-    parser.add_argument("--dataset", type=str, default="coco", help="Dataset, defalut is coco.")
+    parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
     parser.add_argument("--epoch_size", type=int, default=500, help="Epoch size, default is 500.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size, default is 32.")
     parser.add_argument("--pre_trained", type=str, default=None, help="Pretrained Checkpoint file path.")
@@ -59,6 +60,8 @@ def get_args():
                              "default is not freezing.")
     args_opt = parser.parse_args()
     return args_opt
+
+
 
 def main():
     args_opt = get_args()
@@ -122,18 +125,27 @@ def main():
     if args_opt.pre_trained:
         param_dict = load_checkpoint(args_opt.pre_trained)
         if args_opt.filter_weight:
-            filter_checkpoint_parameter(param_dict)
-        load_param_into_net(net, param_dict)
+            filter_parameter_by_network_shape(param_dict, net)
+        load_param_into_net(net, param_dict, True)
 
     if args_opt.freeze_layer == "backbone":
         for param in backbone.feature_1.trainable_params():
             param.requires_grad = False
 
-    lr = Tensor(get_lr(global_step=args_opt.pre_trained_epoch_size * dataset_size,
-                       lr_init=config.lr_init, lr_end=config.lr_end_rate * args_opt.lr, lr_max=args_opt.lr,
-                       warmup_epochs=config.warmup_epochs,
-                       total_epochs=args_opt.epoch_size,
-                       steps_per_epoch=dataset_size))
+    if config.learning_rate.type == "exponential":
+        lr = dynamic_lr.exponential_decay_lr(learning_rate=config.learning_rate.init_lr,
+                                             decay_rate=config.learning_rate.decay_factor,
+                                             total_step=args_opt.epoch_size * dataset_size,
+                                             step_per_epoch=dataset_size,
+                                             decay_epoch=args_opt.epoch_size)
+    else:
+        lr = Tensor(get_lr(global_step=args_opt.pre_trained_epoch_size * dataset_size,
+                           lr_init=config.learning_rate.lr_init,
+                           lr_end=config.learning_rate.lr_end_rate * args_opt.lr,
+                           lr_max=args_opt.lr,
+                           warmup_epochs=config.learning_rate.warmup_epochs,
+                           total_epochs=args_opt.epoch_size,
+                           steps_per_epoch=dataset_size))
 
     if "use_global_norm" in config and config.use_global_norm:
         opt = nn.Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr,

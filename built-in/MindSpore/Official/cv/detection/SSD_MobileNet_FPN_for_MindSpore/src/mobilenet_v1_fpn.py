@@ -97,12 +97,16 @@ class FpnTopDown(nn.Cell):
         super(FpnTopDown, self).__init__()
         self.lateral_convs_list_ = []
         self.fpn_convs_ = []
-        for channel in in_channel_list:
+        for channel in in_channel_list[:-1]:
             l_conv = nn.Conv2d(channel, out_channels, kernel_size=1, stride=1,
                                has_bias=True, padding=0, pad_mode='same')
             fpn_conv = conv_bn_relu(out_channels, out_channels, kernel_size=3, stride=1, depthwise=False)
             self.lateral_convs_list_.append(l_conv)
             self.fpn_convs_.append(fpn_conv)
+        l_conv = nn.Conv2d(in_channel_list[-1], out_channels, kernel_size=1, stride=1,
+                           has_bias=True, padding=0, pad_mode='same')
+        self.lateral_convs_list_.append(l_conv)
+
         self.lateral_convs_list = nn.layer.CellList(self.lateral_convs_list_)
         self.fpn_convs_list = nn.layer.CellList(self.fpn_convs_)
         self.num_layers = len(in_channel_list)
@@ -123,8 +127,9 @@ class FpnTopDown(nn.Cell):
 
         extract_features = ()
         num_features = len(features)
-        for i in range(num_features):
+        for i in range(num_features - 1):
             extract_features = extract_features + (self.fpn_convs_list[i](features[num_features - i - 1]),)
+        extract_features = extract_features + (features[0],)
 
         return extract_features
 

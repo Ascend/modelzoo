@@ -27,10 +27,19 @@ config = ed({
     "max_boxes": 100,
 
     # learning rate settings
-    "global_step": 0,
-    "lr_init": 0.01333,
-    "lr_end_rate": 0.0,
-    "warmup_epochs": 2,
+    #"learning_rate": {
+    #    "type": "custom_cosine",
+    #    "global_step": 0,
+    #    "lr_init": 0.01333,
+    #    "lr_end_rate": 0.0,
+    #    "warmup_epochs": 2,
+    #},
+    "learning_rate": {
+        "type": "exponential",
+        "init_lr": 0.001,
+        "decay_factor": 0.95,
+        "is_stair": False,
+    },
     "weight_decay": 4e-5,
     "momentum": 0.9,
 

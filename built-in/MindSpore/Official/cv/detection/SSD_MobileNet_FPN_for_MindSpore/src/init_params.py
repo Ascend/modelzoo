@@ -39,8 +39,31 @@ def load_backbone_params(network, param_dict):
         if param_name in param_dict:
             param.set_data(param_dict[param_name].data)
 
+
 def filter_checkpoint_parameter(param_dict):
     """remove useless parameters"""
     for key in list(param_dict.keys()):
         if 'multi_loc_layers' in key or 'multi_cls_layers' in key:
             del param_dict[key]
+
+
+def filter_parameter_by_network_shape(param_dict, network):
+    for name, param in network.parameters_and_names():
+        load_param = param_dict[name]
+        if (load_param.shape != param.shape):
+            print("Parameter with different shape: ", name)
+            del param_dict[name]
+
+def filter_parameter_by_name(param_dict, name_list):
+    for name in name_list:
+        if name in param_dict:
+            print("Delete parameter", name)
+            del param_dict[name]
+    filter_list = ['network.multi_box.cls_layers.0.weight',
+                   'network.multi_box.cls_layers.0.bias',
+                   'network.multi_box.loc_layers.0.weight',
+                   'network.multi_box.loc_layers.0.bias']
+    for name in filter_list:
+        if name in param_dict:
+            print("Delete parameter", name)
+            del param_dict[name]
