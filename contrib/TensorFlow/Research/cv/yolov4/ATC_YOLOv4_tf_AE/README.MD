@@ -42,14 +42,14 @@ atc --model=./yolov4_no_postprocess.pb --framework=3 --output=./yolov4_no_postpr
 
 ```
 [INFO] output data success
-Inference average time: 4.538660 ms
-Inference average time without first time: 4.535606 ms
+Inference average time: 46.967860 ms
+Inference average time without first time: 46.953970 ms
 [INFO] unload model success, model Id is 1
 [INFO] Execute sample success.
 Test Finish!
 ```
 
-Batch: 1, shape: 416 * 416 * 3，不带AIPP，平均推理性能4.54ms
+Batch: 1, shape: 416 * 416 * 3，不带AIPP，平均推理性能46.967860ms
 
 ## 精度测试
 
