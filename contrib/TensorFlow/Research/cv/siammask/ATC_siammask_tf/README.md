@@ -34,17 +34,19 @@ Fast Online Object Tracking and Segmentation,[论文地址](https://arxiv.org/ab
 #### 2、原始模型
 参考[训练模型代码](../siammask_tf/)
 训练生成ckpt模型，to_pb.py 转pb模型
-
+- 百度网盘：链接：https://pan.baidu.com/s/1M35mcoZvysxRoZdLTqnWrQ   提取码：qbvi
 
 
 #### 3、转om模型
-- obs链接pb：https://siammask-zx.obs.cn-north-4.myhuaweicloud.com/siammask.pb
+- obs链接pb：https://siammask-zx.obs.cn-north-4.myhuaweicloud.com/siammask.pb  (如果obs失效，请使用百度网盘地址)
 - obs链接om：https://siammask-zx.obs.cn-north-4.myhuaweicloud.com/siammask.om
+- 百度网盘：链接：https://pan.baidu.com/s/1M35mcoZvysxRoZdLTqnWrQ   提取码：qbvi 
 - ATC转换命令：
 ```
 /home/HwHiAiUser/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="template:1,127,127,3;search:1,255,255,3" --check_report=/home/HwHiAiUser/modelzoo/siammask/device/network_analysis.report --input_format=NHWC --output="/home/HwHiAiUser/modelzoo/siammask/device/siammask" --soc_version=Ascend310 --framework=3 --model="/home/HwHiAiUser/mySiamMask/ATC_siammask_tf/model/siammask.pb" 
 ```
 #### 4、将转换的om文件放在model文件夹
+- 百度网盘：链接：https://pan.baidu.com/s/1M35mcoZvysxRoZdLTqnWrQ   提取码：qbvi
 ```
 cd model
 wget https://siammask-zx.obs.cn-north-4.myhuaweicloud.com/siammask.om
@@ -98,6 +100,7 @@ Test Finish!
 #### 7、test Data 
 - 使用get_test_data.sh下载数据集,只使用VOT2016即可（VOT2016包含VOT2016文件夹和VOT2016.json）
 - 也可以直接删除./data目录，再根据下方的[OBS链接](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=hCBKrEZG4sAIrJfXQrXfGsSoRN+g0YNZ9iH1jnDDfzcjjof2ynnXfJ4VYPm/eYo2//6r7VsH19NSgmSA9MrPF0ksNEr7EuSmWmpbDCUVSrk4RKEBOjF9ZJvuMxj+143L6oK3tUDGvIA+fVnrC28m+V2kIEWlvAGH7YKXQ/s4cCMagzvT3OpVDWM2AD7vRsQFlwidqaJTXTkFmCuaCaws1jQzaLzWzP0hMpNCcRvOMfJbQTjwxMBKPBmvVdaOj+/0+m1lMJladvzQKBRkh2hyP0osRrYeKY/UdXdwpo+32rm3ixwEJs0vg08Q1seNgNlmbebWB4zVCZu+F+2MgPJab5xTWCZTfMjn+E1qzMsJ4WHm1z4tKgKA4bB/6/pf/f5cNsp2I4ejA/qRZiwUOVxn8Gn0K/HuQ4cMlWdSfj23I+AE2+h6pH1dhZtKwXGCGlFzVbCrKBI1bp6+rCoGFW5flGd7+o/9U6gOLTXXT84PmyVCw/E0xq+ZgdbbvNlYunqdW1ljwm2gYNQT1XmDTvnWiMzvVr7XWzMPnP90tIjXFI4=)下载数据集,提取密码siamma, 并将下载好数据集各自解压到 ./data/目录下，以下是数据解压后的一个示例。
+- 百度网盘：链接：https://pan.baidu.com/s/1M35mcoZvysxRoZdLTqnWrQ   提取码：qbvi
 ```
 cd data
 wget https://siammask-zx.obs.cn-north-4.myhuaweicloud.com/data/VOT2016.zip
@@ -118,4 +121,4 @@ sudo pip3.7 install numba
 bash make.sh
 bash inference.sh
 ```
-等待时间较久，最后精度EAO为0.281
+等待时间较久(12小时)，最后精度EAO为0.244
