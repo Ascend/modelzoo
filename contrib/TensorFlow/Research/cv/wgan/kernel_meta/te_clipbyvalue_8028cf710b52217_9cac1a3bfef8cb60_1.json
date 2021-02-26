@@ -1,0 +1,16 @@
+{
+    "batchBindOnly":1,
+    "binFileName":"te_clipbyvalue_8028cf710b52217_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":2,
+    "kernelName":"te_clipbyvalue_8028cf710b52217_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0,
+        0,
+        0
+    ],
+    "sha256":"84b919b7aee0f71982ef19e988f0370d159c89f05a8db7e5b91ba51b048192fc"
+}

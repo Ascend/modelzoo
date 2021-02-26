@@ -1,0 +1,15 @@
+{
+    "batchBindOnly":1,
+    "binFileName":"te_conv2dbackpropfilterd_d3519b1e8cc64d07_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":32,
+    "kernelName":"te_conv2dbackpropfilterd_d3519b1e8cc64d07_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0,
+        1
+    ],
+    "sha256":"52c7f8a463614da2b246c38996a458ee56fd06b66ddd5ddb279623146c756b0d"
+}

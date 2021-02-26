@@ -1,0 +1,19 @@
+{
+    "binFileName":"te_bntrainingreducegrad_70db6e736ab4eec_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":32,
+    "kernelName":"te_bntrainingreducegrad_70db6e736ab4eec_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "sha256":"aaac5ab666e79a425399f04ffc9c30adee7d9f7f8ddd9989744b7e6db543296b"
+}

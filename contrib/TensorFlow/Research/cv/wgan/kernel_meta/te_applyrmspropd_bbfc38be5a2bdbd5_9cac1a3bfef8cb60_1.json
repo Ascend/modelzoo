@@ -1,0 +1,20 @@
+{
+    "batchBindOnly":1,
+    "binFileName":"te_applyrmspropd_bbfc38be5a2bdbd5_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":1,
+    "kernelName":"te_applyrmspropd_bbfc38be5a2bdbd5_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "sha256":"0ced8d909c4dcad5f7e2f00fc0d43fe8d198302841cf3612406b30f6445395f1"
+}

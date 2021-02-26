@@ -1,0 +1,23 @@
+{
+    "binFileName":"te_bntrainingupdate_2a59a4c1db64eeb_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":32,
+    "kernelName":"te_bntrainingupdate_2a59a4c1db64eeb_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "sha256":"3c4ffd9b0763598e4e0cc140d08eb56c24da24a9079e974dd308b752ba407afa"
+}

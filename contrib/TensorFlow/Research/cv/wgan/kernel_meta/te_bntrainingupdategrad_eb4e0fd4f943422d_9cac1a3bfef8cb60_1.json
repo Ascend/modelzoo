@@ -1,0 +1,17 @@
+{
+    "binFileName":"te_bntrainingupdategrad_eb4e0fd4f943422d_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":32,
+    "kernelName":"te_bntrainingupdategrad_eb4e0fd4f943422d_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "sha256":"914e56f6204484440c0491aaee1d06a70bb60e9b7a9f9fd82307d99893f5dc86"
+}

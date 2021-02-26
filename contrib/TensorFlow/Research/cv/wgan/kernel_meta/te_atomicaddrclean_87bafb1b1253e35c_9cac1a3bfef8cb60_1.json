@@ -1,0 +1,13 @@
+{
+    "binFileName":"te_atomicaddrclean_87bafb1b1253e35c_9cac1a3bfef8cb60_1",
+    "binFileSuffix":".o",
+    "blockDim":1,
+    "kernelName":"te_atomicaddrclean_87bafb1b1253e35c_9cac1a3bfef8cb60_1__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "opParaSize":0,
+    "parameters":[
+        0,
+        0
+    ],
+    "sha256":"ebe14152b1e96cc43d174fe4b611c3d69ec3c2cac8101769c0261691fbe70689"
+}
