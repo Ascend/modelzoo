@@ -57,4 +57,5 @@ Batch: 1, shape: 416 * 416 * 3，不带AIPP，平均推理性能46.967860ms
 
 推理效果
 
-待完善
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0226/154600_805c7298_8070502.jpeg "kite.jpg")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0226/154612_96b7e29f_8070502.jpeg "out_test.jpg")
