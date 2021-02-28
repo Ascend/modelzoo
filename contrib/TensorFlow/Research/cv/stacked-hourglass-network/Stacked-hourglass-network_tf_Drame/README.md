@@ -6,16 +6,6 @@
 
 MPII数据集下载地址：http://human-pose.mpi-inf.mpg.de/#download
 
-MPII数据集obs桶地址：https://stacked-hourglass-network.obs.cn-north-4.myhuaweicloud.com/MPII-dataset/images.zip
-
-200个checkpoint的obs桶地址：https://stacked-hourglass-network.obs.cn-north-4.myhuaweicloud.com/MPII-dataset/checkpoint.tar.gz
-
-Apulis平台打屏文件：https://stacked-hourglass-network.obs.cn-north-4.myhuaweicloud.com/MPII-dataset/run200checkpoint.txt
-
-train and test events：
-- https://stacked-hourglass-network.obs.cn-north-4.myhuaweicloud.com/MPII-dataset/events.out.tfevents.1607782299.538a9785-f04d-426c-ade8-dfc86af9400e
-
-- https://stacked-hourglass-network.obs.cn-north-4.myhuaweicloud.com/MPII-dataset/events.out.tfevents.1607770474.538a9785-f04d-426c-ade8-dfc86af9400e
 
 ## 2. 结果分析
 
