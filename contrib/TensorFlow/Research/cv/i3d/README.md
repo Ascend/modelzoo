@@ -6,9 +6,9 @@
 * [模型复现的步骤](#模型复现的步骤)
   * [创建数据列表文件](#创建数据列表文件)
   * [下载预训练模型](#下载预训练模型)
-  * [训练](#训练)
-  * [测试](#测试)
   * [外部库](#外部库)
+  * [训练](#训练)
+  * [推理](#推理)  
   * [结果](#结果)
 
 
@@ -55,7 +55,14 @@ create_data_to_txt.py --rgb_path=../data/jpegs_256 --rgb_save_path=../data/rgb.t
 
 下载：[checkpoints](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/checkpoints.zip)  具体来说，下载`checkpoints` 并将其放在 `/data` 目录下:
 
-### 3. 在ucf101训练
+### 3. 外部库
+
+运行代码需要安装：
+
+sonnet： pip install dm-sonnet==1.23
+pillow： pip install pillow
+
+### 4. 在ucf101训练
 
 ```
 # Finetune on split1 of rgb data of UCF101
@@ -63,16 +70,41 @@ python3.7 finetune_new_bn.py --dataset=ucf101 --mode=rgb --split=1
 # Finetune on split2 of flow data of UCF101
 python3.7 finetune_new_bn.py --dataset=ucf101 --mode=flow --split=2 
 ```
-### 4.test
+### 5.推理
 
-待完善
+#### 模型转换
+原始网络模型下载地址，链接: https://pan.baidu.com/s/1c7ByN0W6fKDSp3KvILqduQ  密码: 7jkb
+转换后的om模型下载地址为：
+使用ATC模型转换工具进行模型转换时可以参考的操作指令如下：
 
-### 5. 外部库
+```
+/home/gx/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="input:1,1,224,224,3" --check_report=/home/gx/modelzoo/i3d_modelnew/device/network_analysis.report --input_format=NDHWC --output="/home/gx/modelzoo/i3d_modelnew/device/i3d_modelnew" --soc_version=Ascend310 --framework=3 --model="/home/gx/Downloads/i3d_modelnew.pb"
+```
+#### 制作数据bin文件
 
-运行代码需要安装：
+```
+python3.7 img_to_bin.py ucf101 rgb 1
+python3.7 img_to_bin.py ucf101 flow 2
+```
+转换后的bin数据下载链接为：
 
-sonnet： pip install dm-sonnet==1.23
-pillow： pip install pillow
+
+#### 使用msame进行推理
+
+```
+./msame --model /home/HwHiAiUser/i3d /model/i3d_model/device/i3d_model.om --input /home/HwHiAiUser/i3d/data/rgb/ --output /home/HwHiAiUser/i3d/out/outputrgb
+./msame --model /home/HwHiAiUser/i3d /model/i3d_model/device/i3d_model.om --input /home/HwHiAiUser/i3d/data/flow/ --output /home/HwHiAiUser/i3d/out/outputflow
+
+```
+
+#### 模型后处理
+
+
+```
+python3.7 com_acc.py
+```
+
+
 
 ### 6. 结果
 原论文结果：
@@ -84,6 +116,5 @@ pillow： pip install pillow
 
 | Training Split | rgb | flow | fusion |
 |----------------|-----|------|--------|
-|     Split1     |96.2%|    % |        |
+|     Split1     |96.2%|96.5% |        |
 
-rgb为88.3%时dropout=0.5  step: 9540, loss: 0.0786, accuracy: 0.883
