@@ -197,4 +197,14 @@ TotalLoss趋势比对（NPU vs GPU）：
 | GPU | 0.764     | 0.714  | 0.738 |
 | NPU | 0.730     | 0.742  | 0.736 |
 
+微调后处理的PSE参数：
+min_area_thresh=6, seg_map_thresh=0.99
+在eval.py中：
+```
+def detect(seg_maps, timer, image_w, image_h, min_area_thresh=6, seg_map_thresh=0.99, ratio = 1):
+```
+得到精度：
+|     | Precision | Recall | Hmean |
+|-----|-----------|--------|-------|
+| NPU | 0.751     | 0.738  | 0.745 |
 GPU和NPU的ckpt&events：[BaiduYun link，提取码1234](https://pan.baidu.com/s/1oDi54CifBtWVIp6XsFluFQ)
