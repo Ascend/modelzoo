@@ -199,6 +199,7 @@ TotalLoss趋势比对（NPU vs GPU）：
 
 微调后处理的PSE参数：
 min_area_thresh=6, seg_map_thresh=0.99
+
 在eval.py中：
 ```
 def detect(seg_maps, timer, image_w, image_h, min_area_thresh=6, seg_map_thresh=0.99, ratio = 1):
