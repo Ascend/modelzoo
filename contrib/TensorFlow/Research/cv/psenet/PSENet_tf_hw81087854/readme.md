@@ -207,4 +207,5 @@ def detect(seg_maps, timer, image_w, image_h, min_area_thresh=6, seg_map_thresh=
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | NPU | 0.751     | 0.738  | 0.745 |
+
 GPU和NPU的ckpt&events：[BaiduYun link，提取码1234](https://pan.baidu.com/s/1oDi54CifBtWVIp6XsFluFQ)
