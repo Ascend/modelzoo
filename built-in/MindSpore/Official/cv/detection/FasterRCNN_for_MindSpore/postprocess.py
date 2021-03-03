@@ -14,6 +14,7 @@
 # ============================================================================
 """post process for 310 inference"""
 import argparse
+import os
 
 import numpy as np
 from PIL import Image
@@ -31,18 +32,9 @@ parser.add_argument("--img_path", type=str, required=True, help="image file path
 args = parser.parse_args()
 
 
-def get_imgSize(file_name):
+def get_img_size(file_name):
     img = Image.open(file_name)
     return img.size
-
-
-def get_resizeRatio(img_size):
-    org_width, org_height = img_size
-    resize_ratio = dst_width / org_width
-    if resize_ratio > dst_height / org_height:
-        resize_ratio = dst_height / org_height
-
-    return resize_ratio
 
 
 def scale_bbox(all_bbox, img_meta):
@@ -62,8 +54,8 @@ def get_eval_result(ann_file, img_path):
 
     for img_id in img_ids:
         file_id = str(img_id).zfill(12)
-        file = img_path + "/" + file_id + ".jpg"
-        img_size = get_imgSize(file)
+        file = os.path.join(img_path, f'{file_id}.jpg')
+        img_size = get_img_size(file)
 
         img_metas = np.array([img_size[1], img_size[0], dst_height / img_size[1], dst_width / img_size[0]])
 
