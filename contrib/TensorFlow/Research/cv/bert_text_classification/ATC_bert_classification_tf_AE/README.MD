@@ -6,7 +6,7 @@
 
 参考实现 ：
 
-https://github.com/richzhang/colorization
+https://github.com/percent4/keras_bert_text_classification
 
 原始模型网络及权重下载地址 :
 
@@ -56,5 +56,4 @@ Batch: 1, shape: 1 * 300，不带AIPP，平均推理性能80.482040ms
 
 推理效果
 
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/154713_d1cf11df_8113712.png "图片1.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2020/1116/154747_583198c2_8113712.png "图片2.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/0303/110711_3812818d_5302634.png "屏幕截图.png")
