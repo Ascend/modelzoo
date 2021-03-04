@@ -234,7 +234,7 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         bbox_weights = torch.zeros_like(anchors)
         labels = anchors.new_full((num_valid_anchors, ),
                                   self.num_classes,
-                                  dtype=torch.long)
+                                  dtype=torch.int)
         label_weights = anchors.new_zeros(num_valid_anchors, dtype=torch.float)
 
         pos_inds = sampling_result.pos_inds
