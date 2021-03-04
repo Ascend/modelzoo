@@ -6,7 +6,7 @@
 
 参考实现 ：
 
-https://github.com/richzhang/colorization
+https://github.com/percent4/keras_bert_text_classification
 
 原始模型网络及权重下载地址 :
 
