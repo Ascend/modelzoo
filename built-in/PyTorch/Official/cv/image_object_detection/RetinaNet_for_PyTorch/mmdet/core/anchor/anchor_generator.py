@@ -322,6 +322,12 @@ class AnchorGenerator(object):
         valid_y = torch.zeros(feat_h, dtype=torch.bool, device=device)
         valid_x[:valid_w] = 1
         valid_y[:valid_h] = 1
+        # fix shape and bug
+        # valid_x_res = torch.ones(feat_w, dtype=torch.int, device=device)
+        # valid_h_res = torch.ones(feat_h, dtype=torch.int, device=device)
+        # valid_x[:valid_w] = valid_x_res[:valid_w]
+        # valid_y[:valid_h] = valid_h_res[:valid_h]
+
         valid_xx, valid_yy = self._meshgrid(valid_x, valid_y)
         valid = valid_xx & valid_yy
         valid = valid[:, None].expand(valid.size(0),
