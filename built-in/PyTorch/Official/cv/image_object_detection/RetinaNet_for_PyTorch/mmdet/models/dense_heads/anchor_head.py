@@ -217,11 +217,15 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         if not inside_flags.any():
             return (None, ) * 7
         # assign gt and sample anchors
-        anchors = flat_anchors[inside_flags, :]
+        anchors = flat_anchors * inside_flags.unsqueeze(1).float()
 
         assign_result = self.assigner.assign(
             anchors, gt_bboxes, gt_bboxes_ignore,
             None if self.sampling else gt_labels)
+
+        temp_bug = assign_result.gt_inds.int()
+        assign_result.gt_inds = (temp_bug + inside_flags.int() - 1).long()
+
         sampling_result = self.sampler.sample(assign_result, anchors,
                                               gt_bboxes)
 
@@ -235,14 +239,28 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
 
         pos_inds = sampling_result.pos_inds
         neg_inds = sampling_result.neg_inds
-        if len(pos_inds) > 0:
+        if pos_inds.sum() > 0:
             if not self.reg_decoded_bbox:
-                pos_bbox_targets = self.bbox_coder.encode(
-                    sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes)
+                # pos_bbox_targets = self.bbox_coder.encode(
+                #     sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes)
+                pad_size = 2048
+                pos_bboxes = torch.zeros(pad_size, 4, device=device)
+                num = sampling_result.pos_bboxes.size(0)
+                assert num <= pad_size
+                pos_bboxes[:num] = sampling_result.pos_bboxes
+                pos_gt_bboxes = torch.zeros(pad_size, 4, device=device)
+                pos_gt_bboxes[:num] = sampling_result.pos_gt_bboxes
+
+                pos_bbox_targets = self.bbox_coder.encode(pos_bboxes, pos_gt_bboxes)
+                pos_bbox_targets = pos_bbox_targets[:num]
             else:
                 pos_bbox_targets = sampling_result.pos_gt_bboxes
-            bbox_targets[pos_inds, :] = pos_bbox_targets
-            bbox_weights[pos_inds, :] = 1.0
+            # bbox_targets[pos_inds, :] = pos_bbox_targets
+            # bbox_weights[pos_inds, :] = 1.0
+            bbox_targets_mask = torch.zeros(bbox_targets.size(0), dtype=torch.int, device=device)
+            bbox_targets_mask[pos_inds] = 1
+            bbox_targets[bbox_targets_mask.bool(), :] = pos_bbox_targets
+            bbox_weights[bbox_targets_mask.bool(), :] = 1.0
             if gt_labels is None:
                 # Only rpn gives gt_labels as None
                 # Foreground is the first class since v2.5.0
@@ -258,15 +276,15 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
             label_weights[neg_inds] = 1.0
 
         # map up to original set of anchors
-        if unmap_outputs:
-            num_total_anchors = flat_anchors.size(0)
-            labels = unmap(
-                labels, num_total_anchors, inside_flags,
-                fill=self.num_classes)  # fill bg label
-            label_weights = unmap(label_weights, num_total_anchors,
-                                  inside_flags)
-            bbox_targets = unmap(bbox_targets, num_total_anchors, inside_flags)
-            bbox_weights = unmap(bbox_weights, num_total_anchors, inside_flags)
+        # if unmap_outputs:
+        #     num_total_anchors = flat_anchors.size(0)
+        #     labels = unmap(
+        #         labels, num_total_anchors, inside_flags,
+        #         fill=self.num_classes)  # fill bg label
+        #     label_weights = unmap(label_weights, num_total_anchors,
+        #                           inside_flags)
+        #     bbox_targets = unmap(bbox_targets, num_total_anchors, inside_flags)
+        #     bbox_weights = unmap(bbox_weights, num_total_anchors, inside_flags)
 
         return (labels, label_weights, bbox_targets, bbox_weights, pos_inds,
                 neg_inds, sampling_result)
@@ -354,8 +372,10 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         if any([labels is None for labels in all_labels]):
             return None
         # sampled anchors of all images
-        num_total_pos = sum([max(inds.numel(), 1) for inds in pos_inds_list])
-        num_total_neg = sum([max(inds.numel(), 1) for inds in neg_inds_list])
+        # num_total_pos = sum([max(inds.numel(), 1) for inds in pos_inds_list])
+        # num_total_neg = sum([max(inds.numel(), 1) for inds in neg_inds_list])
+        num_total_pos = sum([max(inds.sum(), 1) for inds in pos_inds_list])
+        num_total_neg = sum([max(inds.sum(), 1) for inds in neg_inds_list])
         # split targets to a list w.r.t. multiple levels
         labels_list = images_to_levels(all_labels, num_level_anchors)
         label_weights_list = images_to_levels(all_label_weights,
@@ -662,9 +682,13 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
             mlvl_scores = torch.cat([mlvl_scores, padding], dim=1)
 
         if with_nms:
-            det_bboxes, det_labels = multiclass_nms(mlvl_bboxes, mlvl_scores,
-                                                    cfg.score_thr, cfg.nms,
-                                                    cfg.max_per_img)
+            mlvl_bboxes_fix = torch.zeros(5000, 4).type_as(mlvl_bboxes)
+            mlvl_bboxes_fix[:mlvl_bboxes.size(0)] = mlvl_bboxes
+            mlvl_scores_fix = torch.zeros(5000, 81).type_as(mlvl_scores)
+            mlvl_scores_fix[:mlvl_scores.size(0)] = mlvl_scores
+            det_bboxes, det_labels = multiclass_nms(mlvl_bboxes_fix, mlvl_scores_fix,
+                                                      cfg.score_thr, cfg.nms,
+                                                      cfg.max_per_img)
             return det_bboxes, det_labels
         else:
             return mlvl_bboxes, mlvl_scores
