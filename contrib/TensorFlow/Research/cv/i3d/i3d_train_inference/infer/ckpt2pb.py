@@ -82,11 +82,11 @@ if __name__ == '__main__':
 #     # 修改模型参数名称
     rename_var(ckpt_path, new_ckpt_path)
 
-    print('*'*30)
+    print('*' * 30)
     # 输出模型参数名称
     read_ckpt(ckpt_path)
     
-    print('*'*30)
+    print('*' * 30)
     read_ckpt(new_ckpt_path)
     # 运行主函数
     main()
