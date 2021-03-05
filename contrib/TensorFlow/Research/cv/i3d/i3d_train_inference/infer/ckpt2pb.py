@@ -2,9 +2,8 @@ import tensorflow as tf
 from tensorflow.python.tools import freeze_graph
 from npu_bridge.estimator import npu_ops
 import os
-
-# 导入网络模型
 import i3d_new_bn as i3d
+
 
 def main():
     tf.reset_default_graph()
@@ -25,16 +24,12 @@ def main():
     predict_class = tf.argmax(rgb_fc_out, axis=1, output_type=tf.int32, name="final_output")
     
     # 保存训练图
-    saver = tf.train.Saver()
-
-    
+    saver = tf.train.Saver()   
     # 初始化参数
+ 
     sess = tf.Session()
     init = tf.global_variables_initializer() 
     sess.run(init)
-    
-    
-
     
     #with tf.Session() as sess:
         #保存图，在./pb_model文件夹中生成model.pb文件
@@ -53,6 +48,7 @@ def main():
 		       initializer_nodes='')
     print("Convert ckpt to pb successfully!")
 
+
 def rename_var(ckpt_path, new_ckpt_path):
     """修改训练参数名称"""
     with tf.Session() as sess:
@@ -61,19 +57,21 @@ def rename_var(ckpt_path, new_ckpt_path):
             var = tf.contrib.framework.load_variable(ckpt_path, var_name)
             new_var_name = var_name.replace('Flow/inception_i3d', 'inception_i3d')
             new_var_name = new_var_name.replace('batch_norm', 'BatchNorm')
-            new_var_name = new_var_name.replace('Flow/dense','dense')
+            new_var_name = new_var_name.replace('Flow/dense', 'dense')
             var = tf.Variable(var, name=new_var_name)
 
         saver = tf.train.Saver()
         sess.run(tf.global_variables_initializer())
         saver.save(sess, new_ckpt_path)
-        
+
+
 def read_ckpt(ckpt_path):
     """阅读模型参数名称"""
     with tf.Session() as sess:
         for var_name, _ in tf.contrib.framework.list_variables(ckpt_path):
             print('ckpt_name: ', var_name)
-            
+
+
 if __name__ == '__main__': 
     # 定义保存后的模型路径
     ckpt_path = '../data/checkpoints2/f/63300_0.962_model-63300'
