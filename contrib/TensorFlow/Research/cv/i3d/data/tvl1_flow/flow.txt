@@ -1,2 +1,0 @@
-ucf101数据的flow类型数据下载链接为：
-https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/ucf101_tv1_flow.zip
