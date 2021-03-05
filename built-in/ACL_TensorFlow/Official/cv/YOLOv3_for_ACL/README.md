@@ -16,13 +16,13 @@ cd modelzoo/built-in/ACL/Official/cv/YOLOv3_for_ACL
 ### 2. Download and preprocess the dataset
 
 1. dataset
-To compare with official implement, for example, we use [get_coco_dataset.sh](https://github.com/pjreddie/darknet/blob/master/scripts/get_coco_dataset.sh) to prepare our dataset.
-   
+  To compare with official implement, for example, we use [get_coco_dataset.sh](https://github.com/pjreddie/darknet/blob/master/scripts/get_coco_dataset.sh) to prepare our dataset.
+
 2. annotation file
-   Using script generate `coco2014_trainval.txt/coco2014_minival.txt` files under `./data/` directory.
+   Using script generate `coco2014_minival.txt` file.
 
    ```
-   python3 coco_trainval_anns.py
+   cd scripts
    python3 coco_minival_anns.py
    ```
 
@@ -40,32 +40,6 @@ To compare with official implement, for example, we use [get_coco_dataset.sh](ht
    ...
    ```
 
-3. class_names file
-   Generate the `data.names` file under `./data/` directory. Each line represents a class name.     
-   For example:     
-
-   ```
-   bird
-   person
-   bike
-   ...
-   ```
-
-   The COCO dataset class names file is placed at `./data/coco.names`.
-
-4. prior anchor file:
-
-   Using the kmeans algorithm to get the prior anchors:
-
-   ```
-   python get_kmeans.py
-   ```
-
-   Then you will get 9 anchors and the average IoU. Save the anchors to a txt file.
-
-   The COCO dataset anchors offered by YOLO's author is placed at `./data/yolo_anchors.txt`, you can use that one too.
-
-   The yolo anchors computed by the kmeans script is on the resized image scale.  The default resize method is the letterbox resize, i.e., keep the original aspect ratio in the resized image.
 
 ### 3. Offline Inference
 
@@ -97,7 +71,7 @@ To compare with official implement, for example, we use [get_coco_dataset.sh](ht
 
   ```
   cd scripts
-  bash benchmark_tf.sh --batchSize=1 --modelType=yolov3 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=yolov3_tf_aipp.om --trueValuePath=instance_val2014.json --imgInfoFile=coco2014_minival.txt --classNamePath=coco.names 
+  bash benchmark_tf.sh --batchSize=1 --modelType=yolov3 --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=yolov3_tf_aipp.om --trueValuePath=instance_val2014.json --imgInfoFile=coco2014_minival.txt --classNamePath=../../coco.names
   ```
 
 
