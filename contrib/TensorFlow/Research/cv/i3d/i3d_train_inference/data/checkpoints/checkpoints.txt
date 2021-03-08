@@ -1,0 +1,2 @@
+下载链接为：
+https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/checkpoints.zip 或 https://github.com/deepmind/kinetics-i3d/tree/master/data
