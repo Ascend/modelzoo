@@ -165,6 +165,23 @@ Script will store:
     perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
     ```
 
+#### ckpt to pb
+
+- run frozen_graph.sh to generate transformer pb model.
+
+```
+./frozen_graph.sh
+
+these parameters needs to be modified:
+MODEL_DIR="./model_dir_base"    ---- the path of ckpt
+vocab_source:/home/wmt-ende/vocab.share  --- the path of vocab dic
+vocab_target:/home/wmt-ende/vocab.share  --- the path of vocab dic
+output_filename:"infer-b${beam}.pb"   --- the pb model name
+ remark:the time for ckpt to pb is about 1h.
+```
+
+
+
 ## Advanced
 
 It contains of parameters of Transformer model and options for training and evaluation, which is set in file `train-ende.sh`.
