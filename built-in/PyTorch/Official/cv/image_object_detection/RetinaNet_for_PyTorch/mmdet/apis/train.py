@@ -71,7 +71,6 @@ def train_detector(model,
     # build runner
     opt_level='O1'
     if opt_level:
-        torch.npu.set_device(cfg.gpu_ids[0])
         optimizer = build_optimizer(model, cfg.optimizer)
         model, optimizer = amp.initialize(model.npu(), optimizer, opt_level=opt_level, loss_scale=64.0)
 
@@ -88,7 +87,7 @@ def train_detector(model,
     else:
         # torch.npu.set_device(cfg.gpu_ids[0])
         model = MMDataParallel(
-            model..npu(), device_ids=cfg.gpu_ids)
+            model.npu(), device_ids=cfg.gpu_ids)
 
     # build runner
     # optimizer = build_optimizer(model, cfg.optimizer)
