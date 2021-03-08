@@ -134,6 +134,7 @@ config = {
     'epoch_mid': 80,
     
     'bn_lr_scale':1.0,
+    'restore_exclude': ['fp32_vars/dense'],
 
   }
 

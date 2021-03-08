@@ -35,10 +35,11 @@ _BATCH_NORM_DECAY = 0.9
 
 _Cardi = 32
 
+
 class LayerBuilder(object):
     def __init__(self, activation=None, data_format='channels_last',
                  training=False, use_batch_norm=False, batch_norm_config=None,
-                 conv_initializer=None, bn_init_mode='adv_bn_init', bn_gamma_initial_value=1.0 ):
+                 conv_initializer=None, bn_init_mode='adv_bn_init', bn_gamma_initial_value=1.0):
         self.activation = activation
         self.data_format = data_format
         self.training = training
@@ -221,9 +222,9 @@ def resnet_bottleneck_v1(builder, inputs, depth, depth_bottleneck, stride, filte
     else: # the downsample(first) block in each layer
         if 'D1' in arch_type:
             if stride == 1:
-              shortcut = builder.average_pooling2d_stride_1(x, stride, stride)             #--------------------Resnet-D------------
+                shortcut = builder.average_pooling2d_stride_1(x, stride, stride)             #--------------------Resnet-D------------
             else:
-              shortcut = builder.average_pooling2d(x, stride, stride)             #--------------------Resnet-D------------
+                shortcut = builder.average_pooling2d(x, stride, stride)             #--------------------Resnet-D------------
             shortcut = builder.conv2d_linear(shortcut, depth, 1, 1, 'SAME')
         elif 'D2' in arch_type:
             shortcut = builder.conv2d_linear(x, depth, 3, stride, 'SAME')
@@ -251,9 +252,9 @@ def resnet_bottleneck_v1(builder, inputs, depth, depth_bottleneck, stride, filte
             elif 'E2' in arch_type:
                 x = builder.conv2d(x, depth_bottleneck, 3, 1, 'SAME')
                 if stride == 1:
-                  x = builder.average_pooling2d_stride_1( x, stride, stride )
+                    x = builder.average_pooling2d_stride_1(x, stride, stride)
                 else:
-                  x = builder.average_pooling2d( x, stride, stride )
+                    x = builder.average_pooling2d(x, stride, stride)
             else:  # E0
                 x = builder.conv2d(x, depth_bottleneck, 3, stride, 'SAME')
             
@@ -293,9 +294,10 @@ def resnext_bottleneck(builder, inputs, depth, depth_bottleneck, stride, filters
             layers_split=[]
             tmp = x
             for i in range(_Cardi):
-              with tf.name_scope('cardi_'+str(i)):
-                split = builder.conv2d_no_act_no_bn( group_inputs[i], depth_bottleneck/_Cardi, 3, stride, 'SAME' )
-                layers_split.append(split)
+                with tf.name_scope('cardi_' + str(i)):
+                    split = builder.conv2d_no_act_no_bn(group_inputs[i], depth_bottleneck / _Cardi,
+                                                        3, stride, 'SAME')
+                    layers_split.append(split)
 
             x = tf.concat(layers_split, axis=3)
             x = builder.batch_norm(x)
@@ -304,10 +306,6 @@ def resnext_bottleneck(builder, inputs, depth, depth_bottleneck, stride, filters
             x = builder.conv2d_linear_last_bn(x, depth, 1, 1, 'SAME')
         x = tf.nn.relu(x + shortcut)
         return x
-
-
-
-
 
 
 def resnet_bottleneck_v2(builder, inputs, depth, depth_bottleneck, stride, filters, arch_type,
@@ -370,11 +368,11 @@ def resnet_bottleneck_v2(builder, inputs, depth, depth_bottleneck, stride, filte
             
             x = builder.conv2d_linear(x, depth, 1, 1, 'SAME')
 
-
         x = x + shortcut
         return x
-        
-def inference_resnext_impl(builder, inputs, layer_counts, arch_type='C1+D', resnet_version='v1.5', basic=False):
+
+
+def inference_resnext_impl(builder, inputs, layer_counts, arch_type='C1+D', num_classes=1001, basic=False):
     x = inputs
     #x = builder.batch_norm(x)
     x = builder.pad2d(x, 3)
@@ -389,23 +387,22 @@ def inference_resnext_impl(builder, inputs, layer_counts, arch_type='C1+D', resn
     for i in range(layer_counts[0]):
         x = resnext_bottleneck(builder, x, 256, 128, 1, num_filters, arch_type, basic)
     for i in range(layer_counts[1]):
-        num_filters=num_filters*2
+        num_filters = num_filters * 2
         x = resnext_bottleneck(builder, x, 512, 256, 2 if i == 0 else 1, num_filters, arch_type, basic)
     for i in range(layer_counts[2]):
-        num_filters=num_filters*2
+        num_filters = num_filters * 2
         x = resnext_bottleneck(builder, x, 1024, 512, 2 if i == 0 else 1, num_filters, arch_type, basic)
     for i in range(layer_counts[3]):
-        num_filters=num_filters*2
+        num_filters = num_filters * 2
         x = resnext_bottleneck(builder, x, 2048, 1024, 2 if i == 0 else 1, num_filters, arch_type, basic)
-    print ('====================Final x:', x)
-       
+    print('====================Final x:', x)
 
-    axes = [1,2]
-    x = tf.reduce_mean( x, axes, keepdims=True )		
+    axes = [1, 2]
+    x = tf.reduce_mean(x, axes, keepdims=True)
     x = tf.identity(x, 'final_reduce_mean')
-    x = tf.reshape( x, [-1, 2048] )
-    x = tf.layers.dense(inputs=x, units=1001,kernel_initializer= tf.variance_scaling_initializer() )
-    x = tf.identity( x, 'final_dense' )
+    x = tf.reshape(x, [-1, 2048])
+    x = tf.layers.dense(inputs=x, units=num_classes, kernel_initializer=tf.variance_scaling_initializer())
+    x = tf.identity(x, 'final_dense')
     return x       
         
 
@@ -453,6 +450,7 @@ def inference_resnet_v1_impl(builder, inputs, layer_counts, arch_type='C1+D', re
     x = tf.layers.dense(inputs=x, units=1001,kernel_initializer=tf.random_normal_initializer(stddev=0.01))
     x = tf.identity( x, 'final_dense' )
     return x
+
 
 def inference_resnet_v2_impl(builder, inputs, layer_counts, arch_type='C1+D', basic=False):
     x = inputs
@@ -511,8 +509,9 @@ def inference_resnet_v2_impl(builder, inputs, layer_counts, arch_type='C1+D', ba
         x = resnet_bottleneck_v2(builder, x, 2048, 512, 2 if i == 0 else 1, num_filters, arch_type, basic)
     return builder.spatial_average2d(x)
 
+
 def inference_resnet_v1(config, inputs, nlayer, data_format='channels_last',
-                        training=False, conv_initializer=None, bn_init_mode='adv_bn_init', bn_gamma_initial_value=1.0 ):
+                        training=False, conv_initializer=None, bn_init_mode='adv_bn_init', bn_gamma_initial_value=1.0):
     """Deep Residual Networks family of models
     https://arxiv.org/abs/1512.03385
     """
@@ -551,18 +550,21 @@ def inference_resnet_v1(config, inputs, nlayer, data_format='channels_last',
                              nlayer)
                              
     elif config['resnet_version'] == 'resnext':
-        builder = LayerBuilder( tf.nn.relu, data_format, training, use_batch_norm=True,
-                               conv_initializer=conv_initializer, bn_init_mode=bn_init_mode, bn_gamma_initial_value=bn_gamma_initial_value)
+        builder = LayerBuilder(tf.nn.relu, data_format, training, use_batch_norm=True,
+                               conv_initializer=conv_initializer, bn_init_mode=bn_init_mode,
+                               bn_gamma_initial_value=bn_gamma_initial_value)
         if nlayer == 18:
-            return inference_resnext_impl(builder, inputs, [2, 2, 2, 2], config['arch_type'], basic=True)
+            return inference_resnext_impl(builder, inputs, [2, 2, 2, 2], config['arch_type'],
+                                          config['num_classes'], basic=True)
         elif nlayer == 34:
-            return inference_resnext_impl(builder, inputs, [3, 4, 6, 3], config['arch_type'], basic=True)
+            return inference_resnext_impl(builder, inputs, [3, 4, 6, 3], config['arch_type'],
+                                          config['num_classes'], basic=True)
         elif nlayer == 50:
-            return inference_resnext_impl(builder, inputs, [3, 4, 6, 3], config['arch_type'])
+            return inference_resnext_impl(builder, inputs, [3, 4, 6, 3], config['arch_type'], config['num_classes'])
         elif nlayer == 101:
-            return inference_resnext_impl(builder, inputs, [3, 4, 23, 3], config['arch_type'])
+            return inference_resnext_impl(builder, inputs, [3, 4, 23, 3], config['arch_type'], config['num_classes'])
         elif nlayer == 152:
-            return inference_resnext_impl(builder, inputs, [3, 8, 36, 3], config['arch_type'])
+            return inference_resnext_impl(builder, inputs, [3, 8, 36, 3], config['arch_type'], config['num_classes'])
         else:
             raise ValueError("Invalid nlayer (%i); must be one of: 18,34,50,101,152" %
                              nlayer)                             
