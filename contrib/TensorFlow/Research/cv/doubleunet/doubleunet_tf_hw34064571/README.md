@@ -48,3 +48,5 @@ https://polyp.grand-challenge.org/site/Polyp/CVCClinicDB/
 epoch=300
 batch_size=16
 lr=1e-5
+
+[offline_inference](https://gitee.com/axiaodongxu/modelzoo/blob/master/contrib/TensorFlow/Research/cv/doubleunet/doubleunet_tf_hw34064571/offline_inference/README.md)
