@@ -241,33 +241,20 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         neg_inds = sampling_result.neg_inds
         if pos_inds.sum() > 0:
             if not self.reg_decoded_bbox:
-                # pos_bbox_targets = self.bbox_coder.encode(
-                #     sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes)
-                pad_size = 2048
-                pos_bboxes = torch.zeros(pad_size, 4, device=device)
-                num = sampling_result.pos_bboxes.size(0)
-                assert num <= pad_size
-                pos_bboxes[:num] = sampling_result.pos_bboxes
-                pos_gt_bboxes = torch.zeros(pad_size, 4, device=device)
-                pos_gt_bboxes[:num] = sampling_result.pos_gt_bboxes
-
-                pos_bbox_targets = self.bbox_coder.encode(pos_bboxes, pos_gt_bboxes)
-                pos_bbox_targets = pos_bbox_targets[:num]
+                pos_bbox_targets = self.bbox_coder.encode(
+                    sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes * pos_inds_unsqu)
             else:
                 pos_bbox_targets = sampling_result.pos_gt_bboxes
-            # bbox_targets[pos_inds, :] = pos_bbox_targets
-            # bbox_weights[pos_inds, :] = 1.0
-            bbox_targets_mask = torch.zeros(bbox_targets.size(0), dtype=torch.int, device=device)
-            bbox_targets_mask[pos_inds] = 1
-            bbox_targets[bbox_targets_mask.bool(), :] = pos_bbox_targets
-            bbox_weights[bbox_targets_mask.bool(), :] = 1.0
+
+            bbox_targets = pos_bbox_targets
+            bbox_weights = bbox_weights + pos_inds_unsqu.float()
             if gt_labels is None:
                 # Only rpn gives gt_labels as None
                 # Foreground is the first class since v2.5.0
                 labels[pos_inds] = 0
             else:
-                labels[pos_inds] = gt_labels[
-                    sampling_result.pos_assigned_gt_inds]
+                pos_gt_bboxes_temp = torch.index_select(gt_labels.int(), 0, sampling_result.pos_assigned_gt_inds.int())
+                labels = torch.where(pos_inds, pos_gt_bboxes_temp, labels)
             if self.train_cfg.pos_weight <= 0:
                 label_weights[pos_inds] = 1.0
             else:
