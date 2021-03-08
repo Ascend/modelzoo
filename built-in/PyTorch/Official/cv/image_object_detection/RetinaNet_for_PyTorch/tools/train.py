@@ -46,6 +46,11 @@ def parse_args():
         action='store_true',
         help='whether to set deterministic options for CUDNN backend.')
     parser.add_argument(
+        '--opt-level',
+        choices=['O0', 'O1', 'O2'],
+        default=None,
+        help='apex opt-level')
+    parser.add_argument(
         '--options',
         nargs='+',
         action=DictAction,
