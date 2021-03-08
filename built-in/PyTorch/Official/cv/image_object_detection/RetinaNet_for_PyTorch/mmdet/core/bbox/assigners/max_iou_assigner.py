@@ -171,8 +171,8 @@ class MaxIoUAssigner(BaseAssigner):
         # 2. assign negative: below
         # the negative inds are set to be 0
         if isinstance(self.neg_iou_thr, float):
-            assigned_gt_inds[(max_overlaps >= 0)
-                             & (max_overlaps < self.neg_iou_thr)] = 0
+            gt_inds_mask = (max_overlaps >= 0) & (max_overlaps < self.neg_iou_thr)
+            assigned_gt_inds = assigned_gt_inds * ~gt_inds_mask
         elif isinstance(self.neg_iou_thr, tuple):
             assert len(self.neg_iou_thr) == 2
             assigned_gt_inds[(max_overlaps >= self.neg_iou_thr[0])
@@ -211,8 +211,8 @@ class MaxIoUAssigner(BaseAssigner):
             # if pos_inds.numel() > 0:
             pos_inds = assigned_gt_inds > 0
             if pos_inds.sum() > 0:
-                ind_temp = assigned_gt_inds[pos_inds].long() - 1
-                assigned_labels[pos_inds] = gt_labels[ind_temp]
+                assigned_labels_temp = torch.index_select(gt_labels.int(), 0, (assigned_gt_inds - 1) * pos_inds)
+                assigned_labels = torch.where(pos_inds, assigned_labels_temp, assigned_labels.int()).long()
         else:
             assigned_labels = None
         
