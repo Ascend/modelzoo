@@ -285,6 +285,7 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
 
         pos_inds = sampling_result.pos_inds
         neg_inds = sampling_result.neg_inds
+        pos_inds_unsqu = pos_inds.unsqueeze(1)
         if pos_inds.sum() > 0:
             if not self.reg_decoded_bbox:
                 pos_bbox_targets = self.bbox_coder.encode(
