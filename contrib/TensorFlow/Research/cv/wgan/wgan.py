@@ -26,6 +26,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import time
 import argparse
@@ -121,22 +149,22 @@ class WassersteinGAN(object):
             #     fig = plt.figure(self.data + '.' + self.model)
             #     grid_show(fig, bx, xs.shape)
             #     fig.savefig('logs/{}/{}.pdf'.format(self.data, t/100))
-        def save(save_dir):
-            
-            os.makedirs(save_dir, exist_ok=True)
-            saver = tf.train.Saver()
-            sess = self.sess
-            saver.save(sess, 'save_dir') 
-            print("save model to: ", save_dir)
+    def save(save_dir):
+        
+        os.makedirs(save_dir, exist_ok=True)
+        saver = tf.train.Saver()
+        sess = self.sess
+        saver.save(sess, 'save_dir') 
+        print("save model to: ", save_dir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('')
-    parser.add_argument('--data', type=str, default='mnist', help="mnist or lsun")
+    parser.add_argument('--data', type=str, default='lsun', help="mnist or lsun")
     parser.add_argument('--model', type=str, default='dcgan')
     parser.add_argument('--gpus', type=str, default='0')
     parser.add_argument('--ckpt', type=str, default='./ckpt/')
-    parser.add_argument('--iters', type=int, default=60000 // 64 // 4)
+    parser.add_argument('--iters', type=int, default=300000 // 64 * 60) # 60000 // 64 * 20 for mnist  300000 // 64 * 60 for lsun
     args = parser.parse_args()
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpus
     data = importlib.import_module(args.data)
@@ -147,4 +175,4 @@ if __name__ == '__main__':
     g_net = model.Generator()
     wgan = WassersteinGAN(g_net, d_net, xs, zs, args.data, args.model)
     wgan.train(num_batches=args.iters)
-    wgan.save(agrs.ckpt)
+    wgan.save(args.ckpt)
