@@ -79,6 +79,10 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         self.loss_bbox = build_loss(loss_bbox)
         self.train_cfg = train_cfg
         self.test_cfg = test_cfg
+        self.anchor_list_v = None
+        self.anchor_list_h = None
+        self.valid_flag_list_v = None
+        self.valid_flag_list_h = None
         if self.train_cfg:
             self.assigner = build_assigner(self.train_cfg.assigner)
             # use PseudoSampler when sampling is False
@@ -141,6 +145,48 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
                     is num_anchors * 4.
         """
         return multi_apply(self.forward_single, feats)
+
+    def get_anchors_ones(self, featmap_sizes, img_metas, device='cuda'):
+        """Get anchors according to feature map sizes.
+
+        Args:
+            featmap_sizes (list[tuple]): Multi-level feature map sizes.
+            img_metas (list[dict]): Image meta info.
+            device (torch.device | str): Device for returned tensors
+
+        Returns:
+            tuple:
+                anchor_list (list[Tensor]): Anchors of each image.
+                valid_flag_list (list[Tensor]): Valid flags of each image.
+        """
+        num_imgs = len(img_metas)
+        # v
+        if img_metas[0]['batch_input_shape'] == (800, 1344):
+            if self.anchor_list_v is None:
+                multi_level_anchors = self.anchor_generator.grid_anchors(featmap_sizes, device)
+                anchor_list = [multi_level_anchors for _ in range(num_imgs)]
+                self.anchor_list_v = anchor_list
+                multi_level_flags_v = self.anchor_generator.valid_flags(featmap_sizes, (800, 1344, 3), device)
+                valid_flag_list_v = [multi_level_flags_v for _ in range(num_imgs)]
+                self.valid_flag_list_v = valid_flag_list_v
+
+            anchor_list = self.anchor_list_v
+            valid_flag_list = self.valid_flag_list_v
+
+        # h
+        if img_metas[0]['batch_input_shape'] == (1344, 800):
+            if self.anchor_list_h is None:
+                multi_level_anchors = self.anchor_generator.grid_anchors(featmap_sizes, device)
+                anchor_list = [multi_level_anchors for _ in range(num_imgs)]
+                self.anchor_list_h = anchor_list
+                multi_level_flags_h = self.anchor_generator.valid_flags(featmap_sizes, (1344, 800, 3), device)
+                valid_flag_list_h = [multi_level_flags_h for _ in range(num_imgs)]
+                self.valid_flag_list_h = valid_flag_list_h
+
+            anchor_list = self.anchor_list_h
+            valid_flag_list = self.valid_flag_list_h
+
+        return anchor_list, valid_flag_list
 
     def get_anchors(self, featmap_sizes, img_metas, device='cuda'):
         """Get anchors according to feature map sizes.
@@ -461,7 +507,7 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
 
         device = cls_scores[0].device
 
-        anchor_list, valid_flag_list = self.get_anchors(
+        anchor_list, valid_flag_list = self.get_anchors_ones(
             featmap_sizes, img_metas, device=device)
         label_channels = self.cls_out_channels if self.use_sigmoid_cls else 1
         cls_reg_targets = self.get_targets(
