@@ -425,7 +425,6 @@ class DataGenerator():
 					img = self._crop_img(img, padd, cbox)
 					img = img.astype(np.uint8)
 					img = cv2.resize(img, (256,256)) 
-					# img = scm.imresize(img, (256,256))
 					img, hm = self._augment(img, hm)
 					hm = np.expand_dims(hm, axis = 0)
 					hm = np.repeat(hm, stacks, axis = 0)
@@ -463,7 +462,6 @@ class DataGenerator():
 			img = self._crop_img(img, padd, cbox)
 			img = img.astype(np.uint8)
 			img = cv2.resize(img, (256,256)) 
-			#img = scm.imresize(img, (256,256))
 			img, hm = self._augment(img, hm)
 			hm = np.expand_dims(hm, axis = 0)
 			hm = np.repeat(hm, stacks, axis = 0)
@@ -539,12 +537,7 @@ class DataGenerator():
 			new_j = self._relative_joints(box,padd, self.data_dict[self.train_set[i]]['joints'], to_size=256)
 			rhm = self._generate_hm(256, 256, new_j,256, w)
 			rimg = self._crop_img(img, padd, box)
-			# See Error in self._generator
-			#rimg = cv2.resize(rimg, (256,256))
 			rimg = scm.imresize(rimg, (256,256))
-			#rhm = np.zeros((256,256,16))
-			#for i in range(16):
-			#	rhm[:,:,i] = cv2.resize(rHM[:,:,i], (256,256))
 			grimg = cv2.cvtColor(rimg, cv2.COLOR_RGB2GRAY)
 			cv2.imshow('image', grimg / 255 + np.sum(rhm,axis = 2))
 			# Wait

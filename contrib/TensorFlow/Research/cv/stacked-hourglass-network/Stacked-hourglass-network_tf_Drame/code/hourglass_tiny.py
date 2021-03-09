@@ -42,30 +42,9 @@ from npu_bridge.estimator.npu.npu_loss_scale_manager import ExponentialUpdateLos
 
 
 class HourglassModel():
-	""" HourglassModel class: (to be renamed)
-	Generate TensorFlow model to train and predict Human Pose from images (soon videos)
-	Please check README.txt for further information on model management.
-	"""
+
 	def __init__(self, nFeat = 512, nStack = 4, nModules = 1, nLow = 4, outputDim = 16, batch_size = 16, drop_rate = 0.2, lear_rate = 2.5e-4, decay = 0.96, decay_step = 2000, dataset = None, training = True, w_summary = True, logdir_train = None, logdir_test = None,tiny = True, attention = False,modif = True,w_loss = False, name = 'tiny_hourglass',  joints = ['r_anckle', 'r_knee', 'r_hip', 'l_hip', 'l_knee', 'l_anckle', 'pelvis', 'thorax', 'neck', 'head', 'r_wrist', 'r_elbow', 'r_shoulder', 'l_shoulder', 'l_elbow', 'l_wrist']):
-		""" Initializer
-		Args:
-			nStack				: number of stacks (stage/Hourglass modules)
-			nFeat				: number of feature channels on conv layers
-			nLow				: number of downsampling (pooling) per module
-			outputDim			: number of output Dimension (16 for MPII)
-			batch_size			: size of training/testing Batch
-			dro_rate			: Rate of neurons disabling for Dropout Layers
-			lear_rate			: Learning Rate starting value
-			decay				: Learning Rate Exponential Decay (decay in ]0,1], 1 for constant learning rate)
-			decay_step			: Step to apply decay
-			dataset			: Dataset (class DataGenerator)
-			training			: (bool) True for training / False for prediction
-			w_summary			: (bool) True/False for summary of weight (to visualize in Tensorboard)
-			tiny				: (bool) Activate Tiny Hourglass
-			attention			: (bool) Activate Multi Context Attention Mechanism (MCAM)
-			modif				: (bool) Boolean to test some network modification # DO NOT USE IT ! USED TO TEST THE NETWORK
-			name				: name of the model
-		"""
+		
 		self.nStack = nStack
 		self.nFeat = nFeat
 		self.nModules = nModules
@@ -89,8 +68,7 @@ class HourglassModel():
 		self.logdir_test = logdir_test
 		self.joints = joints
 		self.w_loss = w_loss
-		
-	# ACCESSOR
+
 	
 	def get_input(self):
 		""" Returns Input (Placeholder) Tensor
@@ -130,7 +108,6 @@ class HourglassModel():
 		return self.loss
 	def get_saver(self):
 		""" Returns Saver
-		/!\ USE ONLY IF YOU KNOW WHAT YOU ARE DOING
 		Warning:
 			Be sure to build the model first
 		"""
@@ -148,11 +125,7 @@ class HourglassModel():
 			self.img = tf.placeholder(dtype= tf.float32, shape= [None, 256, 256, 3], name = 'input_img')
 			if self.w_loss:
 				self.weights = tf.placeholder(dtype = tf.float32, shape = (None, self.outDim))
-			# Shape Ground Truth Map: batchSize x nStack x 64 x 64 x outDim
 			self.gtMaps = tf.placeholder(dtype = tf.float32, shape = [None, self.nStack, 64, 64, self.outDim])
-			# TODO : Implement weighted loss function
-			# NOT USABLE AT THE MOMENT
-			#weights = tf.placeholder(dtype = tf.float32, shape = (None, self.nStack, 1, 1, self.outDim))
 		inputTime = time.time()
 		print('---Inputs : Done (' + str(int(abs(inputTime-startTime))) + ' sec.)')
 		if self.attention:
@@ -179,31 +152,8 @@ class HourglassModel():
 			self.lr = tf.train.exponential_decay(self.learning_rate, self.train_step, self.decay_step, self.decay, staircase= True, name= 'learning_rate')
 		lrTime = time.time()
 		print('---LR : Done (' + str(int(abs(accurTime-lrTime))) + ' sec.)')
-		
-
-		# if FLAGS.use_fp16 and (FLAGS.bert_loss_scale not in [None, -1]):
-		#   opt_tmp = opt
-		#   if FLAGS.bert_loss_scale == 0:
-		#     loss_scale_manager = ExponentialUpdateLossScaleManager(init_loss_scale=2**32, incr_every_n_steps=1000, decr_every_n_nan_or_inf=2, decr_ratio=0.5)
-		#   elif FLAGS.bert_loss_scale >= 1:
-		#     loss_scale_manager = FixedLossScaleManager(loss_scale=FLAGS.bert_loss_scale)
-		#   else:
-		#     raise ValueError("Invalid loss scale: %d" % FLAGS.bert_loss_scale)
-		#   #device数是否大于1，如果大于1，进行分布式训练
-		#   if ops_adapter.size() > 1:
-		#     opt_tmp = NPUDistributedOptimizer(opt_tmp)
-		#     opt = NPULossScaleOptimizer(opt_tmp, loss_scale_manager, is_distributed=True)
-		#   else:
-		#     opt = NPULossScaleOptimizer(opt_tmp, loss_scale_manager)
-
-
 		with tf.name_scope('rmsprop'):
-#			opt_tmp = tf.train.AdamOptimizer(learning_rate= self.lr)
-#			opt_tmp = tf.train.GradientDescentOptimizer(learning_rate= self.lr)
-			#opt_tmp = tf.train.MomentumOptimizer(learning_rate= self.lr, momentum = 0.9)
 			opt_tmp = tf.train.RMSPropOptimizer(learning_rate= self.lr)
-# 			opt_tmp = tf.train.AdadeltaOptimizer(learning_rate= self.lr)
-			# self.rmsprop = tf.train.RMSPropOptimizer(learning_rate= self.lr)
 		bert_loss_scale = 0
 		if bert_loss_scale == 0:
 			loss_scale_manager = ExponentialUpdateLossScaleManager(init_loss_scale=2**32, incr_every_n_steps=1000, decr_every_n_nan_or_inf=2, decr_ratio=0.5)
@@ -260,9 +210,7 @@ class HourglassModel():
 	def _train(self, nEpochs = 10, epochSize = 1000, saveStep = 500, validIter = 10):
 		"""
 		"""
-		with tf.name_scope('Train'):
-# 			self.hhhh = self.dataset._test_aux_generator()
-# 			print("test is ok")            
+		with tf.name_scope('Train'):      
 			self.generator = self.dataset._aux_generator(self.batchSize, self.nStack, normalize = True, sample_set = 'train')
 			self.valid_gen = self.dataset._aux_generator(self.batchSize, self.nStack, normalize = True, sample_set = 'valid')
 			startTime = time.time()
@@ -275,7 +223,6 @@ class HourglassModel():
 				avg_cost = 0.
 				cost = 0.
 				print('Epoch :' + str(epoch) + '/' + str(nEpochs) + '\n')
-				# Training Set
 				for i in range(epochSize):
 					# DISPLAY PROGRESS BAR
 					# TODO : Customize Progress Bar
@@ -300,17 +247,13 @@ class HourglassModel():
 							hhhhhh, c, = self.Session.run([self.train_rmsprop, self.loss], feed_dict = {self.img : img_train, self.gtMaps: gt_train})
 					cost += c
 					avg_cost += c/epochSize
-# 					print(hhhhhh, c,avg_cost)
 				epochfinishTime = time.time()
-				#Save Weight (axis = epoch)
 				if self.w_loss:
 					weight_summary = self.Session.run(self.weight_op, {self.img : img_train, self.gtMaps: gt_train, self.weights: weight_train})
 				else :
 					weight_summary = self.Session.run(self.weight_op, {self.img : img_train, self.gtMaps: gt_train})
 				self.train_summary.add_summary(weight_summary, epoch)
 				self.train_summary.flush()
-				#self.weight_summary.add_summary(weight_summary, epoch)
-				#self.weight_summary.flush()
 				print('Epoch ' + str(epoch) + '/' + str(nEpochs) + ' done in ' + str(int(epochfinishTime-epochstartTime)) + ' sec.' + ' -avg_time/batch: ' + str(((epochfinishTime-epochstartTime)/epochSize))[:4] + ' sec.')
 
 				self.resume['loss'].append(cost)
@@ -334,7 +277,6 @@ class HourglassModel():
 				img_valid, gt_valid, w_valid = next(self.valid_gen)
 				accuracy_pred_test = self.Session.run(self.joint_accur, feed_dict = {self.img : img_valid, self.gtMaps: gt_valid})
 				accuracy_array_test += np.array(accuracy_pred_test, dtype = np.float32) / validIter
-# 				print(i,accuracy_pred_test)
 			print('--Avg. Test Accuracy =', str((np.sum(accuracy_array_test) / len(accuracy_array_test)) * 100)[:6], '%' )
 			
 			print('Training Done')
@@ -346,23 +288,16 @@ class HourglassModel():
 		"""
 		"""
 		with tf.name_scope('Test'):
-			#self.hhhh = self.dataset._test_aux_generator()
 			accuracy_array_test = np.array([0.0]*len(self.joint_accur))
-			#print("test is ok")            
-			# self.generator = self.dataset._aux_generator(self.batchSize, self.nStack, normalize = True, sample_set = 'train')
 			self.valid_gen = self.dataset._aux_generator(self.batchSize, self.nStack, normalize = True, sample_set = 'valid')
 			startTime = time.time()
 			for i in range(validIter):
 				img_valid, gt_valid, w_valid = next(self.valid_gen)
 				accuracy_pred_test = self.Session.run(self.joint_accur, feed_dict = {self.img : img_valid, self.gtMaps: gt_valid})
 				accuracy_array_test += np.array(accuracy_pred_test, dtype = np.float32) / validIter
-# 				print(i,accuracy_pred_test)
 			print('--Avg. Test Accuracy =', str((np.sum(accuracy_array_test) / len(accuracy_array_test)) * 100)[:6], '%' )
 			
 			print('Test Done')
-			# print('Resume:' + '\n' + '  Epochs: ' + str(nEpochs) + '\n' + '  n. Images: ' + str(nEpochs * epochSize * self.batchSize) )
-			# print('  Final Loss: ' + str(cost) + '\n' + '  Relative Loss: ' + str(100*self.resume['loss'][-1]/(self.resume['loss'][0] + 0.1)) + '%' )
-			# print('  Relative Improvement: ' + str((self.resume['err'][-1] - self.resume['err'][0]) * 100) +'%')
 			print('  Training Time: ' + str( datetime.timedelta(seconds=time.time() - startTime)))
 		return accuracy_array_test
 	
@@ -397,10 +332,6 @@ class HourglassModel():
 			self._define_saver_summary()
 			if load is not None:
 				self.saver.restore(self.Session, load)
-				#try:
-					#	self.saver.restore(self.Session, load)
-				#except Exception:
-					#	print('Loading Failed! (Check README file for further information)')
 				out = self._test(nEpochs, epochSize, saveStep, validIter=10)
                 
 			else:
@@ -445,8 +376,6 @@ class HourglassModel():
 		""" Initialize weights
 		"""
 		print('Session initialization')
-		# self.Session = tf.Session()
-		#config = tf.ConfigProto(allow_soft_placement = True)
 
 		config = tf.ConfigProto()
 		custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
@@ -465,7 +394,6 @@ class HourglassModel():
 		"""
 		print('Session initialization')
 		t_start = time.time()
-		# self.Session = tf.Session()
 
 		config = tf.ConfigProto()
 		custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
@@ -473,8 +401,6 @@ class HourglassModel():
 		custom_op.parameter_map["use_off_line"].b = True #在昇腾AI处理器执行训练
 		custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")# 双精度
 		config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  #关闭remap开关
-
-# 		config = tf.ConfigProto(allow_soft_placement = True)
 		self.Session = tf.Session(config = config)
 		print('Sess initialized in ' + str(int(time.time() - t_start)) + ' sec.')
 		
@@ -537,7 +463,6 @@ class HourglassModel():
 					with tf.name_scope('stage_' + str(self.nStack - 1)):
 						hg[self.nStack - 1] = self._hourglass(sum_[self.nStack - 2], self.nLow, self.nFeat, 'hourglass')
 						drop[self.nStack-1] = tf.layers.dropout(hg[self.nStack-1], rate = self.dropout_rate, training = self.training, name = 'dropout')
-						# drop[self.nStack-1] = npu_ops.dropout(hg[self.nStack-1], keep_prob =1- self.dropout_rate, name = 'dropout')
 						ll[self.nStack - 1] = self._conv_bn_relu(drop[self.nStack-1], self.nFeat,1,1, 'VALID', 'conv')
 						if self.modif:
 							out[self.nStack - 1] = self._conv_bn_relu(ll[self.nStack - 1], self.outDim, 1,1, 'VALID', 'out')
@@ -552,12 +477,10 @@ class HourglassModel():
 					with tf.name_scope('stage_0'):
 						hg[0] = self._hourglass(r3, self.nLow, self.nFeat, 'hourglass')
 						drop[0] = tf.layers.dropout(hg[0], rate = self.dropout_rate, training = self.training, name = 'dropout')
-						# drop[0] = npu_ops.dropout(hg[0], keep_prob = 1-self.dropout_rate, name = 'dropout')
 
 						ll[0] = self._conv_bn_relu(drop[0], self.nFeat, 1,1, 'VALID', name = 'conv')
 						ll_[0] =  self._conv(ll[0], self.nFeat, 1, 1, 'VALID', 'll')
 						if self.modif:
-							# TEST OF BATCH RELU
 							out[0] = self._conv_bn_relu(ll[0], self.outDim, 1, 1, 'VALID', 'out')
 						else:
 							out[0] = self._conv(ll[0], self.outDim, 1, 1, 'VALID', 'out')
@@ -567,7 +490,6 @@ class HourglassModel():
 						with tf.name_scope('stage_' + str(i)):
 							hg[i] = self._hourglass(sum_[i-1], self.nLow, self.nFeat, 'hourglass')
 							drop[i] = tf.layers.dropout(hg[i], rate = self.dropout_rate, training = self.training, name = 'dropout')
-							# drop[i] = npu_ops.dropout(hg[i], keep_prob = 1-self.dropout_rate, name = 'dropout')
 							ll[i] = self._conv_bn_relu(drop[i], self.nFeat, 1, 1, 'VALID', name= 'conv')
 							ll_[i] = self._conv(ll[i], self.nFeat, 1, 1, 'VALID', 'll')
 							if self.modif:
@@ -579,7 +501,6 @@ class HourglassModel():
 					with tf.name_scope('stage_' + str(self.nStack -1)):
 						hg[self.nStack - 1] = self._hourglass(sum_[self.nStack - 2], self.nLow, self.nFeat, 'hourglass')
 						drop[self.nStack-1] = tf.layers.dropout(hg[self.nStack-1], rate = self.dropout_rate, training = self.training, name = 'dropout')
-						# drop[self.nStack-1] = npu_ops.dropout(hg[self.nStack-1], keep_prob =1- self.dropout_rate, name = 'dropout')
 						ll[self.nStack - 1] = self._conv_bn_relu(drop[self.nStack-1], self.nFeat, 1, 1, 'VALID', 'conv')
 						if self.modif:
 							out[self.nStack - 1] = self._conv_bn_relu(ll[self.nStack - 1], self.outDim, 1,1, 'VALID', 'out')
@@ -899,14 +820,12 @@ class HourglassModel():
 					ll1 = self._lin(hg, self.nFeat*2)
 					ll2 = self._lin(ll1, self.nFeat*2)
 					drop = tf.layers.dropout(ll2, rate=0.1, training = self.training)
-					# drop = npu_ops.dropout(ll2, keep_prob=1-0.1)
 					att =  self._attention_part_crf(drop, 1, 3, 0)
 					tmpOut = self._attention_part_crf(att, 1, 3, 1)
 				else:
 					ll1 = self._lin(hg, self.nFeat)
 					ll2 = self._lin(ll1, self.nFeat)
 					drop = tf.layers.dropout(ll2, rate=0.1, training = self.training)
-					# drop = npu_ops.dropout(ll2, keep_prob=1-0.1)
 					if i > self.nStack // 2:
 						att = self._attention_part_crf(drop, 1, 3, 0)
 						tmpOut = self._attention_part_crf( att, 1, 3, 1)
