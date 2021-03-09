@@ -154,6 +154,10 @@ if __name__ == '__main__':
         conv = torch.nn.Conv2d(32, 32, 1)
         model = ChannelShuffle(64, split_shuffle=split_shuffle)
 
+        x = x.to(device)
+        conv = conv.to(device)
+        model = model.to(device)
+
         x1 = conv(x)
         x2 = conv(x)
         output = model(x1, x2)
