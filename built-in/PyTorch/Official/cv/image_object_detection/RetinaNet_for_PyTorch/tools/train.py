@@ -124,7 +124,7 @@ def main():
         distributed = False
     else:
         distributed = True
-        os.environ['NPUID'] = args.gpu_ids
+        os.environ['NPUID'] = str(args.gpu_ids[0])
         init_dist(args.launcher, **cfg.dist_params)
         # re-set gpu_ids with distributed training mode
         _, world_size = get_dist_info()
