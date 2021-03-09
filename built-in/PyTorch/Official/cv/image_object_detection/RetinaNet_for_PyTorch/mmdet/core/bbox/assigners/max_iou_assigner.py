@@ -200,7 +200,8 @@ class MaxIoUAssigner(BaseAssigner):
                 if gt_max_overlaps[i] >= self.min_pos_iou:
                     if self.gt_max_assign_all:
                         max_iou_inds = overlaps[i, :] == gt_max_overlaps[i]
-                        assigned_gt_inds[max_iou_inds] = i + 1
+                        gt_inds_temp = assigned_gt_inds.new_full(assigned_gt_inds.size(), i + 1)
+                        assigned_gt_inds = torch.where(max_iou_inds, gt_inds_temp, assigned_gt_inds)
                     else:
                         assigned_gt_inds[gt_argmax_overlaps[i]] = i + 1
 
