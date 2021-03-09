@@ -297,15 +297,18 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
             bbox_weights = bbox_weights + pos_inds_unsqu.float()
             if gt_labels is None:
                 # Only rpn gives gt_labels as None
-                # Foreground is the first class since v2.5.0
-                labels[pos_inds] = 0
+                # Foreground is the first class since v2.5.0                
+                # labels[pos_inds] = 0
+                labels = labels * ~pos_inds
             else:
                 pos_gt_bboxes_temp = torch.index_select(gt_labels.int(), 0, sampling_result.pos_assigned_gt_inds.int())
                 labels = torch.where(pos_inds, pos_gt_bboxes_temp, labels)
             if self.train_cfg.pos_weight <= 0:
-                label_weights[pos_inds] = 1.0
+                # label_weights[pos_inds] = 1.0
+                label_weights = label_weights * (~pos_inds).float() + pos_inds.float()
             else:
-                label_weights[pos_inds] = self.train_cfg.pos_weight
+                # label_weights[pos_inds] = self.train_cfg.pos_weight
+                label_weights = label_weights * (~pos_inds).float() + pos_inds.float() * self.train_cfg.pos_weight
         if len(neg_inds) > 0:
             label_weights[neg_inds] = 1.0
 
