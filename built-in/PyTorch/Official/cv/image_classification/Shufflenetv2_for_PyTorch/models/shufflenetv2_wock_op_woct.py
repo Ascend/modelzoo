@@ -17,9 +17,14 @@ import torch
 import torch.nn as nn
 
 try:
-    from .utils import load_state_dict_from_url
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
+
+try:
+    from .channel_shuffle import ChannelShuffle
 except:
-    pass
+    from channel_shuffle import ChannelShuffle
 
 import numpy as np
 
@@ -34,72 +39,6 @@ model_urls = {
     'shufflenetv2_x1.5': None,
     'shufflenetv2_x2.0': None,
 }
-
-
-class IndexSelectFullImplementation(torch.autograd.Function):
-    @staticmethod
-    def forward(ctx, x1, x2, fp_index, bp_index1, bp_index2):
-        stream = torch.npu.current_stream()
-        stream.synchronize()
-
-        ctx.bp_index1 = bp_index1
-        ctx.bp_index2 = bp_index2
-        x = torch.cat([x1, x2], dim=1)
-        result = x.index_select(1, fp_index)
-
-        return result
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        stream = torch.npu.current_stream()
-        stream.synchronize()
-
-        # convert to NCHW to avoid extra 5HD --> 4D
-        grad_output.data = grad_output.data.npu_format_cast(0)
-        out1 = grad_output.index_select(1, ctx.bp_index1)
-        out2 = grad_output.index_select(1, ctx.bp_index2)
-        return out1, out2, None, None, None, None
-
-
-class IndexSelectHalfImplementation(torch.autograd.Function):
-    @staticmethod
-    def forward(ctx, x1, x2, fp_index1, fp_index2, bp_index1, bp_index2):
-        ctx.bp_index1 = bp_index1
-        ctx.bp_index2 = bp_index2
-        x = torch.cat([x1, x2], dim=1)
-        return x.index_select(1, fp_index1), x.index_select(1, fp_index2)
-
-    @staticmethod
-    def backward(ctx, grad_output1, grad_output2):
-        grad_output = torch.cat([grad_output1, grad_output2], 1)
-        out1 = grad_output.index_select(1, ctx.bp_index1)
-        out2 = grad_output.index_select(1, ctx.bp_index2)
-        return out1, out2, None, None, None, None
-
-
-class Channel_Shuffle(nn.Module):
-    def __init__(self, inp, groups=2, split_shuffle=True):
-        super(Channel_Shuffle, self).__init__()
-
-        self.split_shuffle = split_shuffle
-        self.group_len = inp // groups
-        self.out = np.array(list(range(inp))).reshape(groups, self.group_len).transpose(1, 0).flatten().tolist()
-        if self.split_shuffle:
-            self.register_buffer('fp_index1', torch.tensor(self.out[:self.group_len]))
-            self.register_buffer('fp_index2', torch.tensor(self.out[self.group_len:]))
-        else:
-            self.register_buffer('fp_index', torch.tensor(self.out))
-        # self.register_buffer('bp_index', torch.tensor(list(range(0, inp, 2))+list(range(1,inp,2))))
-        self.register_buffer('bp_index1', torch.tensor(list(range(0, inp, 2))))
-        self.register_buffer('bp_index2', torch.tensor(list(range(1, inp, 2))))
-
-    def forward(self, x1, x2):
-        if self.split_shuffle:
-            return IndexSelectHalfImplementation.apply(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1,
-                                                       self.bp_index2)
-        else:
-            return IndexSelectFullImplementation.apply(x1, x2, self.fp_index, self.bp_index1, self.bp_index2)
-
 
 class InvertedResidual(nn.Module):
     def __init__(self, inp, oup, stride, split_shuffle=True):
@@ -136,10 +75,10 @@ class InvertedResidual(nn.Module):
         )
 
         if self.stride > 1:
-            self.channel_shuffle = Channel_Shuffle(inp=branch_features + branch_features, groups=2,
+            self.ChannelShuffle = ChannelShuffle(branch_features + branch_features, groups=2,
                                                    split_shuffle=split_shuffle)
         else:
-            self.channel_shuffle = Channel_Shuffle(inp=inp, groups=2, split_shuffle=split_shuffle)
+            self.ChannelShuffle = ChannelShuffle(inp, groups=2, split_shuffle=split_shuffle)
 
     @staticmethod
     def depthwise_conv(i, o, kernel_size, stride=1, padding=0, bias=False):
@@ -153,8 +92,8 @@ class InvertedResidual(nn.Module):
             x1 = self.branch1(x)
             x2 = self.branch2(x)
 
-        # out = channel_shuffle(out, 2)
-        out = self.channel_shuffle(x1, x2)
+        # out = ChannelShuffle(out, 2)
+        out = self.ChannelShuffle(x1, x2)
 
         return out
 

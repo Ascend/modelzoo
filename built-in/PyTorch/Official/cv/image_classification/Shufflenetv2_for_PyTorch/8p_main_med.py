@@ -44,7 +44,6 @@ from apex import amp
 from multi_epochs_dataloader import MultiEpochsDataLoader
 import pretrained_model_loader
 
-BATCH_SIZE = 512
 OPTIMIZER_BATCH_SIZE = 2048
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
@@ -286,7 +285,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # train for one epoch
         train(train_loader, train_loader_len, model, criterion, optimizer, epoch, args, ngpus_per_node)
 
-        if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1 or epoch > int(args.epochs * 0.9):
+        if ((epoch + 1) % args.eval_freq == 0) or (epoch == args.epochs - 1) or (epoch > int(args.epochs * 0.9)):
             # evaluate on validation set
             acc1 = validate(val_loader, model, criterion, args, ngpus_per_node)
 
@@ -295,7 +294,7 @@ def main_worker(gpu, ngpus_per_node, args):
             best_acc1 = max(acc1, best_acc1)
 
             if not args.multiprocessing_distributed or \
-                    (args.multiprocessing_distributed and args.rank % ngpus_per_node == 0 or epoch == args.epochs - 1):
+                    (args.multiprocessing_distributed and args.rank % ngpus_per_node == 0):
                 if args.amp:
                     save_checkpoint({
                         'epoch': epoch + 1,
