@@ -86,8 +86,8 @@ def generator(vis=False):
                 if not os.path.exists(txt_fn):
                     print("Ground truth for image {} not exist!".format(im_fn))
                     continue
-                #bbox = load_annoataion(txt_fn)
-                bbox = resize_bbox(txt_fn, (h,w))
+                bbox = load_annoataion(txt_fn)
+                #bbox = resize_bbox(txt_fn, (h,w))
 
                 if len(bbox) == 0:
                     print("Ground truth for image {} empty!".format(im_fn))
