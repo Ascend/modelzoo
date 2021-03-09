@@ -80,8 +80,8 @@ def train_detector(model,
         # Sets the `find_unused_parameters` parameter in
         # torch.nn.parallel.DistributedDataParallel
         model = MMDistributedDataParallel(
-            model.npu(),
-            device_ids=[torch.cuda.current_device()],
+            model,
+            device_ids=[torch.npu.current_device()],
             broadcast_buffers=False,
             find_unused_parameters=find_unused_parameters)
     else:
