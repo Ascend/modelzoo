@@ -26,7 +26,7 @@ git
         1.安装环境
         2.修改run_1p.sh字段"data"为当前磁盘的数据集路径
         3.修改字段device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
-        4.cd到run_1p.sh文件的目录，执行bash run_1p.sh单卡脚本， 进行单卡训练
+        4.执行bash scripts/run_1p.sh单卡脚本， 进行单卡训练
     ```
     
         

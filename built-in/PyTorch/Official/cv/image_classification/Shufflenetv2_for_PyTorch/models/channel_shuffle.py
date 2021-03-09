@@ -69,13 +69,26 @@ class ChannelShuffle(nn.Module):
         """
         if self.bp_index1.device == x.device:
             return
+
+        device = x.device
+
+        if str(device).startswith('npu'):
+            if self.split_shuffle:
+                self.fp_index1 = self.out_channels.int()
+                self.fp_index2 = self.out_channels.int()
+            else:
+                self.fp_index = self.out_channels.int()
+            self.bp_index1 = self.bp_index1.int()
+            self.bp_index2 = self.bp_index2.int()
+
         if self.split_shuffle:
-            self.fp_index1 = self.out_channels.int().npu()
-            self.fp_index2 = self.out_channels.int().npu()
+            self.fp_index1 = self.fp_index1.to(device)
+            self.fp_index2 = self.fp_index2.to(device)
         else:
-            self.fp_index = self.out_channels.int().npu()
-        self.bp_index1 = self.bp_index1.int().npu()
-        self.bp_index2 = self.bp_index2.int().npu()
+            self.fp_index = self.fp_index.to(device)
+        self.bp_index1 = self.bp_index1.to(device)
+        self.bp_index2 = self.bp_index2.to(device)
+
 
     def forward(self, x1, x2):
         self.check_self(x1)
@@ -136,7 +149,7 @@ if __name__ == '__main__':
     if device.startswith('npu'):
         torch.npu.set_device(device)
 
-    def testcase(split_shuffle=True):
+    def tescase(split_shuffle=True):
         x = torch.randn(2, 32, 7, 7)
         conv = torch.nn.Conv2d(32, 32, 1)
         model = ChannelShuffle(64, split_shuffle=split_shuffle)
@@ -147,5 +160,5 @@ if __name__ == '__main__':
         loss = sum([i.sum() for i in output]) if split_shuffle else output.sum()
         loss.backward()
 
-    testcase(split_shuffle=True)
-    testcase(split_shuffle=False)
+    tescase(split_shuffle=True)
+    tescase(split_shuffle=False)

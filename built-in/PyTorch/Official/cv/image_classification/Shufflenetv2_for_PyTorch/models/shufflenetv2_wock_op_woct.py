@@ -235,53 +235,17 @@ def shufflenet_v2_x2_0(pretrained=False, progress=True, **kwargs):
 
 
 if __name__ == '__main__':
-    import pickle
+    device = 'cpu'
 
+    if device.startswith('npu'):
+        torch.npu.set_device(device)
 
-    def init():
-        # init input
-        x = np.random.randn(32, 3, 224, 224).astype(np.float32)
-        with open('input_tensor.pkl', 'wb')as f:
-            pickle.dump(x, f)
-        model = shufflenet_v2_x1_0()
-        with open('init_weight.pth', 'wb')as f:
-            torch.save(model.state_dict(), f)
-
-
-    with open('input_tensor.pkl', 'rb')as f:
-        input_tensor = torch.from_numpy(pickle.load(f))
-        input_tensor.requires_grad = True
-
+    x = np.random.randn(32, 3, 224, 224).astype(np.float32)
+    input_tensor = torch.from_numpy(x)
     model = shufflenet_v2_x1_0()
-    with open('init_weight.pth', 'rb')as f:
-        model.load_state_dict(torch.load(f))
-
-    inter_feature = {}
-    inter_gradient = {}
-
-
-    def make_hook(name, flag):
-        if flag == 'forward':
-            def hook(m, input, output):
-                inter_feature[name] = input
-
-            return hook
-        elif flag == 'backward':
-            def hook(m, input, output):
-                inter_gradient[name] = output
-
-            return hook
-        else:
-            assert False
-
-
-    for name, m in model.named_modules():
-        m.register_forward_hook(make_hook(name, 'forward'))
-        m.register_backward_hook(make_hook(name, 'backward'))
 
     out = model(input_tensor)
     loss = out.sum()
     loss.backward()
 
-    print(inter_feature)
-    print(inter_gradient)
+
