@@ -495,6 +495,10 @@ class Pad(object):
 
     def _pad_img(self, results):
         """Pad images according to ``self.size``."""
+        if results['img_shape'][0] >= results['img_shape'][1]:
+            self.size = [1344, 800, 3]
+        else:
+            self.size = [800, 1344, 3]    
         for key in results.get('img_fields', ['img']):
             if self.size is not None:
                 padded_img = mmcv.impad(
@@ -519,6 +523,26 @@ class Pad(object):
         for key in results.get('seg_fields', []):
             results[key] = mmcv.impad(
                 results[key], shape=results['pad_shape'][:2])
+    
+    def _pad_labels(self, results):
+        """Pad gt_labels."""
+        labels = results['gt_labels']
+        if labels.shape[0] < 40:
+            pad_num = 40 - labels.shape[0]
+            # coco label [0,79]
+            labels = np.lib.pad(labels, (0, pad_num), 'constant', constant_values=80)
+        elif labels.shape[0] > 40:
+            labels = labels[:40]
+        results['gt_labels'] = labels
+
+    def _pad_bboxes(self, results):
+        """Pad gt_bboxes."""
+        bboxes = results['gt_bboxes']
+        if bboxes.shape[0] < 40:
+            bboxes = mmcv.impad(bboxes, shape=[40, 4])
+        elif bboxes.shape[0] > 40:
+            bboxes = bboxes[:40]
+        results['gt_bboxes'] = bboxes
 
     def __call__(self, results):
         """Call function to pad images, masks, semantic segmentation maps.
@@ -532,6 +556,8 @@ class Pad(object):
         self._pad_img(results)
         self._pad_masks(results)
         self._pad_seg(results)
+        self._pad_labels(results)
+        self._pad_bboxes(results)
         return results
 
     def __repr__(self):
