@@ -244,6 +244,9 @@ if __name__ == '__main__':
     input_tensor = torch.from_numpy(x)
     model = shufflenet_v2_x1_0()
 
+    input_tensor = input_tensor.to(device)
+    model = model.to(device)
+
     out = model(input_tensor)
     loss = out.sum()
     loss.backward()
