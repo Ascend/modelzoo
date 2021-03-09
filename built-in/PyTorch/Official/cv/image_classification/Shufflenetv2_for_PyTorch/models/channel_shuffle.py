@@ -74,10 +74,10 @@ class ChannelShuffle(nn.Module):
 
         if str(device).startswith('npu'):
             if self.split_shuffle:
-                self.fp_index1 = self.out_channels.int()
-                self.fp_index2 = self.out_channels.int()
+                self.fp_index1 = self.fp_index1.int()
+                self.fp_index2 = self.fp_index2.int()
             else:
-                self.fp_index = self.out_channels.int()
+                self.fp_index = self.fp_index.int()
             self.bp_index1 = self.bp_index1.int()
             self.bp_index2 = self.bp_index2.int()
 
