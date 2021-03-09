@@ -72,7 +72,8 @@ def train_detector(model,
     if cfg.opt_level is None:
         cfg.opt_level='O0'
     optimizer = build_optimizer(model, cfg.optimizer)
-    model, optimizer = amp.initialize(model.npu(), optimizer, opt_level=cfg.opt_level, loss_scale=64.0)
+    model, optimizer = amp.initialize(model.npu(), optimizer, 
+                opt_level=cfg.opt_level, loss_scale=64.0, combine_grad=True)
 
     # put model on gpus
     if distributed:
