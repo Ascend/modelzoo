@@ -36,7 +36,7 @@ git
         1.安装环境
         2.修改多P脚本中字段"data"为当前磁盘的数据集路径
         3.修改字段device_id_list（多卡训练所使用的device id列表），为训练配置device_id，比如4p,device_id_list=0,1,2,3；8P默认使用0，1，2，3，4，5，6，7卡不用配置
-        4.执行bash scripts/run_8p.sh单卡脚本， 进行单卡训练	
+        4.执行bash scripts/run_8p.sh单卡脚本， 进行8卡训练	
     ```
         
     二、Docker容器训练：
