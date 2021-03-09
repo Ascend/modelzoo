@@ -16,6 +16,9 @@ https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/AT
 
 https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/classification/googlenet.prototxt
 
+AIPP下载地址 ：
+
+https://c7xcode.obs.cn-north-4.myhuaweicloud.com/models/googlenet_imagenet_picture-python/insert_op.cfg
 
 ## om模型
 

@@ -1,0 +1,5 @@
+opencv_python
+numpy==1.19.3
+easydict==1.9
+numba
+colorama==0.3.9

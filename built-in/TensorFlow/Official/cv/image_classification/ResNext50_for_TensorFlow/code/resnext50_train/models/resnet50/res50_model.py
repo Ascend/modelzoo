@@ -28,6 +28,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+import os
 import tensorflow as tf
 from . import resnet, res50_helper
 from trainers.train_helper import stage
@@ -48,7 +49,7 @@ class Model(object):
         self.loss = loss
         self.logger = logger  
 
-    def get_estimator_model_func(self, features, labels, mode, params=None):
+    def get_estimator_model_func(self, features, labels, mode):
         labels = tf.reshape(labels, (-1,))  # Squash unnecessary unary dim         #----------------not use when use onehot label
     
         model_func = self.get_model_func()
@@ -75,7 +76,7 @@ class Model(object):
             #loss = self.loss.get_loss(logits, labels)  
             #loss = tf.losses.sparse_softmax_cross_entropy(logits=logits, labels=labels)
 
-            labels_one_hot = tf.one_hot(labels, depth=1001)
+            labels_one_hot = tf.one_hot(labels, depth=self.config['num_classes'])
             loss = tf.losses.softmax_cross_entropy(
                 logits=logits, onehot_labels=labels_one_hot, label_smoothing=self.config['label_smoothing'])
 
@@ -84,8 +85,8 @@ class Model(object):
      #       base_loss = tf.add_n([loss])                                    
 
             def exclude_batch_norm(name):
-              #return 'batch_normalization' not in name
-              return 'BatchNorm' not in name
+                #return 'batch_normalization' not in name
+                return 'BatchNorm' not in name
             loss_filter_fn = exclude_batch_norm
           
             # Add weight decay to the loss.
@@ -111,7 +112,16 @@ class Model(object):
                     mode, loss=loss, eval_metric_ops=metrics)
 
             assert (mode == tf.estimator.ModeKeys.TRAIN)
-
+            print('==================num_classes: %d' %
+                  self.config['num_classes'])
+            if os.path.exists("{}.meta".format(self.config['restore_path'])):
+                print('==================restore_path: %s' %
+                      self.config['restore_path'])
+                variables_to_restore = tf.contrib.slim.get_variables_to_restore(
+                    exclude=self.config.get('restore_exclude'))
+                tf.train.init_from_checkpoint(self.config.get('restore_path'),
+                                              {v.name.split(':')[0]: v for v in
+                                               variables_to_restore})
             #reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
             #total_loss = tf.add_n([tf.saturate_cast(loss, self.config['dtype']) ] + reg_losses, name='total_loss')
             #total_loss = tf.add_n([loss], name='total_loss')

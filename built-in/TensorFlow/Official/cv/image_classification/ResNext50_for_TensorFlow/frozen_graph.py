@@ -25,6 +25,8 @@ def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--ckpt_path', default=1,
                         help="""set checkpoint path""")
+    parser.add_argument('--num_classes', type=int, default=1001,
+                         help='num_classes')
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -39,9 +41,9 @@ def main():
     inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="input")
     # create inference graph
     with res50_helper.custom_getter_with_fp16_and_weight_decay(dtype=tf.float32, weight_decay=0.0001):
-        builder = resnet.LayerBuilder( tf.nn.relu, 'channels_last', False, use_batch_norm=True,
+        builder = resnet.LayerBuilder(tf.nn.relu, 'channels_last', False, use_batch_norm=True,
                                conv_initializer=None, bn_init_mode='adv_bn_init', bn_gamma_initial_value=1.0)
-        top_layer = resnet.inference_resnext_impl(builder, inputs, [3, 4, 6, 3], "original")
+        top_layer = resnet.inference_resnext_impl(builder, inputs, [3, 4, 6, 3], "original", args.num_classes)
 
     with tf.Session() as sess:
         tf.train.write_graph(sess.graph_def, './', 'model.pb')
