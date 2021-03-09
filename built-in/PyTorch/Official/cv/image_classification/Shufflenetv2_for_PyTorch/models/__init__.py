@@ -16,4 +16,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .shufflenetv2_wock_op_woct_8p import *
+from .shufflenetv2_wock_op_woct import *

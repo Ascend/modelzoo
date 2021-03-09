@@ -4,11 +4,8 @@
 
 import torch
 
-
 def build_model(arch, loc):
     # 请自定义模型并加载预训练模型
-    # import torchvision
-    # model = torchvision.models.resnet50(pretrained=True)
     import models as models
     model = models.__dict__[arch]()
     model = model.to(loc)
@@ -59,13 +56,18 @@ if __name__ == '__main__':
     # 获取checkpoint.pth方式：修改script/run_1p.sh脚本的参数epochs为10，执行bash script/run_1p.sh，训练10个epoch后模型自动生成
     model = build_model(arch, loc)
     ckpt = torch.load("checkpoint.pth", map_location=loc)
-    # model.load_state_dict(ckpt['state_dict'])
-    state_dict_old = ckpt['state_dict']
-    state_dict = {}
-    for key, value in state_dict_old.items():
-        key = key[7:]
-        state_dict[key] = value
-    model.load_state_dict(state_dict)
+
+    try:
+        # for normal model save
+        model.load_state_dict(ckpt['state_dict'])
+    except:
+        # for ddp's model save
+        state_dict_ddp = ckpt['state_dict']
+        state_dict = {}
+        for key, value in state_dict_old.items():
+            key = key[7:]
+            state_dict[key] = value
+        model.load_state_dict(state_dict)
 
     # 3.预处理
     input_tensor = pre_process(raw_data)

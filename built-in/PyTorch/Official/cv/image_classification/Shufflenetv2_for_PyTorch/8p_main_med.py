@@ -44,7 +44,6 @@ from apex import amp
 from multi_epochs_dataloader import MultiEpochsDataLoader
 import pretrained_model_loader
 
-BATCH_SIZE = 512
 OPTIMIZER_BATCH_SIZE = 2048
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
@@ -63,7 +62,7 @@ parser.add_argument('--epochs', default=90, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=BATCH_SIZE, type=int,
+parser.add_argument('-b', '--batch-size', default=256, type=int,
                     metavar='N',
                     help='mini-batch size (default: 256), this is the total '
                          'batch size of all GPUs on the current node when '
@@ -286,7 +285,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # train for one epoch
         train(train_loader, train_loader_len, model, criterion, optimizer, epoch, args, ngpus_per_node)
 
-        if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1 or epoch > int(args.epochs * 0.9):
+        if ((epoch + 1) % args.eval_freq == 0) or (epoch == args.epochs - 1) or (epoch > int(args.epochs * 0.9)):
             # evaluate on validation set
             acc1 = validate(val_loader, model, criterion, args, ngpus_per_node)
 
@@ -295,7 +294,7 @@ def main_worker(gpu, ngpus_per_node, args):
             best_acc1 = max(acc1, best_acc1)
 
             if not args.multiprocessing_distributed or \
-                    (args.multiprocessing_distributed and args.rank % ngpus_per_node == 0 or epoch == args.epochs - 1):
+                    (args.multiprocessing_distributed and args.rank % ngpus_per_node == 0):
                 if args.amp:
                     save_checkpoint({
                         'epoch': epoch + 1,
@@ -595,12 +594,12 @@ def get_pytorch_val_loader(data_path, batch_size, workers=5, _worker_init_fn=Non
     else:
         val_sampler = None
 
-        dataloader_fn = MultiEpochsDataLoader  # torch.utils.data.DataLoader
-        val_loader = dataloader_fn(
-            val_dataset,
-            sampler=val_sampler,
-            batch_size=batch_size, shuffle=(val_sampler is None),
-            num_workers=workers, worker_init_fn=_worker_init_fn, pin_memory=True, collate_fn=fast_collate)
+    dataloader_fn = MultiEpochsDataLoader  # torch.utils.data.DataLoader
+    val_loader = dataloader_fn(
+        val_dataset,
+        sampler=val_sampler,
+        batch_size=batch_size, shuffle=(val_sampler is None),
+        num_workers=workers, worker_init_fn=_worker_init_fn, pin_memory=True, collate_fn=fast_collate)
 
     return val_loader
 

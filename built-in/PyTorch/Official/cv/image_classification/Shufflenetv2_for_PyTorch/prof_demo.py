@@ -5,82 +5,89 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import time
+import argparse
 
 
-def build_model(arch, loc):
+def build_model():
     # 请自定义模型并加载预训练模型
-    # import torchvision
-    # model = torchvision.models.resnet50(pretrained=True)
-    import models as models
-    model = models.__dict__[arch]()
-    model = model.to(loc)
-    model.eval()  # 注意设置eval模式
+    from models import shufflenet_v2_x1_0
+    model = shufflenet_v2_x1_0()
     return model
 
 
 def get_raw_data():
-    # 请自定义获取数据方式，请勿将原始数据上传至代码仓
-    from PIL import Image
-    from urllib.request import urlretrieve
-    IMAGE_URL = 'https://bbs-img.huaweicloud.com/blogs/img/thumb/1591951315139_8989_1363.png'
-    urlretrieve(IMAGE_URL, 'tmp.jpg')
-    img = Image.open("tmp.jpg")
-    img = img.convert('RGB')
-    return img
+    input_tensor = torch.randn(2, 3, 224, 224)
+    return input_tensor
 
 
-def pre_process(raw_data):
-    # 请自定义模型预处理方法
-    from torchvision import transforms
-    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                     std=[0.229, 0.224, 0.225])
-    transforms_list = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        normalize
-    ])
-    input_data = transforms_list(raw_data)
-    return input_data.unsqueeze(0)
-
-
-def post_process(output_tensor):
-    # 请自定义后处理方法
-    return torch.argmax(output_tensor, 1)
-
+def criterion(x, y=None):
+    return x.sum()
 
 if __name__ == '__main__':
-    arch = 'shufflenet_v2_x1_0'
-    loc = 'npu:0'
-    torch.npu.set_device(loc)
+    parser = argparse.ArgumentParser(description='PyTorch Prof')
+    parser.add_argument('--device', type=str, default='cpu',
+                        help='set which type of device used. Support cpu, cuda:0(device_id), npu:0(device_id).')
+    parser.add_argument('--amp', default=False, action='store_true',
+                        help='use amp during prof')
+    parser.add_argument('--loss-scale', default=64.0, type=float,
+                        help='loss scale using in amp, default 64.0, -1 means dynamic')
+    parser.add_argument('--opt-level', default='O2', type=str,
+                        help='opt-level using in amp, default O2')
+    parser.add_argument('--FusedSGD', default=False, action='store_true',
+                        help='use FusedSGD during prof')
 
-    # 1.获取原始数据
-    raw_data = get_raw_data()
+    args = parser.parse_args()
 
-    # 2.构建模型并加载权重
-    model = build_model(arch, loc)
+    # 1.准备工作
+    if args.device.startswith('cuda'):
+        torch.cuda.set_device(args.device)
+        prof_kwargs = {'use_cuda': True}
+    elif args.device.startswith('npu'):
+        torch.npu.set_device(args.device)
+        prof_kwargs = {'use_npu': True}
+    else:
+        prof_kwargs = {}
 
-    # 3.预处理
-    input_tensor = pre_process(raw_data)
-    input_tensor = input_tensor.to(loc)
+    if args.amp:
+        from apex import amp
 
-    # 4. 执行forward+profiling
-    # GPU环境将入参use_npu=True改为use_cuda=True
-    with torch.autograd.profiler.profile(record_shapes=True, use_npu=True) as prof:
-        output_tensor = model(input_tensor)
-        target = torch.randn(output_tensor.size()) # 用随机值代替
-        target = target.to(loc)
-        criterion = nn.MSELoss().to(loc)
-        loss = criterion(output_tensor, target) # 使用均方误差损失
+    # 2.构建模型
+    model = build_model()
+    if args.FusedSGD and args.device.startswith('npu'):
+        from apex.optimizers import NpuFusedSGD
+        optimizer = NpuFusedSGD(model.parameters(), lr=0.01)
+    else:
         optimizer = optim.SGD(model.parameters(), lr=0.01)
+    model = model.to(args.device)
+    if args.amp:
+        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level,
+                                          loss_scale=None if args.loss_scale == -1 else args.loss_scale)
+
+    # 3.生成input
+    input_tensor = get_raw_data()
+    input_tensor = input_tensor.to(args.device)
+
+    # 4. 至少先运行一次，保证prof正确
+    def run():
+        output_tensor = model(input_tensor)
+        loss = criterion(output_tensor)  # 使用均方误差损失
         optimizer.zero_grad()
-        loss.backward()
+        if args.amp:
+            with amp.scale_loss(loss, optimizer) as scaled_loss:
+                scaled_loss.backward()
+        else:
+            loss.backward()
         optimizer.step()
+        return loss
+
+    for i in range(5):
+        start_time = time.time()
+        loss = run()
+        print('iter: %d, loss: %.2f, time: %.2f'%(i, loss, (time.time() - start_time)*1000))
+
+    # 4. profiling
+    with torch.autograd.profiler.profile(**prof_kwargs) as prof:
+        run()
     print(prof.key_averages().table())
-    prof.export_chrome_trace("shufflenet_v2_npu.prof")
-
-    # 5. 后处理
-    result = post_process(output_tensor)
-
-    # 6. 打印
-    print(result)
+    prof.export_chrome_trace("pytorch_prof_%s.prof" % args.device + ('_amp' if args.amp else ''))

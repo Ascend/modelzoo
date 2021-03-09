@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
-export WHICH_OP=GEOP
-export NEW_GE_FE_ID=1
-export GE_AICPU_FLAG=1
-export SLOG_PRINT_TO_STDOUT=0
-export TASK_QUEUE_ENABLE=1
+source scripts/npu_set_env.sh
 
 device_id_list=0,1,2,3,4,5,6,7
-
 currentDir=$(cd "$(dirname "$0")";pwd)/..
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_8p_job_${currtime}
@@ -17,6 +11,8 @@ echo "train log path is ${train_log_dir}"
 
 python3.7 ${currentDir}/8p_main_med.py \
     --data=/data/imagenet \
+    --evaluate \
+    --resume checkpoint.pth.tar \
     --addr=$(hostname -I |awk '{print $1}') \
     --seed=49  \
     --workers=184 \
@@ -36,5 +32,4 @@ python3.7 ${currentDir}/8p_main_med.py \
     --amp \
     --momentum=0 \
     --device-list=${device_id_list} \
-    --evaluate \
     --benchmark 0 > ./shufflenetv2_8p.log 2>&1 &
