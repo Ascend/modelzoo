@@ -73,7 +73,6 @@ from apex import amp
 import apex
 import numpy as np
 
-from hook import *
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('--data', metavar='DIR', default='/dataset/imagenet',
@@ -131,7 +130,6 @@ parser.add_argument('--loss-scale-value', default='1024', type=int, help='static
 
 parser.add_argument('--stop-step-num', default=None, type=int, help='after the stop-step, killing the training task')
 parser.add_argument('--eval-freq', default=10, type=int, help='test interval')
-parser.add_argument('--hook', default=False, action='store_true', help='pytorch hook')
 
 best_acc1 = 0
 cur_step = 0
@@ -237,13 +235,6 @@ def main_worker(gpu, ngpus_per_node, args):
 
     model = vgg16()
     model = model.to(loc)
-
-    # set hook
-    if args.hook:
-        modules = model.named_modules()
-        for name, module in modules:
-            module.register_forward_hook(forward_hook_fn)
-            module.register_backward_hook(backward_hook_fn)
 
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum=args.momentum,

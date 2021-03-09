@@ -36,7 +36,7 @@ git
         1.安装环境
         2.修改多P脚本中字段"data"为当前磁盘的数据集路径
         3.修改字段device_id_list（多卡训练所使用的device id列表），为训练配置device_id，比如4p,device_id_list=0,1,2,3；8P默认使用0，1，2，3，4，5，6，7卡不用配置
-        4.cd到run_8p.sh文件的目录，执行bash run_8p.sh等多卡脚本， 进行多卡训练	
+        4.执行bash scripts/run_8p.sh单卡脚本， 进行8卡训练	
     ```
         
     二、Docker容器训练：
@@ -57,7 +57,7 @@ git
       
     训练日志路径：在训练脚本的同目录下result文件夹里，如：
     ```
-            /home/Shufflenetv2_for_Pytorch/result/training_8p_job_20201121023601
+    /home/Shufflenetv2_for_Pytorch/result/training_8p_job_20201121023601
     ```
 
 ## ShufflenetV2 training result
