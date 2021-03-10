@@ -22,7 +22,7 @@ def register_torch_optimizers():
             torch_optimizers.append(module_name)
 
     # add npu optimizer from apex
-    for module_name in dir(apex.optim):
+    for module_name in dir(apex.optimizers):
         if module_name.startswith('__'):
             continue
         _optim = getattr(apex.optimizers, module_name)
