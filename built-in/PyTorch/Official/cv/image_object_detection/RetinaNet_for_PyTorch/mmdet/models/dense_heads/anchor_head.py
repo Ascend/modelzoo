@@ -310,7 +310,8 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
                 # label_weights[pos_inds] = self.train_cfg.pos_weight
                 label_weights = label_weights * (~pos_inds).float() + pos_inds.float() * self.train_cfg.pos_weight
         if len(neg_inds) > 0:
-            label_weights[neg_inds] = 1.0
+            # label_weights[neg_inds] = 1.0
+            label_weights = label_weights * (~neg_inds).float() + neg_inds.float()
 
         # map up to original set of anchors
         # if unmap_outputs:
@@ -724,8 +725,8 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
             mlvl_scores_fix = torch.zeros(5000, 81).type_as(mlvl_scores)
             mlvl_scores_fix[:mlvl_scores.size(0)] = mlvl_scores
             det_bboxes, det_labels = multiclass_nms(mlvl_bboxes_fix, mlvl_scores_fix,
-                                                      cfg.score_thr, cfg.nms,
-                                                      cfg.max_per_img)
+                                                    cfg.score_thr, cfg.nms,
+                                                    cfg.max_per_img)
             return det_bboxes, det_labels
         else:
             return mlvl_bboxes, mlvl_scores
