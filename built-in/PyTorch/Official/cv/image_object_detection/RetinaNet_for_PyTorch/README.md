@@ -55,17 +55,17 @@ pip list | grep mm
 
 ## Train MODEL
 
-### 单P
-1. 运行train_1p_cmd.sh
+### 单卡
+1. 运行 train_retinanet_1p.sh
 ```
 chmod +x ./tools/dist_train.sh
-sh train_1p_cmd.sh
+sh train_retinanet_1p.sh
 ```
 
-## 8P
-1. 运行train_8p.sh
+## 8卡
+1. 运行 train_retinanet_8p.sh
 ```
 chmod +x ./tools/dist_train.sh
-sh train_1p_cmd.sh
+sh train_retinanet_8p.sh
 ```
 
