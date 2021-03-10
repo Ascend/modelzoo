@@ -124,7 +124,6 @@ def main():
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
 
     ngpus_per_node = torch.cuda.device_count()
-    print('{} node found.'.format(ngpus_per_node))
     if args.multiprocessing_distributed:
         # Since we have ngpus_per_node processes per node, the total world_size
         # needs to be adjusted accordingly
@@ -171,11 +170,6 @@ def main_worker(gpu, ngpus_per_node, args):
             exit(-1)
     else:
         model.parameters()
-    '''
-    for layer in model.modules():
-        if isinstance(layer, nn.Linear):
-            torch.nn.init.kaiming_normal_(layer.weight, a=math.sqrt(5), )
-    '''
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor
@@ -205,10 +199,9 @@ def main_worker(gpu, ngpus_per_node, args):
             model.cuda()
         else:
             model = model.to(CALCULATE_DEVICE)
-           # model = torch.nn.DataParallel(model).cuda()
+           
     
-    # define loss function (criterion) and optimizer
-    #criterion = nn.CrossEntropyLoss().cuda(args.gpu)
+    # define loss function (criterion) and optimizer    
     criterion = nn.CrossEntropyLoss().to(CALCULATE_DEVICE)
 
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
@@ -220,9 +213,7 @@ def main_worker(gpu, ngpus_per_node, args):
             print('=>unsupported precision mode!')
             exit()
         opt_level = args.pm
-        model, optimizer = amp.initialize(model, optimizer, opt_level=opt_level, loss_scale=args.loss_scale)
-
-    #model, optimizer = amp.initialize(model, optimizer, opt_level="O2", loss_scale=1024, verbosity=1)
+        model, optimizer = amp.initialize(model, optimizer, opt_level=opt_level, loss_scale=args.loss_scale) 
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -343,8 +334,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         target = target.to(torch.int32).to(CALCULATE_DEVICE, non_blocking=True)
 
         # compute output
-        #output = model(images)
-        #loss = criterion(output, target)
         output, aux1, aux2 = model(images)
         loss1 = criterion(output, target)
         loss2 = criterion(aux1, target)
@@ -367,12 +356,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         optimizer.step()
         optimizer.zero_grad()
 
-        '''
-        # compute gradient and do SGD step
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        '''
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
