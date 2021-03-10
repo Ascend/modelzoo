@@ -117,7 +117,7 @@ class SingleStageDetector(BaseDetector):
         """
         img = img.npu()
         if img.dim() == 3:
-            img = img.unsqueeze(0)
+            img = img.unsqueeze(0).contiguous()
         x = self.extract_feat(img)
         outs = self.bbox_head(x)
         bbox_list = self.bbox_head.get_bboxes(
