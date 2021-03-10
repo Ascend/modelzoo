@@ -2,6 +2,7 @@ import copy
 import inspect
 
 import torch
+import apex
 
 from ...utils import Registry, build_from_cfg
 
@@ -19,6 +20,17 @@ def register_torch_optimizers():
                                                   torch.optim.Optimizer):
             OPTIMIZERS.register_module()(_optim)
             torch_optimizers.append(module_name)
+
+    # add npu optimizer from apex
+    for module_name in dir(apex.optim):
+        if module_name.startswith('__'):
+            continue
+        _optim = getattr(apex.optimizers, module_name)
+        if inspect.isclass(_optim) and issubclass(_optim,
+                                                  torch.optim.Optimizer):
+            OPTIMIZERS.register_module()(_optim)
+            torch_optimizers.append(module_name)
+
     return torch_optimizers
 
 
