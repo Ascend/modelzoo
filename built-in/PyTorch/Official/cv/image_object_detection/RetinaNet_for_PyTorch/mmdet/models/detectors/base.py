@@ -162,8 +162,8 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
 
             img_meta = img_metas[0]
             if isinstance(img_meta, mmcv.parallel.data_container.DataContainer):
-                img_meta = img_meta.data
-            return self.simple_test(imgs[0], img_meta[0], **kwargs)
+                img_meta = img_meta.data[0]
+            return self.simple_test(imgs[0], img_meta, **kwargs)
         else:
             assert imgs[0].size(0) == 1, 'aug test does not support ' \
                                          'inference with batch size ' \
