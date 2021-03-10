@@ -58,6 +58,7 @@ pip list | grep mm
 ### 单P
 1. 运行train_1p_cmd.sh
 ```
+chmod +x ./tools/dist_train.sh
 sh train_1p_cmd.sh
 ```
 
