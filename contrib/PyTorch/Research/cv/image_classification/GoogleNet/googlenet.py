@@ -5,7 +5,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.jit.annotations import Optional, Tuple
 from torch import Tensor
-#from .utils import load_state_dict_from_url
+
+try:
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
+
 
 __all__ = ['GoogLeNet', 'googlenet', "GoogLeNetOutputs", "_GoogLeNetOutputs"]
 
@@ -64,11 +69,9 @@ def googlenet(pretrained=False, progress=True, **kwargs):
         kwargs['aux_logits'] = True
         kwargs['init_weights'] = False
         model = GoogLeNet(**kwargs)
-        #state_dict = load_state_dict_from_url(model_urls['googlenet'],
-        #                                      progress=progress)
+        
         _load_state_dict(model, model_urls['googlenet'], progress)
         
-        #model.load_state_dict(state_dict)
         if not original_aux_logits:
             model.aux_logits = False
             model.aux1 = None
@@ -211,6 +214,7 @@ class GoogLeNet(nn.Module):
         # type: (Tensor, Optional[Tensor], Optional[Tensor]) -> GoogLeNetOutputs
         if self.training and self.aux_logits:
             #return _GoogLeNetOutputs(x, aux2, aux1)
+            # If you use the original code training will produce output no aux_logits error
             return x, aux2, aux1
         else:
             return x
@@ -282,6 +286,7 @@ class InceptionAux(nn.Module):
     def forward(self, x):
         # aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14
         #x = F.adaptive_avg_pool2d(x, (4, 4))
+        # not suport adaptive_avg_pool2d op 
         x = F.avg_pool2d(x, (3, 3))
         # aux1: N x 512 x 4 x 4, aux2: N x 528 x 4 x 4
         x = self.conv(x)
