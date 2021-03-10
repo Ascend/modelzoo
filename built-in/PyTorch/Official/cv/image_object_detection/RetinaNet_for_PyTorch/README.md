@@ -25,10 +25,19 @@ export MAX_JOBS=8
 cd mmcv
 python setup.py build_ext
 python setup.py develop
+pip list | grep mmcv
 ```
 
 #### Modified MMCV
 将mmcv_need目录下的文件替换到mmcv的安装目录下。
+安装完mmdet后执行以下命令：
+```
+/bin/cp -f mmcv_need/_functions.py ../mmcv/mmcv/parallel/
+/bin/cp -f mmcv_need/builder.py ../mmcv/mmcv/runner/optimizer/
+/bin/cp -f mmcv_need/data_parallel.py ../mmcv/mmcv/parallel/
+/bin/cp -f mmcv_need/dist_utils.py ../mmcv/mmcv/runner/
+/bin/cp -f mmcv_need/distributed.py ../mmcv/mmcv/parallel/
+```
 
 
 ### Build MMDET from source
@@ -40,6 +49,7 @@ python setup.py develop
 cd RetinaNet_for_PyTorch
 pip install -r requirements/build.txt
 pip install -v -e .
+pip list | grep mm
 ```
 
 
