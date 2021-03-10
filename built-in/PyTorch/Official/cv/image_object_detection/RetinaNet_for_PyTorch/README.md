@@ -65,6 +65,7 @@ sh train_1p_cmd.sh
 ## 8P
 1. 运行train_8p.sh
 ```
+chmod +x ./tools/dist_train.sh
 sh train_1p_cmd.sh
 ```
 
