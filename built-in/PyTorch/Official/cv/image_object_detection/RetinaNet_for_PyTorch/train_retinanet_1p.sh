@@ -14,3 +14,4 @@ export ASCEND_GLOBAL_EVENT_ENABLE=0
 export NPUID=0
 PORT=29500 ./tools/dist_train.sh configs/retinanet/retinanet_r50_fpn_1x_coco.py 1 --cfg-options optimizer.lr=0.005 --seed 0 --gpu-ids 0 --opt-level O1
 
+
