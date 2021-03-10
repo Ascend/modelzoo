@@ -11,6 +11,6 @@ export COMBINED_ENABLE=1
 export DYNAMIC_COMPILE_ENABLE=0
 export EXPERIMENTAL_DYNAMIC_PARTITION=0
 export ASCEND_GLOBAL_EVENT_ENABLE=0
-export NPUID=2
-PORT=29504 ./tools/dist_train.sh configs/retinanet/retinanet_r50_fpn_1x_coco.py 1 --cfg-options optimizer.lr=0.005 --seed 0 --gpu-ids 2 --opt-level O1
+export NPUID=0
+PORT=29500 ./tools/dist_train.sh configs/retinanet/retinanet_r50_fpn_1x_coco.py 1 --cfg-options optimizer.lr=0.005 --seed 0 --gpu-ids 0 --opt-level O1
 
