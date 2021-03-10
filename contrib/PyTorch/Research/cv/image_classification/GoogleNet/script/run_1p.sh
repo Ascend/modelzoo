@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
-export WHICH_OP=GEOP
-export NEW_GE_FE_ID=1
-export GE_AICPU_FLAG=1
-
+source pt.sh
 device_id=0
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error

@@ -1,2 +1,1 @@
-torch
-torchvision
+torchvision=0.6.0

@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
-export WHICH_OP=GEOP
-export NEW_GE_FE_ID=1
-export GE_AICPU_FLAG=1
+source pt.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
 /usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
@@ -21,7 +18,7 @@ python3.7 ${currentDir}/main-8p.py \
         --data /opt/npu/imagenet \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed=49 \
-        --workers=128 \
+        --workers=184 \
         --learning-rate=0.5 \
         --mom=0.9 \
         --weight-decay=1.0e-04  \
