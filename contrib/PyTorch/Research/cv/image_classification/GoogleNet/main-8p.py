@@ -207,19 +207,14 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        #model = googlenet(pretrained=True)
-        
+        #model = googlenet(pretrained=True)        
         model = googlenet()
         print("加载自己的训练模型")
         pretrained_dict = \
-        torch.load("/root/myxWorkSpace/googlenet/NpuFusedSGD/model_best.pth.tar", map_location=loc)
+        torch.load("/root/myxWorkSpace/googlenet/NpuFusedSGD/model_best.pth.tar", map_location="cpu")
         pretrained_dict["state_dict"].pop('fc.weight')
         pretrained_dict["state_dict"].pop('fc.bias')
-        model.load_state_dict(pretrained_dict["state_dict"], strict=False)
-        #optimizer.load_state_dict(pretrained_dict['optimizer'])
-        #if args.amp:
-        #    amp.load_state_dict(pretrained_dict['amp'])
-        
+        model.load_state_dict(pretrained_dict["state_dict"], strict=False)        
     else:
         print("=> creating model '{}'".format(args.arch))
         model = googlenet()
@@ -283,11 +278,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().to(loc)
-    '''
-    optimizer = torch.optim.SGD(model.parameters(), args.lr,
-                                momentum=args.momentum,
-                                weight_decay=args.weight_decay)
-    '''
+    
     optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
@@ -335,9 +326,6 @@ def main_worker(gpu, ngpus_per_node, args):
 
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                 and args.rank % ngpus_per_node == 0):
-
-        #if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-        #        and args.rank % ngpus_per_node == 0 and epoch == args.epochs - 1):
             if args.amp:
                 save_checkpoint({
                     'epoch': epoch + 1,
@@ -380,8 +368,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
         images, target = images.to(loc, non_blocking=False), target.to(loc, non_blocking=False)
 
         # compute output
-        #output = model(images)
-        #loss = criterion(output, target)
         output, aux1, aux2 = model(images)
         loss1 = criterion(output, target)
         loss2 = criterion(aux1, target)
