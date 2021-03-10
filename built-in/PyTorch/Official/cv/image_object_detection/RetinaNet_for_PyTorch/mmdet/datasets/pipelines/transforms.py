@@ -526,6 +526,8 @@ class Pad(object):
     
     def _pad_labels(self, results):
         """Pad gt_labels."""
+        if "gt_labels" not in results:
+            return
         labels = results['gt_labels']
         if labels.shape[0] < 40:
             pad_num = 40 - labels.shape[0]
@@ -537,6 +539,8 @@ class Pad(object):
 
     def _pad_bboxes(self, results):
         """Pad gt_bboxes."""
+        if "gt_bboxes" not in results:
+            return
         bboxes = results['gt_bboxes']
         if bboxes.shape[0] < 40:
             bboxes = mmcv.impad(bboxes, shape=[40, 4])

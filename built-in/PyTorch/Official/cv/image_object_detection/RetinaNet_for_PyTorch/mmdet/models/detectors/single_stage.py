@@ -115,7 +115,8 @@ class SingleStageDetector(BaseDetector):
                 The outer list corresponds to each image. The inner list
                 corresponds to each class.
         """
-        if img.dim() == 5:
+        img = img.npu()
+        if img.dim() == 3:
             img = img.unsqueeze(0)
         x = self.extract_feat(img)
         outs = self.bbox_head(x)

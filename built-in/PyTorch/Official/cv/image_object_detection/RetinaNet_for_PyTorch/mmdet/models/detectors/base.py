@@ -145,6 +145,8 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
         # in DETR, this is needed for the construction of masks, which is
         # then used for the transformer_head.
         for img, img_meta in zip(imgs, img_metas):
+            if isinstance(img_meta, mmcv.parallel.data_container.DataContainer):
+                img_meta = img_meta._data[0]
             batch_size = len(img_meta)
             for img_id in range(batch_size):
                 img_meta[img_id]['batch_input_shape'] = tuple(img.size()[-2:])
@@ -157,7 +159,11 @@ class BaseDetector(nn.Module, metaclass=ABCMeta):
             # proposals.
             if 'proposals' in kwargs:
                 kwargs['proposals'] = kwargs['proposals'][0]
-            return self.simple_test(imgs[0], img_metas[0], **kwargs)
+
+            img_meta = img_metas[0]
+            if isinstance(img_meta, mmcv.parallel.data_container.DataContainer):
+                img_meta = img_meta.data
+            return self.simple_test(imgs[0], img_meta[0], **kwargs)
         else:
             assert imgs[0].size(0) == 1, 'aug test does not support ' \
                                          'inference with batch size ' \
