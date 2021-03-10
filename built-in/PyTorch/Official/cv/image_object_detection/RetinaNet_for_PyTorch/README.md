@@ -16,27 +16,28 @@
 
 #### MMCV full version with CPU
 ```
-export MMCV_WITH_OPS = 1
-export MAX_JOBS = 8
-
 cd ../
 git clone https://github.com/open-mmlab/mmcv.git
+
+export MMCV_WITH_OPS=1
+export MAX_JOBS=8
+
 cd mmcv
-python setup.py build_ex
+python setup.py build_ext
 python setup.py develop
 ```
 
 #### Modified MMCV
 将mmcv_need目录下的文件替换到mmcv的安装目录下。
-    分别替换： 
-        mmcv/runner/dist_utils.py
-        mmcv/runner/optimizer/builder.py
-        mmcv/parallel/data_parallel.py
-        mmcv/parallel/distributed.py
-        mmcv/parallel/_functions.py
+
 
 ### Build MMDET from source
+1. 下载modelzoo项目zip文件并解压
+2. 压缩modelzoo\built-in\PyTorch\Official\cv\image_object_detection\RetinaNet_for_PyTorch目录
+3. 于npu服务器解压RetinaNet_for_PyTorch压缩包
+4. 执行以下命令，安装mmdet
 ```
+cd RetinaNet_for_PyTorch
 pip install -r requirements/build.txt
 pip install -v -e .
 ```
@@ -44,15 +45,15 @@ pip install -v -e .
 
 ## Train MODEL
 
-### 单卡
-1. 运行train_retinanet_1p.sh
+### 单P
+1. 运行train_1p_cmd.sh
 ```
-sh train_retinanet_1p.sh
+sh train_1p_cmd.sh
 ```
 
-## 8卡
-1. 运行train_retinanet_8p.sh
+## 8P
+1. 运行train_8p.sh
 ```
-sh train_retinanet_8p.sh
+sh train_1p_cmd.sh
 ```
 
