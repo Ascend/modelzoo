@@ -100,6 +100,7 @@ APP_ERROR MSFasterRcnnPostProcessor::ReadConfigParams() {
             << "    IOU_THRESH: " << iouThresh_ << " \n"
             << "    RPN_MAX_NUM: " << rpnMaxNum_ << " \n"
             << "    MAX_PER_IMG: " << maxPerImg_;
+    return APP_ERR_OK;
 }
 
 /*
@@ -171,7 +172,7 @@ static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t 
 
 void MSFasterRcnnPostProcessor::GetValidDetBoxes(std::vector<std::shared_ptr<void>> &featLayerData,
                                                  std::vector<MxBase::DetectBox> &detBoxes, ImageInfo &imgInfo) const {
-    auto *bboxPtr = static_cast<aclFloat16 *>(featLayerData[OUTPUT_BBOX_INDEX].get());  // 1 * 80000 * 5
+    auto *bboxPtr = static_cast<float*>(featLayerData[OUTPUT_BBOX_INDEX].get());  // 1 * 80000 * 5
     auto *labelPtr = static_cast<int32_t *>(featLayerData[OUTPUT_CLASS_INDEX].get());   // 1 * 80000 * 1
     auto *maskPtr = static_cast<bool *>(featLayerData[OUTPUT_MASK_INDEX].get());        // 1 * 80000 * 1
     // mask filter
@@ -182,16 +183,16 @@ void MSFasterRcnnPostProcessor::GetValidDetBoxes(std::vector<std::shared_ptr<voi
             continue;
         }
         size_t startIndex = index * 5;
-        prob = aclFloat16ToFloat(bboxPtr[startIndex + 4]);
+        prob = bboxPtr[startIndex + 4];
         if (prob <= scoreThresh_) {
             continue;
         }
 
         MxBase::DetectBox detBox;
-        float x1 = aclFloat16ToFloat(bboxPtr[startIndex + 0]);
-        float y1 = aclFloat16ToFloat(bboxPtr[startIndex + 1]);
-        float x2 = aclFloat16ToFloat(bboxPtr[startIndex + 2]);
-        float y2 = aclFloat16ToFloat(bboxPtr[startIndex + 3]);
+        float x1 = bboxPtr[startIndex + 0];
+        float y1 = bboxPtr[startIndex + 1];
+        float x2 = bboxPtr[startIndex + 2];
+        float y2 = bboxPtr[startIndex + 3];
         detBox.x = (x1 + x2) / COORDINATE_PARAM;
         detBox.y = (y1 + y2) / COORDINATE_PARAM;
         detBox.width = x2 - x1;

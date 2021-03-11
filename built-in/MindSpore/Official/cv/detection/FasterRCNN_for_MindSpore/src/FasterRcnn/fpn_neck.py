@@ -66,11 +66,15 @@ class FeatPyramidNeck(nn.Cell):
     def __init__(self,
                  in_channels,
                  out_channels,
-                 num_outs):
+                 num_outs,
+                 img_height,
+                 img_width):
         super(FeatPyramidNeck, self).__init__()
         self.num_outs = num_outs
         self.in_channels = in_channels
         self.fpn_layer = len(self.in_channels)
+        self.img_height = img_height
+        self.img_width = img_width
 
         assert not self.num_outs < len(in_channels)
 
@@ -84,9 +88,9 @@ class FeatPyramidNeck(nn.Cell):
             self.fpn_convs_.append(fpn_conv)
         self.lateral_convs_list = nn.layer.CellList(self.lateral_convs_list_)
         self.fpn_convs_list = nn.layer.CellList(self.fpn_convs_)
-        self.interpolate1 = P.ResizeNearestNeighbor((48, 80))
-        self.interpolate2 = P.ResizeNearestNeighbor((96, 160))
-        self.interpolate3 = P.ResizeNearestNeighbor((192, 320))
+        self.interpolate1 = P.ResizeNearestNeighbor((int(self.img_height // 16), int(self.img_width // 16)))
+        self.interpolate2 = P.ResizeNearestNeighbor((int(self.img_height // 8), int(self.img_width // 8)))
+        self.interpolate3 = P.ResizeNearestNeighbor((int(self.img_height // 4), int(self.img_width // 4)))
         self.maxpool = P.MaxPool(kernel_size=1, strides=2, pad_mode="same")
 
     def construct(self, inputs):

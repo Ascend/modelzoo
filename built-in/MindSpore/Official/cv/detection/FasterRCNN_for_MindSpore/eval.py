@@ -39,6 +39,13 @@ args_opt = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args_opt.device_id)
 
+
+def scale_bbox(all_bbox, img_meta):
+    all_img_meta = np.array([img_meta[3], img_meta[2], img_meta[3], img_meta[2]])
+    all_bbox[:, 0:4] = all_bbox[:, 0:4] / all_img_meta
+    return all_bbox
+
+
 def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
     """FasterRcnn evaluation."""
     ds = create_fasterrcnn_dataset(dataset_path, batch_size=config.test_batch_size, is_training=False)
@@ -83,6 +90,8 @@ def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
 
             all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
             all_labels_tmp_mask = all_label_squee[all_mask_squee]
+
+            scale_bbox(all_bboxes_tmp_mask, img_metas.asnumpy()[j])
 
             if all_bboxes_tmp_mask.shape[0] > max_num:
                 inds = np.argsort(-all_bboxes_tmp_mask[:, -1])
