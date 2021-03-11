@@ -18,16 +18,15 @@ modifications are made to run on NPU. Original README file can be found in `READ
 * [Performance](#performance)
   * [Results](#results)
     * [Training accuracy results](#training-accuracy-results)
-    * [Training performance results](#training-performance-results)
-
-
-    
+    * [Training performance results](#training-performance-results)    
 
 ## Model overview
 
 CTPN model from
 `Zhi Tian, Weilin Huang, Tong He, Pan He, Yu Qiao "Detecting Text in Natural Image with Connectionist Text Proposal Network and Its Application to Scene Text Recognition". <https://arxiv.org/abs/1609.03605>.`
+
 reference implementation:  <https://github.com/eragonruan/text-detection-ctpn>
+
 ### Model architecture
 
 
