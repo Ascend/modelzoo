@@ -59,7 +59,7 @@ The following section lists the requirements to start training the CTPN model.
 
 see `requirements.txt`
 
-### nmd and bbox
+### nms and bbox
 nms and bbox utils are written in cython, hence you have to build the library first.
 ```shell
 cd utils/bbox
@@ -74,54 +74,33 @@ It will generate a nms.so and a bbox.so in current folder.
 
 ```shell
 git clone xxx
-cd  ModelZoo_CRNN_TF_HARD/00-access/
+cd  CTPN_for_TensorFlow/
 ```
 
-### 2. Download and preprocess the dataset
+### 2. Download the dataset and Pretrain model
 
-You can use any datasets as you wish. Here, we only  synth90k dataset as an example to illustrate the data generation. 
-
-1. Download the synth90k, IIIT5K, ICDAR2003 and SVT datasets and put them under `./data`. 
-2. go to  `/data` directory and unzip the datasets
-3. go to `/scripts` and  execute the shell scripts 
-
+- First, download the pre-trained model of VGG net and put it in data/vgg_16.ckpt. you can download it from [tensorflow/models](https://github.com/tensorflow/models/tree/1af55e018eebce03fb61bba9959a04672536107d/research/slim)
+- Second, download the dataset we prepared from [google drive](https://drive.google.com/file/d/1npxA_pcEvIa4c42rho1HgnfJ7tamThSy/view?usp=sharing) or [baidu yun](https://pan.baidu.com/s/1nbbCZwlHdgAI20_P9uw9LQ). put the downloaded data in data/dataset/mlt, then start the training.
+- Also, you can prepare your own dataset according to the following steps. 
+- Modify the DATA_FOLDER and OUTPUT in utils/prepare/split_label.py according to your dataset. And run split_label.py in the root
+```shell
+python ./utils/prepare/split_label.py
 ```
-bash prepare_ds.sh
-``` 
-After data preparation, the directory of  `data/` looks like following structure:
-
-|-- data/
-|     |-- char_dict/
-|     |-- mnt/
-|     |-- images/
-|     |-- test/
-|     |-- tfrecords/
 
 
 ### 3. Train
 
-All the scripts to tick off the training are located under `scripts/`. Make sure that all data are ready before you start training. Training on single NPU or multiple NPU devices are supported. Scripts that contain `1p` indicate single NPU training scripts or configuration. Scripts that contain `8p` indicate training on eight NPU devices.
+Simplely run:
    
 - For training on single NPU device, execute the shell script `run_1p.sh`, e.g.
   ```
-   bash scripts/run_1p.sh
+   bash run_1p.sh
   ```
-   By default, the checkpoints and training log are located in `results/1p/0`.
-
-- For training on eight NPU device, execute the shell script `run_8p.sh`, e.g.
-  ```
-   bash scripts/run_8p.sh
-  ```
-  By default, the checkpoints and training log are located in `results/8p/`. 
-
-
-***Note***: As the time consumption of the training for single NPU is much higher than that of 8 NPUs, it is recommended to train on eight NPUs.
-
 
 ### 4. Test
 Three datases are used to evaluate the trained model. To test, just run test script 'scripts/test.sh ${DIR_TO_CHECKPOINTS}' (replace the ${DIR_TO_CHECKPOINTS}  with real path to checkpoint file). When finished, test results will be saved as text file under project directory with name `test_result.txt` by default.
   ```
-   bash scripts/test.sh ${DIR_TO_CHECKPOINTS}
+   bash eval.sh ${DIR_TO_CHECKPOINTS}
   ```
 
 
@@ -130,23 +109,19 @@ Three datases are used to evaluate the trained model. To test, just run test scr
 
 
 ```
-  --root_dir                        Root directory of the project, default ./
-  --dataset_dir                     path to tfrecords file, default data/
-  --weights_path	            pretrained checkpoint when continuing training, default None
-  --momentum                        momentum factor, default: 0.9
-  --num_iters                       the number of training steps , default 240000
-  --lr_sched                        the lr scheduling policy, default cosine
-  --use_nesterov                    whether to use nesterov in the sgd optimizer, default ,False
-  --warmup_step                     number of warmup step used in lr schedular                    
+  --learning_rate                 1e-5, default ./
+  --max_steps                     50000, default data/
+  --decay_steps	                  30000, default
+  --pretrained_model_path         pretrain model path, default: data/vgg_16.ckpt                    
 ```
-for a complete list of options, please refer to `tools/train_npu.py` and `config/global_config.py`
+for a complete list of options, please refer to `main/train_npu.py`
 
 ### Training process
 
-All the results of the training will be stored in the directory `results`.
+All the results of the training will be stored in the directory `checkpoint`.
 Script will store:
  - checkpoints
- - log
+ - events
  
 ## Performance
 
@@ -169,4 +144,4 @@ and get precision,recall,Hmean as following:
 
 | **NPUs** | batch size        | train performance |
 | :------: | :---------------: |:---------------:  |
-|    8     | 64*8              |  ~ 168ms/step     |
+|    1     | 64*8              |       |
