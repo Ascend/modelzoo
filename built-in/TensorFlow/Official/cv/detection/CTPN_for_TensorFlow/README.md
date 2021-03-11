@@ -98,9 +98,13 @@ Simplely run:
   ```
 
 ### 4. Test
-Three datases are used to evaluate the trained model. To test, just run test script 'scripts/test.sh ${DIR_TO_CHECKPOINTS}' (replace the ${DIR_TO_CHECKPOINTS}  with real path to checkpoint file). When finished, test results will be saved as text file under project directory with name `test_result.txt` by default.
+Three datases are used to evaluate the trained model. To test, just run test script 'eval.sh ${DIR_TO_CHECKPOINTS}' (replace the ${DIR_TO_CHECKPOINTS}  with real path to checkpoint file). 
+
+After finished, test results can be seen on the screen:
   ```
    bash eval.sh ${DIR_TO_CHECKPOINTS}
+   ...
+   {"precision": xxx, "recall": xxx, "hmean": xxx, "AP": 0}
   ```
 
 
