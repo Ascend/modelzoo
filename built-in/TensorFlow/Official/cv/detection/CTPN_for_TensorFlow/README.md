@@ -100,7 +100,7 @@ Simplely run:
 ### 4. Test
 Three datases are used to evaluate the trained model. To test, just run test script `bash eval.sh ${DIR_TO_CHECKPOINTS}` (replace the ${DIR_TO_CHECKPOINTS}  with your own path to checkpoint file). 
 
-After finished, test results can be seen on the screen:
+After finished, test results will be shown on the terminal:
   ```
    bash eval.sh ${DIR_TO_CHECKPOINTS}
    ...
