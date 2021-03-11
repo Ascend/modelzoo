@@ -37,6 +37,7 @@ pip list | grep mmcv
 /bin/cp -f mmcv_need/data_parallel.py ../mmcv/mmcv/parallel/
 /bin/cp -f mmcv_need/dist_utils.py ../mmcv/mmcv/runner/
 /bin/cp -f mmcv_need/distributed.py ../mmcv/mmcv/parallel/
+/bin/cp -f mmcv_need/optimizer.py ../mmcv/mmcv/runner/hooks/
 ```
 
 
