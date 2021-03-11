@@ -1,6 +1,6 @@
 # CRNN for Tensorflow 
 
-This repository provides a script and recipe to train the CRNN  model. The code is based on https://github.com/MaybeShewill-CV/CRNN_Tensorflow,
+This repository provides a script and recipe to train the CTPN model. The code is based on https://github.com/eragonruan/text-detection-ctpn,
 modifications are made to run on NPU. Original README file can be found in `README_ORI.md`  
 
 ## Table Of Contents
@@ -25,20 +25,19 @@ modifications are made to run on NPU. Original README file can be found in `READ
 
 ## Model overview
 
-CRNN model from
-`Shibao Guang  et al. "An End-to-End Trainable Neural Network for Image-based Sequence
-Recognition and Its Application to Scene Text Recognition". <https://arxiv.org/abs/1507.05717>.`
-reference implementation:  <https://github.com/MaybeShewill-CV/CRNN_Tensorflow>
+CTPN model from
+`Zhi Tian, Weilin Huang, Tong He, Pan He, Yu Qiao "Detecting Text in Natural Image with Connectionist Text Proposal Network and Its Application to Scene Text Recognition". <https://arxiv.org/abs/1609.03605>.`
+reference implementation:  <https://github.com/eragonruan/text-detection-ctpn>
 ### Model architecture
 
 
 
 ### Default configuration
 
-The following sections introduce the default configurations and hyperparameters for CRNN  model. We reproduce training setups 
-on synth90k datasets, evaluate on three datasets: IIIT5K, ICDAR2003 and SVT. See [Results](#results) for details.
+The following sections introduce the default configurations and hyperparameters for CTPN  model. We reproduce training setups 
+on mlt datasets, evaluate on ICDAR2013 test. See [Results](#results) for details.
 
-For detailed hpyerparameters, please refer to corresponding scripts under directory `scripts/` and 
+For detailed hpyerparameters, please refer to corresponding scripts under directory `main/train_npu.py`
 #### Optimizer
 
 This model uses Momentum optimizer from Tensorflow with the following hyperparameters:
