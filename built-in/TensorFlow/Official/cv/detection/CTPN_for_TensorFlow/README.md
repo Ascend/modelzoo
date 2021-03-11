@@ -1,4 +1,4 @@
-# CRNN for Tensorflow 
+# CTPN for Tensorflow 
 
 This repository provides a script and recipe to train the CTPN model. The code is based on https://github.com/eragonruan/text-detection-ctpn,
 modifications are made to run on NPU. Original README file can be found in `README_ORI.md`  
@@ -39,28 +39,34 @@ on mlt datasets, evaluate on ICDAR2013 test. See [Results](#results) for details
 For detailed hpyerparameters, please refer to corresponding scripts under directory `main/train_npu.py`
 #### Optimizer
 
-This model uses Momentum optimizer from Tensorflow with the following hyperparameters:
+This model uses Adam optimizer from Tensorflow with the following hyperparameters:
 
-- Momentum : 0.9
-- LR schedule: cosine_annealing
-- Batch size : 64 * 8   
+- LR schedule: piecewise_constant
 
 #### Data augmentation
 
 This model uses the following data augmentation:
 
 - For training:
-  - Normalize=(value/127.5-1.0)
+  - resize to (H,W)=(600,900)
 - For inference:
-  - Normalize=(value/127.5-1.0)
-
+  - resize to (H,W)=(600,900)
 
 
 ## Setup
-The following section lists the requirements to start training the CRNN model.
+The following section lists the requirements to start training the CTPN model.
 ### Requirements
 
 see `requirements.txt`
+
+### nmd and bbox
+nms and bbox utils are written in cython, hence you have to build the library first.
+```shell
+cd utils/bbox
+chmod +x make.sh
+./make.sh
+```
+It will generate a nms.so and a bbox.so in current folder.
 
 ## Quick Start Guide
 
