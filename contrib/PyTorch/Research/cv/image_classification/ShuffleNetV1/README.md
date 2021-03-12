@@ -13,7 +13,7 @@ The training script is adapted from [the ShuffleNetV2 script on Gitee](https://g
 
 - pytorch_ascend, apex_ascend, tochvision
 - Download the ImageNet dataset from http://www.image-net.org/
-    - Then, and move validation images to labeled subfolders, using [the following shell script](https://raw.githubusercontent.com/soumith/imagenetloader.torch/master/valprep.sh). (This script is also in the util_scripts directory).
+    - Then, and move validation images to labeled subfolders, using [the following shell script](https://raw.githubusercontent.com/soumith/imagenetloader.torch/master/valprep.sh).
 
 ## Training
 一、训练流程：

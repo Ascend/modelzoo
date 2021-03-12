@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
 source npu_setenv.sh
-export WHICH_OP=GEOP
-export NEW_GE_FE_ID=1
-export GE_AICPU_FLAG=1
 
 device_id=0
 

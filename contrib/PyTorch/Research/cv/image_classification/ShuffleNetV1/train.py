@@ -306,7 +306,6 @@ def runprof(train_loader, model, criterion, optimizer, args):
     for _, (images, target) in enumerate(train_loader):
         cnt += 1
 
-        #target = target.to(torch.int32)
         images = images.to(loc, non_blocking=True).to(torch.float).sub(mean).div(std)
         target = target.to(loc, non_blocking=True)
         # profile after 5 steps
@@ -364,7 +363,6 @@ def train(train_loader, train_loader_len, model, criterion, optimizer, epoch, ar
         # measure data loading time
         data_time.update(time.time() - end)
 
-        #target = target.to(torch.int32)
         images = images.to(loc, non_blocking=True).to(torch.float).sub(mean).div(std)
         target = target.to(loc, non_blocking=True)
 
@@ -444,7 +442,6 @@ def validate(val_loader, model, criterion, args, ngpus_per_node):
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
 
-            #target = target.to(torch.int32)
             images = images.to(loc, non_blocking=True).to(torch.float).sub(mean).div(std)
             target = target.to(loc, non_blocking=True)
 
