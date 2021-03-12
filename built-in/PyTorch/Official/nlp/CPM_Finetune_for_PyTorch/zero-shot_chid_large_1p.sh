@@ -1,5 +1,10 @@
 #!/bin/bash
-
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+export ASCEND_GLOBAL_LOG_LEVEL=3
+export ASCEND_GLOBAL_EVENT_ENABLE=0
+export TASK_QUEUE_ENABLE=1
+export PTCOPY_ENABLE=1
+export SWITCH_MM_OUTPUT_ENABLE=1
 DATA_DIR="/data/chid/preprocessed/"
 CHECKPOINT_PATH="/data/checkpoints/CPM-large_1p"
 RESULTS_DIR="results/"
@@ -15,7 +20,7 @@ CUR_PATH=$(realpath $0)
 CUR_DIR=$(dirname ${CUR_PATH})
 DS_CONFIG="${CUR_DIR}/ds_finetune_large.json"
 
-python3.7 -m torch.distributed.launch --master_port ${1-1122} --nproc_per_node 1 zero-shot_chid.py \
+nohup taskset -c 0-19 python3.7 -m torch.distributed.launch --master_port ${1-1122} --nproc_per_node 1 zero-shot_chid.py \
        --data_dir ${DATA_DIR} \
        --model-parallel-size ${MPSIZE} \
        --num-layers ${NLAYERS} \
@@ -32,4 +37,4 @@ python3.7 -m torch.distributed.launch --master_port ${1-1122} --nproc_per_node 1
        --batch-size 2 \
        --seed 23333 \
        --results_dir ${RESULTS_DIR} \
-       --model_name ${MODEL_NAME} \
+       --model_name ${MODEL_NAME} &

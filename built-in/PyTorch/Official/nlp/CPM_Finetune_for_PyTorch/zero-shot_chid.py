@@ -64,8 +64,10 @@ class CHIDDataset(torch.utils.data.Dataset):
             data = json.load(f)
 
         self.samples, self.sizes, self.truth_labels = self.process(data)
-
-        self.max_size = max(self.sizes)
+        if max(self.sizes) % 16 != 0:
+            self.max_size = (max(self.sizes) // 16 + 1） * 16
+        else:
+            self.max_size = max(self.sizes)
 
     def process(self, data):
         contents = data["contents"]
