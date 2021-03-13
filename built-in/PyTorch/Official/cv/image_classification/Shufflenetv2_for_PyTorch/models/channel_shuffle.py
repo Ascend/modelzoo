@@ -64,10 +64,13 @@ class ChannelShuffle(nn.Module):
         self.bp_index1 = torch.tensor(list(range(0, in_channels, 2)))
         self.bp_index2 = torch.tensor(list(range(1, in_channels, 2)))
 
+        self.checked = False
+
     def check_self(self, x):
         r"""Check device equipment between tensors.
         """
         if self.bp_index1.device == x.device:
+            self.checked = True
             return
 
         device = x.device
@@ -91,7 +94,8 @@ class ChannelShuffle(nn.Module):
 
 
     def forward(self, x1, x2):
-        self.check_self(x1)
+        if not self.checked:
+            self.check_self(x1)
         if self.split_shuffle:
             return IndexSelectHalfImplementation.apply(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1,
                                                        self.bp_index2)

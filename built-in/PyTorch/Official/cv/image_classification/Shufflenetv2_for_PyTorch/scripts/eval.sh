@@ -9,7 +9,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-python3.7 ${currentDir}/8p_main_med.py \
+python3.7 -u ${currentDir}/8p_main_med.py \
     --data=/data/imagenet \
     --evaluate \
     --resume checkpoint.pth.tar \
