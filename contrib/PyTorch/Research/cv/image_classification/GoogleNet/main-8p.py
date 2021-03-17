@@ -313,7 +313,12 @@ def main_worker(gpu, ngpus_per_node, args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
-        adjust_learning_rate(optimizer, epoch, args)
+        lr = adjust_learning_rate(optimizer, epoch, args)
+
+        if not args.multiprocessing_distributed or (args.multiprocessing_distributed
+                and args.rank % ngpus_per_node == 0):
+            print("=> Epoch[{}]   Setting lr: {}".format(epoch+1, lr))
+
 
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node)
@@ -360,6 +365,12 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
     model.train()
     end = time.time()
     loc = 'npu:{}'.format(args.gpu)
+    # steps_per_epoch = len(train_loader)
+    steps_per_epoch = len(train_loader)
+    if not args.multiprocessing_distributed or (args.multiprocessing_distributed
+            and args.rank % ngpus_per_node == 0):
+        print('==========step per epoch======================', steps_per_epoch)
+
     for i, (images, target) in enumerate(train_loader):
         # measure data loading time
         data_time.update(time.time() - end)
@@ -507,6 +518,7 @@ def adjust_learning_rate(optimizer, epoch, args):
     lr = args.lr * (0.1 ** (epoch // 30))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
+    return lr
 
 
 def accuracy(output, target, topk=(1,)):
