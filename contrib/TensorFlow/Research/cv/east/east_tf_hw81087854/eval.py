@@ -16,6 +16,7 @@ tf.app.flags.DEFINE_bool('no_write_images', False, 'do not write images')
 
 import model
 from icdar import restore_rectangle
+from clock_wise import order_points
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -122,7 +123,6 @@ def sort_poly(p):
     else:
         return p[[0, 3, 2, 1]]
 
-
 def main(argv=None):
     import os
     os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.gpu_list
@@ -185,6 +185,7 @@ def main(argv=None):
                             box = sort_poly(box.astype(np.int32))
                             if np.linalg.norm(box[0] - box[1]) < 5 or np.linalg.norm(box[3]-box[0]) < 5:
                                 continue
+                            box = order_points(box)
                             f.write('{},{},{},{},{},{},{},{}\r\n'.format(
                                 box[0, 0], box[0, 1], box[1, 0], box[1, 1], box[2, 0], box[2, 1], box[3, 0], box[3, 1],
                             ))
