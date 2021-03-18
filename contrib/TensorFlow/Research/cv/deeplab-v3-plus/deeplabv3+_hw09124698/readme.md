@@ -122,10 +122,11 @@ python deeplab/vis.py \
 ```
 当显示Finished visualization后即为完成推理 可以ctrl+c手动结束脚本！
 然后进行推理结果打包
-'''
+
+```
 cd log_e
 tar -zcvf results.tgz results
-'''
+```
 得到results.tgz后进入 http://host.robots.ox.ac.uk:8080/ 注册, 然后进入[评估页面](http://host.robots.ox.ac.uk:8080/eval/upload/)  
 
 填入对应信息后选择results.tgz上传  
