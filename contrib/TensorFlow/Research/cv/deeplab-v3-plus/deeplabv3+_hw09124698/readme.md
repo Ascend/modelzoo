@@ -94,7 +94,7 @@ bash train.sh
 ```
 20w个Step，NPU大概花费27小时，TotalLoss收敛趋势基本一致 :\
 https://pan.baidu.com/s/1v05LbDMFGmcRr0MhoG_M6Q 提取码: nxhq
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0114/232451_0023bcbd_8432352.png "vs.png")
+![输入图片说明](https://gitee.com/aioe/modelzoo/raw/deeplab_/contrib/TensorFlow/Research/cv/deeplab-v3-plus/deeplabv3+_hw09124698/img/vs.png "vs.png")
 
 蓝色是NPU，红色是GPU.
 
@@ -129,11 +129,11 @@ tar -zcvf results.tgz results
 
 填入对应信息后选择results.tgz上传  
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0114/232451_0023bcbd_8432352.png "upload.png")  
+![输入图片说明](https://gitee.com/aioe/modelzoo/raw/deeplab_/contrib/TensorFlow/Research/cv/deeplab-v3-plus/deeplabv3+_hw09124698/img/upload.png "upload.png")  
 
 稍等片刻后刷新即可得到精度结果  
 
-![输入图片说明](https://images.gitee.com/uploads/images/2021/0114/232451_0023bcbd_8432352.png "best.png")  
+![输入图片说明](https://gitee.com/aioe/modelzoo/raw/deeplab_/contrib/TensorFlow/Research/cv/deeplab-v3-plus/deeplabv3+_hw09124698/img/best.png "best.png")  
 
 
 
