@@ -187,6 +187,11 @@ data/reds
     > 2020-12-25 08:36:24 Step:480, lr:0.00039999, loss:6809.04133592, time:212.99ms, fps:18.78 <br>
     > 2020-12-25 08:36:29 Step:500, lr:0.00039999, loss:6736.72430321, time:210.67ms, fps:18.99 <br>
 
+    注意：示例配置文件``edvr.yaml``和训练脚本``run_1p_train.sh``以及``run_8p_train.sh``仅作为参考。
+    单卡``batchsize=4``且只训练1000个step，是无法达到本仓库所复现的精度的。需要完整体验复现精度，请执行
+   ``run_1p_train_precision_overwatch.sh``和``run_8p_train_precision_overwatch.sh``脚本。单卡``batchsize=32``
+   或8卡每张卡``batchsize=4``（等效``batchsize=32``）可达到复现精度。
+
 2. 执行单机8卡训练：
 
     ```sh
