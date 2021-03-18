@@ -92,12 +92,13 @@ bash train.sh
 --train_crop_size="513,513"  
 --train_batch_size=7
 ```
-20w个Step，NPU大概花费27小时，TotalLoss收敛趋势基本一致 :\
+因为测试环境的v100只有 16G显存所以只能设置batch_size为7进行loss曲线对比  
+20w个Step，NPU大概花费27小时，TotalLoss收敛趋势基本一致   
 https://pan.baidu.com/s/1v05LbDMFGmcRr0MhoG_M6Q 提取码: nxhq  
 
 ![输入图片说明](https://gitee.com/aioe/modelzoo/raw/deeplab_/contrib/TensorFlow/Research/cv/deeplab-v3-plus/deeplabv3+_hw09124698/img/vs.png "vs.png")  
 
-蓝色是NPU，红色是GPU.
+蓝色是Ascend910，红色是V100-16G.
 
 ### 精度评估
 
