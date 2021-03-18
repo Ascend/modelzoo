@@ -139,7 +139,7 @@ tar -zcvf results.tgz results
 
 
 
-### 精度比对（NPU vs GPU）:
+### 精度比对:
 [NPU 87.72010%](http://host.robots.ox.ac.uk:8080/anonymous/AFSMJC.html)  
-[GPU 87.84490%](http://host.robots.ox.ac.uk:8080/anonymous/NU9OS6.html)  
+[论文 87.84490%](http://host.robots.ox.ac.uk:8080/anonymous/NU9OS6.html)  
 NPU Checkpoints: [提取码cwsn](https://pan.baidu.com/s/1IcXF0ThsAygWZ5yjWhCd8g)  
