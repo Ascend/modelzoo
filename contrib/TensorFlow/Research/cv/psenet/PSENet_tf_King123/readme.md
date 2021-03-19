@@ -84,7 +84,7 @@ python3.7 train_npu.py \
 --checkpoint_path=./checkpoint/ \
 --training_data_path=./ocr/icdar2015/
 ```
-### TotalLoss趋势比对（NPU vs GPU）
+### TotalLoss趋势比对（NPU vs GPU--型号为T4）
 数据集Icdar2015、超参相同时,10w个Step，NPU大概花费11小时，TotalLoss收敛趋势基本一致 :
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0220/000403_b5cfae72_8432352.png "屏幕截图.png")
 
