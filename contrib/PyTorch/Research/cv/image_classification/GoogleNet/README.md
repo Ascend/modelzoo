@@ -18,15 +18,22 @@ Details, see ./googlenet.py
 
 To train a model, run `main.py`or `main-8p.py` with the desired model architecture and the path to the ImageNet dataset:
 
-```bash
-cp ./scripts/*.sh ./
 
-# O2 training 1p
-bash train_1p.sh
 
-# O2 training 8p
-bash train_8p.sh
-```
+# 1p training 1p
+bash script/run_1p.sh
+
+# 8p training 8p
+bash script/run_8p.sh
+
+# eval default 8p， should support 1p
+bash script/eval.sh
+
+# online inference demo 
+python3.7.5 demo.py
+
+# To ONNX
+python3.7.5 pthtar2onnx.py
 
 ## GoogleNet training result
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source pt.sh
+source script/pt.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
 /usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
@@ -12,7 +12,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-python3.7 ${currentDir}/main-8p.py \
+python3.7 ${currentDir}/../main-8p.py \
 	-a googlenet \
 	--amp \
         --data /opt/npu/imagenet \

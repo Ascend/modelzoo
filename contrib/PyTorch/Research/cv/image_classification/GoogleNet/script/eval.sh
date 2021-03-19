@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source pt.sh
+source script/pt.sh
 
 
 device_id=0
@@ -13,7 +13,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-python3.7 ${currentDir}/main.py \
+python3.7 ${currentDir}/../main-8p.py \
         --data /opt/npu/dataset/imagenet \
         --npu ${device_id} \
 	-a googlenet \
