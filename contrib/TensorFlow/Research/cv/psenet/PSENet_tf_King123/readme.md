@@ -210,3 +210,31 @@ def detect(seg_maps, timer, image_w, image_h, min_area_thresh=6, seg_map_thresh=
 | NPU | 0.751     | 0.738  | 0.745 |
 
 GPU和NPU的ckpt&events：[BaiduYun link，提取码1234](https://pan.baidu.com/s/1oDi54CifBtWVIp6XsFluFQ)
+
+增加训练step和微调pse算法参数：
+```
+export TF_CPP_MIN_LOG_LEVEL=2
+export RANK_SIZE=1
+nohup python3.7 npu_train.py \
+--input_size=512 \
+--learning_rate=0.0001 \
+--batch_size_per_gpu=14 \
+--num_readers=16  \
+--max_steps=150000  \
+--checkpoint_path=./checkpoint/ \
+--training_data_path=./ocr/icdar2015/ \
+--pretrained_model_path=./pretrain_model/resnet_v1_50.ckpt
+```
+微调后处理的PSE参数：
+min_area_thresh=6, seg_map_thresh=0.91
+
+在eval.py中：
+```
+def detect(seg_maps, timer, image_w, image_h, min_area_thresh=6, seg_map_thresh=0.91, ratio = 1):
+```
+得到精度：
+|     | Precision | Recall | Hmean |
+|-----|-----------|--------|-------|
+| NPU | 0.744     | 0.767  | 0.755 |
+
+NPU的ckpt：[BaiduYun link，提取码1234](https://pan.baidu.com/s/1Mm6ifkzg-0RJ7s6q07ux2Q)
