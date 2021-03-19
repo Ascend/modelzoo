@@ -42,6 +42,8 @@ The following are the command line options about the training scrip:
 
     --data_url                     Path to the dataset.
     --model_dir                    Path to save model ckpt.
+    --tf_log_dir                   Path to save summary file.
+    --test                         Evaluate pre_trained model. 
 
 
 ## Quick Start Guide
@@ -72,9 +74,14 @@ git clone xxx
 
 2) Train the model with the following commend:
 ```
-python main.py --data_url ./path/to/dataset/ --model_dir ./path/to/model/
+python train.py --data_url ./path/to/dataset/ --model_dir ./path/to/save/model/ --tf_log_dir ./path/to/summary/file/
 ```
 
+### Evaluate model
+Then you can evaluate the pre_trained model with the following commend:
+```
+python test.py --data_url ./path/to/dataset/ --model_dir ./path/to/pre_trained/model/ --gpu gpu_id --path ./path/to/specific/model/
+``` 
 
 ## Performance
 We trained and evaluated the model in the ShapeNet's rendering for chairs. The mean angular distance error of the pretrained model is 13.61° which is 14.57° in the paper(smaller is better).
