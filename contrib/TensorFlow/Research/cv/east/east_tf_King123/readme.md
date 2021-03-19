@@ -67,7 +67,7 @@ python3.7 npu_train.py \
 bash train_npu.sh
 ```
 
-### TotalLoss趋势比对（NPU vs GPU）
+### TotalLoss趋势比对（NPU vs GPU 型号为t4）
 数据集和超参相同时:
 ```
 --input_size=512 \
@@ -127,7 +127,7 @@ python3.7 evaluation/script.py -g=./evaluation/gt.zip -s=${output_dir}/results.z
 ) 和相同的超参，NPU的精度优于GPU（看Hmean，即为F1 Score）:
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
-| GPU | 0.826     | 0.771  | 0.797 |
+| GPU T4 | 0.826     | 0.771  | 0.797 |
 | NPU | 0.834     | 0.767  | 0.799 |
 
 NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/19qRk67W3R4x_5wDbPwmWIA) )\
@@ -174,7 +174,7 @@ GPU、NPU使用相同的超参:
 
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
-| GPU | 0.842     | 0.766  | 0.803 |
+| GPU T4| 0.842     | 0.766  | 0.803 |
 | NPU | 0.853     | 0.773  | 0.811 |
 
 NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1jVMvmWgKrj2hOkvV2_0VOw) )\
