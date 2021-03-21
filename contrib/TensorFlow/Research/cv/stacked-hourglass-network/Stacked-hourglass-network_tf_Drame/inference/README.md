@@ -10,6 +10,10 @@
 
 调用datagen.py中的_test_aux_generator函数
 
+####ckpt转pb代码
+
+ckpt2pb.py 
+
 #### 推理结果
 
 
