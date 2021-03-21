@@ -11,7 +11,7 @@ MPII数据集下载地址：http://human-pose.mpi-inf.mpg.de/#download
 
 论文精度：90.9%
 
-在NPU上实现的精度：85.469 %
+在NPU上实现的精度：91.180 %
 
 ## 3. 文件说明
 
