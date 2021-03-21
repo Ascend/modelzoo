@@ -1,28 +1,31 @@
 ## 推理
 
-#### 转换后的Bin数据集
+推理精度为 0.899
+
+#### 1、转换后的Bin数据集
 
 链接：https://pan.baidu.com/s/1CbgNLx7rmKTinoResZ7pCg 
 
 提取码：fxz1 
 
-#### 转换Bin文件的代码
+#### 2、转换Bin文件的代码
 
 调用datagen.py中的_test_aux_generator函数
 
-#### ckpt转pb代码
+#### 3、ckpt转pb代码
 
 ckpt2pb.py 
 
-#### 推理结果
+需要指定checkpoint的地址和输出pb文件的位置。
+
+#### 4、推理结果
 
 链接：https://pan.baidu.com/s/1ngflIObMK8j59en3na1xBw 
 
 提取码：y388 
 
 
-
-#### 模型后处理
+#### 5、模型后处理
 
 tuili.py
 
