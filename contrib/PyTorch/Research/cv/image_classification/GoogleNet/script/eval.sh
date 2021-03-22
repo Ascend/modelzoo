@@ -1,27 +1,36 @@
 #!/usr/bin/env bash
 source script/pt.sh
 
-
-device_id=0
-
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
 
+ip=$(hostname -I |awk '{print $1}')
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
-train_log_dir=${currentDir}/result/training_1p_job_${currtime}
+train_log_dir=${currentDir}/result/training_8p_job_${currtime}
 mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
 python3.7 ${currentDir}/../main-8p.py \
-        --data /opt/npu/dataset/imagenet \
-        --npu ${device_id} \
 	-a googlenet \
-        -b 512 \
-        --lr 0.01 \
-        --epochs 1 \
-	-j 32 \
 	--amp \
- 	--wd 0.0001 \
+        --data /opt/npu/imagenet \
+        --addr=$(hostname -I |awk '{print $1}') \
+        --seed=49 \
+        --workers=184 \
+        --learning-rate=0.5 \
+        --mom=0.9 \
+        --weight-decay=1.0e-04  \
+        --print-freq=30 \
+        --dist-url='tcp://127.0.0.1:50000' \
+        --dist-backend='hccl' \
+        --multiprocessing-distributed \
+        --world-size=1 \
+        --rank=0 \
+        --benchmark=0 \
+        --device='npu' \
+        --epochs=150 \
 	--evaluate \
-    	--resume checkpoint.pth.tar > ./goolenet_1p.log 2>&1 &
+        --resume /root/myxWorkSpace/googlenet/result/training_8p_job_20210304101618/model_best_acc69.8074_epoch139.pth.tar \
+        --batch-size=4096	> ./googlenet_npu_evaluate_8p.log 2>&1 &
