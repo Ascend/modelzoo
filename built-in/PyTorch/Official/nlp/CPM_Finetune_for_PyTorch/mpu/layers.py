@@ -240,20 +240,12 @@ class ColumnParallelLinear(torch.nn.Module):
         # Set up backprop all-reduce.
         input_parallel = copy_to_model_parallel_region(input_)
         # Matrix multiply.
-        if input_parallel.dim() == 2:
-            output_parallel = F.linear(input_parallel, self.weight, self.bias)
-            if self.gather_output:
-                # All-gather across the partitions.
-                return gather_from_model_parallel_region(output_parallel)
-            else:
-                return output_parallel
+        output_parallel = F.linear(input_parallel, self.weight, self.bias)
+        if self.gather_output:
+            # All-gather across the partitions.
+            return gather_from_model_parallel_region(output_parallel)
         else:
-            output_parallel = F.linear(input_parallel, self.weight, None)
-            if self.gather_output:
-                # All-gather across the partitions.
-                return gather_from_model_parallel_region(output_parallel) + self.bias
-            else:
-                return output_parallel + self.bias
+            return output_parallel
 
 
 class RowParallelLinear(torch.nn.Module):
@@ -325,19 +317,10 @@ class RowParallelLinear(torch.nn.Module):
         else:
             input_parallel = scatter_to_model_parallel_region(input_)
         # Matrix multiply.
-        if get_model_parallel_world_size() == 1:
-            if input_parallel.dim() == 3:
-                if self.count_3 == 0:
-                    self.weight_trans_3 = torch.unsqueeze(self.weight.permute(1, 0), 0).contiguous()
-                    self.count_3 = 1
-                return torch.matmul(input_parallel, self.weight_trans_3) + self.bias
-            else:
-                return F.linear(input_parallel, self.weight, self.bias)
+        output_parallel = F.linear(input_parallel, self.weight)
+        # All-reduce across all the partitions.
+        output_ = reduce_from_model_parallel_region(output_parallel)
+        if self.bias is not None:
+            return output_ + self.bias
         else:
-            output_parallel = F.linear(input_parallel, self.weight)
-            output_ = reduce_from_model_parallel_region(output_parallel)
-            if self.bias is not None:
-                return output_ + self.bias
-            else:
-                return output_
-
+            return output_

@@ -73,6 +73,7 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
         self.hidden_size_per_partition = divide(hidden_size, world_size)
         self.hidden_size_per_attention_head = divide(hidden_size,
                                                      num_attention_heads)
+        self.hidden_size_per_attention_head_inv = 1.0 / math.sqrt(self.hidden_size_per_attention_head)
         self.num_attention_heads_per_partition = divide(num_attention_heads,
                                                         world_size)
         # Strided linear layer.
@@ -98,6 +99,15 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
             checkpoint = deepspeed.checkpointing.checkpoint
 
 
+    def _transpose_for_scores_key(self, tensor):
+        """Transpose a 3D tensor [b, s, np*hn] into a 4D tensor with
+        size [b, np, s, hn].
+        """
+        new_tensor_shape = tensor.size()[:-1] + \
+                           (self.num_attention_heads_per_partition,
+                            self.hidden_size_per_attention_head)
+        return tensor.npu_confusion_transpose((0, 2, 3, 1), [*new_tensor_shape], False)
+
     def _transpose_for_scores(self, tensor):
         """Transpose a 3D tensor [b, s, np*hn] into a 4D tensor with
         size [b, np, s, hn].
@@ -105,8 +115,9 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
         new_tensor_shape = tensor.size()[:-1] + \
                            (self.num_attention_heads_per_partition,
                             self.hidden_size_per_attention_head)
-        tensor = tensor.view(*new_tensor_shape)
-        return tensor.permute(0, 2, 1, 3)
+        # tensor = tensor.view(*new_tensor_shape)
+        # return tensor.permute(0, 2, 1, 3)
+        return tensor.npu_confusion_transpose((0, 2, 1, 3), [*new_tensor_shape], False)
 
     def forward(self, hidden_states, ltor_mask):
         # hidden_states: [b, s, h]
@@ -120,17 +131,14 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
 
         # Reshape and transpose [b, np, s, hn]
         query_layer = self._transpose_for_scores(mixed_query_layer)
-        key_layer = self._transpose_for_scores(mixed_key_layer)
+        key_layer = self._transpose_for_scores_key(mixed_key_layer)
         value_layer = self._transpose_for_scores(mixed_value_layer)
 
         # Raw attention scores. [b, np, s, s]
-        attention_scores = torch.matmul(query_layer,
-                                        key_layer.transpose(-1, -2))
-        attention_scores = attention_scores / math.sqrt(
-            self.hidden_size_per_attention_head)
+        attention_scores = torch.matmul(query_layer, key_layer)
+        attention_scores = attention_scores * self.hidden_size_per_attention_head_inv
         # Apply the left to right attention mask.
-        attention_scores = torch.mul(attention_scores, ltor_mask) - \
-                           10000.0 * (1.0 - ltor_mask)
+        attention_scores = attention_scores - 10000.0 * (1.0 - ltor_mask)
 
         # Attention probabilities. [b, np, s, s]
         attention_probs = torch.nn.Softmax(dim=-1)(attention_scores)
@@ -141,11 +149,13 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
         # [b, np, s, hn]
         context_layer = torch.matmul(attention_probs, value_layer)
         # [b, s, np, hn]
-        context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
-        new_context_layer_shape = context_layer.size()[:-2] + \
+        new_context_layer_shape = (context_layer.size()[0],) + \
+                                  (context_layer.size()[2],) + \
                                   (self.hidden_size_per_partition,)
         # [b, s, hp]
-        context_layer = context_layer.view(*new_context_layer_shape)
+        context_layer = context_layer.npu_confusion_transpose((0, 2, 1, 3),
+                                                              [*new_context_layer_shape],
+                                                              True)
 
         # Output. [b, s, h]
         output = self.dense(context_layer)

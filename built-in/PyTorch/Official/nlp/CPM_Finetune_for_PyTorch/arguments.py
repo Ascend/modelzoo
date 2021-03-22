@@ -317,6 +317,10 @@ def get_args():
         args.rank = nodeid*local_size + local_rank
         args.world_size = num_nodes*local_size
 
+        # recover world_size and rank with Open MPI ENV
+        args.world_size = int(os.getenv('OMPI_COMM_WORLD_SIZE'))
+        args.rank = int(os.getenv('OMPI_COMM_WORLD_SIZE'))
+
     args.model_parallel_size = min(args.model_parallel_size, args.world_size)
     if args.rank == 0:
         print('using world size: {} and model-parallel size: {} '.format(
