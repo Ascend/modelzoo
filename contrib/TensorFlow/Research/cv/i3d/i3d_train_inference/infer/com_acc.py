@@ -23,7 +23,7 @@ def main(dataset, mode, split):
     OUTPUT = './out_rgb/'
     files = os.listdir(OUTPUT)
     check_num = 0
-    label_map = get_label_map(os.path.join('./data', dataset, 'label_map.txt'))
+    label_map = get_label_map(os.path.join('../data', dataset, 'label_map.txt'))
     for file in files:
         if file.endswith(".bin"):
             np_list = np.fromfile(OUTPUT+'/'+file, dtype='float32')
