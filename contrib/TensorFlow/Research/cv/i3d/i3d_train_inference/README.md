@@ -80,7 +80,7 @@ python3.7 finetune_new_bn.py --dataset=ucf101 --mode=flow --split=2
 ### 5.推理
 
 #### 模型转换
-原始网络模型下载地址，链接: https://pan.baidu.com/s/1c7ByN0W6fKDSp3KvILqduQ  密码: 7jkb
+原始网络模型下载地址，链接: https://pan.baidu.com/s/1ih8QL1VGw7BXIcTzm59dLA  密码: 4ka8
 转换后的om模型下载地址为：
 使用ATC模型转换工具进行模型转换时可以参考的操作指令如下：
 
