@@ -14,9 +14,9 @@
 
 **修改时间（Modified） ：_2020.10.14_**
 
-_**大小（Size）**_**：**_1331.2M_
+**大小（Size）**_**：**_1331.2M_
 
-**框架（Framework）：_TensorFlow 1.15.0_
+**框架（Framework）：_TensorFlow 1.15.0_**
 
 **模型格式（Model Format）：_ckpt_**
 
@@ -30,7 +30,7 @@ _**大小（Size）**_**：**_1331.2M_
 
 <h2 id="概述.md">概述</h2>
 
-    BERT是谷歌2018年推出的预训练语言模型结构，通过自监督训练实现对语义语境相关的编码，是目前众多NLP应用的基石。
+   BERT是谷歌2018年推出的预训练语言模型结构，通过自监督训练实现对语义语境相关的编码，是目前众多NLP应用的基石。
 
 -   参考论文：
 
@@ -41,8 +41,6 @@ _**大小（Size）**_**：**_1331.2M_
 
     ```
     https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/LanguageModeling/BERT
-    branch=master
-    commit_id=3d400a58023086b5c128ecd4b3ea46c129b5988b
     ```
 
 -   适配昇腾 AI 处理器的实现：
@@ -50,7 +48,7 @@ _**大小（Size）**_**：**_1331.2M_
     ```
     https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Bert-base_for_TensorFlow
     branch=master
-    commit_id=9887f0b4ae27f16a1e9f8b0a94dda87b0bf8430a
+    commit_id=2b23507343672251385e691458e37cc936d28d9f
 
     ```
 
@@ -130,10 +128,10 @@ _**大小（Size）**_**：**_1331.2M_
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-1.  _硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
-2.  _宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。_
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。_
 
-    _当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
     **表 1** _镜像列表_
 
@@ -185,96 +183,43 @@ _**大小（Size）**_**：**_1331.2M_
 
  - 单卡训练
     
-    1. 在`scripts`路径下的`run_pretraining.py`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径。
-
-       参数说明：
-    
-```
-        python3.7 ${dname}/src/pretrain/run_pretraining.py \
-             --bert_config_file=${dname}/configs/bert_base_config.json \
-             --max_seq_length=128 \
-             --max_predictions_per_seq=20 \
-             --train_batch_size=128 \
-             --learning_rate=1e-4 \
-             --num_warmup_steps=10000 \
-             --num_train_steps=500000 \
-             --optimizer_type=adam \
-             --manual_fp16=True \
-             --use_fp16_cls=True \
-             --input_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \      #训练数据集路径
-             --eval_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \       #验证数据集路径  
-             --npu_bert_debug=False \
-             --npu_bert_use_tdt=True \
-             --do_train=True \
-             --num_accumulation_steps=1 \
-             --npu_bert_job_start_file= \
-             --iterations_per_loop=100 \
-             --save_checkpoints_steps=10000 \
-             --npu_bert_clip_by_global_norm=False \
-             --distributed=True \
-             --npu_bert_loss_scale=0 \
-             --output_dir=./output
-```
-    2. 单卡训练指令，如下： 
-
-        ```
-        cd scripts
+    1. 在`scripts`路径下的`run_pretraining.py`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径，如下：
         
-        bash run_pretraining.sh
-        ```
-- 8卡训练
+```
+        --input_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \      #训练数据集路径
+        --eval_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \       #验证数据集路径
+```
+  
+      2. 单卡训练指令，在ModelZoo_BertBase_TF目录下，执行如下命令：
+            
+            bash scripts/run_pretraining.sh
+
    
-    1. 在`scripts`路径下的`train_8p.sh`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径。
-
-        参数说明：
-
+- 8卡训练
+    1. 在`scripts`路径下的`train_8p.sh`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径，如下：
         ```
-        python3.7 ${dname}/src/pretrain/run_pretraining.py \
-         --bert_config_file=${dname}/configs/bert_base_config.json \
-         --max_seq_length=128 \
-         --max_predictions_per_seq=20 \
-         --train_batch_size=128 \
-         --learning_rate=1e-4 \
-         --num_warmup_steps=10000 \
-         --num_train_steps=500000 \
-         --optimizer_type=adam \
-         --manual_fp16=True \
-         --use_fp16_cls=True \
          --input_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \      #训练数据集路径
          --eval_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \       #验证数据集路径  
-         --npu_bert_debug=False \
-         --npu_bert_use_tdt=True \
-         --do_train=True \
-         --num_accumulation_steps=1 \
-         --npu_bert_job_start_file= \
-         --iterations_per_loop=100 \
-         --save_checkpoints_steps=10000 \
-         --npu_bert_clip_by_global_norm=False \
-         --distributed=True \
-         --npu_bert_loss_scale=0 \
-         --output_dir=./output > ${currentDir}/result/8p/train_${device_id}.log 2>&1
          ```
-    2. 8卡训练指令，如下
+    2. 8卡训练指令，在ModelZoo_BertBase_TF目录下，执行如下命令： 
 
         ```
-        cd scripts
-        
-        bash run_8p.sh
+        bash scripts/run_8p.sh
         ```
 
 -  验证。
 
     1. 提供三个脚本，分别是文本分类任务，序列标注任务，阅读理解任务，并且提供了XNLI，LCQMC，CHNSENTI，NER，CMRC的数据处理方法示例，用户可根据自己的下游任务需要改写和处理数据。然后运行脚本，参考超参已经写入脚本供用户参考。
     
-    执行命令：
-    
-    ```
-    bash scripts/run_downstream_classifier.sh进行分类下游任务。
-    
-    bash scripts/run_downstream_ner.sh进行序列标注下游任务。
-    
-    bash scripts/run_downstream_reading.sh进行阅读理解下游任务。
-    ```
+        执行命令：
+        
+        ```
+        bash scripts/run_downstream_classifier.sh进行分类下游任务。
+        
+        bash scripts/run_downstream_ner.sh进行序列标注下游任务。
+        
+        bash scripts/run_downstream_reading.sh进行阅读理解下游任务。
+        ```
     
     2. 执行命令前请先阅读相应bash脚本，补充相应文件路径。
 
@@ -349,7 +294,6 @@ _**大小（Size）**_**：**_1331.2M_
     
      
 ```
-         --max_predictions_per_seq=20 \
          --train_batch_size=128 \           #每个NPU训练的batch size，默认：128
          --learning_rate=1e-4 \             #学习率，默认：1e-4
          --num_warmup_steps=10000 \         # 初始warmup训练epoch数，默认：10000
@@ -387,9 +331,9 @@ I0521 19:45:05.733291 281473385623568 basic_session_run_hooks.py:260] global_ste
 
 调优过程
 
-通过“快速上手”中的调优说明，对自己的下游任务进行调优和预测。
+通过“快速上手”中的调优说明(即验证章节)，对自己的下游任务进行调优和预测。
 
 ## 推理/验证过程<a name="section1465595372416"></a>
 
-见下游任务Finetune。
+见下游任务Finetune（“快速上手”中的验证章节）。
 

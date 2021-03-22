@@ -6,27 +6,27 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：_huawei_**
+**发布者（Publisher）：huawei**
 
-**应用领域（Application Domain）：_Image Classification_**
+**应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：_1.2_**
+**版本（Version）：1.2**
 
-**修改时间（Modified） ：_2020.10.14_**
+**修改时间（Modified） ：2020.10.14**
 
-_**大小（Size）**_**：_221M_**
+**大小（Size）：221M**
 
-**框架（Framework）：_TensorFlow 1.15.0_**
+**框架（Framework）：TensorFlow 1.15.0**
 
-**模型格式（Model Format）：_ckpt_**
+**模型格式（Model Format）：ckpt**
 
 **精度（Precision）：Mixed**
 
-**处理器（Processor）：_昇腾910_**
+**处理器（Processor）：昇腾910**
 
-**应用级别（Categories）：_Official_**
+**应用级别（Categories）：Official**
 
-**描述（Description）：_基于TensorFlow框架的ResNeXt-50图像分类网络训练代码_**
+**描述（Description）：基于TensorFlow框架的ResNeXt-50图像分类网络训练代码**
 
 <h2 id="概述.md">概述</h2>
 
@@ -36,10 +36,10 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
         [Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, Kaiming He.Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/abs/1611.05431) 
 
-    -   参考实现：
+ -   参考实现：
         
  
-    -   适配昇腾 AI 处理器的实现：
+ -   适配昇腾 AI 处理器的实现：
     
         ```
         https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_for_TensorFlow
@@ -205,19 +205,19 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
     5. 执行训练脚本:
 
-       5.1 进行训练时，需要使用 `res50_32bs_1p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_1p_host.py`）， `mode` 默认设置为         `train`。
+       5.1 进行训练时，需要使用 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`）， `mode` 默认设置为         `train`。
 
             ```
             'mode':'train',                                         # "train","evaluate"
 
             ```
-       5.2 进行验证时，需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate`。
+       5.2 进行验证时，需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate`。
 
             ```
             'mode':'evaluate',                                         # "train","evaluate"
             ```
         
-       5.3 8P训练指令（脚本位于`testscript/Resnext50_1p_host.sh`）
+       5.3 单卡训练指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_1p_host.sh`）
             
             ```
             bash  Resnext50_1p_host.sh
@@ -261,19 +261,19 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
     5. 执行训练脚本:
 
-       5.1 进行训练时，需要使用 `res50_32bs_8p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_8p_host.py`）， `mode` 默认设置为         `train`。
+       5.1 进行训练时，需要使用 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`）， `mode` 默认设置为         `train`。
 
             ```
             'mode':'train',                                         # "train","evaluate"
             ```
        
-       5.2 进行验证时，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
+       5.2 进行验证时，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
 
             ```
             'mode':'evaluate',                                         # "train","evaluate"
             ```
         
-       5.3 8P训练指令（脚本位于`testscript/Resnext50_8p_host.sh`）
+       5.3 8P训练指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_8p_host.sh`）
             
             ```
             bash Resnext50_8p_host.sh
@@ -281,7 +281,21 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
 - 验证。
 
-    通过“模型训练”中的测试指令启动8P测试。在120 epoch训练执行完成后，脚本会自动执行验证流程。验证结果会输出到 ./result/cloud-localhost--0/0/resnet50_train/results/res50_32bs_8p目录中。 测试结束后会打印验证集的top1 accuracy和top5 accuracy。
+    1. 通过“模型训练”中的测试指令启动8P测试。
+
+        1.1 进行验证之前，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
+
+            ```
+            'mode':'evaluate',                                         # "train","evaluate"
+            ```
+        1.2 8P测试指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_8p_host.sh`）
+            
+            ```
+            bash Resnext50_8p_host.sh    
+
+    2. 在验证执行完成后，验证结果会输出到 ModelZoo_ResNext50_TF_MTI/result/cloud-localhost--0/0/resnet50_train/results/res50_32bs_8p目录中。 测试结束后会打印
+
+验证集的top1 accuracy和top5 accuracy。
 
 
 <h2 id="迁移学习指导.md">迁移学习指导</h2>
