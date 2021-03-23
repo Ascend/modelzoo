@@ -6,12 +6,12 @@
 - Tensorflow-1.15
 
 ## Datasets
-- [OULU-NPU](https://sites.google.com/site/oulunpudatabase/) 
+- OULU-NPU
 
 ## Installation
-- Clone FAS_ModelZoo_v4 repository. We'll call the directory that you cloned ReId_Eigen as $ROOT_PATH.
+- Clone depthsuperviseset repository. We'll call the directory that you cloned depthsupervisesenet_tf_hw80211537 as $ROOT_PATH.
     ```Shell
-  git clone --recursive https://github.com/liuajian/FAS_ModelZoo_v4.git
+  git clone --recursive https://gitee.com/liuajian/modelzoo/tree/master/contrib/TensorFlow/Research/cv/depthsuperviseset/depthsupervisesenet_tf_hw80211537
     ```
     
 ## Requirements
@@ -19,7 +19,7 @@
 - Obs: ajian3
 
 ## Usage
-- data_url: Oulu-Train
+- data_url: obs://ajian3/Oulu-Train/Oulu-Train
 - train_url: Jobs
 - Start training: python train_depth_yun.py
 - Start testing: python test_depth_yun.py
