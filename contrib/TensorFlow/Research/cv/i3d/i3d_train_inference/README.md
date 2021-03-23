@@ -22,7 +22,12 @@
 ### 1.创建数据列表文件
 源码通过遍历 `/data/ucf101/` 中的rgb.txt和flow.txt文件，查找磁盘上的 `rgb` 数据和 `flow` 数据，这里将 `rgb` 数据和 `flow` 数据放在了OBS桶中。
 
- **下载链接** 如下：[rgb](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/jepgs_256.zip) [flow](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/ucf101_tv1_flow.zip)。下载完成后，需要将两个文件放置在 `/data/` 目录下
+ **下载链接** 如下：[rgb](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/jepgs_256.zip) [flow](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/ucf101_tv1_flow.zip)。
+其备用数据下载链接为：UCF01 RGB：[part1](http://ftp.tugraz.at/pub/feichtenhofer/tsfusion/data/ucf101_jpegs_256.zip.001) 
+[part2](http://ftp.tugraz.at/pub/feichtenhofer/tsfusion/data/ucf101_jpegs_256.zip.002)[part3](http://ftp.tugraz.at/pub/feichtenhofer/tsfusion/data/ucf101_jpegs_256.zip.003)
+UCF01 FLOW：[part1](http://ftp.tugraz.at/pub/feichtenhofer/tsfusion/data/ucf101_tvl1_flow.zip.001) [part2](http://ftp.tugraz.at/pub/feichtenhofer/tsfusion/data/ucf101_tvl1_flow.zip.002) [part3](http://ftp.tugraz.at/pub/feichtenhofer/tsfusion/data/ucf101_tvl1_flow.zip.003)
+
+下载完成后，需要将两个文件放置在 `/data/` 目录下
 
 
 我们必须调整列表文件，以确保列表文件能够映射数据的正确路径。具体来说，对于rgb数据，必须更新 `/data/ucf101/rgb.txt`。该文件中的每一行应采用以下格式:
@@ -53,7 +58,9 @@ create_data_to_txt.py --rgb_path=../data/jpegs_256 --rgb_save_path=../data/rgb.t
 ### 2.下载预训练模型
 为了在ucf101上优化I3D网络，需要在下载DeepMind提供的Kinetics预训练I3D模型。为了方便，我们将预训练模型放在了OBS桶中，
 
-下载：[checkpoints](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/checkpoints.zip)  具体来说，下载`checkpoints` 并将其放在 `/data` 目录下:
+下载：[checkpoints](https://i3d-ucf101.obs.cn-north-4.myhuaweicloud.com/checkpoints.zip) 
+备用预训练模型下载链接为：链接: https://pan.baidu.com/s/15k-KNuEc0TpDlgqYBWXxbw  密码: q0jj
+具体来说，下载`checkpoints` 并将其放在 `/data` 目录下:
 
 ### 3. 外部库
 
@@ -73,12 +80,12 @@ python3.7 finetune_new_bn.py --dataset=ucf101 --mode=flow --split=2
 ### 5.推理
 
 #### 模型转换
-原始网络模型下载地址，链接: https://pan.baidu.com/s/1c7ByN0W6fKDSp3KvILqduQ  密码: 7jkb
+原始网络模型下载地址，链接: https://pan.baidu.com/s/1ih8QL1VGw7BXIcTzm59dLA  密码: 4ka8
 转换后的om模型下载地址为：
 使用ATC模型转换工具进行模型转换时可以参考的操作指令如下：
 
 ```
-/home/gx/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="input:1,1,224,224,3" --check_report=/home/gx/modelzoo/i3d_modelnew/device/network_analysis.report --input_format=NDHWC --output="/home/gx/modelzoo/i3d_modelnew/device/i3d_modelnew" --soc_version=Ascend310 --framework=3 --model="/home/gx/Downloads/i3d_modelnew.pb"
+/home/gx/Ascend/ascend-toolkit/20.1.rc1/atc/bin/atc --input_shape="input:1,251,224,224,3" --check_report=/home/gx/modelzoo/i3d_modelnew/device/network_analysis.report --input_format=NDHWC --output="/home/gx/modelzoo/i3d_modelnew/device/i3d_modelnew" --soc_version=Ascend310 --framework=3 --model="/home/gx/Downloads/i3d_modelnew.pb"
 ```
 #### 制作数据bin文件
 
@@ -87,13 +94,13 @@ python3.7 img_to_bin.py ucf101 rgb 1
 python3.7 img_to_bin.py ucf101 flow 2
 ```
 转换后的bin数据下载链接为：
-
+链接: https://pan.baidu.com/s/17LXq4oDc5C_Z1UkBA4MGEw  密码: 7f45
 
 #### 使用msame进行推理
 
 ```
-./msame --model /home/HwHiAiUser/i3d /model/i3d_model/device/i3d_model.om --input /home/HwHiAiUser/i3d/data/rgb/ --output /home/HwHiAiUser/i3d/out/outputrgb
-./msame --model /home/HwHiAiUser/i3d /model/i3d_model/device/i3d_model.om --input /home/HwHiAiUser/i3d/data/flow/ --output /home/HwHiAiUser/i3d/out/outputflow
+./msame --model /home/HwHiAiUser/i3d /model/i3d_model/device/i3d_infer_rgb_model.om --input /home/HwHiAiUser/i3d/data/rgb/ --output /home/HwHiAiUser/i3d/out/outputrgb
+./msame --model /home/HwHiAiUser/i3d /model/i3d_model/device/i3d_infer_flow_model.om --input /home/HwHiAiUser/i3d/data/flow/ --output /home/HwHiAiUser/i3d/out/outputflow
 
 ```
 
@@ -101,7 +108,7 @@ python3.7 img_to_bin.py ucf101 flow 2
 
 
 ```
-python3.7 com_acc.py
+python3.7 infer_acc.py
 ```
 
 
@@ -112,9 +119,9 @@ python3.7 com_acc.py
 |----------------|-----|------|--------|
 |     Split1     |94.7%|96.3% | 97.6%  |
 
-目前结果（待完善）：
+结果：
 
 | Training Split | rgb | flow | fusion |
 |----------------|-----|------|--------|
-|     Split1     |96.2%|96.5% |        |
+|     Split1     |96.2%|96.5% |  XXX   |
 
