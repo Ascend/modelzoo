@@ -6,28 +6,28 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：_huawei_**
+**发布者（Publisher）：huawei**
 
-**应用领域（Application Domain）：_NLP_**
+**应用领域（Application Domain）：NLP**
 
-**版本（Version）：_1.1_**
+**版本（Version）：1.1**
 
-**修改时间（Modified） ：_2020.10.14_**
+**修改时间（Modified） ：2020.10.14**
 
-_**大小（Size）**_**：**_2457.6M_
+**大小（Size）：2457.6M**
 
 
-**框架（Framework）：_TensorFlow 1.15.0_**
+**框架（Framework）：TensorFlow 1.15.0**
 
-**模型格式（Model Format）：_ckpt_**
+**模型格式（Model Format）：ckpt**
 
-**精度（Precision）：_Mixed_**
+**精度（Precision）：Mixed**
 
-**处理器（Processor）：_昇腾910_**
+**处理器（Processor）：昇腾910**
 
-**应用级别（Categories）：_Official_**
+**应用级别（Categories）：Official**
 
-**描述（Description）：_基于TensorFlow框架的Transformer代码_**
+**描述（Description）：基于TensorFlow框架的Transformer代码**
 
 <h2 id="概述.md">概述</h2>
 
@@ -37,40 +37,38 @@ Transformer是一个能够高效并行训练的序列到序列模型，该模型
 
        [Ashish Vaswani, Noam Shazeer, Niki Parmar, JakobUszkoreit, Llion Jones, Aidan N Gomez, Ł ukaszKaiser, and Illia Polosukhin. 2017. Attention is all you need. In NIPS 2017, pages 5998–6008.](https://arxiv.org/abs/1706.03762)
 
-    -   参考实现：
-
-        ```
-        无
-        ```
+   -   参考实现：
 
 
-    -   适配昇腾 AI 处理器的实现：
+   -   适配昇腾 AI 处理器的实现：
     
         ```
-        无
+        https://gitee.com/zhou-biao-biao/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow/
+        branch=master
+        commit_id= 477b07a1e95a35885b3a9a569b1c8ccb9ad5d7af
         ```
 
 
-    通过Git获取对应commit\_id的代码方法如下：
+   -   通过Git获取对应commit\_id的代码方法如下：
     
-    ```
-    git clone {repository_url}    # 克隆仓库的代码
-    cd {repository_name}    # 切换到模型的代码仓目录
-    git checkout  {branch}    # 切换到对应分支
-    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    ```
+        ```
+        git clone {repository_url}    # 克隆仓库的代码
+        cd {repository_name}    # 切换到模型的代码仓目录
+        git checkout  {branch}    # 切换到对应分支
+        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+        ```
 
 ## 默认配置<a name="section91661242121611"></a>
 
--   _网络结构_
+-   网络结构
     - 6层，隐层大小1024，残差和层归一化使用Pre-norm方式。
 
     - 使用方差缩放（Variance Scaling）的均匀分布进行参数初始化。
 
     - bias和层归一化的beta初始化为0，层归一化的gamma初始化为1。
 
--   _训练数据集预处理（当前代码以wmt16 en-de训练集为例，仅作为用户参考示例）_
+-   训练数据集预处理（当前代码以wmt16 en-de训练集为例，仅作为用户参考示例）
 
     - Transformer采用翻译文本输入，padding到最大长度128；
 
@@ -114,12 +112,12 @@ run_config = NPURunConfig(
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-1.  _硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
-2.  _宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。_
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
-    _当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。_
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
-    **表 1** _镜像列表_
+    **表 1** 镜像列表
 
     <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
     <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
@@ -160,97 +158,99 @@ run_config = NPURunConfig(
 4. 将数据转成tfrecord格式，命令如下：
     
 
-```
-paste train.tok.clean.bpe.32000.en train.tok.clean.bpe.32000.de > train.all 
-
-python create_training_data_concat.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/train.l128.tfrecord --max_seq_length 128
-```
-
+    ```
+    paste train.tok.clean.bpe.32000.en train.tok.clean.bpe.32000.de > train.all 
+    
+    python3 create_training_data_concat.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/train.l128.tfrecord --max_seq_length 128
+    ```
+    说明：配置`--output_file` 参数，请用户根据实际路径进行配置；
 ## 模型训练<a name="section715881518135"></a>
 
-1.  下载训练脚本。（单击“立即下载”，并选择合适的下载方式下载源码包。）
+- 下载训练脚本。（单击“立即下载”，并选择合适的下载方式下载源码包。）
 
-2.  开始训练。
+- 开始训练。
 
-    启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息示例内容如下。
-    当版本为Atlas Data Center Solution V100R020C00时，请使用以下环境变量：
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
+
+       环境变量配置信息参见：
+
+          [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+    2. 配置configs/transformer_big.yml中的网络参数，请用户根据自己需求进行配置；
     
-```
-#!/bin/bash \
-    export install_path=/usr/local/Ascend \
-    export PATH=${install_path}/nnae/latest/fwkacllib/ccec_compiler/bin:${PATH} \
-    export ASCEND_OPP_PATH=${install_path}/nnae/latest/opp \
-    export PYTHONPATH=$PYTHONPATH:${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbe:${install_path}/tfplugin/latest/tfplugin/python/site-packages/:${install_path}/nnae/latest/fwkacllib/python/site-packages/hccl:${install_path}/nnae/latest/fwkacllib/python/site-packages/te:${install_path}/nnae/latest/fwkacllib/python/site-packages/topi
-    export LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib/:${install_path}/nnae/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons
+    3. 配置train-ende.sh中`DATA_PATH`训练参数（脚本位于Transformer_for_TensorFlow目录下），请用户根据实际数据集路径进行配置，确保`DATA_PATH`下存在已准备的数据集，如下所示（仅供参考）：
+               
+        ```
+                DATA_PATH="../wmt-ende"
+                VOCAB_SOURCE=${DATA_PATH}/vocab.share
+                VOCAB_TARGET=${DATA_PATH}/vocab.share
+                TRAIN_FILES=${DATA_PATH}/concat128/train.l128.tfrecord-001-of-016
+                for idx in {002..016}; do
+                  TRAIN_FILES="${TRAIN_FILES},${DATA_PATH}/concat128/train.l128.tfrecord-${idx}-of-016"
+                done
+                DEV_SOURCES=${DATA_PATH}/dev2010.tok.zh
+                DEV_TARGETS=${DATA_PATH}/dev2010.tok.en
+        ```
+
+            
+    4.  单卡训练。
+
+        单卡训练指令如下（脚本位于Transformer_for_TensorFlow/transformer_1p目录下）：
+
+        ```
+            bash transformer_1p/transformer_main_1p.sh
+        ```
+
+
+    5.  8卡训练。
+        
+        8卡训练指令如下（脚本位于Transformer_for_TensorFlow/transformer_8p目录下）：
+        ```
+            bash transformer_8p/transformer_8p.sh 
+        ```
+
+
+-  开始推理。
+
+    1. 配置inference.sh中的参数，'DATA_PATH', 'TEST_SOURCES', 'MODEL_DIR' 和'output'请用户设置为自己的路径；
+        
+        
+        ```
+        DATA_PATH="../wmt-ende"
+        TEST_SOURCES="${DATA_PATH}/tfrecord/newstest2014.l128.tfrecord"
+        MODEL_DIR="file://PATH_TO_BE_CONFIGURED"
+        .    .    .
+        output: ./output-0603
+        ```
+
+    2. 推理生成翻译结果，该脚本生成的为词id的表现形式；
+
+        bash inference.sh
+
+    3. 生成翻译结果的文本形式。
+
+        REF_DATA：newstest2014.tok.de
+
+        EVAL_OUTPUT：inference.sh的生成的output文件
+
+        VOCAB_FILE：vocab.share
+
+        bash scripts/process_output.sh REF_DATA EVAL_OUTPUT VOCAB_FILE
+
+        例如：
+
+        bash scripts/process_output.sh /data/wmt-ende/newstest2014.tok.de output-0603 /data/wmt-ende/vocab.share
+
+    4. 测试BLEU值。
+
+        4.1 multi-bleu.perl脚本可以通过 [perl script](https://githup.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl) 下载；
     
-    当版本为Atlas Data Center Solution V100R020C10时，请使用以下环境变量：
-    export install_path=/usr/local/Ascend/nnae/latest
-    # driver包依赖
-    export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver:$LD_LIBRARY_PATH #仅容器训练场景配置
-    export LD_LIBRARY_PATH=/usr/local/Ascend/add-ons:$LD_LIBRARY_PATH
-    #fwkacllib 包依赖
-    export LD_LIBRARY_PATH=${install_path}/fwkacllib/lib64:$LD_LIBRARY_PATH
-    export 
-    PYTHONPATH=${install_path}/fwkacllib/python/site-packages:${install_path}/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:${install_path}/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
-    export
-    PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:$PATH
-    #tfplugin 包依赖
-    export PYTHONPATH=/usr/local/Ascend/tfplugin/latest/tfplugin/python/site-packages:$PYTHONPATH
-    # opp包依赖export ASCEND_OPP_PATH=${install_path}/opp
-``` 
-3.  配置configs/transformer_big.yml中的网络参数，配置train-ende.sh中训练参数；
-    
-   
-    
-4.  单卡训练。
+        4.2 执行指令：
 
-```
+            perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
 
-    cd transformer_1p
+            例如：
 
-    bash transformer_main_1p.sh
-```
-
-
-5.  8卡训练。
-
-    
-```
-    cd transformer_8p/ 
-
-    bash transformer_8p.sh 
-```
-
-
-6.  开始推理。
-
-    配置inference.sh中的参数，'DATA_PATH', 'TEST_SOURCES', 'MODEL_DIR' 和'output'设置为自己的路径；
-
-    推理生成翻译结果，该脚本生成的为词id的表现形式；
-
-    bash inference.sh
-
-7.  生成翻译结果的文本形式。
-
-    REF_DATA：newstest2014.tok.de
-
-    EVAL_OUTPUT：inference.sh的生成的output文件
-
-    VOCAB_FILE：vocab.share
-
-    `bash scripts/process_output.sh REF_DATA EVAL_OUTPUT VOCAB_FILE`
-
-    例如：
-
-    bash scripts/process_output.sh /data/wmt-ende/newstest2014.tok.de output-0603 /data/wmt-ende/vocab.share
-
-8. 测试BLEU值。
-
-    multi-bleu.perl脚本可以通过 [perl script](https://githup.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl) 下载；
-    
-    ` perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu`
-
-    例如：perl multi-bleu.perl /data/wmt-ende/newstest2014.tok.de.forbleu < output-0603.forbleu
+            perl multi-bleu.perl /data/wmt-ende/newstest2014.tok.de.forbleu < output-0603.forbleu
 
 <h2 id="高级参考.md">高级参考</h2>
 

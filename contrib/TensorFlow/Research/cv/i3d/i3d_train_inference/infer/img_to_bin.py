@@ -109,11 +109,7 @@ def main(dataset, mode, split):
     true_count = 0
     video_size = len(test_info_rgb)
     print('video_size:', video_size)
-#     error_record = open(os.path.join(
-#         log_dir, 'error_record_'+mode+'.txt'), 'w')
-#     rgb_fc_data = np.zeros((video_size, _CLASS_NUM[dataset]))
-#     flow_fc_data = np.zeros((video_size, _CLASS_NUM[dataset]))
-#     label_data = np.zeros((video_size, 1))
+
 
     # just load 1 video for test,this place needs to be improved
     for i in range(video_size):
@@ -136,8 +132,6 @@ def main(dataset, mode, split):
 
         input_label = np.array([label]).reshape(-1)
         print('input_label.shape:', input_label.shape)
-#        print('input_rgb.shape:', input_rgb.shape)
-#        print('input_flow.shape:', input_flow.shape)
         if mode in ['flow', 'mixed']:
             video_name = flow_data.videos[i].name
             input_label.tofile('../data/label/' + video_name + '.bin')
