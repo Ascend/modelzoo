@@ -1,0 +1,79 @@
+algorithm:
+  name: "ResNet50"
+  framework: "tensorflow"
+  description: "基于tensorflow的resnet50分类模型"
+train:
+  on_common_platform:
+    entry: "on_platform/modelarts/train_start.py"
+    comm_para:
+      input_path:
+        - name: "data_url"
+          type: "string"
+          desc: "数据集路径"
+      output_path:
+        - name: "train_url"
+          type: "string"
+          desc: "模型文件路径"
+    custom_para:
+      - name: "max_train_steps"
+        type: "int"
+        default: 1000
+        required: true
+        desc: "最大训练步数"
+        editable: true
+      - name: "batch_size"
+        type: "int"
+        default: 256
+        required: true
+        desc: "一次训练所抓取的数据样本数量"
+      - name: "num_epochs"
+        type: int
+        default: 0
+        required: true
+        desc: "训练轮数，设置非0值后max_train_steps参数失效"
+      - name: "learning_rate_maximum"
+        type: int
+        default: 0.1
+        required: true
+        desc: "初始学习率"
+      - name: "num_classes"
+        type: int
+        default: 1001
+        required: true
+        desc: "数据集类别数（迁移学习需要，正常训练设置为1001）"
+      - name: "restore_path"
+        type: string
+        default: "/cache/model.ckpt-56300"
+        required: true
+        desc: "迁移学习时指定预训练模型路径（迁移学习需要，正常训练不需要上传预训练模型）"
+convert:
+  entry: "atc"
+  parameters:
+    # 用户必须输入
+    - name: "model"
+      required: true
+      desc: "原始模型PB文件路径与文件名"
+    - name: "framework"
+      required: true
+      default: 3
+      desc: "训练框架"
+    - name: "output"
+      required: true
+      default: "resnet50_aipp"
+      desc: "OM模型输出路径"
+    - name: "soc_version"
+      required: true
+      default: "Ascend310"
+      desc: "模型转换时指定芯片版本"
+    - name: "input_shape"
+      required: true
+      default: "Placeholder:1,224,224,3"
+      desc: "模型输入数据的shape"
+    - name: "log"
+      required: true
+      default: "info"
+      desc: "日志显示级别"
+    # 用户必须输入
+    - name: "insert_op_conf"
+      required: true
+      desc: "aipp配置文件"

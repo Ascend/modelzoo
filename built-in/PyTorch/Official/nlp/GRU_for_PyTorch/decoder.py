@@ -20,7 +20,7 @@ class Decoder(nn.Module):
         input = input.unsqueeze(0)
         embedded = self.embedding(input)
         if self.training:
-            embedded, _, _ = torch.dropoutV2(embedded, self.seed, p=self.prob)
+            embedded, _, _ = torch.npu_dropoutV2(embedded, self.seed, p=self.prob)
 
         emb_con = torch.cat((embedded, context), dim=2)
         output, hidden = self.rnn(emb_con, hidden)

@@ -21,6 +21,7 @@ export PTCOPY_ENABLE=1
 export TASK_QUEUE_ENABLE=1
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export DYNAMIC_OP="ADD#MUL"
+export COMBINED_ENABLE=1
 source env_new.sh
 /usr/local/Ascend/driver/tools/msnpureport -g error -d 0
 /usr/local/Ascend/driver/tools/msnpureport -g error -d 4

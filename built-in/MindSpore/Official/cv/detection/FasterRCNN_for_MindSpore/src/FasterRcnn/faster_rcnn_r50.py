@@ -85,7 +85,9 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         # Fpn
         self.fpn_ncek = FeatPyramidNeck(config.fpn_in_channels,
                                         config.fpn_out_channels,
-                                        config.fpn_num_outs)
+                                        config.fpn_num_outs,
+                                        config.img_height,
+                                        config.img_width)
 
         # Rpn and rpn loss
         self.gt_labels_stage1 = Tensor(np.ones((self.train_batch_size, config.num_gts)).astype(np.uint8))
@@ -111,7 +113,7 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         # Assign and sampler stage two
         self.bbox_assigner_sampler_for_rcnn = BboxAssignSampleForRcnn(config, self.train_batch_size,
                                                                       config.num_bboxes_stage2, True)
-        self.decode = P.BoundingBoxDecode(max_shape=(768, 1280), means=self.target_means, \
+        self.decode = P.BoundingBoxDecode(max_shape=(config.img_height, config.img_width), means=self.target_means, \
                                           stds=self.target_stds)
 
         # Roi
@@ -157,7 +159,7 @@ class Faster_Rcnn_Resnet50(nn.Cell):
 
         self.rpn_max_num = config.rpn_max_num
 
-        self.zeros_for_nms = Tensor(np.zeros((self.rpn_max_num, 3)).astype(np.float16))
+        self.zeros_for_nms = Tensor(np.zeros((self.rpn_max_num, 3)).astype(np.float32))
         self.ones_mask = np.ones((self.rpn_max_num, 1)).astype(np.bool)
         self.zeros_mask = np.zeros((self.rpn_max_num, 1)).astype(np.bool)
         self.bbox_mask = Tensor(np.concatenate((self.ones_mask, self.zeros_mask,
@@ -165,10 +167,10 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         self.nms_pad_mask = Tensor(np.concatenate((self.ones_mask, self.ones_mask,
                                                    self.ones_mask, self.ones_mask, self.zeros_mask), axis=1))
 
-        self.test_score_thresh = Tensor(np.ones((self.rpn_max_num, 1)).astype(np.float16) * config.test_score_thr)
-        self.test_score_zeros = Tensor(np.ones((self.rpn_max_num, 1)).astype(np.float16) * 0)
-        self.test_box_zeros = Tensor(np.ones((self.rpn_max_num, 4)).astype(np.float16) * -1)
-        self.test_iou_thr = Tensor(np.ones((self.rpn_max_num, 1)).astype(np.float16) * config.test_iou_thr)
+        self.test_score_thresh = Tensor(np.ones((self.rpn_max_num, 1)).astype(np.float32) * config.test_score_thr)
+        self.test_score_zeros = Tensor(np.ones((self.rpn_max_num, 1)).astype(np.float32) * 0)
+        self.test_box_zeros = Tensor(np.ones((self.rpn_max_num, 4)).astype(np.float32) * -1)
+        self.test_iou_thr = Tensor(np.ones((self.rpn_max_num, 1)).astype(np.float32) * config.test_iou_thr)
         self.test_max_per_img = config.test_max_per_img
         self.nms_test = P.NMSWithMask(config.test_iou_thr)
         self.softmax = P.Softmax(axis=1)
@@ -183,9 +185,9 @@ class Faster_Rcnn_Resnet50(nn.Cell):
 
         # Init tensor
         roi_align_index = [np.array(np.ones((config.num_expected_pos_stage2 + config.num_expected_neg_stage2, 1)) * i,
-                                    dtype=np.float16) for i in range(self.train_batch_size)]
+                                    dtype=np.float32) for i in range(self.train_batch_size)]
 
-        roi_align_index_test = [np.array(np.ones((config.rpn_max_num, 1)) * i, dtype=np.float16) \
+        roi_align_index_test = [np.array(np.ones((config.rpn_max_num, 1)) * i, dtype=np.float32) \
                                 for i in range(self.test_batch_size)]
 
         self.roi_align_index_tensor = Tensor(np.concatenate(roi_align_index))
@@ -276,7 +278,7 @@ class Faster_Rcnn_Resnet50(nn.Cell):
                                             self.cast(x[3], mstype.float32))
 
 
-        roi_feats = self.cast(roi_feats, mstype.float16)
+        roi_feats = self.cast(roi_feats, mstype.float32)
         rcnn_masks = self.concat(mask_tuple)
         rcnn_masks = F.stop_gradient(rcnn_masks)
         rcnn_mask_squeeze = self.squeeze(self.cast(rcnn_masks, mstype.bool_))
@@ -289,11 +291,11 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         if self.training:
             output += (rpn_loss, rcnn_loss, rpn_cls_loss, rpn_reg_loss, rcnn_cls_loss, rcnn_reg_loss)
         else:
-            output = self.get_det_bboxes(rcnn_cls_loss, rcnn_reg_loss, rcnn_masks, bboxes_all, img_metas)
+            output = self.get_det_bboxes(rcnn_cls_loss, rcnn_reg_loss, rcnn_masks, bboxes_all)
 
         return output
 
-    def get_det_bboxes(self, cls_logits, reg_logits, mask_logits, rois, img_metas):
+    def get_det_bboxes(self, cls_logits, reg_logits, mask_logits, rois):
         """Get the actual detection box."""
         scores = self.softmax(cls_logits)
 
@@ -304,20 +306,16 @@ class Faster_Rcnn_Resnet50(nn.Cell):
             out_boxes_i = self.decode(rois, reg_logits_i)
             boxes_all += (out_boxes_i,)
 
-        img_metas_all = self.split(img_metas)
         scores_all = self.split(scores)
         mask_all = self.split(self.cast(mask_logits, mstype.int32))
 
         boxes_all_with_batchsize = ()
         for i in range(self.test_batch_size):
-            scale = self.split_shape(self.squeeze(img_metas_all[i]))
-            scale_h = scale[2]
-            scale_w = scale[3]
             boxes_tuple = ()
             for j in range(self.num_classes):
                 boxes_tmp = self.split(boxes_all[j])
-                out_boxes_h = boxes_tmp[i] / scale_h
-                out_boxes_w = boxes_tmp[i] / scale_w
+                out_boxes_h = boxes_tmp[i]
+                out_boxes_w = boxes_tmp[i]
                 boxes_tuple += (self.select(self.bbox_mask, out_boxes_w, out_boxes_h),)
             boxes_all_with_batchsize += (boxes_tuple,)
 
@@ -420,6 +418,16 @@ class Faster_Rcnn_Resnet50(nn.Cell):
         for i in range(num_levels):
             anchors = self.anchor_generators[i].grid_anchors(
                 featmap_sizes[i], self.anchor_strides[i])
-            multi_level_anchors += (Tensor(anchors.astype(np.float16)),)
+            multi_level_anchors += (Tensor(anchors.astype(np.float32)),)
 
         return multi_level_anchors
+
+class FasterRcnn_Infer(nn.Cell):
+    def __init__(self, config):
+        super(FasterRcnn_Infer, self).__init__()
+        self.network = Faster_Rcnn_Resnet50(config)
+        self.network.set_train(False)
+
+    def construct(self, img_data):
+        output = self.network(img_data, None, None, None, None)
+        return output

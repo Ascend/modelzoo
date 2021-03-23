@@ -105,8 +105,8 @@ def anchor_target_layer(rpn_cls_score, gt_boxes, bbox_pred, im_shape=INPUTS_SHAP
        mask_fg = tf.logical_or(mask_fg_1_b, mask_fg)
        
        mask_bg = tf.less_equal(max_overlap, cfg.RPN_NEGATIVE_OVERLAP)
-       mask_bg_2 = tf.greater(max_overlap, 0)
-       mask_bg = tf.logical_and(mask_bg, mask_bg_2)
+       #mask_bg_2 = tf.greater(max_overlap, 0)
+       #mask_bg = tf.logical_and(mask_bg, mask_bg_2)
 
        num_fg = int(cfg.RPN_FG_FRACTION * cfg.RPN_BATCHSIZE)
        num_bg = cfg.RPN_BATCHSIZE - num_fg

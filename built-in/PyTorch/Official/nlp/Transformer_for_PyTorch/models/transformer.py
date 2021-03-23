@@ -185,7 +185,7 @@ class TransformerEncoder(nn.Module):
         if self.embed_positions is not None:
             x += self.embed_positions(src_tokens)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.dropout)
 
         # B:batch size ; T: seq length ; C: embedding dim 512
         # B x T x C -> T x B x C
@@ -267,7 +267,7 @@ class TransformerDecoder(IncrementalDecoder):
         if positions is not None:
             x += positions
         if self.training:
-            x,_,_ = torch.dropoutV2(x, self.seed, p=self.dropout)
+            x,_,_ = torch.npu_dropoutV2(x, self.seed, p=self.dropout)
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
@@ -320,17 +320,17 @@ class TransformerEncoderLayer(nn.Module):
                               need_weights=False,
                               static_kv=False)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.ln1(x)
 
         residual = x
         x = F.threshold(self.fc1(x), 0.0, 0.0)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.relu_dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.relu_dropout)
         x = self.fc2(x)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p =self.dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p =self.dropout)
         x = residual + x
         x = self.ln2(x)
         return x
@@ -384,7 +384,7 @@ class TransformerDecoderLayer(nn.Module):
         )
 
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.self_attn_layer_norm(x)
 
@@ -403,7 +403,7 @@ class TransformerDecoderLayer(nn.Module):
                 need_weights=(not self.training and self.need_attn),
             )
             if self.training:
-                x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
+                x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.dropout)
             x = residual + x
 
             x = self.encoder_attn_layer_norm(x)
@@ -411,10 +411,10 @@ class TransformerDecoderLayer(nn.Module):
         residual = x
         x = F.threshold(self.fc1(x), 0.0, 0.0)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.relu_dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.relu_dropout)
         x = self.fc2(x)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.dropout)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.dropout)
         x = residual + x
         x = self.layer_norm(x)
         return x, attn

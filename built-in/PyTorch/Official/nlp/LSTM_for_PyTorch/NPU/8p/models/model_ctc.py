@@ -48,15 +48,15 @@ class BatchRNN(nn.Module):
             x = x.transpose(-1, -2)
             x = self.batch_norm(x)
             x = x.transpose(-1, -2)
+            
         x_post, _ = self.rnn(x)
-        x_reverse = torch.flip(torch.unsqueeze(x, 0), [1])
-        x_reverse, _ = self.rnn_w(torch.squeeze(x_reverse, 0))
-        x_reverse = torch.flip(torch.unsqueeze(x_reverse, 0), [1])
-        x_reverse = torch.squeeze(x_reverse, 0)
-        x_reverse = x_reverse.mul(1.0)
+        x_reverse = torch.flip(x, [0])
+        x_reverse, _ = self.rnn_w(x_reverse)
+        x_reverse = torch.flip(x_reverse, [0]) 
         x = torch.cat((x_post, x_reverse), 2)
+
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.prob)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.prob)
         
         return x
 
@@ -94,7 +94,7 @@ class LayerCNN(nn.Module):
         if self.pooling is not None:
             x = self.pooling(x)
         if self.training:
-            x, _, _ = torch.dropoutV2(x, self.seed, p=self.prob)
+            x, _, _ = torch.npu_dropoutV2(x, self.seed, p=self.prob)
 
         return x
 
