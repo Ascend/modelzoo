@@ -125,7 +125,7 @@ bigru
 
 ## 五、下载
 
-提供训练好的checkpoint (model.ckpt-263002，BLEU值为26.7624)，请放到 train/ 路径下：
+提供训练好的checkpoint (model.ckpt-545000，BLEU值为27.2491)，请放到 train/ 路径下：
 
 百度云：[链接](https://pan.baidu.com/s/1QUupKKZa9RgeGTzsGteVGA)
 
@@ -141,7 +141,7 @@ bigru
 - GPU：0.454 sec/step，和动态shape版本的最长序列单步耗时0.46 sec/step相当
 - NPU：2.355 sec/step 2020.12.15（2020.12.27降低为1.355 sec/step）
 
-训练需要运行30w step，这代表在NPU上需要训练约合9天时间（2020.12.27降低为约合5天）。
+训练需要运行50w step，这代表在NPU上需要训练约合9天时间（2020.12.27降低为约合5天）。
 
 ## 七、精度
 
@@ -149,7 +149,7 @@ bigru
 
 |             | original-GPU | dynamic-GPU | static-GPU | static-NPU |
 | ----------- | ------------ | ----------- | ---------- | ---------- |
-| beam_size=1 | -            | 26.76       | 27.20      | 27.20      |
+| beam_size=1 | -            | 26.76       | 27.20      | 27.25      |
 | beam_size=4 | -            | 27.54       | -          | -          |
 | unknown     | 28.53        | -           | -          | -          |
 
@@ -179,7 +179,7 @@ vi thumt/bin/ckpt2pb.py +301
 
 ```python
             ...
-            ckpt_path = "bi-gru/train/model.ckpt-545000"# 263002改成所要测试的ckpt名字
+            ckpt_path = "bi-gru/train/model.ckpt-545000"# 545000改成所要测试的ckpt名字
             with tf.Session() as sess:
             ...
 ```
