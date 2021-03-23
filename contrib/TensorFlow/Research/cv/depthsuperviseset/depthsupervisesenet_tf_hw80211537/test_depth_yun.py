@@ -12,7 +12,7 @@ import util.utils as utils
 from util.dataset import Dataset
 import numpy as np
 
-import moxing as mox
+# import moxing as mox
 import npu_bridge
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 config = tf.compat.v1.ConfigProto()
@@ -43,10 +43,10 @@ def main(args):
     model_dir = os.path.join(args.train_url, 'models', args.protocol, subdir)
     outputs_dir = os.path.join(args.train_url, 'outputs', subdir)
     scores_dir = os.path.join(args.train_url, 'scores', args.protocol, subdir)
-    mox.file.copy_parallel(os.path.join('obs://ajian3/Jobs', 'models', args.protocol, subdir), model_dir)
-    mox.file.copy_parallel(os.path.join('obs://ajian3/Jobs', 'outputs', subdir), outputs_dir)
-    mox.file.copy_parallel(os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir), scores_dir)
-    print("OBS2yun data successfully")
+    # mox.file.copy_parallel(os.path.join('obs://ajian3/Jobs', 'models', args.protocol, subdir), model_dir)
+    # mox.file.copy_parallel(os.path.join('obs://ajian3/Jobs', 'outputs', subdir), outputs_dir)
+    # mox.file.copy_parallel(os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir), scores_dir)
+    # print("OBS2yun data successfully")
 
     ### Load data from different domain ###
     dev_data = utils.load_oulu_npu(args.data_url, protocol=args.protocol, mode=args.phases[1])
@@ -148,9 +148,9 @@ def main(args):
                 min_value = evaluate_metric(iter_now, min_value)
                 iter_before = iter_now
                 print('end one iteration!')
-                mox.file.copy_parallel(outputs_dir, os.path.join('obs://ajian3/Jobs', 'outputs', subdir))
-                mox.file.copy_parallel(scores_dir,  os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir))
-                print("yun2OBS data successfully")
+                # mox.file.copy_parallel(outputs_dir, os.path.join('obs://ajian3/Jobs', 'outputs', subdir))
+                # mox.file.copy_parallel(scores_dir,  os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir))
+                # print("yun2OBS data successfully")
 
     print('Start Testing')
     start_iteration = 0

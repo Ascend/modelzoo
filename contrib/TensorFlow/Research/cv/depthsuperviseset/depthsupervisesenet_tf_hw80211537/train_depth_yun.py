@@ -12,7 +12,7 @@ import util.utils as utils
 from util.dataset import Dataset
 import numpy as np
 
-import moxing as mox
+# import moxing as mox
 import npu_bridge
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 config = tf.compat.v1.ConfigProto()
@@ -99,10 +99,10 @@ def main(args):
                 model_list, train_op, outputs_dir, args.phases[0], fid_train)
             ### Save model ###
             utils.save_variables_and_metagraph(sess, saver, model_dir, subdir, epoch)
-            mox.file.copy_parallel(model_dir,   os.path.join('obs://ajian3/Jobs', 'models', args.protocol, subdir))
-            mox.file.copy_parallel(outputs_dir, os.path.join('obs://ajian3/Jobs', 'outputs', subdir))
-            mox.file.copy_parallel(scores_dir,  os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir))
-            print("copy data successfully")
+            # mox.file.copy_parallel(model_dir,   os.path.join('obs://ajian3/Jobs', 'models', args.protocol, subdir))
+            # mox.file.copy_parallel(outputs_dir, os.path.join('obs://ajian3/Jobs', 'outputs', subdir))
+            # mox.file.copy_parallel(scores_dir,  os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir))
+            # print("copy data successfully")
         ### End sess ###
         fid_train.close()
         sess.close()
