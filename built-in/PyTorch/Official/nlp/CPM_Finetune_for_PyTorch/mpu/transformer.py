@@ -98,7 +98,6 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
             get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
             checkpoint = deepspeed.checkpointing.checkpoint
 
-
     def _transpose_for_scores_key(self, tensor):
         """Transpose a 3D tensor [b, s, np*hn] into a 4D tensor with
         size [b, np, s, hn].
@@ -115,8 +114,6 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
         new_tensor_shape = tensor.size()[:-1] + \
                            (self.num_attention_heads_per_partition,
                             self.hidden_size_per_attention_head)
-        # tensor = tensor.view(*new_tensor_shape)
-        # return tensor.permute(0, 2, 1, 3)
         return tensor.npu_confusion_transpose((0, 2, 1, 3), [*new_tensor_shape], False)
 
     def forward(self, hidden_states, ltor_mask):
@@ -160,7 +157,6 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
         # Output. [b, s, h]
         output = self.dense(context_layer)
         output = self.output_dropout(output)
-
         return output
 
 
