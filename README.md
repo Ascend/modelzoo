@@ -94,6 +94,11 @@ Thank You!
 	- [LSTM_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/LSTM_for_PyTorch)
 	- [Transformer_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/Transformer_for_PyTorch)
  
+     -Research
+	
+	- [VGG16_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/contrib/PyTorch/Research/cv/image_classification/Vgg16)
+	- [VGG19_for_PyTorch](https://gitee.com/ascend/modelzoo/tree/master/contrib/PyTorch/Research/cv/image_classification/Vgg19)
+
 - MindSpore
 	
 	 -Benchmark

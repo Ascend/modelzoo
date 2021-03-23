@@ -93,7 +93,8 @@ chmod +x build_device.sh
 ### 预处理脚本
 
 ```
-./pre_treatment/prerun_jasper_infer_input_fp32.sh
+cd pre_treatment
+./prerun_jasper_infer_input_fp32.sh
 
 --datasets_folder  预处理数据集路径，默认值为./datasets
 --output_folder	   预处理的输出路径，默认值为./datasets/jasper
@@ -114,6 +115,7 @@ json脚本中，涉及om_path_list，dir_path_list，result_path_list，json文�
 ### 后处理脚本
 
 ```
+cd post_treatment
 ./jasper_accuracy_calc_fp32.sh
 
 --inferRet_folder	推理输出的结果文件路径，默认值为：./model1_dev_0_chn_0_result/jasper/

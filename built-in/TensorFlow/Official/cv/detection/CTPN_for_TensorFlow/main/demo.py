@@ -18,6 +18,8 @@ tf.app.flags.DEFINE_string('output_path', 'data/res/', '')
 tf.app.flags.DEFINE_string('dataset', 'ic13', '')
 tf.app.flags.DEFINE_string('gpu', '0', '')
 tf.app.flags.DEFINE_string('checkpoint_path', 'checkpoints_mlt/', '')
+tf.app.flags.DEFINE_integer('inputs_height',600,'')
+tf.app.flags.DEFINE_integer('inputs_width',900,'')
 FLAGS = tf.app.flags.FLAGS
 
 
@@ -31,6 +33,7 @@ def get_images():
                     files.append(os.path.join(parent, filename))
                     break
     print('Find {} images'.format(len(files)))
+    files.sort()
     return files
 
 
@@ -110,13 +113,6 @@ def main(argv=None):
                 img = cv2.resize(img, None, None, fx=1.0 / rh, fy=1.0 / rw, interpolation=cv2.INTER_LINEAR)
                 cv2.imwrite(os.path.join(FLAGS.output_path, os.path.basename(im_fn)), img[:, :, ::-1])
 
-                with open(os.path.join(FLAGS.output_path, os.path.splitext(os.path.basename(im_fn))[0]) + ".txt",
-                          "w") as f:
-                    for i, box in enumerate(boxes):
-                        line = ",".join(str(box[k]) for k in range(8))
-                        line += "," + str(scores[i]) + "\r\n"
-                        f.writelines(line)
-
                 # only four coordinates needed for evaluation of ic13 dataset
                 if FLAGS.dataset=="ic13":
                     with open(os.path.join(FLAGS.output_path, "res_"+os.path.splitext(os.path.basename(im_fn))[0]) + ".txt",
@@ -129,7 +125,6 @@ def main(argv=None):
                             line = ",".join(str(box[k]) for k in [0,1,4,5])
                             line = line + '\n'
                             f.writelines(line)
-
                 else:
                     with open(os.path.join(FLAGS.output_path, os.path.splitext(os.path.basename(im_fn))[0]) + ".txt",
                           "w") as f:
@@ -137,7 +132,5 @@ def main(argv=None):
                             line = ",".join(str(box[k]) for k in range(8))
                             line += "," + str(scores[i]) + "\r\n"
                             f.writelines(line)
-
-
 if __name__ == '__main__':
     tf.app.run()

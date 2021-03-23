@@ -80,6 +80,10 @@ def main():
                          help="""config file used.""")
     cmdline.add_argument('--model_dir', default="./model_dir",
                          help="""config file used.""")
+    cmdline.add_argument('--num_classes', type=int, default=1001,
+                         help='num_classes')
+    cmdline.add_argument('--restore_path', type=str, default='',
+                         help='restore ckpt path')
     FLAGS, unknown_args = cmdline.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -97,11 +101,15 @@ def main():
     config['debug'] = FLAGS.debug
     config['eval'] = FLAGS.eval
     config['model_dir'] = FLAGS.model_dir
-    print("iterations_per_loop:%d" %(config['iterations_per_loop']))
-    print("max_train_steps    :%d" %(config['max_train_steps']))
-    print("debug              :%s" %(config['debug']))
-    print("eval               :%s" %(config['eval']))
-    print("model_dir          :%s" %(config['model_dir']))
+    config['num_classes'] = FLAGS.num_classes
+    config['restore_path'] = FLAGS.restore_path
+    print("iterations_per_loop:%d" % (config['iterations_per_loop']))
+    print("max_train_steps    :%d" % (config['max_train_steps']))
+    print("debug              :%s" % (config['debug']))
+    print("eval               :%s" % (config['eval']))
+    print("model_dir          :%s" % (config['model_dir']))
+    print("num_classes        :%s" % (config['num_classes']))
+    print("restore_path       :%s" % (config['restore_path']))
     Session = cs.CreateSession(config)
     data = dl.DataLoader(config)
     hyper_param = hp.HyperParams(config)

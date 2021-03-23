@@ -27,7 +27,7 @@ tf.app.flags.DEFINE_boolean('restore', False, '')
 tf.app.flags.DEFINE_integer('save_checkpoint_steps', 2000, '')
 tf.app.flags.DEFINE_string('dataset_dir', 'resized/', '')
 tf.app.flags.DEFINE_integer('num_bbox', 256, '')
-tf.app.flags.DEFINE_integer('loss_scale', 2048, '')
+tf.app.flags.DEFINE_integer('loss_scale', 4096, '')
 tf.app.flags.DEFINE_integer('inputs_height', 600, '')
 tf.app.flags.DEFINE_integer('inputs_width', 900, '')
 

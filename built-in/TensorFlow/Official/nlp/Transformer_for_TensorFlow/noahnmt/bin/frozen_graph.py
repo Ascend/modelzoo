@@ -231,7 +231,7 @@ def main(_argv):
         "remove_device",
         "strip_unused_nodes(type=float)",
         "merge_duplicate_nodes",
-        "remove_nodes(op=CheckNumerics,op=StopGradient)",
+        "remove_nodes(op=CheckNumerics,op=StopGradient,op=Identity)",
         # "fold_constants(ignore_errors=true)",
         "sort_by_execution_order"]
     tf.logging.info("Optimizing for inference...")
@@ -260,7 +260,7 @@ def main(_argv):
       f.write(output_graph_def.SerializeToString())
   tf.logging.info("%d ops in the final graph." % len(output_graph_def.node))
 
-  load_frozen_graph()
+  #load_frozen_graph()
 
 if __name__ == "__main__":
   tf.logging.set_verbosity(tf.logging.INFO)

@@ -403,11 +403,14 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="fast
     }
     writer.add_schema(fasterrcnn_json, "fasterrcnn_json")
 
-    for image_name in image_files:
+    image_files_num = len(image_files)
+    for ind, image_name in enumerate(image_files):
         with open(image_name, 'rb') as f:
             img = f.read()
         annos = np.array(image_anno_dict[image_name], dtype=np.int32)
         row = {"image": img, "annotation": annos}
+        if (ind + 1) % 10 == 0:
+            print("writing {}/{} into mindrecord.".format(ind + 1, image_files_num))
         writer.write_raw_data([row])
     writer.commit()
 
