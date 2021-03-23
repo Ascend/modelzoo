@@ -5,6 +5,7 @@ export ASCEND_GLOBAL_EVENT_ENABLE=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 export SWITCH_MM_OUTPUT_ENABLE=1
+export HCCL_SECURITY_MODE=1
 DATA_DIR="/data/chid/preprocessed/"
 CHECKPOINT_PATH="/data/checkpoints/CPM-large_1p"
 RESULTS_DIR="results/"
