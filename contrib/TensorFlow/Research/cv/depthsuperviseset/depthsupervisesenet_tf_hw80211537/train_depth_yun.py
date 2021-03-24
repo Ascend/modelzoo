@@ -157,7 +157,7 @@ def parse_arguments(argv):
     parser.add_argument("--color_image_size", type=int, default=256)
     parser.add_argument("--depth_image_size", type=int, default=32)
     parser.add_argument("--check_point", type=int, default=0)
-    parser.add_argument("--max_nrof_epochs", type=int, default=60)
+    parser.add_argument("--max_nrof_epochs", type=int, default=43)
     parser.add_argument("--lr_decay_epochs", type=list, default=[20, 30, 40])
     parser.add_argument("--color_mean", type=list, default=[0.0, 127.5])
     parser.add_argument("--depth_mean", type=list, default=[0.0, 255.0])

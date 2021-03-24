@@ -82,7 +82,6 @@ def main(args):
     def evaluate_score(trainedModal):
         saver.restore(sess, trainedModal)
         for phase in args.phases[1:]:
-            print('ceshi2:', phase)
             if phase == 'dev':
                 dataset = Dataset(args, dev_image, dev_label, mode=args.phases[1])
                 epoch_size = len(dev_image)
@@ -140,6 +139,7 @@ def main(args):
             return 0
         for i in range(1, len(lines)):
             iter_now = int(lines[i].split('-')[-1][:-2])
+            iter_now = 42
             if iter_now - iter_before >= interval_iteration:
                 trainedModal = \
                     os.path.join(model_dir, 'model-{}.ckpt-{}'.format(subdir, iter_now))
@@ -151,6 +151,7 @@ def main(args):
                 # mox.file.copy_parallel(outputs_dir, os.path.join('obs://ajian3/Jobs', 'outputs', subdir))
                 # mox.file.copy_parallel(scores_dir,  os.path.join('obs://ajian3/Jobs', 'scores', args.protocol, subdir))
                 # print("yun2OBS data successfully")
+                exit(0)
 
     print('Start Testing')
     start_iteration = 0

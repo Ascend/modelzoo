@@ -23,6 +23,7 @@
 - train_url: Jobs
 - Start training: python train_depth_yun.py
 - Start testing: python test_depth_yun.py
+If you do not train the model by yourself, you can download our [trained model](https://pan.baidu.com/s/13B7N51in8hMmAATveen4TQ). code: gec4
 
 ## Results
 - The testing results of these methods based on multi-shot setting are as follows(%): 
