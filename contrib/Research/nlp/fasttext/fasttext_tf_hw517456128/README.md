@@ -10,6 +10,10 @@ Image Path : swr.cn-north-4.myhuaweicloud.com/ascend-share/3.3.0.alpha001_tensor
 
 AG_news
 
+Download：https://pan.baidu.com/s/1L9eNGT_gZdTrqmaccpAHJQ 
+
+pyee 
+
 # Results
 
 Top1 accuracy : 95.37
