@@ -36,6 +36,11 @@ labels
 ```
 
 ### 3. Offline Inference
+**Freeze ckpt to pb**
+Please use the frozen_graph.py from the train scripts [frozen_graph.py](https://gitee.com/ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow/tools/frozen_graph.py)
+```
+python3 frozen_graph.py --ckpt_path= ckpt_path/shadownet_xxx.ckpt-600000
+```
 
 **Convert pb to om.**
 
@@ -48,7 +53,7 @@ labels
 - convert pb to om
 
   ```
-  atc --model=alexnet_tf.pb --framework=3 --output=alexnet_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,224,224,3" --log=info --insert_op_conf=alexnet_tf_aipp.cfg
+  atc --model=shadownet_tf_64batch.pb --framework=3 --output=shadownet_tf_64batch --output_type=FP32 --soc_version=Ascend310 --input_shape="test_images:64,32,100,3" --log=info
   ```
 
 - Build the program
@@ -61,7 +66,7 @@ labels
 
   ```
   cd scripts
-  bash benchmark_tf.sh --batchSize=1 --modelType=alexnet --imgType=raw --precision=fp16 --outputType=fp32 --useDvpp=1 --deviceId=0 --modelPath=alexnet_tf_aipp.om --dataPath=image-1024 --trueValuePath=val_lable.txt
+  bash benchmark_tf.sh
   ```
 
 
@@ -72,14 +77,17 @@ labels
 
 Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
 
-#### Inference accuracy results
+#### Inference accuracy results:
 
-|       model       | **data**  |    Top1/Top5    |
-| :---------------: | :-------: | :-------------: |
-| offline Inference | 5W images | 59.08 %/ 81.37% |
+| Test Dataset | Per_Char_Accuracy | Full_Seq_Accuracy |
+|--------------|-------------------|-------------------|
+| SVT          | 88.9%             | 77.2%             |
+| ICDAR2013    | 93.5%             | 87.3%             |
+| IIIT5K       | 91.4%             | 79.6%             |
 
-#### Inference performance results
 
-|       model       | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |       270 img/s       |
+#### Inference performance:
+
+|       model       | batch size | Inference performance | Platform Information |
+| :---------------: | :--------: | :-------------------: |:-------------------: |
+| offline Inference |     64      |       1070 img/s       | Ascend310*1        |
