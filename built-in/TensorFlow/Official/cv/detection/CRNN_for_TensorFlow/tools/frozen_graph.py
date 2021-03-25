@@ -44,7 +44,7 @@ def main():
         phase = 'test',
         hidden_nums = CFG.ARCH.HIDDEN_UNITS,
         layers_nums = CFG.ARCH.HIDDEN_LAYERS,
-        num_classed = CFG.ARCH.NUM_CLASSES
+        num_classes = CFG.ARCH.NUM_CLASSES
     )
     #compute inference result
     test_inference_ret = shadownet.inference(
