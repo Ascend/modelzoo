@@ -736,7 +736,8 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         if with_nms:
             mlvl_bboxes_fix = torch.zeros(5000, 4).type_as(mlvl_bboxes)
             mlvl_bboxes_fix[:mlvl_bboxes.size(0)] = mlvl_bboxes
-            mlvl_scores_fix = torch.zeros(5000, 81).type_as(mlvl_scores)
+            classes_num = mlvl_scores.size(1)
+            mlvl_scores_fix = torch.zeros(5000, classes_num).type_as(mlvl_scores)
             mlvl_scores_fix[:mlvl_scores.size(0)] = mlvl_scores
             det_bboxes, det_labels = multiclass_nms(mlvl_bboxes_fix, mlvl_scores_fix,
                                                     cfg.score_thr, cfg.nms,
