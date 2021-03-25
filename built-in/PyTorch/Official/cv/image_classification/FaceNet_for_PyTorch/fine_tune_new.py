@@ -20,13 +20,13 @@ from apex import amp
 def parse_opts():
     parser = argparse.ArgumentParser(description='facenet')
     parser.add_argument('--seed', type=int, default=123456, help='random seed')
-    parser.add_argument('--amp_cfg', action='store_true', hlep='If true, use apex.')
-    parser.add_argument('opt_level', default='O0', type=str, help='set opt level.')
+    parser.add_argument('--amp_cfg', action='store_true', help='If true, use apex.')
+    parser.add_argument('--opt_level', default='O0', type=str, help='set opt level.')
     parser.add_argument('--loss_scale_value', default=1024, type=int, help='set loss scale value.')
     parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
     parser.add_argument('--batch_size', default=64, type=int, help='set batch_size')
     parser.add_argument('--epochs', default=20, type=int, help='set epochs')
-    parser.add_argument('--workers', default=0, type=str, help='set workers')
+    parser.add_argument('--workers', default=0, type=int, help='set workers')
     parser.add_argument('--data_dir', default="", type=str, help='set data_dir')
     args = parser.parse_args()
     return args
@@ -45,13 +45,13 @@ def main():
     device_id = int(args.device_list.split(",")[0])
     device = 'npu:{}'.format(device_id)
     print('Running on device: {}'.format(device))
-
+    torch.npu.set_device(device)
     dataset = datasets.ImageFolder(args.data_dir, transform=None)
 
     resnet = InceptionResnetV1(
         classify=True,
         pretrained='vggface2',
-        num_classed=len(dataset.class_to_idx)
+        num_classes=len(dataset.class_to_idx)
     ).to(device)
 
     optimizer = apex.optimizers.NpuFusedAdam(resnet.parameters(), lr=0.001)
