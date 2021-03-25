@@ -56,6 +56,11 @@ pip list | grep mm
 
 ## Train MODEL
 
+### 导入环境变量
+```
+source pt_set_env.sh
+```
+
 ### 单卡
 1. 运行 train_retinanet_1p.sh
 ```
@@ -63,7 +68,7 @@ chmod +x ./tools/dist_train.sh
 sh train_retinanet_1p.sh
 ```
 
-## 8卡
+### 8卡
 1. 运行 train_retinanet_8p.sh
 ```
 chmod +x ./tools/dist_train.sh
