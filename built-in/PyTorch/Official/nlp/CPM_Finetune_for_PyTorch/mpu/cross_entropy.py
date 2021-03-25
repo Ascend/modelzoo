@@ -65,9 +65,7 @@ class _VocabParallelCrossEntropy(torch.autograd.Function):
         masked_target_1d = masked_target.view(-1)
         arange_1d = torch.arange(start=0, end=logits_2d.size()[0],
                                  device=logits_2d.device)
-        logits_2d = logits_2d.cpu()
-        predicted_logits_1d = logits_2d[arange_1d.cpu().long(), masked_target_1d.cpu().long()]
-        predicted_logits_1d = predicted_logits_1d.npu()
+        predicted_logits_1d = logits_2d[arange_1d.long(), masked_target_1d.long()]
         predicted_logits = predicted_logits_1d.view_as(target)
         predicted_logits[target_mask] = 0.0
         # All reduce is needed to get the chunks from other GPUs.

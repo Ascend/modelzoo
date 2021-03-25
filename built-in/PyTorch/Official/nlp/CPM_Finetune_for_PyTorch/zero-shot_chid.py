@@ -31,7 +31,6 @@ from utils import load_checkpoint
 from data_utils.tokenization_gpt2 import GPT2Tokenizer
 from configure_data import configure_data
 import mpu
-import deepspeed
 import json
 
 from tqdm import tqdm

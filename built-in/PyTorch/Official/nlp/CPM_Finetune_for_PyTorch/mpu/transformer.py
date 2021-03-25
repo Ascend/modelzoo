@@ -25,9 +25,6 @@ from .initialize import get_model_parallel_world_size
 from .layers import ColumnParallelLinear
 from .layers import RowParallelLinear
 from .mappings import gather_from_model_parallel_region
-
-import deepspeed
-
 from .random import checkpoint
 from .random import get_cuda_rng_tracker
 
@@ -92,11 +89,6 @@ class GPT2ParallelSelfAttention(torch.nn.Module):
                                        input_is_parallel=True,
                                        init_method=output_layer_init_method)
         self.output_dropout = torch.nn.Dropout(output_dropout_prob)
-
-        if deepspeed.checkpointing.is_configured():
-            global get_cuda_rng_tracker, checkpoint
-            get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
-            checkpoint = deepspeed.checkpointing.checkpoint
 
     def _transpose_for_scores_key(self, tensor):
         """Transpose a 3D tensor [b, s, np*hn] into a 4D tensor with
@@ -210,7 +202,7 @@ class GPT2ParallelMLP(torch.nn.Module):
     def forward(self, hidden_states):
         # [b, s, 4hp]
         intermediate_parallel = self.dense_h_to_4h(hidden_states)
-        intermediate_parallel = gelu(intermediate_parallel)
+        intermediate_parallel = torch.nn.functional.gelu(intermediate_parallel)
 
         # [b, s, h]
         output = self.dense_4h_to_h(intermediate_parallel)
@@ -260,7 +252,9 @@ class GPT2ParallelTransformerLayer(torch.nn.Module):
             output_layer_init_method = init_method
 
         # Layernorm on the input data.
-        self.input_layernorm = torch.nn.LayerNorm(hidden_size, eps=layernorm_epsilon)
+        self.input_layernorm = torch.nn.LayerNorm(hidden_size,
+                                                  eps=layernorm_epsilon,
+                                                  is_eval=True)
 
         # Self attention.
         self.attention = GPT2ParallelSelfAttention(
@@ -273,7 +267,8 @@ class GPT2ParallelTransformerLayer(torch.nn.Module):
 
         # Layernorm on the input data.
         self.post_attention_layernorm = torch.nn.LayerNorm(hidden_size,
-                                                  eps=layernorm_epsilon)
+                                                           eps=layernorm_epsilon,
+                                                           is_eval=True)
 
         # MLP
         self.mlp = GPT2ParallelMLP(
@@ -388,13 +383,9 @@ class GPT2ParallelTransformer(torch.nn.Module):
             [get_layer() for _ in range(num_layers)])
 
         # Final layer norm before output.
-        self.final_layernorm = torch.nn.LayerNorm(hidden_size, eps=layernorm_epsilon)
-
-        if deepspeed.checkpointing.is_configured():
-            global get_cuda_rng_tracker, checkpoint
-            get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
-            checkpoint = deepspeed.checkpointing.checkpoint
-
+        self.final_layernorm = torch.nn.LayerNorm(hidden_size,
+                                                  eps=layernorm_epsilon,
+                                                  is_eval=True)
 
     def forward(self, hidden_states, attention_mask):
 
@@ -475,12 +466,6 @@ class BertParallelSelfAttention(torch.nn.Module):
         # different outputs on different number of parallel partitions but
         # on average it should not be partition dependent.
         self.dropout = torch.nn.Dropout(dropout_prob)
-
-        if deepspeed.checkpointing.is_configured():
-            global get_cuda_rng_tracker, checkpoint
-            get_cuda_rng_tracker = deepspeed.checkpointing.get_cuda_rng_tracker
-            checkpoint = deepspeed.checkpointing.checkpoint
-
 
     def _transpose_for_scores(self, tensor):
         """Transpose a 3D tensor [b, s, np*hn] into a 4D tensor with

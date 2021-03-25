@@ -276,37 +276,26 @@ def load_checkpoint(model, optimizer, lr_scheduler, args):
     if not success:
         return 0
         
-    if args.deepspeed:
+    # Checkpoint.
+    checkpoint_name = get_checkpoint_name(args.load, iteration, release)
+    
+    if mpu.get_data_parallel_rank() == 0:
+        print('global rank {} is loading checkpoint {}'.format(
+            torch.distributed.get_rank(), checkpoint_name))
 
-        checkpoint_name, sd = model.load_checkpoint(args.load, iteration, load_module_strict=False, load_optimizer_states=False, load_lr_scheduler_states=False)
+    # Load the checkpoint.
+    sd = torch.load(checkpoint_name, map_location='cpu')
 
-        if checkpoint_name is None:
-            if mpu.get_data_parallel_rank() == 0:
-                print("Unable to load checkpoint.")
-            return iteration
-
-    else:
-        
-        # Checkpoint.
-        checkpoint_name = get_checkpoint_name(args.load, iteration, release)
-        
-        if mpu.get_data_parallel_rank() == 0:
-            print('global rank {} is loading checkpoint {}'.format(
-                torch.distributed.get_rank(), checkpoint_name))
-
-        # Load the checkpoint.
-        sd = torch.load(checkpoint_name, map_location='cpu')
-
-        if isinstance(model, torchDDP):
-            model = model.module
-        
-        # Model.
-        try:
-            model.load_state_dict(sd['module'])
-        except KeyError:
-            print_rank_0('A metadata file exists but unable to load model '
-                        'from checkpoint {}, exiting'.format(checkpoint_name))
-            exit()
+    if isinstance(model, torchDDP):
+        model = model.module
+    
+    # Model.
+    try:
+        model.load_state_dict(sd['module'])
+    except KeyError:
+        print_rank_0('A metadata file exists but unable to load model '
+                    'from checkpoint {}, exiting'.format(checkpoint_name))
+        exit()
 
     if args.model_parallel_size > 1:
         torch.distributed.barrier()

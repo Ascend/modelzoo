@@ -24,9 +24,6 @@ import random
 import math
 import numpy as np
 import torch
-
-import deepspeed
-
 from arguments import get_args
 from configure_data import configure_data
 from fp16 import FP16_Module
@@ -76,7 +73,7 @@ def get_model(args, model_cls):
             sum([p.nelement() for p in model.parameters()])), flush=True)
 
     # To prevent OOM for model sizes that cannot fit in GPU memory in full precision
-    if args.deepspeed and args.fp16:
+    if args.fp16:
         model.half()
 
     # GPU allocation.
@@ -89,7 +86,8 @@ def get_model(args, model_cls):
     # Wrap model for distributed training.
     if USE_TORCH_DDP:
         i = torch.npu.current_device()
-        model = DDP(model, device_ids=[i], output_device=i)
+        model = DDP(model, device_ids=[i], output_device=i,
+                    process_group=mpu.get_data_parallel_group())
     else:
         model = DDP(model)
 
@@ -114,8 +112,7 @@ def get_optimizer(model, args):
         if args.cpu_torch_adam:
             cpu_adam_optimizer = torch.optim.Adam
         else:
-            from deepspeed.ops.adam import DeepSpeedCPUAdam
-            cpu_adam_optimizer = DeepSpeedCPUAdam
+            pass
         optimizer = cpu_adam_optimizer(param_groups,
                         lr=args.lr, weight_decay=args.weight_decay)
     else:
@@ -124,9 +121,6 @@ def get_optimizer(model, args):
                          lr=args.lr, weight_decay=args.weight_decay)
 
     print(f'Optimizer = {optimizer.__class__.__name__}')
-    if args.deepspeed:
-        # fp16 wrapper is not required for DeepSpeed.
-        return optimizer
 
     # Wrap into fp16 optimizer.
     if args.fp16:
@@ -168,18 +162,6 @@ def setup_model_and_optimizer(args, model_cls=GPT2Model):
     model = get_model(args, model_cls)
     optimizer = None
     lr_scheduler = None
-
-    if args.deepspeed:
-        print_rank_0("DeepSpeed is enabled.")
-
-        model, optimizer, _, lr_scheduler = deepspeed.initialize(
-            model=model,
-            optimizer=optimizer,
-            args=args,
-            lr_scheduler=lr_scheduler,
-            mpu=mpu,
-            dist_init_required=False
-        )
 
     if args.load is not None:
         args.iteration = load_checkpoint(model, optimizer, lr_scheduler, args)
@@ -500,8 +482,6 @@ def evaluate(data_iterator, model, args, timers, verbose=False):
             allocated by the optimizations are deallocated during backward pass
             in the absence of backward pass the buffers should be reset after each
             forward pass'''
-            if args.deepspeed and args.deepspeed_activation_checkpointing:
-                deepspeed.checkpointing.reset()
 
             # Reduce across processes.
             if isinstance(model, DDP):
@@ -574,12 +554,6 @@ def initialize_distributed(args):
 
     # Set the model-parallel / data-parallel communicators.
     mpu.initialize_model_parallel(args.model_parallel_size)
-
-    # Optional DeepSpeed Activation Checkpointing Features
-    #
-    if args.deepspeed and args.deepspeed_activation_checkpointing:
-        set_deepspeed_activation_checkpointing(args)
-
 
 def set_random_seed(seed):
     """Set random seed for reproducability."""

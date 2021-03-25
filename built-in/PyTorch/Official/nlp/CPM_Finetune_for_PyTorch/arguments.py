@@ -18,7 +18,6 @@
 import argparse
 import os
 import torch
-import deepspeed
 
 
 def add_model_config_args(parser):
@@ -290,9 +289,6 @@ def get_args():
     parser = add_evaluation_args(parser)
     parser = add_text_generate_args(parser)
     parser = add_data_args(parser)
-
-    # Include DeepSpeed configuration arguments
-    parser = deepspeed.add_config_arguments(parser)
 
     args = parser.parse_args()
 
