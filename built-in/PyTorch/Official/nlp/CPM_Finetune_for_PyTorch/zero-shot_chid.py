@@ -65,7 +65,7 @@ class CHIDDataset(torch.utils.data.Dataset):
 
         self.samples, self.sizes, self.truth_labels = self.process(data)
         if max(self.sizes) % 16 != 0:
-            self.max_size = (max(self.sizes) // 16 + 1） * 16
+            self.max_size = (max(self.sizes) // 16 + 1) * 16
         else:
             self.max_size = max(self.sizes)
 
