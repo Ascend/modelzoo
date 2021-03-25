@@ -216,22 +216,28 @@ def main():
             loss = torch.sum(losses * loss_mask, dim=-1) / loss_mask.sum(dim=-1)
 
             loss_tensor_list = [torch.zeros_like(loss).to(device) for _ in range(mpu.get_data_parallel_world_size())]
-            loss_tensor_list[0] = loss.cpu()
-            all_losses.extend(loss_tensor_list)
+            torch.distributed.all_gather(loss_tensor_list, loss.data, group=mpu.get_data_parallel_group())
+            for loss_item in loss_tensor_list:
+                all_losses.append(loss_item.cpu())
 
             sids = no_model_batch["sids"]
+            # HCCL不支持int64
+            sids = sids.int()
             sid_tensor_list = [torch.zeros_like(sids) for _ in range(mpu.get_data_parallel_world_size())]
             if args.model_parallel_size > 1:
-                sid_tensor_list[0] = sids.cpu()
-                all_sids.extend(sid_tensor_list)
+                torch.distributed.all_gather(sid_tensor_list, sids.data, group=mpu.get_data_parallel_group())
+                for sid_item in sid_tensor_list:
+                    all_sids.append(sid_item.cpu())
             else:
                 all_sids.extend(sids.cpu().data)
 
             cids = no_model_batch["cids"]
+            cids = cids.int()
             cid_tensor_list = [torch.zeros_like(cids) for _ in range(mpu.get_data_parallel_world_size())]
             if args.model_parallel_size > 1:
-                cid_tensor_list[0] = cids.cpu()
-                all_cids.extend(cid_tensor_list)
+                torch.distributed.all_gather(cid_tensor_list, cids.data, group=mpu.get_data_parallel_group())
+                for cid_item in cid_tensor_list:
+                    all_cids.append(cid_item.cpu())
             else:
                 all_cids.extend(cids.cpu().data)
 

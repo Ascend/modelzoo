@@ -315,7 +315,7 @@ def get_args():
 
         # recover world_size and rank with Open MPI ENV
         args.world_size = int(os.getenv('OMPI_COMM_WORLD_SIZE'))
-        args.rank = int(os.getenv('OMPI_COMM_WORLD_SIZE'))
+        args.rank = int(os.getenv('OMPI_COMM_WORLD_RANK'))
 
     args.model_parallel_size = min(args.model_parallel_size, args.world_size)
     if args.rank == 0:

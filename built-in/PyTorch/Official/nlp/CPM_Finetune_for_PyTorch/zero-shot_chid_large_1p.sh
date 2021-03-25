@@ -30,7 +30,7 @@ taskset -c 0-25 python3.7 -m torch.distributed.launch --master_port ${1-1122} --
        --out-seq-length 512 \
        --tokenizer-path ${TOKENIZER_PATH} \
        --vocab-size 30000 \
-       --batch-size 2 \
+       --batch-size 1 \
        --seed 23333 \
        --results_dir ${RESULTS_DIR} \
        --model_name ${MODEL_NAME}
