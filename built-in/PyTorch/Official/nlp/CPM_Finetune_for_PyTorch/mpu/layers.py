@@ -316,11 +316,20 @@ class RowParallelLinear(torch.nn.Module):
             input_parallel = input_
         else:
             input_parallel = scatter_to_model_parallel_region(input_)
-        # Matrix multiply.
-        output_parallel = F.linear(input_parallel, self.weight)
-        # All-reduce across all the partitions.
-        output_ = reduce_from_model_parallel_region(output_parallel)
-        if self.bias is not None:
-            return output_ + self.bias
+
+        if get_model_parallel_world_size() == 1:
+            if input_parallel.dim() == 3:
+                if self.count_3 == 0:
+                    self.weight_trans_3 = torch.unsqueeze(self.weight.permute(1, 0), 0).contiguous()
+                    self.count_3 = 1
+                return torch.matmul(input_parallel, self.weight_trans_3) + self.bias
+            else:
+                return F.linear(input_parallel, self.weight, self.bias)
         else:
+            output_parallel = F.linear(input_parallel, self.weight)
+            output_ = reduce_from_model_parallel_region(output_parallel)
+            if self.bias is not None:
+                return output_ + self.bias
+            else:
+                return output_
             return output_
