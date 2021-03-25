@@ -119,8 +119,10 @@ def parse_anno(annotation_path, target_size=None):
             x_min, y_min, x_max, y_max = float(s[i*5+1]), float(s[i*5+2]), float(s[i*5+3]), float(s[i*5+4])
             width = x_max - x_min
             height = y_max - y_min
-            assert width > 0
-            assert height > 0
+            #assert width > 0
+            #assert height > 0
+            if width == 0 or height == 0:
+                continue
             # use letterbox resize, i.e. keep the original aspect ratio
             # get k-means anchors on the resized target image size
             if target_size is not None:

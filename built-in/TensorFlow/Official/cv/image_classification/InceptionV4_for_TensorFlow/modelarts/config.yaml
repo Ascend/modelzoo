@@ -1,0 +1,180 @@
+# 1 custom create algorithm  ------------------------------------------------------------
+create_algo:
+  name: InceptionV4-Ascend-ModelZoo                  # |必填|op账号创建算法的算法名称|若算法管理中没有该算法名称，则version_id设置为0.0.1。否则，在当前最大版本上添加版本|
+                                                     # |备注|训练作业名称、模型名称和服务名称，无需填写，已设置为算法名称+version_id|
+  description: null                                  # |选填|创建算法的算法描述|    
+  config:
+    training:
+      image:
+        # 常用engine_name和engine_version举例
+        # engine_name|engine_version： Horovod    | 0.16.2-TF-1.13.1-python3.6
+        # engine_name|engine_version： PyTorch    | PyTorch-1.0.0-python2.7, PyTorch-1.0.0-python3.6, PyTorch-1.3.0-python2.7, PyTorch-1.3.0-python3.6, PyTorch-1.4.0-python3.6 
+        # engine_name|engine_version： Ray        | RAY-0.7.4-python3.6  
+        # engine_name|engine_version： TensorFlow | TF-1.13.1-python2.7, TF-1.13.1-python3.6, TF-1.8.0-python2.7, TF-1.8.0-python3.6, TF-2.1.0-python3.6    
+        engine_name: Ascend-Powered-Engine           # |必填|创建算法的引擎名称|
+        engine_version: TF-1.15-python3.7-aarch64    # |必填|创建算法的引擎版本|
+      code:
+        #  relative_boot_file is in the '/cnnorth4-job-train-algorithm/aimarket_model_zoo/${version}/${relative_path}/code' folder
+        relative_boot_file: train_start.py           # |必填|启动脚本的文件名不做限制，但启动脚本必须在`code`的目录下，不可以创建多级目录|
+      inputs:                                        # |必填|inputs必填name, parameter, dataset_enable|推荐保持默认值|      
+        - name: 数据来源                             # |必填|inputs必填name, parameter, dataset_enable|推荐保持默认值|
+          parameter:                                 # |必填|inputs必填name, parameter, dataset_enable|推荐保持默认值| 
+            label: data_url
+            value: data_url/
+          dataset_enable: false                      # |必填|inputs必填name, parameter, dataset_enable|推荐保持默认值| 
+          annotations:                               # |选填|inputs选填annotations算法输入约束|  
+            - key: data_source                       # |选填|inputs选填annotations算法输入约束-数据来源限制data_source|
+              value:
+                - obs
+                - modelarts_dataset
+            - key: dataset_type                      # |选填|inputs选填annotations算法输入约束-标注类型dataset_type|  
+              value:
+                - '0'                                # |单选，'0'图像分类，'1'物体检测，'2'图像标注，'3'图像分割，'100'文本分类,'101'命名实体,'102'文本三元组,'200'声音分类|
+            - key: data_format                       # |选填|inputs选填annotations算法输入约束-数据格式data_format|Default代表manifast| 
+              value:
+                - Default
+            - key: data_segmentation                 # |选填|inputs选填annotations算法输入约束-数据切分data_segmentation|
+              value:
+                - ''                                 # |选填单选，''无限制, 'true'仅支持切分数据集,'false'仅支持未切分数据集 |
+            - key: isconstrictinput                  # |选填|如果有算法输入约束，必填，保持默认值|
+            - key: constrictInputTempShow            # |选填|如果有算法输入约束，必填，保持默认值|
+            - key: isSelectDatasetAndObs             # |选填|如果有算法输入约束，必填，保持默认值|
+      outputs:                                       # |必填|outputs推荐保持默认值| 
+        - name: 模型输出
+          description: ''
+          parameter:
+            label: train_url
+            value: train_url/
+          artifact:
+            - type: ''
+          modelarts_hosted: false
+      flavor:                                        # |选填|flavor选填算法训练约束|
+        flavor_codes: []                             # |选填|如果有算法约束，必填，保持默认值|
+        annotations: 
+          - key: flavor_type                         # |选填|flavor选填算法训练约束-资源类型|多选CPU，GPU， Ascend|
+            value:
+              - Ascend
+          - key: is_multi_devices_supported          # |选填|flavor选填算法训练约束-多卡训练| 
+            value:
+              - 'true'
+          - key: is_multi_nodes_supported            # |选填|flavor选填算法训练约束-分布式训练|
+            value:
+              - 'true'
+          - key: flavor_codes                        # |选填|如果有算法约束，必填，保持默认值|
+            value: []
+          - key: isMultiDevHide                      # |选填|如果有算法约束，必填，保持默认值|
+      parameters:                                    # |必填|算法默认参数|
+        regular:
+          - key: mode                                # 运行模式，train, evaluate, and train_and_evaluate
+            help: null
+            type: String
+            default_value: 'train'
+            editable: true
+            required: true
+          - key: batch_size                          # 一次训练所抓取的数据样本数量
+            help: null
+            type: Integer
+            default_value: '128'
+            editable: true
+            required: true
+          - key: max_epochs                          # 训练的总轮数，精度训练建议：100轮
+            help: null
+            type: Integer
+            default_value: '5'
+            required: true
+            editable: true
+          - key: lr                                  # 训练的初始学习速率
+            help: null
+            type: Continuous
+            default_value: '0.045'
+            editable: true
+            required: true
+          - key: epochs_between_evals                # 每训练n轮做一次验证
+            help: null
+            type: Integer
+            default_value: '5'
+            required: true
+            editable: true
+          - key: display_every                       # 每做n次训练打印一次
+            help: null
+            type: Integer
+            default_value: '100'
+            required: true
+            editable: true
+        customization: true                          # |必填|是否支持自定义超级参数 |
+#-- end of 1 custom create algorithm  ---------------------------------------------------
+
+# 2 custom publish algorithm  -----------------------------------------------------------        
+publish_algo:
+  item_name: 图像分类-InceptionV4-Ascend                   # |必填|op账号发布算法的商品名称|
+  short_desc: '该算法支持在Ascend设备上进行训练'          # |选填|简短描述|
+  add_version_desc: 添加算法约束                       # |选填|添加版本的描述|
+  # 发布逻辑如下：
+  # 若AI市场没有商品item_name，则白名单发布商品item_name。
+  # 若AI市场只有一个商品item_name且没有item_name的beta版本，则白名单发布商品item_name的beta版本。
+  # 若AI市场只有一个商品item_name和一个item_name的beta版本，则item_name的beta商品添加版本。
+#-- end of 2 custom publish algorithm  --------------------------------------------------
+
+# 3 custom create train job  -----------------------------------------------------------  
+create_train_job:
+  task_type: image_classification                  # |task_type和inputs二必填一个,inputs优先|task_type算法类型|单选，取值为image_classification， object_detection， recommendations|
+  job_desc: null                                   # |选填|training账号创建的作业描述| 
+  config:
+    flavor:                                        # |必填|training账号创建的作业规格|取值为modelarts.vm.cpu.2u.2， modelarts.p3.large.ex， modelarts.kat1.xlarge， modelarts.kat1.8xlarge|
+      code: modelarts.kat1.xlarge
+    log_url: null                                  # |选填|训练作业输出日志路径|
+    parameter:                                     # |选填|训练作业参数|如果不填，则默认按照create_algo里的parameters|
+      - label: mode
+        value: 'train'
+        required: true
+        editable: true
+      - label: batch_size
+        value: '128'
+        required: true
+        editable: true
+      - label: max_epochs
+        value: '5'
+        required: true
+        editable: true
+      - label: lr
+        value: '0.045'
+        required: true
+        editable: true
+      - label: epochs_between_evals
+        value: '5'
+        required: true
+        editable: true
+      - label: display_every
+        value: '100'
+        required: true
+        editable: true
+    inputs:                                        # |task_type和inputs必填一个,inputs优先|inputs训练作业数据输入|
+      # 填法1： obs路径如下：
+      - data_source:
+          obs:
+            obs_url: null                          # obs_url不填，根据task_type自动设置训练数据集
+      # 填法2： 数据集及版本如下：
+      #- data_source:
+      #    dataset:
+      #      dataset_name: flower # dataset_name和version_name均不填，根据task_type自动设置训练数据集
+      #      version_name: V012   # dataset_name和version_name均不填，根据task_type自动设置训练数据集
+    outputs:                                       # |选填|训练作业模型输出路径。若不填，自动设置输出路径='/cnnorth4-job-test/e2e_output/'+算法名称+version_id|
+      - value: null
+#-- end of 3 custom create train job    ---------------------------------------------------
+
+# 4 custom create model  -----------------------------------------------------------------
+create_model:
+  model_type: TensorFlow                           # |必填|training账号模型类型，取值为TensorFlow/ MXNet/ Caffe/ Spark_MLlib/ Scikit_Learn/ XGBoost/ Image / PyTorch|
+  description: null                                # |选填|模型描述| 
+#-- end of 4 create service -----------------------------------------------------------------
+
+# 5 custom create service  -----------------------------------------------------------------
+create_service:
+  schedule:                                        # |必填|training账号在线服务时长|推荐保持默认值，默认一个小时停止|
+    - duration: 1
+      time_unit: HOURS
+      type: stop
+  description: null                                # |选填|在线服务描述|
+  config:                                          
+    - specification: modelarts.kat1.xlarge       # |选填|training账号创建的在线服务规格,不填默认 modelarts.vm.gpu.0.25p4|
+#-- end of 5 create service -----------------------------------------------------------------  

@@ -36,7 +36,6 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 
-from torch.utils.tensorboard import SummaryWriter
 from densenet_0_2_2 import densenet121
 
 import numpy as np
@@ -84,6 +83,8 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
+parser.add_argument('--fine-tuning', action='store_true',
+                    help='use fine-tuning model')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -103,6 +104,8 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
                          'multi node data parallel training')
 parser.add_argument('--npu', default=0, type=int,
                     help='NPU id to use.')
+parser.add_argument('--stop-step-num', default=None, type=int,
+                    help='after the stop-step,killing the training task.')
 
 # apex
 parser.add_argument('--amp', default=False, action='store_true',
@@ -111,6 +114,8 @@ parser.add_argument('--loss-scale', default=1024., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+
+cur_step = 0
 
 
 def main():
@@ -159,6 +164,7 @@ def main():
 
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
+    global cur_step
     args.gpu = gpu
 
     if args.gpu is not None:
@@ -176,10 +182,27 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = models.__dict__[args.arch](pretrained=True)
+        model = densenet121(pretrained=True)
     else:
         print("=> creating model '{}'".format(args.arch))
         model = densenet121()
+
+    parameters = model.parameters()
+    if args.fine_tuning:
+        print("=> transfer-learning mode + fine-tuning (train only the last FC layer)")
+        for param in model.parameters():
+            param.requires_grad = False
+        if args.arch == 'densenet121':
+            model.classifier = nn.Linear(1024, 101)
+            parameters = model.classifier.parameters()
+        elif args.arch == 'densenet201':
+            model.classifier = nn.Linear(1920, 101)
+            parameters = model.classifier.parameters()
+        else:
+            print("Error:Fine-tuning is not supported on this architecture")
+            exit(-1)
+    else:
+        parameters = model.parameters()
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor
@@ -312,9 +335,12 @@ def main_worker(gpu, ngpus_per_node, args):
                         'best_acc1': best_acc1,
                         'optimizer': optimizer.state_dict(),
                     }, is_best)
+        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+            break
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
+    global cur_step
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
@@ -329,7 +355,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     model.train()
 
     end = time.time()
+    step_per_epoch = len(train_loader)
     for i, (images, target) in enumerate(train_loader):
+        cur_step = epoch * step_per_epoch + i
         # measure data loading time
         data_time.update(time.time() - end)
 
@@ -362,6 +390,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
+
+        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+            break
 
     print(' * FPS@all {:.3f}'.format(args.batch_size / batch_time.avg))
 

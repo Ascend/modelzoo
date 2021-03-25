@@ -26,6 +26,7 @@ import random
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
+import apex
 from torch.utils.tensorboard import SummaryWriter
 
 sys.path.append('./')
@@ -47,6 +48,12 @@ parser.add_argument('--loss_scale', default=128., type=float,
 parser.add_argument('--opt_level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
 
+MAX = 2147483647
+def _gen_seeds(shape):
+    return np.random.uniform(1, MAX, size=shape).astype(np.float32)
+seed_shape = (32 * 1024 * 12, )
+
+
 def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, optimizer=None, print_every=20,
               is_training=True):
     if is_training:
@@ -63,6 +70,10 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
     steps_per_epoch = len(data_iter)
     end = time.time()
     for i, data in enumerate(data_iter):
+        if i == 4:
+            batch_time = 0
+            data_time = 0
+
         data_time += (time.time() - end)
         global_step = (epoch_id - 1) * steps_per_epoch + i
         inputs, input_sizes, targets, target_sizes, utt_list = data
@@ -76,13 +87,12 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
         out_len, batch_size, _ = out.size()
         input_sizes_npu = (input_sizes_npu * out_len).long()
         loss = loss_fn(out, targets_npu, input_sizes_npu, target_sizes_npu)
-
         prob, index = torch.max(out, dim=-1)
-        index = index.transpose(0, 1).cpu()
         loss /= batch_size
-        input_sizes = input_sizes_npu.cpu()
         cur_loss += loss.item()
         total_loss += loss.item()
+        index = index.cpu().transpose(0, 1)
+        input_sizes = input_sizes_npu.cpu()
 
         if is_training:
             optimizer.zero_grad()
@@ -109,9 +119,17 @@ def run_epoch(epoch_id, model, data_iter, loss_fn, device, opts, sum_writer, opt
             # sum_writer.add_scalar('Accuary/valid/total_wer', total_errs / total_tokens, global_step)
 
         if is_training:
-            print('Epoch: [%d] [%d / %d], Time %.6f s Data %.6f s, total_loss = %.5f, total_wer = %.5f' %
-                  (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1), total_loss / (i + 1),
-                   total_errs / total_tokens))
+            if i <= 3:
+                print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, FPS %.3f, total_loss = %.5f, total_wer = %.5f'
+                      % (epoch_id, i + 1, steps_per_epoch, batch_time / (i + 1), data_time / (i + 1),
+                         opts.batch_size * (i + 1) / batch_time , total_loss / (i + 1),
+                         total_errs / total_tokens))
+            else:
+                print('Epoch: [%d] [%d / %d], Time %.6fs, Data %.6fs, FPS %.3f, total_loss = %.5f, total_wer = %.5f'
+                      % (epoch_id, i + 1, steps_per_epoch, batch_time / (i - 3), data_time / (i - 3),
+                         opts.batch_size * (i - 3) / batch_time, total_loss / (i + 1),
+                         total_errs / total_tokens))
+
         end = time.time()
 
     average_loss = total_loss / (i + 1)
@@ -191,7 +209,11 @@ def main(args, conf):
             layer_param.append(None)
         cnn_param["layer"].append(layer_param)
 
-    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out)
+    seed = _gen_seeds(seed_shape)
+    seed = torch.from_numpy(seed)
+    seed = seed.to(device)
+    model = CTC_Model(add_cnn=add_cnn, cnn_param=cnn_param, rnn_param=rnn_param, num_class=num_class, drop_out=drop_out,
+                      seed=seed)
 
     num_params = 0
     for name, param in model.named_parameters():
@@ -214,7 +236,8 @@ def main(args, conf):
     print(params)
 
     loss_fn = nn.CTCLoss(reduction='sum').to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+    # optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+    optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
 
     model = model.to(device)
     if args.opt_level:

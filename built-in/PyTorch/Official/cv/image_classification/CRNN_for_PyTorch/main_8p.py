@@ -8,7 +8,6 @@ import utils
 import torch
 import torch.nn.parallel
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from apex import amp
 from easydict import EasyDict as edict
 
@@ -33,9 +32,6 @@ def main():
     config, npu = parse_arg()
     print('config is: ', config)
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-
     # seed everything
     utils.seed_everything()
 
@@ -57,11 +53,6 @@ def main():
         # world_size means nums of all devices or nums of processes
         config.DISTRIBUTED.WORLD_SIZE = npus_per_node * config.DISTRIBUTED.WORLD_SIZE
 
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",
-          os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(npu)
-
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if npu is not None:
         print("[npu id:", npu, "]", "Use NPU: {} for training".format(npu))
@@ -154,41 +145,39 @@ def main():
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[npu], broadcast_buffers=False)
 
     converter = utils.strLabelConverter(config.DATASET.ALPHABETS)
-    checkpoint_dir, log_dir = utils.create_output_folder(config)
-    writer = SummaryWriter(log_dir)
+    if distributed and npu == 0:
+        checkpoint_dir, log_dir = utils.create_output_folder(config)
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
         train(config, train_loader, train_dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node,
-              npu, writer)
-        acc = validate(config, val_loader, val_dataset, converter, model, criterion, device, epoch, writer)
+              npu)
+        acc = validate(config, val_loader, val_dataset, converter, model, criterion, device, epoch)
         is_best = acc > best_acc
         best_acc = max(acc, best_acc)
         print("is best:", is_best)
         print("best acc is:", best_acc)
-        if config.TRAIN.AMP:
-            torch.save(
-                {
-                    'epoch': epoch + 1,
-                    'state_dict': model.state_dict(),
-                    'best_acc': best_acc,
-                    'optimizer': optimizer.state_dict(),
-                    'amp': amp.state_dict(),
-                }, os.path.join(checkpoint_dir, "checkpoint_{}_acc_{:.4f}.pth".format(epoch, acc))
-            )
-        else:
-            torch.save(
-                {
-                    'epoch': epoch + 1,
-                    'state_dict': model.state_dict(),
-                    'best_acc': best_acc,
-                    'optimizer': optimizer.state_dict(),
-                }, os.path.join(checkpoint_dir, "checkpoint_{}_acc_{:.4f}.pth".format(epoch, acc))
-            )
+        if distributed and npu == 0:
+            if config.TRAIN.AMP:
+                torch.save(
+                    {
+                        'epoch': epoch + 1,
+                        'state_dict': model.state_dict(),
+                        'best_acc': best_acc,
+                        'optimizer': optimizer.state_dict(),
+                        'amp': amp.state_dict(),
+                    }, os.path.join(checkpoint_dir, "checkpoint_{}_acc_{:.4f}.pth".format(epoch, acc))
+                )
+            else:
+                torch.save(
+                    {
+                        'epoch': epoch + 1,
+                        'state_dict': model.state_dict(),
+                        'best_acc': best_acc,
+                        'optimizer': optimizer.state_dict(),
+                    }, os.path.join(checkpoint_dir, "checkpoint_{}_acc_{:.4f}.pth".format(epoch, acc))
+                )
 
-    writer.close()
 
-
-def train(config, train_loader, dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node, npu,
-          writer):
+def train(config, train_loader, dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node, npu):
     utils.seed_everything()
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
@@ -229,13 +218,12 @@ def train(config, train_loader, dataset, converter, model, criterion, optimizer,
                 epoch, i, len(train_loader), batch_time=batch_time,
                 data_time=data_time, fps=fps, loss=losses)
             print(msg)
-        # writer.add_scalar('train_loss', losses.avg, epoch * len(train_loader) + i)
         end = time.time()
     print("[npu id:", npu, "]",
           ' * FPS@all {:.3f}'.format(npus_per_node * config.TRAIN.BATCH_SIZE_PER_GPU * 1000 / batch_time.avg))
 
 
-def validate(config, val_loader, dataset, converter, model, criterion, device, epoch, writer):
+def validate(config, val_loader, dataset, converter, model, criterion, device, epoch):
     losses = utils.AverageMeter()
     model.eval()
     n_correct = 0
@@ -255,6 +243,7 @@ def validate(config, val_loader, dataset, converter, model, criterion, device, e
             loss = criterion(preds, text, preds_size, length)
             losses.update(loss.item(), inp.size(0))
             _, preds = preds.max(2)
+            preds = preds.int()
             preds = preds.transpose(1, 0).contiguous().view(-1)
             sim_preds = converter.decode(preds.data, preds_size.data, raw=False)
             for pred, target in zip(sim_preds, labels):
@@ -269,7 +258,6 @@ def validate(config, val_loader, dataset, converter, model, criterion, device, e
     print(n_total)
     accuracy = n_correct / float(n_total)
     print('Test loss: {:.4f}, accuracy: {:.4f}'.format(losses.avg, accuracy))
-    # writer.add_scalar('valid_acc', accuracy, epoch * len(val_loader) + i)
     return accuracy
 
 

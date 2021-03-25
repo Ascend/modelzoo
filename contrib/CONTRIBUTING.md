@@ -16,20 +16,20 @@ Ascend ModelZoo，欢迎各位开发者
 
 2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 
-3、贡献者模型代码目录规则："modelzoo/contrib/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
+3、贡献者模型代码目录规则："modelzoo/contrib/框架/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
 
 4、从其他开源迁移的代码，请增加License声明
 
  **二、License规则**
 
 * TensorFlow
-    
+
     迁移场景
-  
+
     1、迁移TensorFlow模型中若源项目已包含License文件则必须拷贝引用，否则在模型顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
 
     2、迁移TensorFlow框架开发的模型，需要在模型目录下每个源文件附上源社区TensorFlow Apache 2.0 License头部声明，并在其下追加新增完整华为公司License声明
-    
+
     ```
     # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
     #
@@ -45,7 +45,7 @@ Ascend ModelZoo，欢迎各位开发者
     # See the License for the specific language governing permissions and
     # limitations under the License.
     # ============================================================================
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
@@ -63,9 +63,9 @@ Ascend ModelZoo，欢迎各位开发者
 
     1、基于TensorFlow框架开发模型，需在模型项目顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
 
-    2、基于TensorFlow框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
+    2、基于TensorFlow框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明
     ```
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
@@ -82,16 +82,16 @@ Ascend ModelZoo，欢迎各位开发者
 * PyTorch
 
     迁移场景
-  
+
     1、迁移PyTorch模型中若源项目录已包含PyTorch License文件则必须拷贝引用，否则在模型顶层目录下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
-    
+
     2、迁移PyTorch第三方框架开发的模型，需要在模型目录下每个源文件附上源社区PyTorch BSD-3 License头部声明，并在其下追加新增一行华为公司License声明
     ```
     # BSD 3-Clause License
     #
-    # Copyright (c) 2017 xxxx 
+    # Copyright (c) 2017 xxxx
     # All rights reserved.
-    # Copyright 2020 Huawei Technologies Co., Ltd 
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Redistribution and use in source and binary forms, with or without
     # modification, are permitted provided that the following conditions are met:
@@ -119,14 +119,14 @@ Ascend ModelZoo，欢迎各位开发者
     # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     # ============================================================================
     ```
-    
+
     开发场景
 
     1、基于PyTorch框架开发模型，需在模型项目下添加PyTorch BSD-3 License [PyTorch License链接](https://github.com/pytorch/examples/blob/master/LICENSE)
 
-    2、基于PyTorch框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明 
+    2、基于PyTorch框架开发模型，需要在模型目录下每个源文件附上源社区华为公司Apache 2.0 License头部声明
      ```
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Licensed under the BSD 3-Clause License  (the "License");
     # you may not use this file except in compliance with the License.
@@ -142,12 +142,12 @@ Ascend ModelZoo，欢迎各位开发者
     ```
 
 * MindSpore/ACL
-    
+
     1、迁移或开发场景下MindSpore/ACL模型顶层目录下需要包含华为公司 License [华为公司 License链接](https://gitee.com/mindspore/mindspore/blob/master/LICENSE)
-    
+
     2、迁移或开发场景下MindSpore/ACL模型，需要在模型目录下每个源文件中添加区华为公司Apache 2.0 License头部声明
      ```
-    # Copyright 2020 Huawei Technologies Co., Ltd
+    # Copyright 2021 Huawei Technologies Co., Ltd
     #
     # Licensed under the Apache License, Version 2.0 (the "License");
     # you may not use this file except in compliance with the License.
@@ -162,9 +162,8 @@ Ascend ModelZoo，欢迎各位开发者
     # limitations under the License.
     ```
 
-> 关于License声明时间，应注意： 2020年新建的文件，应该是Copyright 2020 Huawei Technologies Co., Ltd 2019年创建年份，2020年修改年份，应该是Copyright 2019-2020 Huawei Technologies Co., Ltd
+> 关于License声明时间，应注意： 2021年新建的文件，应该是Copyright 2021 Huawei Technologies Co., Ltd 2020年创建年份，2020年修改年份，应该是Copyright 2020 Huawei Technologies Co., Ltd
 
- 
  **三、readme**
 
 readme用于指导用户理解和部署样例，要包含如下内容：
@@ -173,7 +172,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 1、模型的来源及原理；
 
-2、模型复现的步骤，含训练、eval、在线/离线推理等，入口请封装成.sh、.py；
+2、模型复现的步骤，含训练、eval、在线/离线推理等，入口请封装成`.sh`、`.py`；
 
 - 关键要求：
 
@@ -195,11 +194,11 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 1、不同于完整的训练过程和全量数据集的推理，自测试用例的目的是验证提交代码基本功能可用，执行时长控制在10min之内(推理或训练只需执行有限的图片或step)；
 
-2、提交PR中训练用例入口train_testcase.sh, 在线推理用例入口online_inference_testcase.sh, 离线推理用例入口offline_inference_testcase.sh；
+2、提交PR中训练用例入口`train_testcase.sh`, 在线推理用例入口`online_inference_testcase.sh`, 离线推理用例入口`offline_inference_testcase.sh`；
 
 3、提交PR后，会自动触发门禁流水，后台会根据用例入口shell，自动将代码分发到对应执行环境；
 
-4、Jekins预置账号：global_read/huawei@123，登录之后，可以查看到用例执行日志
+4、Jenkins预置账号：`global_read/huawei@123`，登录之后，可以查看到用例执行日志
 
 5、如果提交失败，请查看日志，修复代码或其他问题后，在你当前的PR中，评论“compile”即可重新触发用例执行
 
@@ -211,21 +210,21 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 3、执行环境已预装软件包和Python3.7.5环境，调用命令"python3"、"python3.7"、"python3.7.5"均可，安装第三方库依赖使用"pip3"、"pip3.7"均可；
 
-4、数据集和模型：小于500M的文件，建议使用obsutil命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前下载到执行环境上,
+4、数据集和模型：小于500M的文件，建议使用`obsutil`命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前下载到执行环境上,
 
 已预置数据集&python第三方库: [Environments](https://gitee.com/ascend/modelzoo/blob/master/contrib/ENVIRONMENTS.md)
 
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试用例开发参考：
-[训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
-[离线推理](https://gitee.com/ascend/modelzoo/tree/master/contrib/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
+- [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
+- [离线推理](https://gitee.com/alexcheng88/modelzoo/tree/master/contrib/TensorFlow/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **五、PR提交**
 
 - 关键要求：
 
-1、请将modelzoo仓fork到个人分支,基于个人分支新增、修改和提交PR；
+1、请将modelzoo仓fork到个人分支，基于个人分支新增、修改和提交PR；
 
 2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 

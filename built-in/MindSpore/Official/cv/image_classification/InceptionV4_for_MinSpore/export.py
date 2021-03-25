@@ -28,6 +28,8 @@ from src.inceptionv4 import Inceptionv4
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='checkpoint export')
+    parser.add_argument('--model_name', type=str, default='inceptionV4.air', help='convert model name of inceptionv4')
+    parser.add_argument('--format', type=str, default='AIR', help='convert model name of inceptionv4')
     parser.add_argument('--checkpoint', type=str, default='', help='checkpoint of inceptionv4')
     args_opt = parser.parse_args()
 
@@ -36,5 +38,4 @@ if __name__ == '__main__':
     load_param_into_net(net, param_dict)
 
     input_arr = Tensor(np.random.uniform(0.0, 1.0, size=[1, 3, 299, 299]), ms.float32)
-    export(net, input_arr, file_name=config.onnx_filename, file_format="ONNX")
-    export(net, input_arr, file_name=config.air_filename, file_format="AIR")
+    export(net, input_arr, file_name=args_opt.model_name, file_format=args_opt.format)

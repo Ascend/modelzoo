@@ -7,6 +7,7 @@
 * [默认配置](#默认配置)
 * [快速上手](#快速上手)
   * [准备数据集](#准备数据集)
+  * [Docker容器场景](#Docker容器场景)
   * [关键配置修改](#关键配置修改)
   * [运行示例](#运行示例)
     * [训练](#训练)
@@ -80,6 +81,46 @@ python utils/create_pretraining_data.py \
   --dupe_factor=5
 ```
 
+### Docker容器场景
+
+- 编译镜像
+```bash
+docker build -t ascend-nezha .
+```
+
+- 启动容器实例
+```bash
+bash scripts/docker_start.sh
+```
+
+参数说明:
+
+```
+#!/usr/bin/env bash
+docker_image=$1 \   #接受第一个参数作为docker_image
+data_dir=$2 \       #接受第二个参数作为训练数据集路径
+model_dir=$3 \      #接受第三个参数作为模型执行路径
+docker run -it --ipc=host \
+        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
+ --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
+        -v ${data_dir}:${data_dir} \    #训练数据集路径
+        -v ${model_dir}:${model_dir} \  #模型执行路径
+        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
+        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image为镜像名称
+        /bin/bash
+```
+
+执行docker_start.sh后带三个参数：
+  - 生成的docker_image
+  - 数据集路径
+  - 模型执行路径
+```bash
+./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
+```
+
+
 
 ### 关键配置修改
 
@@ -96,6 +137,37 @@ export RANK_ID=1
 ### 运行示例
 
 #### 训练
+
+在`scripts`路径下的`train_8p.sh`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径。
+
+参数说明：
+
+```
+python3.7 ${dname}/src/pretrain/run_pretraining.py \
+ --bert_config_file=${dname}/configs/nezha_large_config.json \
+ --max_seq_length=128 \
+ --max_predictions_per_seq=20 \
+ --train_batch_size=64 \
+ --learning_rate=1e-4 \
+ --num_warmup_steps=10000 \
+ --num_train_steps=1000000 \
+ --optimizer_type=lamb \
+ --manual_fp16=True \
+ --use_fp16_cls=True \
+ --input_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \         #训练数据集路径
+ --eval_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \          #验证数据集路径
+ --npu_bert_debug=False \
+ --npu_bert_use_tdt=True \
+ --do_train=True \
+ --num_accumulation_steps=1 \
+ --npu_bert_job_start_file= \
+ --iterations_per_loop=100 \
+ --save_checkpoints_steps=10000 \
+ --npu_bert_clip_by_global_norm=False \
+ --distributed=True \
+ --npu_bert_loss_scale=0 \
+ --output_dir=./output > ${currentDir}/result/8p/train_${device_id}.log 2>&1
+ ```
 
 1.单卡训练
 

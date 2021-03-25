@@ -12,6 +12,8 @@ else
 	export PYTHONPATH=/usr/local/Ascend/ascend-toolkit/latest/fwkacllib/python/site-packages/:/usr/local/Ascend/ascend-toolkit/latest/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:/usr/local/Ascend/ascend-toolkit/latest/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
 fi
 
+source env_new.sh
 
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
+export ASCEND_GLOBAL_LOG_LEVEL=3

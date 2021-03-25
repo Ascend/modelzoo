@@ -105,9 +105,9 @@ def get_1980_lr(config, global_step, lr_init, lr_end, lr_max, warmup_epochs, ste
         warmup_steps = steps_per_epoch * warmup_epochs
         inc_each_step = ( float(lr_max) - float(lr_init) ) / float(warmup_steps)
         for i in range( config['total_steps_include_iterations'] ):
-          if i < warmup_steps:
+          if i <= warmup_steps:
             lr = float(lr_init) + inc_each_step * float(i) 
-          elif i <= total_steps:
+          elif i < total_steps:
             base =  ( 1.0 - (float(i)-float(warmup_steps))/(float(total_steps)-float(warmup_steps)) ) 
             lr = float(lr_max) * base 
           else:
@@ -119,9 +119,9 @@ def get_1980_lr(config, global_step, lr_init, lr_end, lr_max, warmup_epochs, ste
         
         warmup_steps = steps_per_epoch * warmup_epochs
         for i in range( config['total_steps_include_iterations'] ):
-          if i < warmup_steps:
+          if i <= warmup_steps:
             lr = cos_warmup_1980( i, warmup_steps, lr_max )
-          elif i <= total_steps:
+          elif i < total_steps:
             lr = cos_decay_1980( i, warmup_steps, total_steps, lr_max )
           else:
             lr = 0.0
@@ -131,9 +131,9 @@ def get_1980_lr(config, global_step, lr_init, lr_end, lr_max, warmup_epochs, ste
         warmup_steps = steps_per_epoch * warmup_epochs
         inc_each_step = ( float(lr_max) - float(lr_init) ) / float(warmup_steps)
         for i in range( config['total_steps_include_iterations'] ):
-          if i < warmup_steps:
+          if i <= warmup_steps:
             lr = float(lr_init) + inc_each_step * float(i) 
-          elif i <= total_steps:
+          elif i < total_steps:
             lr = cos_decay_1980( i, warmup_steps, total_steps, lr_max )
           else:
             lr = 0.0
@@ -142,7 +142,7 @@ def get_1980_lr(config, global_step, lr_init, lr_end, lr_max, warmup_epochs, ste
         total_steps = int(nsteps)
         warmup_steps = steps_per_epoch * warmup_epochs
         for i in range(total_steps):
-            if i < warmup_steps:
+            if i <= warmup_steps:
                 lr = lr_init + (lr_max - lr_init) * i / warmup_steps
             else: 
                 lr = lr_max - ( lr_max - lr_end ) * (i - warmup_steps) / (total_steps - warmup_steps)

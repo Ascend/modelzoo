@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+"""train imagenet"""
+import os
+import argparse
+import math
+import numpy as np
+
 from mindspore.communication import init, get_rank
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, LossMonitor
 from mindspore.train.model import ParallelMode
-from mindspore.train.loss_scale_manager import FixedLossScaleManager, DynamicLossScaleManager
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore import Model
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.nn import RMSProp
@@ -25,14 +31,9 @@ from mindspore.common import set_seed
 from mindspore.common.initializer import XavierUniform, initializer
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
-import os
-import argparse
-import math
-import time
-import numpy as np
 from src.inceptionv4 import Inceptionv4
-from src.dataset import create_dataset, device_id, device_num
-from src.callback import EvaluateCallBack
+from src.dataset import create_dataset, device_num
+
 from src.config import config_ascend as config
 
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
@@ -75,14 +76,14 @@ def generate_cosine_lr(steps_per_epoch, total_epochs,
     return learning_rate
 
 
-def Inceptionv4_train():
+def inception_v4_train():
     """
     Train Inceptionv4 in data parallelism
     """
     print('epoch_size: {} batch_size: {} class_num {}'.format(config.epoch_size, config.batch_size, config.num_classes))
 
     context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-    context.set_context(device_id=device_id)
+    context.set_context(device_id=args.device_id)
     context.set_context(enable_graph_kernel=False)
     rank = 0
     if device_num > 1:
@@ -90,7 +91,8 @@ def Inceptionv4_train():
         rank = get_rank()
         context.set_auto_parallel_context(device_num=device_num,
                                           parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+                                          gradients_mean=True,
+                                          all_reduce_fusion_config=[200, 400])
 
     # create dataset
     train_dataset = create_dataset(dataset_path=args.dataset_path, do_train=True,
@@ -121,7 +123,7 @@ def Inceptionv4_train():
     opt = RMSProp(group_params, lr, decay=config.decay, epsilon=config.epsilon, weight_decay=config.weight_decay,
                   momentum=config.momentum, loss_scale=config.loss_scale)
 
-    if device_id == 0:
+    if args.device_id == 0:
         print(lr)
         print(train_step_size)
     if args.resume:
@@ -138,11 +140,11 @@ def Inceptionv4_train():
     ckp_save_step = config.save_checkpoint_epochs * train_step_size
     config_ck = CheckpointConfig(save_checkpoint_steps=ckp_save_step, keep_checkpoint_max=config.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix=f"inceptionV4-train-rank{rank}",
-                                 directory=os.path.join(config.ckpt_path, 'ckpts_rank_' + str(rank)), config=config_ck)
+                                 directory='ckpts_rank_' + str(rank), config=config_ck)
     callbacks = [performance_cb, loss_cb]
     if device_num > 1 and config.is_save_on_master:
-        if device_id == 0:
-            callbacks =  callbacks.append(ckpoint_cb)
+        if args.device_id == 0:
+            callbacks.append(ckpoint_cb)
     else:
         callbacks.append(ckpoint_cb)
 
@@ -153,7 +155,8 @@ def Inceptionv4_train():
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser(description='InceptionV4 image classification training')
     arg_parser.add_argument('--dataset_path', type=str, default='', help='Dataset path')
+    arg_parser.add_argument('--device_id', type=int, default=0, help='device id')
     arg_parser.add_argument('--resume', type=str, default='', help='resume training with existed checkpoint')
     args = arg_parser.parse_args()
-    Inceptionv4_train()
+    inception_v4_train()
     print('Inceptionv4 training success!')

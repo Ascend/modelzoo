@@ -137,7 +137,6 @@ class DenseNet(nn.Module):
 def densenet121(pretrained=False, **kwargs):
     r"""Densenet-121 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
-
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
@@ -148,16 +147,8 @@ def densenet121(pretrained=False, **kwargs):
         # has keys 'norm.1', 'relu.1', 'conv.1', 'norm.2', 'relu.2', 'conv.2'.
         # They are also in the checkpoints in model_urls. This pattern is used
         # to find such keys.
-        pattern = re.compile(
-            r'^(.*denselayer\d+\.(?:norm|relu|conv))\.((?:[12])\.(?:weight|bias|running_mean|running_var))$')
-        state_dict = model_zoo.load_url(model_urls['densenet121'])
-        for key in list(state_dict.keys()):
-            res = pattern.match(key)
-            if res:
-                new_key = res.group(1) + res.group(2)
-                state_dict[new_key] = state_dict[key]
-                del state_dict[key]
-        model.load_state_dict(state_dict)
+        checkpoint = torch.load('checkpoint.pth.tar', map_location='cpu')
+        model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()})
     return model
 
 

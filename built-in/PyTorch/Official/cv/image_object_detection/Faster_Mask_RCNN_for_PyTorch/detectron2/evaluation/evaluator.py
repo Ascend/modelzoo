@@ -111,7 +111,7 @@ class DatasetEvaluators(DatasetEvaluator):
         return results
 
 
-def inference_on_dataset(model, data_loader, evaluator):
+def inference_on_dataset(model, data_loader, evaluator, device):
     """
     Run model on the data_loader and evaluate the metrics with evaluator.
     Also benchmark the inference speed of `model.forward` accurately.
@@ -146,6 +146,8 @@ def inference_on_dataset(model, data_loader, evaluator):
     total_compute_time = 0
     with inference_context(model), torch.no_grad():
         for idx, inputs in enumerate(data_loader):
+            for d in inputs:
+                d["image_preprocess"] = d["image_preprocess"].to(device)
             if idx == num_warmup:
                 start_time = time.perf_counter()
                 total_compute_time = 0
@@ -169,6 +171,7 @@ def inference_on_dataset(model, data_loader, evaluator):
                     ),
                     n=5,
                 )
+
 
     # Measure the time only for this worker (before the synchronization barrier)
     total_time = time.perf_counter() - start_time

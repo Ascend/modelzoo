@@ -246,7 +246,10 @@ parser.add_argument('--checkpoint-freq',
                          '0: save only one file whitch per epoch;'
                          'n: save diff file per n epoch'
                          '-1:no checkpoint,not support')
-
+parser.add_argument('-t',
+                    '--fine-tuning',
+                    action='store_true',
+                    help='transfer learning + fine tuning - train only the last FC layer.')
 best_acc1 = 0
 
 def nvidia_model_config(args):
@@ -343,9 +346,6 @@ def main():
     print(args)
     print("===============main()=================")
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:",os.environ['KERNEL_NAME_ID'])
-
     if args.seed is not None:
         random.seed(args.seed)
         torch.manual_seed(args.seed)
@@ -391,10 +391,6 @@ def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = args.process_device_map[gpu]
 
-    print("[gpu id:",args.gpu,"]","+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(gpu)
-    print("[gpu id:",args.gpu,"]","+++++++++++++++++++++++++++KERNEL_NAME_ID:",os.environ['KERNEL_NAME_ID'])
-
     if args.gpu is not None:
         print("[gpu id:",args.gpu,"]","Use GPU: {} for training".format(args.gpu))
 
@@ -415,10 +411,29 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     if args.pretrained:
         print("[gpu id:",args.gpu,"]","=> using pre-trained model '{}'".format(args.arch))
-        model = models.__dict__[args.arch](pretrained=True)
+        # model = models.__dict__[args.arch](pretrained=True)
+        model = nvmodels.build_resnet("resnet50", "classic", True)
+        print("加载自己的训练模型")
+        pretrained_dict = \
+        torch.load("/home/checkpoint_npu0model_best.pth.tar", map_location="cpu")["state_dict"]
+        pretrained_dict.pop('fc.weight')
+        pretrained_dict.pop('fc.bias')
+        model.load_state_dict(pretrained_dict, strict=False)
     else:
         print("[gpu id:",args.gpu,"]","=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch]()
+
+    if args.fine_tuning:
+        print("=> transfer learning + fine tuning(train only the last FC layer)")
+        for param in model.parameters():
+            param.requires_grad = True
+        if args.arch == "resnet50":
+            model.parameters()
+        else:
+            print("Error: Fine-tuning is not supported on this architecture")
+            exit(-1)
+    else:
+        model.parameters()
 
     print("[gpu id:",args.gpu,"]","===============main_worker()=================")
     print("[gpu id:",args.gpu,"]",args)
@@ -499,7 +514,10 @@ def main_worker(gpu, ngpus_per_node, args):
             # ourselves based on the total number of GPUs we have
             # args.batch_size = int(args.batch_size / ngpus_per_node)
             # args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
-            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], broadcast_buffers=False)
+            if args.pretrained:
+                model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], broadcast_buffers=False, find_unused_parameters=True)
+            else:
+                model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], broadcast_buffers=False)
         else:
             print("[gpu id:",args.gpu,"]","============================test   args.gpu is not None   else==========================")
             model = torch.nn.parallel.DistributedDataParallel(model)
@@ -612,8 +630,8 @@ def main_worker(gpu, ngpus_per_node, args):
                     'epoch': epoch + 1,
                     'arch': args.arch,
                     'state_dict': modeltmp.state_dict(),
-                    'best_acc1': best_acc1.to("cpu"),
-                }, is_best.to("cpu"),filename=filename)
+                    'best_acc1': best_acc1,
+                }, is_best,filename=filename)
                 
                 if (epoch == (args.epochs - 1)) or ((args.checkpoint_freq > 0) and (((epoch+1) % args.checkpoint_freq) == 0)):
                     #保留每个freq的checkpoint，共epochs/freq个checkpoint文件
@@ -624,8 +642,8 @@ def main_worker(gpu, ngpus_per_node, args):
                         'epoch': epoch + 1,
                         'arch': args.arch,
                         'state_dict': modeltmp.state_dict(),
-                        'best_acc1': best_acc1.to("cpu"),
-                    }, is_best.to("cpu"),filename=filename)
+                        'best_acc1': best_acc1,
+                    }, is_best,filename=filename)
 
                 loc = 'npu:{}'.format(args.gpu)
                 modeltmp.to(loc)
@@ -820,7 +838,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[gpu id:",os.environ['KERNEL_NAME_ID'],"]",'\t'.join(entries))
+        print("[gpu id:","0","]",'\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))

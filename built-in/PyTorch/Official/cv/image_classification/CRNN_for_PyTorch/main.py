@@ -8,7 +8,6 @@ import utils
 import torch
 import torch.nn.parallel
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from apex import amp
 from easydict import EasyDict as edict
 
@@ -93,10 +92,9 @@ def main():
 
     converter = utils.strLabelConverter(config.DATASET.ALPHABETS)
     checkpoint_dir, log_dir = utils.create_output_folder(config)
-    writer = SummaryWriter(log_dir)
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
-        train(config, train_loader, train_dataset, converter, model, criterion, optimizer, device, epoch, writer)
-        acc = validate(config, val_loader, val_dataset, converter, model, criterion, device, epoch, writer)
+        train(config, train_loader, train_dataset, converter, model, criterion, optimizer, device, epoch)
+        acc = validate(config, val_loader, val_dataset, converter, model, criterion, device, epoch)
         is_best = acc > best_acc
         best_acc = max(acc, best_acc)
         print("is best:", is_best)
@@ -121,10 +119,9 @@ def main():
                 }, os.path.join(checkpoint_dir, "checkpoint_{}_acc_{:.4f}.pth".format(epoch, acc))
             )
 
-    writer.close()
 
 
-def train(config, train_loader, dataset, converter, model, criterion, optimizer, device, epoch, writer):
+def train(config, train_loader, dataset, converter, model, criterion, optimizer, device, epoch):
     utils.seed_everything()
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
@@ -166,12 +163,11 @@ def train(config, train_loader, dataset, converter, model, criterion, optimizer,
                 epoch, i, len(train_loader), batch_time=batch_time,
                 data_time=data_time, fps=fps, loss=losses)
             print(msg)
-        # writer.add_scalar('train_loss', losses.avg, epoch+1)
         end = time.time()
     print(' * FPS@all {:.3f}'.format(config.TRAIN.BATCH_SIZE_PER_GPU * 1000 / batch_time.avg))
 
 
-def validate(config, val_loader, dataset, converter, model, criterion, device, epoch, writer):
+def validate(config, val_loader, dataset, converter, model, criterion, device, epoch):
     losses = utils.AverageMeter()
     model.eval()
     n_correct = 0
@@ -191,6 +187,7 @@ def validate(config, val_loader, dataset, converter, model, criterion, device, e
             loss = criterion(preds, text, preds_size, length)
             losses.update(loss.item(), inp.size(0))
             _, preds = preds.max(2)
+            preds = preds.int()
             preds = preds.transpose(1, 0).contiguous().view(-1)
             sim_preds = converter.decode(preds.data, preds_size.data, raw=False)
             for pred, target in zip(sim_preds, labels):
@@ -205,7 +202,6 @@ def validate(config, val_loader, dataset, converter, model, criterion, device, e
     print(n_total)
     accuracy = n_correct / float(n_total)
     print('Test loss: {:.4f}, accuracy: {:.4f}'.format(losses.avg, accuracy))
-    # writer.add_scalar('valid_acc', accuracy, epoch+1)
     return accuracy
 
 

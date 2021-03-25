@@ -1,7 +1,5 @@
 #!/bin/bash
 
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-
 source pt_set_env.sh
 #Author: Ruchao Fan
 #2017.11.1     Training acoustic model and decode with phoneme-level bigram
@@ -9,7 +7,6 @@ source pt_set_env.sh
 #2019.12.20    Update to pytorch1.2 and python3.7
 
 device_id=0
-export PTCOPY_ENABLE=1
 
 . path.sh
 stage=0
@@ -43,7 +40,7 @@ fi
 
 if [ $stage -le 2 ]; then
     echo "Step 2: Acoustic Model(CTC) Training..."
-    python3 steps/train_ctc.py \
+    taskset -c 0-128 python3 steps/train_ctc.py \
     --use_npu True \
     --device_id $device_id \
     --loss_scale 128 \

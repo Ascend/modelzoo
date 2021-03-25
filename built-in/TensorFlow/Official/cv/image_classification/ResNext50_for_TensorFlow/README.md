@@ -7,6 +7,7 @@
 * [默认配置](#默认配置)
 * [快速上手](#快速上手)
   * [准备数据集](#准备数据集)
+  * [Docker容器场景](#Docker容器场景)
   * [关键配置修改](#关键配置修改)
   * [运行示例](#运行示例)
     * [训练](#训练)
@@ -72,6 +73,45 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 - 请用户自行准备好数据集，包含训练集和验证集两部分，可选用的数据集包括ImageNet2012，CIFAR10、Flower等。
 - 以ImageNet2012举例，训练集和验证集图片统一放到“data/resnext50/imagenet_TF”目录下。
 
+### Docker容器场景
+
+- 编译镜像
+```bash
+docker build -t ascend-resnext50 .
+```
+
+- 启动容器实例
+```bash
+bash docker_start.sh
+```
+
+参数说明:
+
+```
+#!/usr/bin/env bash
+docker_image=$1 \   #接受第一个参数作为docker_image
+data_dir=$2 \       #接受第二个参数作为训练数据集路径
+model_dir=$3 \      #接受第三个参数作为模型执行路径
+docker run -it --ipc=host \
+        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
+ --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
+        -v ${data_dir}:${data_dir} \    #训练数据集路径
+        -v ${model_dir}:${model_dir} \  #模型执行路径
+        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
+        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image为镜像名称
+        /bin/bash
+```
+
+执行docker_start.sh后带三个参数：
+  - 生成的docker_image
+  - 数据集路径
+  - 模型执行路径
+```bash
+./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
+```
+
 ### 关键配置修改
 
 启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
@@ -84,79 +124,34 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
 #### 训练
 
-- 容器场景
-
-修改`testscript`目录下`Resnext50_*_docker.sh`文件，将对应容器镜像名修改为实际名称。
-
-`Resnext50_1p_docker.sh`脚本文件:
-
-```
-# user testcase
-casecsv="case_resnext50.csv"
-casenum=1
-
-# docker or host
-exectype="docker"
-
-ostype=`uname -m`
-if [ x"${ostype}" = xaarch64 ];
-then
-    # arm
-    dockerImage="ubuntu_arm:18.04"
-else
-    # x86
-    dockerImage="ubuntu:16.04"
-fi
-```
-   
-`Resnext50_8p_docker`脚本文件:
-
-```                   
-# user testcase
-casecsv="case_resnext50.csv"
-casenum=8
-
-# docker or host
-exectype="docker"
-
-ostype=`uname -m`
-if [ x"${ostype}" = xaarch64 ];
-then
-    # arm
-    dockerImage="ubuntu_arm:18.04"
-else
-    # x86
-    dockerImage="ubuntu:16.04"
-fi
-```
-
-执行训练脚本:
-
-1P训练指令（脚本位于`testscript/Resnext50_1p_docker.sh`）
-
-```
-./Resnext50_1p_docker.sh
-```
-
-8P训练指令（脚本位于`testscript/Resnext50_8p_docker.sh`）
-
-```
-./Resnext50_8p_docker.sh
-```
-
 
 - 物理机场景
 
-修改`case_resnext50_host.csv`中，路径为脚本所在的绝对路径地址
+
+修改 `ResNext50_for_TensorFlow / bin ` 中 `npu_set_env.sh` 和 `npu_set_env_1p.sh` 文件，根据hccl.json文件实际路径进行配置
 
 ```
-/home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/code/resnext50_train/mains/res50.py
---model_dir=/home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/d_solution/ckpt${DEVICE_ID}
+export RANK_TABLE_FILE=/network/ResNext50_for_TensorFlow/hccl.json
 ```
+
+修改 `ResNext50_for_TensorFlow / testscript` 中 `Resnext50_8p_host.sh` 和 `Resnext50_1p_host.sh` 文件:
+
+根据文件 `npu_set_env.sh` 的实际路径进行配置修改
+
+```
+source /network/ResNext50_for_TensorFlow/bin/npu_set_env.sh $RANK_ID $RANK_SIZE
+```
+
+根据文件 `res50.py` 的实际路径进行配置修改
+
+```
+python3.7 /network/ResNext50_for_TensorFlow/code/resnext50_train/mains/res50.py --config_file=res50_32bs_8p_host --max_train_steps=10000 --iterations_per_loop=1000   --debug=True  --eval=False  --model_dir=./  2>&1 | tee train_$RANK_ID.log &
+```
+
 
 修改`ModelZoo_ResNext50_TF_MTI\code\resnext50_train\configs` 中`res50_32bs_1p_host` 和 `res50_32bs_8p_host`文件:
 
-配置数据集的绝对路径地址
+配置数据集的绝对路径地址，确保修改为用户数据集所在路径
 
 ```
 'data_url':  'file:///home/models/training_shop/03-code/ModelZoo_ResNext50_TF_MTI/data/resnext50/imagenet_TF',
@@ -169,6 +164,13 @@ fi
 ```
 
 执行训练脚本:
+
+需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `train` , 8p同理。
+
+```
+'mode':'train',                                         # "train","evaluate"
+```
+
 
 1P训练指令（脚本位于`testscript/Resnext50_1p_host.sh`）
 
@@ -185,7 +187,26 @@ fi
 
 #### 推理
 
-在120 epoch训练执行完成后，脚本会自动执行验证流程
+执行推理脚本:
+
+需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate` , 8p同理。
+
+```
+'mode':'evaluate',                                         # "train","evaluate"
+```
+
+1P推理指令（脚本位于`testscript/Resnext50_1p_host.sh`）
+
+```
+./Resnext50_1p_host.sh
+```
+
+8P推理指令（脚本位于`testscript/Resnext50_8p_host.sh`）
+
+```
+./Resnext50_8p_host.sh
+```
+
 
 
 ## 高级

@@ -28,10 +28,10 @@ class _ROIAlign(Function):
         ctx.sampling_ratio = sampling_ratio
         ctx.input_shape = input.size()
         ctx.aligned = aligned
-
+        roi_end_mode = 0
         output = torch.npu_roi_align(
             input, roi, spatial_scale,
-            output_size[0], output_size[1], sampling_ratio)
+            output_size[0], output_size[1], sampling_ratio, roi_end_mode)
 
         return output
 

@@ -1,0 +1,1 @@
+python3 test_npu.py  --model_path ./model/fcn.ckpt-9 --data_path ./data/val.tfrecords   --image_num  736

@@ -1,0 +1,130 @@
+{
+  "op": [
+    {
+      "is_support": false,
+      "name": "Merge/MergeSummary",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "MergeSummary"
+    },
+    {
+      "is_support": false,
+      "name": "learning_rate",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/classification_dice_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/geo_map_0",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/geo_map_0_pred",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/geometry_AABB",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/geometry_theta",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/input",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/model_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/score_map",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/score_map_pred",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/total_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "model_0/training_masks",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ImageSummary"
+    },
+    {
+      "is_support": false,
+      "name": "save/SaveV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "SaveV2"
+    }
+  ]
+}

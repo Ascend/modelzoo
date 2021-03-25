@@ -8,6 +8,7 @@ This repository provides a script and recipe to train the DeepFM model .
 * [Requirements](#Requirements)
 * [Quick start guide](#quick-start-guide)
   * [Prepare the dataset](#Prepare-the-dataset)
+  * [Docker container scene](#Docker-container-scene)
   * [Modification of OPP operator](#Modification-of-OPP-operator)
   * [Check json](#Check-json)
   * [Key configuration changes](#Key-configuration-changes)
@@ -40,6 +41,46 @@ DeepFM "DeepFM: A Factorization-Machine based Neural Network for CTR prediction"
 - The train and val images are under the train/ and val/ directories, respectively. All images within one folder have the same label.
 
 - Please convert the dataset to tfrecord format file by yourself.
+
+
+### Docker container scene
+
+- Compile image
+```bash
+docker build -t ascend-deepfm .
+```
+
+- Start the container instance
+```bash
+bash scripts/docker_start.sh
+```
+
+Parameter Description:
+
+```bash
+#!/usr/bin/env bash
+docker_image=$1 \   #Accept the first parameter as docker_image
+data_dir=$2 \       #Accept the second parameter as the training data set path
+model_dir=$3 \      #Accept the third parameter as the model execution path
+docker run -it --ipc=host \
+        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #The number of cards used by docker, currently using 0~7 cards
+        --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
+        -v ${data_dir}:${data_dir} \    #Training data set path
+        -v ${model_dir}:${model_dir} \  #Model execution path
+        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
+        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image is the image name
+        /bin/bash
+```
+
+After executing docker_start.sh with three parameters:
+  - The generated docker_image
+  - Dataset path
+  - Model execution path
+```bash
+./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
+```
 
 
 ### Modification of OPP operator
@@ -246,6 +287,7 @@ configs/config.py: record_path
 --num_inputs                      number of features of dataset. default : 39
 --batch_size                      mini-batch size ,default: 128 
 --n_epoches                       initial learning rate,default: 0.06
+--line_per_sample                 number of samples per line,make sure that it is divisible by batch_size
 ```
 
 

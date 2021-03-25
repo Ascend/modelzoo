@@ -19,11 +19,12 @@ import os
 import time
 import argparse
 import ast
+import numpy as np
 
 import mindspore.common.dtype as mstype
-from mindspore import context, Tensor
+from mindspore import context, Tensor, Parameter
 from mindspore.communication.management import init
-from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor, LossMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -101,8 +102,8 @@ if __name__ == '__main__':
     loss_scale = float(config.loss_scale)
 
     # When create MindDataset, using the fitst mindrecord file, such as FasterRcnn.mindrecord0.
-    dataset = create_fasterrcnn_dataset(mindrecord_file, repeat_num=1,
-                                        batch_size=config.batch_size, device_num=device_num, rank_id=rank)
+    dataset = create_fasterrcnn_dataset(mindrecord_file, batch_size=config.batch_size,
+                                        device_num=device_num, rank_id=rank)
 
     dataset_size = dataset.get_dataset_size()
     print("Create dataset done!")
@@ -116,6 +117,9 @@ if __name__ == '__main__':
         for item in list(param_dict.keys()):
             if not item.startswith('backbone'):
                 param_dict.pop(item)
+        for key, value in param_dict.items():
+            tensor = value.asnumpy().astype(np.float32)
+            param_dict[key] = Parameter(tensor, key)
         load_param_into_net(net, param_dict)
 
     loss = LossNet()
@@ -141,4 +145,8 @@ if __name__ == '__main__':
         cb += [ckpoint_cb]
 
     model = Model(net)
-    model.train(config.epoch_size, dataset, callbacks=cb)
+    if config.dataset_sink_mode:
+        model.train(config.epoch_size, dataset, callbacks=cb)
+    else:
+        cb.append(LossMonitor(config.steps_of_echo_loss))
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=False)

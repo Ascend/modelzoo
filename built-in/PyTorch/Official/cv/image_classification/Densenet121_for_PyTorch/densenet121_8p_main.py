@@ -82,6 +82,8 @@ parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
+parser.add_argument('--fine-tuning', action='store_true',
+                    help='use fine-tuning model')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int,
@@ -143,9 +145,6 @@ def main():
     print(args)
     print("===============main()=================")
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-
     if args.seed is not None:
         random.seed(args.seed)
         torch.manual_seed(args.seed)
@@ -192,10 +191,6 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = args.process_device_map[gpu]
-    print("[npu id:", args.gpu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:",
-          os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(gpu)
-    print("[npu id:", args.gpu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if args.gpu is not None:
         print("[npu id:", args.gpu, "]", "Use GPU: {} for training".format(args.gpu))
@@ -217,6 +212,30 @@ def main_worker(gpu, ngpus_per_node, args):
 
     loc = 'npu:{}'.format(args.gpu)
     torch.npu.set_device(loc)
+
+    if args.pretrained:
+        print("=> using pre-trained model '{}'".format(args.arch))
+        model = densenet121(pretrained=True)
+    else:
+        print("=> creating model '{}'".format(args.arch))
+        model = densenet121()
+
+    parameters = model.parameters()
+    if args.fine_tuning:
+        print("=> transfer-learning mode + fine-tuning (train only the last FC layer)")
+        for param in model.parameters():
+            param.requires_grad = False
+        if args.arch == 'densenet121':
+            model.classifier = nn.Linear(1024, 101)
+            parameters = model.classifier.parameters()
+        elif args.arch == 'densenet201':
+            model.classifier = nn.Linear(1920, 101)
+            parameters = model.classifier.parameters()
+        else:
+            print("Error:Fine-tuning is not supported on this architecture")
+            exit(-1)
+    else:
+        parameters = model.parameters()
 
     args.batch_size = int(args.batch_size / ngpus_per_node)
     args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
@@ -402,8 +421,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % ngpus_per_node == 0):
         print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
-        hwlog.remark_print(key=hwlog.FPS,
-                           value=' * FPS@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg))
 
 
 def validate(val_loader, model, criterion, args, ngpus_per_node):
@@ -497,7 +514,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[npu id:", os.environ['KERNEL_NAME_ID'], "]", '\t'.join(entries))
+        print("[npu id:", '0', "]", '\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))

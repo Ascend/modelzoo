@@ -301,7 +301,8 @@ class DefaultTrainer(SimpleTrainer):
             model = DistributedDataParallel(
                 model, device_ids=[comm.get_local_rank()], broadcast_buffers=False
             )
-        super().__init__(model, data_loader, optimizer)
+        super().__init__(model, data_loader, optimizer,
+                         aspect_ratio_grouping=cfg.DATALOADER.ASPECT_RATIO_GROUPING)
 
         self.scheduler = self.build_lr_scheduler(cfg, optimizer)
         # Assume no other objects need to be checkpointed.
@@ -535,7 +536,7 @@ Alternatively, you can call evaluation functions yourself (see Colab balloon tut
                     )
                     results[dataset_name] = {}
                     continue
-            results_i = inference_on_dataset(model, data_loader, evaluator)
+            results_i = inference_on_dataset(model, data_loader, evaluator, cfg.MODEL.DEVICE)
             results[dataset_name] = results_i
             if comm.is_main_process():
                 assert isinstance(

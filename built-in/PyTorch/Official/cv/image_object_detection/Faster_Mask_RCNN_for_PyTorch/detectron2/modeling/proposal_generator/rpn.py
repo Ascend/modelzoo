@@ -422,7 +422,7 @@ class RPN(nn.Module):
 
         valid_mask = gt_labels >= 0 # already fixed, the num be RPN.BATCH_SIZE_PER_IMAGE(256)*num_images
         objectness_loss = F.binary_cross_entropy_with_logits(
-            cat(pred_objectness_logits, dim=1),
+            cat(pred_objectness_logits, dim=1).float(),
             gt_labels.float(),
             reduction="none",
         )

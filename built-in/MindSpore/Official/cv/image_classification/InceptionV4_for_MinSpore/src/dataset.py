@@ -4,14 +4,14 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
+# 
 """Create train or eval dataset."""
 import os
 import mindspore.common.dtype as mstype
@@ -39,16 +39,13 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32):
         Dataset.
     """
 
-    if do_train:
-        do_shuffle = True
-    else:
-        do_shuffle = False
+    do_shuffle = bool(do_train)
 
     if device_num == 1 or not do_train:
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=config.work_nums, shuffle=do_shuffle)
     else:
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=config.work_nums,
-                                    shuffle=do_shuffle, num_shards=device_num, shard_id=device_id)
+                                   shuffle=do_shuffle, num_shards=device_num, shard_id=device_id)
 
     image_length = 299
     if do_train:
@@ -68,7 +65,7 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32):
         C.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         C.HWC2CHW()
     ]
-    
+
     type_cast_op = C2.TypeCast(mstype.int32)
 
     ds = ds.map(input_columns="label", operations=type_cast_op, num_parallel_workers=config.work_nums)

@@ -2,8 +2,8 @@
 
 source npu_set_env.sh
 
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 172.17.0.1:22118 --log \"SetLogLevel(0)[error]\" --device 0"
-su HwHiAiUser -c "/usr/local/Ascend/ascend-toolkit/latest/toolkit/bin/adc --host 172.17.0.1:22118 --log \"SetLogLevel(0)[error]\" --device 4"
+/usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
@@ -12,8 +12,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-export SLOG_PRINT_TO_STDOUT=0
-export TASK_QUEUE_ENABLE=1
+
 nohup python3.7 ${currentDir}/mobilenetv2_8p_main_anycard.py \
     --addr=$(hostname -I |awk '{print $1}') \
     --seed 49  \

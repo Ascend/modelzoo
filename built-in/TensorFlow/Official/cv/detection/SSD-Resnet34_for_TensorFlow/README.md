@@ -8,6 +8,7 @@
 * [快速上手](#快速上手)
   * [准备数据集](#准备数据集)
   * [准备预训练网络](#准备预训练网络)
+  * [Docker容器场景](#Docker容器场景)
   * [检查json](#检查json)
   * [关键配置修改](#关键配置修改)
   * [运行示例](#运行示例)
@@ -90,11 +91,54 @@ Ascend本次提供的是以ResNet34为主干网络、输入shape为300的SSD-Res
 
 - 将标注json文件放置于<path_to_annotations>目录中。
 
+
 ### 准备预训练模型
 
 请自行下载主干网络ResNet34的预训练模型的所有文件。
 
 将这些文件放置于同一目录<path_to_pretrain>中。
+
+
+### Docker容器场景
+
+- 编译镜像
+```bash
+docker build -t ascend-ssd .
+```
+
+- 启动容器实例
+```bash
+bash docker_start.sh
+```
+
+参数说明:
+
+```
+#!/usr/bin/env bash
+docker_image=$1 \   #接受第一个参数作为docker_image
+data_dir=$2 \       #接受第二个参数作为训练数据集路径
+model_dir=$3 \      #接受第三个参数作为模型执行路径
+docker run -it --ipc=host \
+        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
+ --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
+        -v ${data_dir}:${data_dir} \    #训练数据集路径
+        -v ${model_dir}:${model_dir} \  #模型执行路径
+        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
+        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
+        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image为镜像名称
+        /bin/bash
+```
+
+执行docker_start.sh后带三个参数：
+  - 生成的docker_image
+  - 数据集路径
+  - 模型执行路径
+```bash
+./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
+```
+
+
 
 ### 检查json
 

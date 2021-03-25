@@ -1,0 +1,2 @@
+python3    train_inception_frn.py  --model_path ./model/inception_v3.ckpt  --data_path  ./train_data --output_path  ./model_save    --image_num  1281167 --class_num  1000  --batch_size  64 --epoch  25
+    

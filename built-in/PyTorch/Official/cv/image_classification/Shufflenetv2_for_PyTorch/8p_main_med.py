@@ -42,9 +42,8 @@ import numpy as np
 
 from apex import amp
 from multi_epochs_dataloader import MultiEpochsDataLoader
+import pretrained_model_loader
 
-
-BATCH_SIZE = 512
 OPTIMIZER_BATCH_SIZE = 2048
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
@@ -63,7 +62,7 @@ parser.add_argument('--epochs', default=90, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=BATCH_SIZE, type=int,
+parser.add_argument('-b', '--batch-size', default=256, type=int,
                     metavar='N',
                     help='mini-batch size (default: 256), this is the total '
                          'batch size of all GPUs on the current node when '
@@ -138,8 +137,8 @@ def main():
     print(args)
     print("===============main()=================")
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
+    os.environ['LOCAL_DEVICE_ID'] = str(0)
+    print("+++++++++++++++++++++++++++LOCAL_DEVICE_ID:", os.environ['LOCAL_DEVICE_ID'])
 
     if args.seed is not None:
         random.seed(args.seed)
@@ -178,7 +177,7 @@ def main():
         # Use torch.multiprocessing.spawn to launch distributed processes: the
         # main_worker process function
         # The child process uses the environment variables of the parent process,
-        # we have to set KERNEL_NAME_ID for every proc
+        # we have to set LOCAL_DEVICE_ID for every proc
         if args.device == 'npu':
             # main_worker(args.gpu, ngpus_per_node, args)
             mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
@@ -197,9 +196,9 @@ def main_worker(gpu, ngpus_per_node, args):
     else:
         args.gpu = gpu
 
-    print("[npu id:", args.gpu, "]", "++++++++++++++++ before set KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(args.gpu)
-    print("[npu id:", args.gpu, "]", "++++++++++++++++ KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
+    print("[npu id:", args.gpu, "]", "++++++++++++++++ before set LOCAL_DEVICE_ID:", os.environ['LOCAL_DEVICE_ID'])
+    os.environ['LOCAL_DEVICE_ID'] = str(args.gpu)
+    print("[npu id:", args.gpu, "]", "++++++++++++++++ LOCAL_DEVICE_ID:", os.environ['LOCAL_DEVICE_ID'])
 
     if args.gpu is not None:
         print("[npu id:", args.gpu, "]", "Use GPU: {} for training".format(args.gpu))
@@ -255,15 +254,20 @@ def main_worker(gpu, ngpus_per_node, args):
     # optionally resume from a checkpoint
     if args.resume:
         if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume, map_location=loc)
-            args.start_epoch = checkpoint['epoch']
-            best_acc1 = checkpoint['best_acc1']
-            model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
-            if args.amp:
-                amp.load_state_dict(checkpoint['amp'])
-            print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
+            if args.pretrained:
+                checkpoint = torch.load(args.resume, map_location=loc)
+                pretrained_model_loader.load_state_dict(model, checkpoint)
+                print("=> loaded pretrained model '{}'".format(args.resume))
+            else:
+                print("=> loading checkpoint '{}'".format(args.resume))
+                checkpoint = torch.load(args.resume, map_location=loc)
+                args.start_epoch = checkpoint['epoch']
+                best_acc1 = checkpoint['best_acc1']
+                model.load_state_dict(checkpoint['state_dict'])
+                optimizer.load_state_dict(checkpoint['optimizer'])
+                if args.amp:
+                    amp.load_state_dict(checkpoint['amp'])
+                print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
@@ -281,7 +285,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # train for one epoch
         train(train_loader, train_loader_len, model, criterion, optimizer, epoch, args, ngpus_per_node)
 
-        if (epoch + 1) % args.eval_freq == 0 or epoch == args.epochs - 1 or epoch > int(args.epochs * 0.9):
+        if ((epoch + 1) % args.eval_freq == 0) or (epoch == args.epochs - 1) or (epoch > int(args.epochs * 0.9)):
             # evaluate on validation set
             acc1 = validate(val_loader, model, criterion, args, ngpus_per_node)
 
@@ -290,7 +294,7 @@ def main_worker(gpu, ngpus_per_node, args):
             best_acc1 = max(acc1, best_acc1)
 
             if not args.multiprocessing_distributed or \
-                    (args.multiprocessing_distributed and args.rank % ngpus_per_node == 0 or epoch == args.epochs - 1):
+                    (args.multiprocessing_distributed and args.rank % ngpus_per_node == 0):
                 if args.amp:
                     save_checkpoint({
                         'epoch': epoch + 1,
@@ -391,7 +395,8 @@ def train(train_loader, train_loader_len, model, criterion, optimizer, epoch, ar
 
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                 and args.rank % ngpus_per_node == 0):
-        print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}, TIME@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg, batch_time.avg))
+        if batch_time.avg > 0:
+            print("[npu id:", args.gpu, "]", '* FPS@all {:.3f}, TIME@all {:.3f}'.format(ngpus_per_node * args.batch_size / batch_time.avg, batch_time.avg))
 
 
 def validate(val_loader, model, criterion, args, ngpus_per_node):
@@ -493,7 +498,7 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print("[npu id:", os.environ['KERNEL_NAME_ID'], "]", '\t'.join(entries))
+        print("[npu id:", os.environ['LOCAL_DEVICE_ID'], "]", '\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
@@ -589,12 +594,12 @@ def get_pytorch_val_loader(data_path, batch_size, workers=5, _worker_init_fn=Non
     else:
         val_sampler = None
 
-        dataloader_fn = MultiEpochsDataLoader  # torch.utils.data.DataLoader
-        val_loader = dataloader_fn(
-            val_dataset,
-            sampler=val_sampler,
-            batch_size=batch_size, shuffle=(val_sampler is None),
-            num_workers=workers, worker_init_fn=_worker_init_fn, pin_memory=True, collate_fn=fast_collate)
+    dataloader_fn = MultiEpochsDataLoader  # torch.utils.data.DataLoader
+    val_loader = dataloader_fn(
+        val_dataset,
+        sampler=val_sampler,
+        batch_size=batch_size, shuffle=(val_sampler is None),
+        num_workers=workers, worker_init_fn=_worker_init_fn, pin_memory=True, collate_fn=fast_collate)
 
     return val_loader
 

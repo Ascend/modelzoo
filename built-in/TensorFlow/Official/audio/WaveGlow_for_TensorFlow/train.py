@@ -238,6 +238,8 @@ def main():
     #custom_op.parameter_map["enable_data_pre_proc"].b = True
     custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
     custom_op.parameter_map["mix_compile_mode"].b = True
+    # Autotune
+    custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes(os.getenv("FLAG_AUTOTUNE"))
 
     custom_op.parameter_map["hcom_parallel"].b = True
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # 关闭remap开关

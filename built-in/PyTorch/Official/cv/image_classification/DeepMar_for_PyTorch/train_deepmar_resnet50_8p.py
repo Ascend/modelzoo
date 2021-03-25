@@ -29,26 +29,25 @@ import time
 import argparse
 import pdb
 import sys
-from torch.utils.tensorboard import SummaryWriter
 
 from baseline.dataset import add_transforms
 from baseline.dataset.Dataset import AttDataset
 from baseline.model.DeepMAR import DeepMAR_ResNet50
-from baseline.model.DeepMAR import DeepMAR_ResNet50_ExtractFeature 
+from baseline.model.DeepMAR import DeepMAR_ResNet50_ExtractFeature
 from baseline.utils.evaluate import attribute_evaluate
 from baseline.utils.utils import str2bool
 from baseline.utils.utils import transfer_optim_state
 from baseline.utils.utils import time_str
 from baseline.utils.utils import save_ckpt, load_ckpt
-from baseline.utils.utils import load_state_dict 
+from baseline.utils.utils import load_state_dict
 from baseline.utils.utils import ReDirectSTD
 from baseline.utils.utils import adjust_lr_staircase
 
 from baseline.utils.utils import set_devices
 from baseline.utils.utils import AverageMeter
-from baseline.utils.utils import to_scalar 
-from baseline.utils.utils import may_set_mode 
-from baseline.utils.utils import may_mkdir 
+from baseline.utils.utils import to_scalar
+from baseline.utils.utils import may_set_mode
+from baseline.utils.utils import may_mkdir
 from baseline.utils.utils import set_seed
 from baseline.utils.utils import seed_everything
 import torch.distributed as dist
@@ -60,16 +59,17 @@ import numpy as np
 from apex import amp
 import torch.npu
 
+
 class Config(object):
     def __init__(self):
-        
+
         parser = argparse.ArgumentParser()
 
         parser.add_argument('--npu', default=None, type=int, help='NPU id to use.')
         parser.add_argument('--set_seed', type=str2bool, default=False)
         ## dataset parameter
         parser.add_argument('--dataset', type=str, default='peta',
-                choices=['peta','rap', 'pa100k', 'rap2'])
+                            choices=['peta', 'rap', 'pa100k', 'rap2'])
         parser.add_argument('--save_dir', type=str, default='/home/dataset/peta/')
         parser.add_argument('--split', type=str, default='trainval',
                             choices=['trainval', 'train'])
@@ -82,7 +82,7 @@ class Config(object):
         # model
         parser.add_argument('--num_att', type=int, default=35)
         parser.add_argument('--pretrained', type=str2bool, default=True)
-        parser.add_argument('--last_conv_stride', type=int, default=2, choices=[1,2])
+        parser.add_argument('--last_conv_stride', type=int, default=2, choices=[1, 2])
         parser.add_argument('--drop_pool5', type=str2bool, default=True)
         parser.add_argument('--drop_pool5_rate', type=float, default=0.5)
 
@@ -91,7 +91,7 @@ class Config(object):
         parser.add_argument('--new_params_lr', type=float, default=0.001)
         parser.add_argument('--finetuned_params_lr', type=float, default=0.001)
         parser.add_argument('--staircase_decay_at_epochs', type=eval,
-                            default=(51, ))
+                            default=(51,))
         parser.add_argument('--staircase_decay_multiple_factor', type=float,
                             default=0.1)
         parser.add_argument('--total_epochs', type=int, default=150)
@@ -132,10 +132,9 @@ class Config(object):
                                  'N processes per node, which has N NPUs. This is the '
                                  'fastest way to use PyTorch for either single node or '
                                  'multi node data parallel training')
-                       
-        parser.add_argument('--device_num', default=-1, type=int, help='device num')
-        parser.add_argument('--device_list', default='', type=str, help='device id list')
 
+        parser.add_argument('--device_num', default=-1, type=int, help='device num')
+        parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str, help='device id list')
 
         args = parser.parse_args()
 
@@ -145,7 +144,7 @@ class Config(object):
         self.set_seed = args.set_seed
         if self.set_seed:
             self.seed = 0
-        else: 
+        else:
             self.seed = None
         # amp
         self.amp = args.amp
@@ -158,10 +157,10 @@ class Config(object):
         datasets['peta'] = args.save_dir + '/peta_dataset.pkl'
         partitions = dict()
         partitions['peta'] = args.save_dir + '/peta_partition.pkl'
-        
+
         self.dataset_name = args.dataset
-        if args.dataset not in datasets  or args.dataset not in partitions:
-            print ("Please select the right dataset name.")
+        if args.dataset not in datasets or args.dataset not in partitions:
+            print("Please select the right dataset name.")
             raise ValueError
         else:
             self.dataset = datasets[args.dataset]
@@ -198,13 +197,13 @@ class Config(object):
         self.ckpt_file = args.ckpt_file
         if self.resume:
             if self.ckpt_file == '':
-                print ('Please input the ckpt_file if you want to resume training')
+                print('Please input the ckpt_file if you want to resume training')
                 raise ValueError
         self.load_model_weight = args.load_model_weight
         self.model_weight_file = args.model_weight_file
         if self.load_model_weight:
             if self.model_weight_file == '':
-                print ('Please input the model_weight_file if you want to load model weight')
+                print('Please input the model_weight_file if you want to load model weight')
                 raise ValueError
         self.test_only = args.test_only
         self.exp_dir = args.exp_dir
@@ -214,7 +213,7 @@ class Config(object):
         self.epochs_per_val = args.epochs_per_val
         self.epochs_per_save = args.epochs_per_save
         self.run = args.run
-        
+
         # for model
         model_kwargs = dict()
         model_kwargs['num_att'] = args.num_att
@@ -227,19 +226,21 @@ class Config(object):
 
         if self.exp_dir == '':
             self.exp_dir = os.path.join('exp',
-                '{}'.format(self.exp_subpath),
-                '{}'.format(self.dataset_name),
-                'partition{}'.format(self.partition_idx),
-                'run{}'.format(self.run))
+                                        '{}'.format(self.exp_subpath),
+                                        '{}'.format(self.dataset_name),
+                                        'partition{}'.format(self.partition_idx),
+                                        'run{}'.format(self.run))
         self.stdout_file = os.path.join(self.exp_dir, \
-            'log', 'stdout_{}.txt'.format(time_str()))
+                                        'log', 'stdout_{}.txt'.format(time_str()))
         self.stderr_file = os.path.join(self.exp_dir, \
-            'log', 'stderr_{}.txt'.format(time_str()))
+                                        'log', 'stderr_{}.txt'.format(time_str()))
         may_mkdir(self.stdout_file)
 
 
 def save_checkpoint(state, filename='checkpoint.path.tar'):
     torch.save(state, filename)
+
+
 def main():
     ### main function ###
     # pdb.set_trace()
@@ -257,9 +258,6 @@ def main():
     pprint.pprint(cfg.__dict__)
     print('-' * 60)
 
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-    
     # set the random seed
     # print(cfg.seed)
     if cfg.set_seed:
@@ -275,27 +273,22 @@ def main():
 
     if cfg.device_list != '':
         npus_per_node = len(process_device_map)
-    elif cfg.device_num >0:
+    elif cfg.device_num > 0:
         npus_per_node = cfg.device_num
     else:
         npus_per_node = torch.npu.device_count()
-
-
 
     if cfg.multiprocessing_distributed:
         # Since we have ngpus_per_node processes per node, the total world_size needs to be adjusted accordingly
         cfg.world_size = npus_per_node * cfg.world_size  # world_size means nums of all devices or nums of processes
         mp.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, cfg))
 
+
 def main_worker(npu, npus_per_node, cfg):
     # cfg.npu = npu
     process_device_map = device_id_to_process_device_map(cfg.device_list)
 
     cfg.npu = process_device_map[npu]
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++ before set KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
-    os.environ['KERNEL_NAME_ID'] = str(npu)
-
-    print("[npu id:", npu, "]", "+++++++++++++++++++++++++++KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
 
     if npu is not None:
         print("[npu id:", npu, "]", "Use NPU: {} for training".format(npu))
@@ -306,10 +299,9 @@ def main_worker(npu, npus_per_node, cfg):
         # For multiprocessing distributed training, rank needs to be the
         # global rank among all the processes
         cfg.rank = cfg.rank * npus_per_node + npu
-        
 
-    print("rank:",cfg.rank)
-    dist.init_process_group(backend=cfg.dist_backend, #init_method=cfg.dist_url,
+    print("rank:", cfg.rank)
+    dist.init_process_group(backend=cfg.dist_backend,  # init_method=cfg.dist_url,
                             world_size=cfg.world_size, rank=cfg.rank)
 
     calculate_device = 'npu:{}'.format(npu)
@@ -326,17 +318,17 @@ def main_worker(npu, npus_per_node, cfg):
     # dataset
     normalize = transforms.Normalize(mean=cfg.mean, std=cfg.std)
     transform = transforms.Compose([
-            transforms.Resize(cfg.resize),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            normalize,])
+        transforms.Resize(cfg.resize),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        normalize, ])
     # by a subset of attributes
     train_set = AttDataset(
-        dataset = cfg.dataset,
-        partition = cfg.partition,
-        split = cfg.split,
-        partition_idx= cfg.partition_idx,
-        transform = transform)
+        dataset=cfg.dataset,
+        partition=cfg.partition,
+        split=cfg.split,
+        partition_idx=cfg.partition_idx,
+        transform=transform)
 
     num_att = len(train_set.dataset['selected_attribute'])
     cfg.model_kwargs['num_att'] = num_att
@@ -348,25 +340,25 @@ def main_worker(npu, npus_per_node, cfg):
         train_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
-        dataset = train_set,
-        batch_size = cfg.batch_size,
+        dataset=train_set,
+        batch_size=cfg.batch_size,
         shuffle=(train_sampler is None),
-        num_workers = cfg.workers,
-        pin_memory = True,
+        num_workers=cfg.workers,
+        pin_memory=True,
         sampler=train_sampler,
-        drop_last = True)
+        drop_last=True)
 
     test_transform = transforms.Compose([
-            transforms.Resize(cfg.resize),
-            transforms.ToTensor(),
-            normalize,])
+        transforms.Resize(cfg.resize),
+        transforms.ToTensor(),
+        normalize, ])
 
     test_set = AttDataset(
-        dataset = cfg.dataset,
-        partition = cfg.partition,
-        split = cfg.test_split,
-        partition_idx = cfg.partition_idx,
-        transform = test_transform)
+        dataset=cfg.dataset,
+        partition=cfg.partition,
+        split=cfg.test_split,
+        partition_idx=cfg.partition_idx,
+        transform=test_transform)
 
     ### Att model ###
     model = DeepMAR_ResNet50(**cfg.model_kwargs)
@@ -375,7 +367,7 @@ def main_worker(npu, npus_per_node, cfg):
     finetuned_params = []
     new_params = []
     for n, p in model.named_parameters():
-        if n.find('classifier') >=0:
+        if n.find('classifier') >= 0:
             new_params.append(p)
         else:
             finetuned_params.append(p)
@@ -384,8 +376,8 @@ def main_worker(npu, npus_per_node, cfg):
 
     optimizer = optim.SGD(
         param_groups,
-        momentum = cfg.sgd_momentum,
-        weight_decay = cfg.sgd_weight_decay)
+        momentum=cfg.sgd_momentum,
+        weight_decay=cfg.sgd_weight_decay)
 
     # model = model.cuda()
     model = model.to(calculate_device)
@@ -409,7 +401,7 @@ def main_worker(npu, npus_per_node, cfg):
         weight_neg = [1 for i in range(num_att)]
     else:
         if len(rate) != num_att:
-            print ("the length of rate should be equal to %d" % (num_att))
+            print("the length of rate should be equal to %d" % (num_att))
             raise ValueError
         weight_pos = []
         weight_neg = []
@@ -422,7 +414,7 @@ def main_worker(npu, npus_per_node, cfg):
 
     # load model weight if necessary
     if cfg.load_model_weight:
-        map_location = (lambda storage, loc:storage)
+        map_location = (lambda storage, loc: storage)
         ckpt = torch.load(cfg.model_weight_file, map_location=map_location)
         model.load_state_dict(ckpt['state_dicts'][0], strict=False)
 
@@ -444,10 +436,9 @@ def main_worker(npu, npus_per_node, cfg):
     # print (model)
     # test only
     if cfg.test_only:
-        print ('test with feat_func_att')
+        print('test with feat_func_att')
         attribute_evaluate_subfunc(feat_func_att, test_set, **cfg.test_kwargs)
         sys.exit(0)
-
 
     # training
     for epoch in range(start_epoch, cfg.total_epochs):
@@ -469,15 +460,15 @@ def main_worker(npu, npus_per_node, cfg):
         # recording loss
         loss_meter = AverageMeter('Loss', ':.4e', start_count_index=0)
         batch_time = AverageMeter('Time', ':6.3f')
-        dataset_L = len(train_loader) # crop batch data
+        dataset_L = len(train_loader)  # crop batch data
         ep_st = time.time()
-        ep_st_mark=ep_st
+        ep_st_mark = ep_st
         # runing every batch data
         for step, (imgs, targets) in enumerate(train_loader):
 
             step_st = time.time()
             # measure data loading time
-            data_time = step_st-ep_st
+            data_time = step_st - ep_st
 
             imgs_var = Variable(imgs)
             targets_var = Variable(targets)
@@ -535,27 +526,29 @@ def main_worker(npu, npus_per_node, cfg):
         ##############
         epoch_time = time.time() - ep_st_mark
         log = 'Ep{}, {:.2f}s, loss {:.4f}'.format(
-            epoch+1, epoch_time, loss_meter.avg)
+            epoch + 1, epoch_time, loss_meter.avg)
         print(log)
         if not cfg.multiprocessing_distributed or (cfg.multiprocessing_distributed and cfg.rank % npus_per_node == 0):
             print("[npu id:", cfg.npu, "]", ' * FPS@all {:.3f}'.format(npus_per_node * cfg.batch_size / batch_time.avg))
         # model ckpt
-        if (epoch + 1) % cfg.epochs_per_save == 0 or epoch+1 == cfg.total_epochs:
-            ckpt_file = os.path.join(cfg.exp_dir, 'model', 'ckpt_epoch%d.pth'%(epoch+1))
-            save_ckpt(modules_optims, epoch+1, 0, ckpt_file)
-            save_checkpoint({
-                'epoch': epoch + 1,
-                'state_dict': model.state_dict(),
-                'optimizer': optimizer.state_dict(),
-                'amp': amp.state_dict()
-            })
+        if not cfg.multiprocessing_distributed or (cfg.multiprocessing_distributed and cfg.rank % npus_per_node == 0):
+            if (epoch + 1) % cfg.epochs_per_save == 0 or epoch + 1 == cfg.total_epochs:
+                ckpt_file = os.path.join(cfg.exp_dir, 'model', 'ckpt_epoch%d.pth' % (epoch + 1))
+                save_ckpt(modules_optims, epoch + 1, 0, ckpt_file)
+                save_checkpoint({
+                    'epoch': epoch + 1,
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'amp': amp.state_dict()
+                })
 
         ##########################
         # test on validation set #
         ##########################
-        if (epoch + 1) % cfg.epochs_per_val == 0 or epoch+1 == cfg.total_epochs:
-            print ('att test with feat_func_att')
+        if (epoch + 1) % cfg.epochs_per_val == 0 or epoch + 1 == cfg.total_epochs:
+            print('att test with feat_func_att')
             attribute_evaluate_subfunc(feat_func_att, test_set, calculate_device, cfg, **cfg.test_kwargs)
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -586,32 +579,39 @@ class AverageMeter(object):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
 
+
 def attribute_evaluate_subfunc(feat_func, test_set, device_id, cfg, **test_kwargs):
     """ evaluate the attribute recognition precision """
     result = attribute_evaluate(feat_func, test_set, device_id, **test_kwargs)
-    print ('-' * 60)
-    print ('Evaluation on %s set:' % (cfg.test_split))
-    print ('Label-based evaluation: \n mA: %.4f'%(np.mean(result['label_acc'])))
-    print ('Instance-based evaluation: \n Acc: %.4f, Prec: %.4f, Rec: %.4f, F1: %.4f' \
-        %(result['instance_acc'], result['instance_precision'], result['instance_recall'], result['instance_F1']))
-    print ('-' * 60)
+    print('-' * 60)
+    print('Evaluation on %s set:' % (cfg.test_split))
+    print('Label-based evaluation: \n mA: %.4f' % (np.mean(result['label_acc'])))
+    print('Instance-based evaluation: \n Acc: %.4f, Prec: %.4f, Rec: %.4f, F1: %.4f' \
+          % (result['instance_acc'], result['instance_precision'], result['instance_recall'], result['instance_F1']))
+    print('-' * 60)
 
     # return result['instance_acc']
+
 
 # intermediate variable
 inter_feature = {}
 inter_gradient = {}
+
+
 def make_hook(name, flag):
     if flag == 'forward':
         def hook(m, input, output):
             inter_feature[name] = input
+
         return hook
     elif flag == 'backward':
         def hook(m, input, output):
             inter_gradient[name] = output
+
         return hook
     else:
         assert False
+
 
 def device_id_to_process_device_map(device_list):
     devices = device_list.split(",")
@@ -624,6 +624,6 @@ def device_id_to_process_device_map(device_list):
 
     return process_device_map
 
+
 if __name__ == '__main__':
-  
     main()
