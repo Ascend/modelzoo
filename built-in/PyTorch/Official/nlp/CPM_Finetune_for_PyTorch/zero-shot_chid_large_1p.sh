@@ -1,4 +1,5 @@
 #!/bin/bash
+source pt_set_env.sh
 export SWITCH_MM_OUTPUT_ENABLE=1
 export HCCL_SECURITY_MODE=1
 DATA_DIR="/data/chid/preprocessed/"
