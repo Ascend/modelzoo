@@ -38,7 +38,7 @@ labels
 ### 3. Offline Inference
 **Freeze ckpt to pb**
 
-Please use the frozen_graph.py from the train scripts [frozen_graph.py](https://gitee.com/ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow/tools/frozen_graph.py)
+Please use the frozen_graph.py from the train scripts: [frozen_graph.py](https://gitee.com/ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow/tools/frozen_graph.py)
 ```
 python3 frozen_graph.py --ckpt_path= ckpt_path/shadownet_xxx.ckpt-600000
 ```
