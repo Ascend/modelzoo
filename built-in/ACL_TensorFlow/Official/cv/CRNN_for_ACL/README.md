@@ -1,8 +1,8 @@
 
 
-# AlexNet Inference for Tensorflow 
+# CRNN Inference for Tensorflow 
 
-This repository provides a script and recipe to Inference the AlexNet model.
+This repository provides a script and recipe to Inference the CRNN model. Original train implement please follow this link: [CRNN_for_Tensorflow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow)
 
 ## Quick Start Guide
 
@@ -10,14 +10,30 @@ This repository provides a script and recipe to Inference the AlexNet model.
 
 ```shell
 git clone https://gitee.com/ascend/modelzoo.git
-cd modelzoo/built-in/ACL/Official/cv/AlexNet_for_ACL
+cd modelzoo/built-in/ACL/Official/cv/CRNN_for_ACL
 ```
 
 ### 2. Download and preprocess the dataset
 
-1. Download the ImageNet2012 dataset by yourself
+1. Download the IIIT5K/ICDAR03/SVT test dataset by yourself and put them to the path: **scripts/data/**
 
- 
+2. Preprocess of the test datasets and labels:
+```
+cd scripts
+python3 tools/preprocess.py
+```
+and it will generate **img_bin** and **labels** directories:
+```
+img_bin
+|___batch_data_000.bin
+|___bathc_data_001.bin
+...
+
+labels
+|___batch_label_000.txt
+|___batch_label_001.txt
+...
+```
 
 ### 3. Offline Inference
 
@@ -27,10 +43,6 @@ cd modelzoo/built-in/ACL/Official/cv/AlexNet_for_ACL
 
   ```
   export install_path=/usr/local/Ascend
-  export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
-  export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
-  export LD_LIBRARY_PATH=${install_path}/atc/lib64:$LD_LIBRARY_PATH
-  export ASCEND_OPP_PATH=${install_path}/opp
   ```
 
 - convert pb to om
