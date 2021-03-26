@@ -109,9 +109,9 @@ def get_annotation(annotation_file):
 
 
 def preprocess_shadownet(dataset_dir, img_dir, label_dir, annotation_file, batchsize=64):
-    if not os.path.exits(img_dir):
+    if not os.path.exists(img_dir):
         os.mkdir(img_dir)
-    if not os.path.exits(label_dir):
+    if not os.path.exists(label_dir):
         os.mkdir(label_dir)
 
     sess = tf.Session()
@@ -123,7 +123,6 @@ def preprocess_shadownet(dataset_dir, img_dir, label_dir, annotation_file, batch
         num_iterations = len(annotation_list)//batchsize
         epoch_tqdm = tqdm.tqdm(range(num_iterations))
         for i in epoch_tqdm:
-        for i in range(num_iterations):
             anns = annotation_list[i*batchsize:(i+1)*batchsize]
             batch_data, batch_label = get_batch_data(dataset_dir, anns)
             (np.array(batch_data)).tofile(os.path.join(img_dir,'batch_data_'+str(i).rjust(3,'0')+'.bin'))
