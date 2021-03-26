@@ -1,151 +1,76 @@
-# 训练交付件模板
--   [交付件基本信息](#交付件基本信息.md)
+-   [基本信息](#基本信息.md)
 -   [概述](#概述.md)
 -   [训练环境准备](#训练环境准备.md)
 -   [快速上手](#快速上手.md)
 -   [迁移学习指导](#迁移学习指导.md)
 -   [高级参考](#高级参考.md)
-<h2 id="交付件基本信息.md">交付件基本信息</h2>
+<h2 id="基本信息.md">基本信息</h2>
 
-_**名称中携带相关基本信息并提供基本属性。此处内容主要用于后续上网作为标签展示。**_
+**发布者（Publisher）：huawei**
 
-**发布者（Publisher）：_huawei_**
+**应用领域（Application Domain）：Classification**
 
-**应用领域（Application Domain）：_可以从以下做选择_**
+**版本（Version）：1.2**
 
-**_Classification, Object Detection, Segmentation, Image Synthesis, NLP, Speech Synthesis, Speech Recognition, Text To Speech, Audio Synthesis, Machine Translation, Recommendation, Aesthetics Assessment其他（请备注）_**，添加OCR\(推理中，例如CRNN和CTPN Optical Character Recognition，陈海波），Reinforcement Learning。
+**修改时间（Modified） ：2020.10.14**
 
-**版本（Version）：_1.1_**
+**大小（Size）：47M**
 
-_版本号规则，2位：_
+**框架（Framework）：TensorFlow 1.15.0**
 
-_第一位，大版本号。0表示C3X，1表示C7X，2及以上预留，根据后续的T/C版本而定_
+**模型格式（Model Format）：ckpt**
 
-_第二位，模型自身的升级_
+**精度（Precision）：Mixed**
 
-_例如：0.1 -\> 0.2 -\> 1.0 -\> 1.1 -\> … -\> 1.15_
+**处理器（Processor）：昇腾910**
 
-**修改时间（Modified） ：_2020.04.11_**
+**应用级别（Categories）：Official**
 
-_**大小（Size）**_**：**_大小，1M以下请直接写xxK，1M以上写xxM；_
+**描述（Description）：基于TensorFlow框架的MobileNetV2图像分类网络训练代码**
 
-如训练后得到的ckpt文件大小。
 
-**框架（Framework）：_第三方框架，TensorFlow、MindSpore、PyTorch等_**_**带框架版本**_
-
-例如：TensorFlow 1.15.0
-
-**模型格式（Model Format）：_ckpt_**
-
-例如：ckpt，_pth等_
-
-**精度（Precision）：_精度 例如 FP32_、FP16、Mixed**
-
-**处理器（Processor）：_昇腾910_**
-
-**应用级别（Categories）：_Bench__mark、Official、Research，tutorial当前先写为__Research_**
-
-_Benchmark__：32__卡训练性能为基线性能1.8__倍（竞品按照线性度测算）_基于昇腾AI处理器，可获得极致性能
-
-_Official__：单卡训练性能为基线性能1.2__倍_  在昇腾AI处理器有良好的精度和性能表现
-
-_Research__：其他_   经典或前沿算法在昇腾AI处理器的实现，供开发者开展研究
-
-**_tutorial_**_：昇腾AI处理器的深度学习快速入门示例_
-
-**描述（Description）：_一句话描述_**
-
-示例：_基于TensorFlow框架的EDVR视频超分网络训练代码_
 
 <h2 id="概述.md">概述</h2>
 
-## 简述<a name="section194554031510"></a>
+-   简述
+    MobileNetV2是一种轻量型的适用于移动端的网络，其主要是由depthwise separable，linear bottlenecks，以及inverted residuals构成。MobileNetV2作为一种轻量级backbone，被广泛应用在分类，目标检测，实例分割等计算机视觉任务中。
+-   参考论文：
 
-_描述要点（key）：_
+    [Sandler, Mark, et al. "Mobilenetv2: Inverted residuals and linear bottlenecks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2018.](https://arxiv.org/abs/1801.04381)
 
--   _对于开源网络，请给出网络简介，并附上参考论文及链接，参考实现链接信息。__注意__不要拷贝论文图片、文字，也不要用自己的语言表达一遍论文的思想。_
+-   参考实现：
 
-    **1. 训练模型代码与推理支持的模型代码同源\(开源地址、分支、Commit ID一致\)。**
+    [https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet)
+        
 
-    **2. 如果代码来源于开源社区，提供模型开源地址和对应的git分支与Commit ID。**
-
-    EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技术搜索得到。相比其他网络，EfficientNets在相似精度的条件下参数量明显更少、或者在相似参数量条件下精度明显更高。EfficientNet-B0是系列网路中最小的基础网络，其他较大尺度网络均基于它缩放生成。本文档描述的EfficientNet-B0是基于Pytorch实现的版本。
-
-    -   参考论文：
-
-        [Tan M, Le Q V. Efficientnet: Rethinking model scaling for convolutional neural networks\[J\]. arXiv preprint arXiv:1905.11946, 2019.](https://arxiv.org/abs/1905.11946)
-
-    -   参考实现：
-
-        ```
-        url=https://github.com/lukemelas/EfficientNet-PyTorch.git
-        branch=master
-        commit_id=3d400a58023086b5c128ecd4b3ea46c129b5988b
-        ```
-
-
-    -   适配昇腾 AI 处理器的实现：
+-   适配昇腾 AI 处理器的实现：
     
-        ```
-        url=https://gitee.com/ascend/modelzoo.git
-        branch=master
-        commit_id=9887f0b4ae27f16a1e9f8b0a94dda87b0bf8430a
-        code_path=built-in/PyTorch/Official/cv/image_classification/EfficientNet_for_PyTorch
-        ```
+        https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow/
+        
+        commit_id=6ba647224a789698263fba8ea1fcfd86652a9050
+        
 
-
-    通过Git获取对应commit\_id的代码方法如下：
+-   通过Git获取对应commit\_id的代码方法如下：
     
-    ```
+   
     git clone {repository_url}    # 克隆仓库的代码
     cd {repository_name}    # 切换到模型的代码仓目录
     git checkout  {branch}    # 切换到对应分支
     git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
     cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    ```
     
-    ![](figures/zh-cn_image_0000001093155863.png)
-    
-    ![](figures/zh-cn_image_0000001093276341.png)
-
--   _对于自研网络，需要对网络进行较详细的介绍、包括对模型架构的介绍等。_
--   _有分类的提示信息：此处，对我们不同分类的的模型，需要由不同的提示语。_
-
-_Benchmark__（高性能版）：基于昇腾AI__处理器，可获得极致性能_
-
-_Official__（商用版）：在昇腾AI__处理器有良好的精度和性能表现_
-
-_Research__（研究版）：经典或前沿算法在昇腾AI__处理器的实现，供开发者开展研究_
-
-_Tutorials__（新手版）：昇腾AI__处理器的深度学习快速入门示例_
-
-示例：
-
-![](figures/zh-cn_image_0000001093416827.jpg)
 
 ## 默认配置<a name="section91661242121611"></a>
 
-_描述要点（key）：_
-
--   _使用的超参配置__及内部网络实现的优化点。_
-
-    示例：
-
-    ![](figures/zh-cn_image_0000001093276343.png)
-
--   _数据集信息：对数据集的使用约束或者要求；列举多个可选的数据集，并明确脚本中只是提供了一种参考示例。_
-
-    示例
-
-    ![](figures/zh-cn_image_0000001093560099.png)
-
-
-## 默认配置示例<a name="section136021153756"></a>
-
--   网络结构
-    -   每个残差分支的最后一个BN采用zero-initialize
-    -   卷积采用Kaiming初始化
-
+-   数据集预处理（以ImageNet2012数据集为例，仅作为用户参考示例）：
+	for training:
+    -   Convert DataType and RandomResizeCrop
+    -   RandomHorizontalFlip, prob=0.5
+	-	Subtract with 0.5 and multiply with 2.0
+	for inference:
+	-	Convert dataType
+	-	CenterCrop 87.5% of the original image and resize to (224,224)
+	-	Subtract with 0.5 and multiply 2.0
 -   训练数据集预处理（当前代码以ImageNet验证集为例，仅作为用户参考示例）：
     -   图像的输入尺寸为224\*224
     -   随机裁剪图像尺寸
@@ -156,56 +81,60 @@ _描述要点（key）：_
     -   图像的输入尺寸为224\*224（将图像最小边缩放到256，同时保持宽高比，然后在中心裁剪图像）
     -   根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
 
--   训练超参（单卡）：
+-   训练超参：
     -   Batch size: 256
     -   Momentum: 0.9
-    -   LR scheduler: cosine
-    -   Learning rate\(LR\): 0.1
-    -   Weight decay: 0.0001
+    -   LR scheduler: cosine annealing
+    -   Learning rate\(LR\): 0.8
+    -   Weight decay: 0.00004
     -   Label smoothing: 0.1
-    -   Train epoch: 90
+    -   Train epoch: 300
+    -	Warmup_epoch: 5
+    -	Optimizer: MomentumOptimizer
+    -	Moving average decay=0.9999
+
 
 
 ## 支持特性<a name="section1899153513554"></a>
 
-_描述要点（key）：_
+| 特性列表  | 是否支持 |
+|-------|------|
+| 分布式训练 | 是    |
+| 混合精度  | 是    |
+| 数据并行  | 是    |
 
--   _支持的网络和特性__，那些是我们的特性需要定义出来需要讨论：1、分布式训练，2、混合精度，3、数据并行/模型并行，4、小型化_？
-
-示例
-
-![](figures/zh-cn_image_0000001093155857.png)
-
--   _Features简介_：上面特性的基本概念简介，及如何使用如上特性
 
 ## 混合精度训练<a name="section168064817164"></a>
 
-_描述要点（key）：_混合精度训练的基本原理，和Ascend的实现方案简介。
-
-示例：
-
-![](figures/zh-cn_image_0000001093416823.png)
+昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
 ## 开启混合精度<a name="section20779114113713"></a>
 
-_描述要点（key）：如何在该模型下开启混合精度训练_
+脚本已默认开启混合精度，具体的参数在estimator_impl.py脚本中（脚本位于MobileNetV2_for_TensorFlow目录下）。设置precision_mode参数的脚本参考如下。
 
-示例
 
-![](figures/zh-cn_image_0000001093155861.png)
+```
+run_config = NPURunConfig(
+             hcom_parallel=True,
+             precision_mode="allow_mix_precision",
+             enable_data_pre_proc=True,
+             save_checkpoints_steps=self.env.calc_steps_per_epoch(),
+             session_config=self.estimator_config,
+             model_dir=logdir,
+             iterations_per_loop=config['iterations_per_loop'],
+             keep_checkpoint_max=5
+        )
+```
+
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-_描述要点（key）：_要运行此模型需要具备的硬件要求和软件要求，及参考文档。
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
-示例：
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
-1.  _硬件环境准备请参见[各硬件产品文档](https://ascend.huawei.com/#/document?tag=developer)。需要在硬件设备上安装固件与驱动。_
-2.  _宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascend.huawei.com/ascendhub/#/home)获取镜像。_
-
-    _当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。_
-
-    **表 1** _镜像列表_
+    **表 1** 镜像列表
 
     <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
     <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
@@ -216,11 +145,11 @@ _描述要点（key）：_要运行此模型需要具备的硬件要求和软件
     </th>
     </tr>
     </thead>
-    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-pytorch-arm" target="_blank" rel="noopener noreferrer">ascend-pytorch-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-pytorch-x86" target="_blank" rel="noopener noreferrer">ascend-pytorch-x86</a></em></li></ul>
+    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-arm" target="_blank" rel="noopener noreferrer">ascend-tensorflow-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-x86" target="_blank" rel="noopener noreferrer">ascend-tensorflow-x86</a></em></li></ul>
     </td>
-    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>20.1.0</em></p>
+    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>20.2.0</em></p>
     </td>
-    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://ascend.huawei.com/#/software/cann" target="_blank" rel="noopener noreferrer">20.1</a></em></p>
+    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373/software" target="_blank" rel="noopener noreferrer">20.2</a></em></p>
     </td>
     </tr>
     </tbody>
@@ -229,128 +158,310 @@ _描述要点（key）：_要运行此模型需要具备的硬件要求和软件
 
 <h2 id="快速上手.md">快速上手</h2>
 
-_描述要点（key）：_**_如何快速从网上下载脚本并运行训练。我们的方案是否可以做到如此简洁？我们的方案上运行环境是否有差别？比如云环境，实体环境？_**
-
-_是否默认前端环境已经ok？如TensorFlow、依赖等都已经具备。一个容器对应一个网络？还是所有网络兼容同一个容器？_
-
 ## 数据集准备<a name="section361114841316"></a>
 
-_请用户自行准备数据集（包括训练集和验证集），例如xx1，xx2，xx3，并上传到train和val文件夹，以xx1为例，数据集格式要求为：_
+1. 模型训练使用ImageNet2012数据集，数据集请用户自行获取。
 
-_（如果是离线预处理请选择此步骤的模板）以xx1数据集为例，用户可以参考如下命令进行数据预处理，用于XX（例如生成H5格式数据集）。_
+2. 数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
 
-_**bash scripts/run\_process\_data.sh**_
+3. 数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
 
-_（如果是在线预处理请选择此步骤的模板）当前提供的训练脚本中，是以xx1数据集为例，训练过程中进行数据预处理。请用户使用该脚本前，自行修改训练脚本中的数据集和预处理方法。_
-
-示例：
-
-![](figures/zh-cn_image_0000001093416825.png)
 
 ## 模型训练<a name="section715881518135"></a>
 
-1.  下载训练脚本。_（例如：单击“立即下载”，并选择合适的下载方式下载源码包。）_
-2.  （可选）下载预训练模型。_如果模型需要预训练模型，则需提供。_
-3.  上传源码包到服务器并解压。
-4.  进入代码目录，编译镜像。_通过Dockerfile编译，代码仓中提供Dockerfile文件。_
-
-    _提供Docker镜像构建命令或脚本。_
-
-    **docker build -t** _\{docker\_image\}_** --build-arg FROM\_IMAGE\_NAME=**\{_base\_image_\}** **.
-
-    示例：
-
-    ![](figures/zh-cn_image_0000001080685154.png)
-
-5.  启动容器实例。
-
-    _可提供启动脚本。_
-
-    **bash scripts/docker\_start.sh **_\[docker\_image__\] \[__data\_dir\] \[__model\_dir\]_
-
-    >![](figures/icon-note.gif) **说明：** 
-    >-   _docker\_image_：编译镜像生成的镜像名称
-    >-   data\_dir：数据集路径
-    >-   model\_dir：训练脚本路径
-
-    示例：
-
-    ![](figures/zh-cn_image_0000001127587081.png)
-
-6.  开始训练。_提供训练环境+配置，让训练跑起来，补充容器化运行的说明。_
-    -   单机单卡
-
-        _XXX_
-
-    -   单机八卡
-
-        _XXX_
+1.  单击“立即下载”，并选择合适的下载方式下载源码包。
+2.  检查目录下是否有存在8卡IP的json配置文件“8p.json”，请用户根据实际数据配置`device_ip`参数。
+    8P配置文件示例。
 
 
-7.  验证。
+```
+{
+ "group_count": "1",
+ "group_list": [
+  {
+   "group_name": "worker",
+   "device_count": "8",
+   "instance_count": "1",
+   "instance_list": [
+    {
+     "devices":[
+      {"device_id":"0","device_ip":"192.168.100.101"},
+      {"device_id":"1","device_ip":"192.168.101.101"},
+      {"device_id":"2","device_ip":"192.168.102.101"},
+      {"device_id":"3","device_ip":"192.168.103.101"},
+      {"device_id":"4","device_ip":"192.168.100.100"},
+      {"device_id":"5","device_ip":"192.168.101.100"},
+      {"device_id":"6","device_ip":"192.168.102.100"},
+      {"device_id":"7","device_ip":"192.168.103.100"}
+     ],
+     "pod_name":"ascend8p",
+     "server_id":"127.0.0.1"
+    }
+   ]
+  }
+ ],
+ "status": "completed"
+}
+```
 
-    xxx
+-   开始训练。
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
 
+       环境变量配置信息参见：
+
+          [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+    2. 单卡训练
+        
+        2.1 在脚本train_1p.sh中（脚本位于MobileNetV2_for_TensorFlow/train_1p.sh），配置`dataset_dir`训练数据集路径参数，请用户根据实际路径配置，参考示例如下。
+
+            `--dataset_dir=/opt/npu/slimImagenet` 
+    
+
+        2.2 单卡训练训练指令（脚本位于MobileNetV2_for_TensorFlow/run_1p.sh）
+
+            `bash run_1p.sh`
+
+    1. 8卡训练
+        
+        2.1 在脚本train_8p.sh中（脚本位于MobileNetV2_for_TensorFlow/train_8p.sh），配置`dataset_dir`训练数据集路径参数，请用户根据实际路径配置，参考示例如下。
+
+            `--dataset_dir=/opt/npu/slimImagenet` 
+    
+
+        2.2 单卡训练训练指令（脚本位于MobileNetV2_for_TensorFlow/run_8p.sh）
+
+            `bash run_8p.sh`
+
+
+-   验证。
+
+    1. 训练完成之后，可以开始测试，修改eval_image_classifier_mobilenet.py脚本中checkpoint的文件路径以及dataset_dir路径，请用户根据实际路径配置，示例如下。
+
+        
+        ```
+        --checkpoint_path=path/to/checkpoint 
+        --dataset_dir=path/to/validaton
+        ```
+
+
+    2. 执行测试指令
+    
+        `python3 eval_image_classifier_mobilenet.py --checkpoint_path=path/to/checkpoint --dataset_dir=path/to/validaton`
 
 <h2 id="迁移学习指导.md">迁移学习指导</h2>
 
-_描述要点（key）：_**_提供迁移学习指导和训练：类别 & 数据集的格式说明等_**。_通过用户自定义的数据集能够进行模型训练。_
+-   数据集准备。
 
-1.  数据集准备。
+    数据集要求如下：
 
-    _用户自定义的数据集能够让模型脚本跑起来，提供数据集修改方式。包括数据标注文件格式、目录结构、数据格式转换方法（如有需提供）等。通过修改后的数据集能够直接用于模型训练。_
+    1.1 获取数据。
 
-    1.  获取数据。
-    2.  数据目录结构。
-    3.  数据标注。_（标注数据格式需要详细说明，提供样例，如脚本中有标注文件样例，可直接写明参考XXX文件。）_
+    1.2 如果要使用自己的数据集，请参见“数据集准备”，需要将数据集转化为tfrecord格式。
 
-        ![](figures/zh-cn_image_0000001093276349.png)
+    1.3 准确标注类别标签的数据集。
 
-    4.  （可选）数据转换。_（有则需要提供）_
+    1.4 数据集每个类别所占比例大致相同。
 
-2.  修改训练脚本。
+    1.5 数据集文件结构，请用户自行参照tfrecord脚本生成train/eval使用的TFRecord文件，包含训练集和验证集两部分，目录参考：
 
-    _（修改模型配置文件、模型脚本，根据客户实际业务数据做对应模型的修改，以适配）_
+        ```
+        |--|imagenet_tfrecord
+        |   train-00000-of-01024
+        |   train-00001-of-01024
+        |   train-00002-of-01024
+        |   ...
+        |   validation-00000-of-00128
+        |   validation-00000-of-00128
+        |   ...
+        ```
 
-    1.  修改配置文件。
 
-        ![](figures/zh-cn_image_0000001093560101.png)
+-   模型修改。
 
-    2.  加载预训练模型。_（预加载模型继续训练或者使用用户的数据集继续训练）_
+    1. 模型分类类别修改。
 
+        1.1 使用自有数据集进行分类，如需将分类类别修改为10。修改nets/inception_resnet_v2.py将num_classes=1001设置为num_classes=10。
+
+        ```
+        def inception_resnet_v2(inputs, num_classes=1001, is_training=True,
+        dropout_keep_prob=0.8,
+        reuse=None,
+        scope='InceptionResnetV2',
+        create_aux_logits=True,
+        activation_fn=tf.nn.relu):
+        ```
+
+        1.2 修改nets/mobilenet/mobilenet_v2.py，将num_classes=1001设置为num_classes=10。
+
+        ```
+        def mobilenet(input_tensor,
+        num_classes=1001,
+        depth_multiplier=1.0,
+        scope='MobilenetV2',
+        conv_defs=None,
+        finegrain_classification_mode=False,
+        ```
+
+        1.3 修改nets/inception_v2.py，将num_classes=1000设置为num_classes=10。
+
+
+        ```
+        def inception_v2(inputs,
+        num_classes=1000,
+        is_training=True,
+        dropout_keep_prob=0.8,
+        min_depth=16,
+        depth_multiplier=1.0,
+        prediction_fn=slim.softmax,
+        ```
+
+
+
+        1.4 修改estimator_impl.py，将num_classes=1001设置为num_classes=10。
+
+        ```
+        def model_fn(self, features, labels, mode, params):
+        num_classes = 1001
+        ```
+
+        1.5 修改nets/post_training_quantization.py，将num_classes=1001设置为num_classes=10。
+
+        ```
+        flags.DEFINE_integer("num_classes", 1001,
+                             "Number of output classes for the model.")
+        ```
+
+        1.6 修改datasets/imagenet.py，将_NUM_CLASSES=1001设置为_NUM_CLASSES=10。
+
+        `_NUM_CLASSES = 1001`
+
+    2. 加载预训练模型。
+
+       配置文件增加参数
+
+        2.1 修改文件train.py（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。
+            
+            
+            #用户根据预训练的实际ckpt进行配置
+            tf.app.flags.DEFINE_string(
+            'restore_path', '/code/ckpt/model.ckpt-187500', 'The directory where the ckpt files are stored.')
+            #不加载预训练网络中FC层权重
+            tf.app.flags.DEFINE_list(
+            'restore_exclude', ['MobilenetV2/Logits/'], 'The directory where the fc files are stored.')
+            
+
+        2.2 模型加载修改，修改文件estimator_impl.py，增加以下代码行。
+
+            
+            estimator_spec = tf.estimator.EstimatorSpec(
+                    mode=tf.estimator.ModeKeys.TRAIN, loss=total_loss, train_op=train_op)
+            #restore ckpt for finetune，
+            variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.env.FLAGS.restore_exclude)
+            tf.train.init_from_checkpoint(self.env.FLAGS.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})   
+            
+
+    
 3.  模型训练。
 
-    _可以参考“模型训练”中训练步骤。（根据实际情况，开源数据集与自定义数据集的训练方法是否一致？）_
+    参考“模型训练”中训练步骤。
 
-4.  模型评估。（根据实际情况）_可以参考“模型训练”中训练步骤。_
+4.  模型评估。
+
+    参考“模型训练”中验证步骤。
 
 <h2 id="高级参考.md">高级参考</h2>
 
-## 脚本和示例代码<a name="section08421615141513"></a>
 
-_描述要点（key）：源码仓目录简介_
+脚本和示例代码
 
-示例：
+```
+├── train.py                                          //网络训练与测试代码
+├── env.py                                            //超参配置
+├── README.md                                         //说明文档
+├── logger.py
+├── eval_image_classifier_mobilenet.py                //测试脚本
+├── dataloader
+│    ├──data_provider.py                             //数据加载入口脚本 
+├── estimator_impl.py
+```
 
-![](figures/zh-cn_image_0000001093560097.png)
 
 ## 脚本参数<a name="section6669162441511"></a>
 
-_描述要点（key）：其他参数介绍_
 
-![](figures/zh-cn_image_0000001093276347.png)
+```
+--dataset_dir              数据集路径，默认：/opt/npu/slimImagenet
+--max_train_steps          最大的训练step 数， 默认：None
+--iterations_per_loop      NPU运行时，device端下沉次数，默认：None
+--model_name               网络模型，默认：mobilenet_v2_140
+--moving_average_decay     滑动平均的衰减系数， 默认：None
+--label_smoothing          label smooth 系数， 默认：0.1
+--preprocessing_name       预处理方法， 默认：inception_v2
+--weight_decay             正则化系数，默认：0
+--batch_size               每个NPU的batch size， 默认：256
+--learning_rate_decay_type 学习率衰减的策略， 默认：fixed
+--learning_rate            学习率， 默认：0.1
+--optimizer                优化器， 默认：sgd
+--momentum                 动量， 默认：0.9 
+--warmup_epochs            学习率线性warmup 的epoch数， 默认：5
+--max_epoch                训练epoch次数，默认：300
+```
 
-![](figures/zh-cn_image_0000001093560095.png)
 
 ## 训练过程<a name="section1589455252218"></a>
 
-_描述要点（key）：通过整个训练过程脚本实现的说明介绍里面的原理_
+1. 配置8卡训练脚本（train_8p.sh）的参数，详细可参考“快速上手”。checkpoint和log文件默认保存在“result/8p/”下面，以下为log信息示例。
 
-![](figures/zh-cn_image_0000001093416821.png)
+```
+2020-06-28 15:20:50.593892: I tf_adapter/kernels/geop_npu.cc:780] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp10_0, ret_status:success ,tf session: directdbe078fad5c67345 ,graph id: 61 [0 ms]
+2020-06-28 15:20:50.594560: I tf_adapter/kernels/geop_npu.cc:65] BuildOutputTensorInfo, num_outputs:1
+2020-06-28 15:20:50.594604: I tf_adapter/kernels/geop_npu.cc:94] BuildOutputTensorInfo, output index:0, total_bytes:8, shape:, tensor_ptr:281463098667072, output281463099285952
+2020-06-28 15:20:50.594621: I tf_adapter/kernels/geop_npu.cc:758] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp10_0[ 827us]
+step:73750  epoch:117.89251518342262 ips:11012.314306960132 loss:2.76953125  total_loss:3.094825029373169  lr:0.5281736254692078, train_accuracy:0.5798249840736389
+I0628 15:20:50.594920 281472846090256 logger.py:42] step:73750  epoch:117.89251518342262 ips:11012.314306960132 loss:2.76953125  total_loss:3.094825029373169  lr:0.5281736254692078, train_accuracy:0.5798249840736389
+INFO:tensorflow:loss = 3.094825, step = 73750
+I0628 15:20:50.595537 281472846090256 basic_session_run_hooks.py:262] loss = 3.094825, step = 73750
+2020-06-28 15:20:50.595977: I tf_adapter/kernels/geop_npu.cc:555] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp10_0, num_inputs:0, num_outputs:1
+2020-06-28 15:20:50.596056: I tf_adapter/kernels/geop_npu.cc:423] [GEOP] tf session directdbe078fad5c67345, graph id: 61 no need to rebuild
+2020-06-28 15:20:50.596076: I tf_adapter/kernels/geop_npu.cc:766] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp10_0 ,tf session: directdbe078fad5c67345 ,graph id: 61
+2020-06-28 15:20:50.596142: I tf_adapter/kernels/geop_npu.cc:780] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp10_0, ret_status:success ,tf session: directdbe078fad5c67345 ,graph id: 61 [0 ms]
+2020-06-28 15:20:50.597643: I tf_adapter/kernels/geop_npu.cc:65] BuildOutputTensorInfo, num_outputs:1
+2020-06-28 15:20:50.597666: I tf_adapter/kernels/geop_npu.cc:94] BuildOutputTensorInfo, output index:0, total_bytes:8, shape:, tensor_ptr:281463098682112, output281463099635088
+2020-06-28 15:20:50.597679: I tf_adapter/kernels/geop_npu.cc:758] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp10_0[ 1603us]
+INFO:tensorflow:global_step...73750
+```
 
 ## 推理/验证过程<a name="section1465595372416"></a>
 
-_描述要点（key）：通过整个推理过程脚本实现的说明介绍里面的关键信息说明_
+1. 通过“快速上手”中的测试指令启动测试。
+2. 当前只能针对该工程训练出的checkpoint进行推理测试。
+3. 推理脚本参数checkpoint_path可以配置为checkpoint所在的文件夹路径，则该路径下所有.ckpt文件都会根据进行推理，也可以是某个checkpoint的路径，默认读取“result/8p/0/results/”下面最新的文件。
+4. 测试结束后会打印验证集的top1 accuracy，如下所示。
 
-![](figures/zh-cn_image_0000001093560093.png)
+
+```
+2020-06-26 09:15:46.236574: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0xaaab02f1d790 initialized for platform Host (this does not guarantee that XLA       will be used). Devices:
+2020-06-26 09:15:46.236626: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+WARNING:tensorflow:From eval_image_classifier_mobilenet.py:159: The name tf.global_variables_initializer is deprecated. Please use tf.compat.v1.global_variables_initializer instead.
+
+W0626 09:15:46.409178 281473216393232 module_wrapper.py:139] From eval_image_classifier_mobilenet.py:159: The name tf.global_variables_initializer is deprecated. Please use tf.compat.v1.global_variables_initializer instead.
+WARNING:tensorflow:From eval_image_classifier_mobilenet.py:160: The name tf.local_variables_initializer is deprecated. Please use tf.compat.v1.local_variables_initializer instead.
+W0626 09:15:47.034382 281473216393232 module_wrapper.py:139] From eval_image_classifier_mobilenet.py:160: The name tf.local_variables_initializer is deprecated. Please use tf.compat.v1.local_variables_initializer instead.
+INFO:tensorflow:Restoring parameters from /opt/npu/mobilenetv2_v1.1/result/8p/0/results/model.ckpt-125000
+I0626 09:15:47.133081 281473216393232 saver.py:1284] Restoring parameters from /opt/npu/mobilenetv2_v1.1/result/8p/0/results/model.ckpt-125000
+WARNING:tensorflow:From eval_image_classifier_mobilenet.py:164: The name tf.train.write_graph is deprecated. Please use tf.io.write_graph instead.
+W0626 09:15:47.560457 281473216393232 module_wrapper.py:139] From eval_image_classifier_mobilenet.py:164: The name tf.train.write_graph is deprecated. Please use tf.io.write_graph instead.
+0, _metric_update_op: [0.74609375]
+1, _metric_update_op: [0.7480469]
+2, _metric_update_op: [0.7447917]
+3, _metric_update_op: [0.74121094]
+4, _metric_update_op: [0.73359376]
+5, _metric_update_op: [0.7317708]
+6, _metric_update_op: [0.72935265]
+7, _metric_update_op: [0.7260742]
+8, _metric_update_op: [0.7204861]
+9, _metric_update_op: [0.721875]
+
+```
 
