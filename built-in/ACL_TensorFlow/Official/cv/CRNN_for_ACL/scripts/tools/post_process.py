@@ -67,7 +67,7 @@ def evaluate_shadownet(input_dir, label_dir, char_dict_path,
     )
 
     config = tf.ConfigProto()
-    sess = tf.Session(config)
+    sess = tf.Session(config=config)
     inputPath = input_dir
     labelPath = label_dir
     with sess.as_default():
@@ -98,9 +98,8 @@ def evaluate_shadownet(input_dir, label_dir, char_dict_path,
                     )
             i += 1
 
-        epoch_tqdm.close()
-        avg_per_char_accuracy = per_char_accuracy / num_iterations
-        avg_full_sequence_accuracy = full_sequence_accuracy / num_iterations
+        avg_per_char_accuracy = per_char_accuracy / i
+        avg_full_sequence_accuracy = full_sequence_accuracy / i
         log.info('Mean test per char accuracy is {:5f}'.format(avg_per_char_accuracy))
         log.info('Mean test full sequence accuracy is {:5f}'.format(avg_full_sequence_accuracy))
 
