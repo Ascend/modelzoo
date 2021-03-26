@@ -272,9 +272,12 @@ run_config = NPURunConfig(
 
 - 修改训练脚本。
     1.  修改配置文件。
-        使用自有数据集进行分类，如需将分类类别修改为10，修改alexnet/model.py，将depth=1000设置为depth=10。
-        `labels_one_hot = tf.one_hot(labels, depth=1000)`
-        修改alexnet/alexnet.py，将num_classes=1000修改为num_classes=10。将“x, 1000”设置为“x, 10”。
+
+        1.1 使用自有数据集进行分类，如需将分类类别修改为10，修改alexnet/model.py，将depth=1000设置为depth=10。
+        
+            `labels_one_hot = tf.one_hot(labels, depth=1000)`
+
+        1.2 修改alexnet/alexnet.py，将num_classes=1000修改为num_classes=10。将“x, 1000”设置为“x, 10”。
 
         
         ```

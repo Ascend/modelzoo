@@ -14,7 +14,7 @@
 
 **修改时间（Modified） ：2020.10.14**
 
-**大小（Size）：**
+**大小（Size）：100**
 
 **框架（Framework）：TensorFlow 1.15.0**
 
@@ -34,19 +34,16 @@
 
     -   参考论文（需优化）：
 
-        [Tan M, Le Q V. Efficientnet: Rethinking model scaling for convolutional neural networks\[J\]. arXiv preprint arXiv:1905.11946, 2019.](https://arxiv.org/abs/1905.11946)
+        [Mingxing Tan and Quoc V. Le. EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019](https://arxiv.org/abs/1905.11946)
 
     -   参考实现(需优化)：
 
-        ```
-        https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet
-        ```
+        [https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet](https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet)
 
     -   适配昇腾 AI 处理器的实现：
     
         ```
         https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_for_TensorFlow/
-        branch=master
         commit_id=579e9271b436906bc2a0423f1791de6c1829e247
         ```
 
@@ -145,9 +142,9 @@
 
 1. 模型训练使用ImageNet2012数据集，数据集请用户自行获取。
 
-2. 这里是列表文本数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
+2. 数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
 
-3. 这里是列表文本数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
+3. 数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
 ## 模型训练<a name="section715881518135"></a>
 
 -   下载训练脚本。
