@@ -49,6 +49,10 @@ python3 frozen_graph.py --ckpt_path= ckpt_path/shadownet_xxx.ckpt-600000
 
   ```
   export install_path=/usr/local/Ascend
+  export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
+  export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
+  export LD_LIBRARY_PATH=${install_path}/atc/lib64:$LD_LIBRARY_PATH
+  export ASCEND_OPP_PATH=${install_path}/opp
   ```
 
 - convert pb to om
