@@ -44,7 +44,6 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
     
         
         https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/
-        branch=master
         commit_id=579e9271b436906bc2a0423f1791de6c1829e247
         
 
@@ -152,20 +151,26 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
 - 数据集准备
 1. 模型训练使用ImageNet2012数据集，数据集请用户自行获取。
 
-2. 这里是列表文本数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
+2. 数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
 
-3. 这里是列表文本数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
+3. 数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
    
 
 ## 模型训练<a name="section715881518135"></a>
 
-- 单击“立即下载”，并选择合适的下载方式下载源码包。。
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+
+- 启动训练之前，首先要配置程序运行相关环境变量。
+
+  环境变量配置信息参见：
+
+     [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
 - 单卡训练 
 
   1. 配置训练参数。
 
-     首先在脚本scripts/train_1p.sh中，配置训练数据集路径等参数，请用用户根据实际路径配置。
+     首先在脚本scripts/train_1p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
 
      ```
       --data_dir=/opt/npu/slimImagenet
@@ -183,7 +188,7 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
 
   1. 配置训练参数。
 
-     首先在脚本scripts/train_8p.sh中，配置训练数据集路径等参数，请用用户根据实际路径配置。
+     首先在脚本scripts/train_8p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
 
      ```
       --data_dir=/opt/npu/slimImagenet
@@ -203,6 +208,7 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
     1. 测试的时候，需要修改脚本启动参数（脚本位于DenseNet121_for_TensorFlow/scripts/test.sh），配置mode为evaluate并在eval_dir中配置checkpoint文件所在路径，请用户根据实际路径进行修改。
 
           ```
+          --mode=evaluate
           --eval_dir=${dname}/scripts/result/8p/0/model_8p
           ```
 

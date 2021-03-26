@@ -20,19 +20,19 @@ import torch
 import torch.nn as nn
 
 try:
-    from .utils import load_state_dict_from_url
-except:
-    pass
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
 import numpy as np
 
 __all__ = [
-            'ShuffleNetV2',
-            'shufflenet_v2_x0_5',
-            'shufflenet_v2_x1_0',
-            'shufflenet_v2_x1_5',
-            'shufflenet_v2_x2_0'
-          ]
+    'ShuffleNetV2',
+    'shufflenet_v2_x0_5',
+    'shufflenet_v2_x1_0',
+    'shufflenet_v2_x1_5',
+    'shufflenet_v2_x2_0'
+]
 
 model_urls = {
     'shufflenetv2_x0.5': 'https://download.pytorch.org/models/shufflenetv2_x0.5-f707e7126e.pth',
@@ -70,7 +70,8 @@ class Channel_Shuffle(nn.Module):
 
     def forward(self, x1, x2):
         if self.split_shuffle:
-            return IndexSelectHalfImplementationforward(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1, self.bp_index2)
+            return IndexSelectHalfImplementationforward(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1,
+                                                        self.bp_index2)
         else:
             return IndexSelectFullImplementationforward(x1, x2, self.fp_index, self.bp_index1, self.bp_index2)
 
@@ -202,7 +203,7 @@ def _shufflenetv2(arch, pretrained, progress, *args, **kwargs):
             raise NotImplementedError('pretrained {} is not supported as of now'.format(arch))
         else:
             state_dict = load_state_dict_from_url(model_url, progress=progress)
-            model.load_state_dict(state_dict)
+            model.load_state_dict(state_dict, strict=False)
 
     return model
 
@@ -265,5 +266,5 @@ def shufflenet_v2_x2_0(pretrained=False, progress=True, **kwargs):
 
 if __name__ == '__main__':
     dummy_input = torch.randn(2, 3, 224, 224)
-    model = shufflenet_v2_x1_0()
+    model = shufflenet_v2_x1_0(pretrained=True)
     torch.onnx.export(model, dummy_input, "shufflenetv2.onnx", verbose=True)
