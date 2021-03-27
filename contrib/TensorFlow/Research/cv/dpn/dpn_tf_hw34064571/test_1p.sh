@@ -1,0 +1,1 @@
+python3    test_npu.py  --model_path ./model_save/dpn.ckpt-56  --data_path  /diska/xiaoqiqi/val.tfrecords --output_path  ./model_save   
