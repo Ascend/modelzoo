@@ -97,11 +97,27 @@ class ChannelShuffle(nn.Module):
         if not self.checked:
             self.check_self(x1)
         if self.split_shuffle:
-            return IndexSelectHalfImplementation.apply(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1,
-                                                       self.bp_index2)
+            if self.training:
+                return IndexSelectHalfImplementation.apply(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1,
+                                                           self.bp_index2)
+            else:
+                return IndexSelectHalfImplementationforward(x1, x2, self.fp_index1, self.fp_index2, self.bp_index1,
+                                                           self.bp_index2)
         else:
-            return IndexSelectFullImplementation.apply(x1, x2, self.fp_index, self.bp_index1, self.bp_index2)
+            if self.training:
+                return IndexSelectFullImplementation.apply(x1, x2, self.fp_index, self.bp_index1, self.bp_index2)
+            else:
+                return IndexSelectFullImplementationforward(x1, x2, self.fp_index, self.bp_index1, self.bp_index2)
 
+
+def IndexSelectFullImplementationforward(x1, x2, fp_index, bp_index1, bp_index2):
+    x = torch.cat([x1, x2], dim=1)
+    result = x.index_select(1, fp_index)
+    return result
+
+def IndexSelectHalfImplementationforward(x1, x2, fp_index1, fp_index2, bp_index1, bp_index2):
+    x = torch.cat([x1, x2], dim=1)
+    return x.index_select(1, fp_index1), x.index_select(1, fp_index2)
 
 class IndexSelectFullImplementation(torch.autograd.Function):
     @staticmethod
