@@ -162,7 +162,7 @@ flags.DEFINE_integer(
     "The config json file corresponding to the pre-trained RESNET model. ")
 
 flags.DEFINE_integer(
-    "epoch", 300,
+    "epoch", 60,
     "The config json file corresponding to the pre-trained RESNET model. ")
 
 
