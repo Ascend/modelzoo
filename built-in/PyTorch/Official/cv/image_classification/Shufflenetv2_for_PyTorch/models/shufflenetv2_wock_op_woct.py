@@ -92,7 +92,6 @@ class InvertedResidual(nn.Module):
             x1 = self.branch1(x)
             x2 = self.branch2(x)
 
-        # out = ChannelShuffle(out, 2)
         out = self.ChannelShuffle(x1, x2)
 
         return out
