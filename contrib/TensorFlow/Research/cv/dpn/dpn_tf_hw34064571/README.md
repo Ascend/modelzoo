@@ -31,6 +31,7 @@ dpn
   	├─dpn.index
   	├─dpn.meta
   	└─...
+  ├─pre_model 用于存放预训练模型文件#obs://dpn-new/pre_model/
   ├─DPN_model.py 定义dpn的模型架构
   ├─train_npu.py dpn训练文件
   ├─test_npu.py dpn测试文件
@@ -42,6 +43,8 @@ dpn
 数据集 cvcdb
 https://polyp.grand-challenge.org/site/Polyp/CVCClinicDB/
 
+### 预训练模型
+预训练模型 miou为 0.017 
 
 ### 训练过程及结果
 epoch=57
