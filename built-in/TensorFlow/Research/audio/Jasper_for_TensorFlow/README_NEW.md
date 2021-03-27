@@ -1,100 +1,59 @@
-# 训练交付件模板
--   [交付件基本信息](#交付件基本信息.md)
+-   [基本信息](#基本信息.md)
 -   [概述](#概述.md)
 -   [训练环境准备](#训练环境准备.md)
 -   [快速上手](#快速上手.md)
 -   [迁移学习指导](#迁移学习指导.md)
 -   [高级参考](#高级参考.md)
-<h2 id="交付件基本信息.md">交付件基本信息</h2>
+<h2 id="基本信息.md">基本信息</h2>
 
-_**名称中携带相关基本信息并提供基本属性。此处内容主要用于后续上网作为标签展示。**_
+**发布者（Publisher）：huawei**
 
-**发布者（Publisher）：_huawei_**
-
-**应用领域（Application Domain）：_可以从以下做选择_**
-
-**_Classification, Object Detection, Segmentation, Image Synthesis, NLP, Speech Synthesis, Speech Recognition, Text To Speech, Audio Synthesis, Machine Translation, Recommendation, Aesthetics Assessment其他（请备注）_**，添加OCR\(推理中，例如CRNN和CTPN Optical Character Recognition，陈海波），Reinforcement Learning。
+**应用领域（Application Domain）：Speech Recognition**
 
 **版本（Version）：_1.1_**
 
-_版本号规则，2位：_
+**修改时间（Modified） ：2020.12.28**
 
-_第一位，大版本号。0表示C3X，1表示C7X，2及以上预留，根据后续的T/C版本而定_
+**大小（Size）：**
 
-_第二位，模型自身的升级_
 
-_例如：0.1 -\> 0.2 -\> 1.0 -\> 1.1 -\> … -\> 1.15_
+**框架（Framework）：TensorFlow 1.15.0**
 
-**修改时间（Modified） ：_2020.04.11_**
+**模型格式（Model Format）：ckpt**
 
-_**大小（Size）**_**：**_大小，1M以下请直接写xxK，1M以上写xxM；_
+**精度（Precision）：Mixed**
 
-如训练后得到的ckpt文件大小。
+**处理器（Processor）：昇腾910**
 
-**框架（Framework）：_第三方框架，TensorFlow、MindSpore、PyTorch等_**_**带框架版本**_
+**应用级别（Categories）：Research**
 
-例如：TensorFlow 1.15.0
-
-**模型格式（Model Format）：_ckpt_**
-
-例如：ckpt，_pth等_
-
-**精度（Precision）：_精度 例如 FP32_、FP16、Mixed**
-
-**处理器（Processor）：_昇腾910_**
-
-**应用级别（Categories）：_Bench__mark、Official、Research，tutorial当前先写为__Research_**
-
-_Benchmark__：32__卡训练性能为基线性能1.8__倍（竞品按照线性度测算）_基于昇腾AI处理器，可获得极致性能
-
-_Official__：单卡训练性能为基线性能1.2__倍_  在昇腾AI处理器有良好的精度和性能表现
-
-_Research__：其他_   经典或前沿算法在昇腾AI处理器的实现，供开发者开展研究
-
-**_tutorial_**_：昇腾AI处理器的深度学习快速入门示例_
-
-**描述（Description）：_一句话描述_**
-
-示例：_基于TensorFlow框架的EDVR视频超分网络训练代码_
+**描述（Description）：基于TensorFlow框架的Jasper网络代码**
 
 <h2 id="概述.md">概述</h2>
 
-## 简述<a name="section194554031510"></a>
+-  简述
+    Jasper是一个端到端的ASR模型框架，它用卷积神经网络取代了传统得声学和发音模型。
+-   参考论文：
 
-_描述要点（key）：_
+    [Jason Li, Vitaly Lavrukhin, Boris Ginsburg, Ryan Leary, Oleksii Kuchaiev, Jonathan M. Cohen, Huyen Nguyen, Ravi Teja Gaddecc. Jasper: An End-to-End Convolutional Neural Acoustic Model. arXiv.1904.03288](https://arxiv.org/abs/1904.03288)
 
--   _对于开源网络，请给出网络简介，并附上参考论文及链接，参考实现链接信息。__注意__不要拷贝论文图片、文字，也不要用自己的语言表达一遍论文的思想。_
+-   参考实现：
 
-    **1. 训练模型代码与推理支持的模型代码同源\(开源地址、分支、Commit ID一致\)。**
-
-    **2. 如果代码来源于开源社区，提供模型开源地址和对应的git分支与Commit ID。**
-
-    EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技术搜索得到。相比其他网络，EfficientNets在相似精度的条件下参数量明显更少、或者在相似参数量条件下精度明显更高。EfficientNet-B0是系列网路中最小的基础网络，其他较大尺度网络均基于它缩放生成。本文档描述的EfficientNet-B0是基于Pytorch实现的版本。
-
-    -   参考论文：
-
-        [Tan M, Le Q V. Efficientnet: Rethinking model scaling for convolutional neural networks\[J\]. arXiv preprint arXiv:1905.11946, 2019.](https://arxiv.org/abs/1905.11946)
-
-    -   参考实现：
-
-        ```
-        url=https://github.com/lukemelas/EfficientNet-PyTorch.git
-        branch=master
-        commit_id=3d400a58023086b5c128ecd4b3ea46c129b5988b
-        ```
+        
+    [https://github.com/NVIDIA/OpenSeq2Seq](https://github.com/NVIDIA/OpenSeq2Seq)
+        
 
 
-    -   适配昇腾 AI 处理器的实现：
+-   适配昇腾 AI 处理器的实现：
     
-        ```
-        url=https://gitee.com/ascend/modelzoo.git
-        branch=master
-        commit_id=9887f0b4ae27f16a1e9f8b0a94dda87b0bf8430a
-        code_path=built-in/PyTorch/Official/cv/image_classification/EfficientNet_for_PyTorch
-        ```
+        
+    https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow/
+    commit_id=7d2c0ba1bbb6239977ca776180c79cd381e512dd
+        
+        
 
 
-    通过Git获取对应commit\_id的代码方法如下：
+-   通过Git获取对应commit\_id的代码方法如下：
     
     ```
     git clone {repository_url}    # 克隆仓库的代码
@@ -103,109 +62,69 @@ _描述要点（key）：_
     git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
     cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
     ```
-    
-    ![](figures/zh-cn_image_0000001093155863.png)
-    
-    ![](figures/zh-cn_image_0000001093276341.png)
-
--   _对于自研网络，需要对网络进行较详细的介绍、包括对模型架构的介绍等。_
--   _有分类的提示信息：此处，对我们不同分类的的模型，需要由不同的提示语。_
-
-_Benchmark__（高性能版）：基于昇腾AI__处理器，可获得极致性能_
-
-_Official__（商用版）：在昇腾AI__处理器有良好的精度和性能表现_
-
-_Research__（研究版）：经典或前沿算法在昇腾AI__处理器的实现，供开发者开展研究_
-
-_Tutorials__（新手版）：昇腾AI__处理器的深度学习快速入门示例_
-
-示例：
-
-![](figures/zh-cn_image_0000001093416827.jpg)
 
 ## 默认配置<a name="section91661242121611"></a>
 
-_描述要点（key）：_
-
--   _使用的超参配置__及内部网络实现的优化点。_
-
-    示例：
-
-    ![](figures/zh-cn_image_0000001093276343.png)
-
--   _数据集信息：对数据集的使用约束或者要求；列举多个可选的数据集，并明确脚本中只是提供了一种参考示例。_
-
-    示例
-
-    ![](figures/zh-cn_image_0000001093560099.png)
-
-
-## 默认配置示例<a name="section136021153756"></a>
-
--   网络结构
-    -   每个残差分支的最后一个BN采用zero-initialize
-    -   卷积采用Kaiming初始化
-
--   训练数据集预处理（当前代码以ImageNet验证集为例，仅作为用户参考示例）：
-    -   图像的输入尺寸为224\*224
-    -   随机裁剪图像尺寸
-    -   随机水平翻转图像
-    -   根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
-
--   测试数据集预处理（当前代码以ImageNet验证集为例，仅作为用户参考示例）：
-    -   图像的输入尺寸为224\*224（将图像最小边缩放到256，同时保持宽高比，然后在中心裁剪图像）
-    -   根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
+-  训练数据集预处理：（当前代码以LibriSpeech训练集为例，仅作为用户参考示例）
+    -   该数据集是包含大约1000小时的英语语音的大型语料库。这些数据来自LibriVox项目的有声读物。
 
 -   训练超参（单卡）：
-    -   Batch size: 256
-    -   Momentum: 0.9
-    -   LR scheduler: cosine
-    -   Learning rate\(LR\): 0.1
-    -   Weight decay: 0.0001
-    -   Label smoothing: 0.1
-    -   Train epoch: 90
+    -   Batch size: 32
+    -   grad_averaging:False
+    -   优化器采用NovoGrad
+    -   Learning rate\(LR\): 1e-5
+    -   Weight decay: 0.001
+    -   epsilon:1e-08
+    -   Train epoch: 50
 
 
 ## 支持特性<a name="section1899153513554"></a>
 
-_描述要点（key）：_
+| 特性列表  | 是否支持 |
+|-------|------|
+| 分布式训练 | 是    |
+| 混合精度  | 是    |
+| 数据并行  | 是    |
 
--   _支持的网络和特性__，那些是我们的特性需要定义出来需要讨论：1、分布式训练，2、混合精度，3、数据并行/模型并行，4、小型化_？
-
-示例
-
-![](figures/zh-cn_image_0000001093155857.png)
-
--   _Features简介_：上面特性的基本概念简介，及如何使用如上特性
 
 ## 混合精度训练<a name="section168064817164"></a>
 
-_描述要点（key）：_混合精度训练的基本原理，和Ascend的实现方案简介。
-
-示例：
-
-![](figures/zh-cn_image_0000001093416823.png)
+Ascend 910提供自动混合精度性能，可以根据内置优化策略，自动地将部分算子以fp16的精度模式进行计算，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
 ## 开启混合精度<a name="section20779114113713"></a>
 
-_描述要点（key）：如何在该模型下开启混合精度训练_
+将NPURunConfig的precision_mode设为“allow_mix_precision”，即可开启混合精度模式。脚本中默认开启了混合精度。
 
-示例
 
-![](figures/zh-cn_image_0000001093155861.png)
+
+```
+sess_config = tf.ConfigProto()
+    custom_op = sess_config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True
+    custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes('allow_mix_precision')
+    # custom_op.parameter_map["mix_compile_mode"].b = True
+    sess_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    sess_config.graph_options.rewrite_options.optimizers.extend(["pruning",
+                                               "function",
+                                               "constfold",
+                                               "shape",
+                                               "arithmetic",
+                                               "loop",
+                                               "dependency",
+                                               "layout",
+                                               "memory",
+                                               "GradFusionOptimizer"])
+```
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-_描述要点（key）：_要运行此模型需要具备的硬件要求和软件要求，及参考文档。
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
-示例：
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
-1.  _硬件环境准备请参见[各硬件产品文档](https://ascend.huawei.com/#/document?tag=developer)。需要在硬件设备上安装固件与驱动。_
-2.  _宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascend.huawei.com/ascendhub/#/home)获取镜像。_
-
-    _当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。_
-
-    **表 1** _镜像列表_
+    **表 1** 镜像列表
 
     <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
     <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
@@ -216,11 +135,11 @@ _描述要点（key）：_要运行此模型需要具备的硬件要求和软件
     </th>
     </tr>
     </thead>
-    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-pytorch-arm" target="_blank" rel="noopener noreferrer">ascend-pytorch-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-pytorch-x86" target="_blank" rel="noopener noreferrer">ascend-pytorch-x86</a></em></li></ul>
+    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-arm" target="_blank" rel="noopener noreferrer">ascend-tensorflow-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-x86" target="_blank" rel="noopener noreferrer">ascend-tensorflow-x86</a></em></li></ul>
     </td>
-    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>20.1.0</em></p>
+    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>20.2.0</em></p>
     </td>
-    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://ascend.huawei.com/#/software/cann" target="_blank" rel="noopener noreferrer">20.1</a></em></p>
+    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373/software" target="_blank" rel="noopener noreferrer">20.2</a></em></p>
     </td>
     </tr>
     </tbody>
@@ -229,128 +148,226 @@ _描述要点（key）：_要运行此模型需要具备的硬件要求和软件
 
 <h2 id="快速上手.md">快速上手</h2>
 
-_描述要点（key）：_**_如何快速从网上下载脚本并运行训练。我们的方案是否可以做到如此简洁？我们的方案上运行环境是否有差别？比如云环境，实体环境？_**
-
-_是否默认前端环境已经ok？如TensorFlow、依赖等都已经具备。一个容器对应一个网络？还是所有网络兼容同一个容器？_
-
 ## 数据集准备<a name="section361114841316"></a>
 
-_请用户自行准备数据集（包括训练集和验证集），例如xx1，xx2，xx3，并上传到train和val文件夹，以xx1为例，数据集格式要求为：_
+1. 请用户自行准备数据集，可选用LibriSpeech。
 
-_（如果是离线预处理请选择此步骤的模板）以xx1数据集为例，用户可以参考如下命令进行数据预处理，用于XX（例如生成H5格式数据集）。_
-
-_**bash scripts/run\_process\_data.sh**_
-
-_（如果是在线预处理请选择此步骤的模板）当前提供的训练脚本中，是以xx1数据集为例，训练过程中进行数据预处理。请用户使用该脚本前，自行修改训练脚本中的数据集和预处理方法。_
-
-示例：
-
-![](figures/zh-cn_image_0000001093416825.png)
-
+2. 数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
+   
 ## 模型训练<a name="section715881518135"></a>
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+- 开始训练。
+    
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
 
-1.  下载训练脚本。_（例如：单击“立即下载”，并选择合适的下载方式下载源码包。）_
-2.  （可选）下载预训练模型。_如果模型需要预训练模型，则需提供。_
-3.  上传源码包到服务器并解压。
-4.  进入代码目录，编译镜像。_通过Dockerfile编译，代码仓中提供Dockerfile文件。_
+       环境变量配置信息参见：
 
-    _提供Docker镜像构建命令或脚本。_
+          [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+    
 
-    **docker build -t** _\{docker\_image\}_** --build-arg FROM\_IMAGE\_NAME=**\{_base\_image_\}** **.
-
-    示例：
-
-    ![](figures/zh-cn_image_0000001080685154.png)
-
-5.  启动容器实例。
-
-    _可提供启动脚本。_
-
-    **bash scripts/docker\_start.sh **_\[docker\_image__\] \[__data\_dir\] \[__model\_dir\]_
-
-    >![](figures/icon-note.gif) **说明：** 
-    >-   _docker\_image_：编译镜像生成的镜像名称
-    >-   data\_dir：数据集路径
-    >-   model\_dir：训练脚本路径
-
-    示例：
-
-    ![](figures/zh-cn_image_0000001127587081.png)
-
-6.  开始训练。_提供训练环境+配置，让训练跑起来，补充容器化运行的说明。_
-    -   单机单卡
-
-        _XXX_
-
-    -   单机八卡
-
-        _XXX_
-
-
-7.  验证。
-
-    xxx
+    2. 单卡训练
+        
+        2.1 设置单卡训练参数（脚本位于Jasper_for_TensorFlow / configs / speech2text //jasper5x3_LibriSpeech_nvgrad_masks_1p.py），示例如下。请确保下面例子中的`vocab_file`、`dataset_files`修改为用户准备数据集的实际路径。
+                
+                    base_params = {
+                    .    .    .   
+                            "vocab_file": "/data/librispeech/vocab/vocab.txt",
+                    .    .    .
+                    }
+                    train_params = {
+                    .    .    .
+                            "dataset_files": [
+                                "/data/librispeech/librivox-train-clean-100.csv",
+                                "/data/librispeech/librivox-train-clean-360.csv",
+                                "/data/librispeech/librivox-train-other-500.csv"
+                            ],        
+                    }
+                    eval_params = {
+                    .    .    .
+                            "dataset_files": [
+                                "/data/librispeech/librivox-dev-clean.csv", 
+                            ],
+                    }
+                   infer_params = {
+                    .    .    .
+                            "dataset_files": [
+                                   "/data/librispeech/librivox-test-clean.csv",
+                            ],
+       
+        
 
 
-<h2 id="迁移学习指导.md">迁移学习指导</h2>
 
-_描述要点（key）：_**_提供迁移学习指导和训练：类别 & 数据集的格式说明等_**。_通过用户自定义的数据集能够进行模型训练。_
 
-1.  数据集准备。
 
-    _用户自定义的数据集能够让模型脚本跑起来，提供数据集修改方式。包括数据标注文件格式、目录结构、数据格式转换方法（如有需提供）等。通过修改后的数据集能够直接用于模型训练。_
+        2.2 单卡训练指令（脚本位于Jasper_for_TensorFlow / scripts/run_1p.sh） 
 
-    1.  获取数据。
-    2.  数据目录结构。
-    3.  数据标注。_（标注数据格式需要详细说明，提供样例，如脚本中有标注文件样例，可直接写明参考XXX文件。）_
+            `bash run_1p.sh` 
 
-        ![](figures/zh-cn_image_0000001093276349.png)
+    3. 8卡训练
+        
+        3.1 设置8卡训练参数（脚本位于Jasper_for_TensorFlow / configs / speech2text //jasper5x3_LibriSpeech_nvgrad_masks_8p.py），示例如下。请确保下面例子中的`vocab_file`、`dataset_files`修改为用户准备数据集的实际路径。
+                
+                    base_params = {
+                    .    .    .   
+                            "vocab_file": "/data/librispeech/vocab/vocab.txt",
+                    .    .    .
+                    }
+                    train_params = {
+                    .    .    .
+                            "dataset_files": [
+                                "/data/librispeech/librivox-train-clean-100.csv",
+                                "/data/librispeech/librivox-train-clean-360.csv",
+                                "/data/librispeech/librivox-train-other-500.csv"
+                            ],        
+                    }
+                    eval_params = {
+                    .    .    .
+                            "dataset_files": [
+                                "/data/librispeech/librivox-dev-clean.csv", 
+                            ],
+                    }
+                   infer_params = {
+                    .    .    .
+                            "dataset_files": [
+                                   "/data/librispeech/librivox-test-clean.csv",
+                            ],
+       
+        
 
-    4.  （可选）数据转换。_（有则需要提供）_
 
-2.  修改训练脚本。
 
-    _（修改模型配置文件、模型脚本，根据客户实际业务数据做对应模型的修改，以适配）_
 
-    1.  修改配置文件。
 
-        ![](figures/zh-cn_image_0000001093560101.png)
+        2.2 单卡训练指令（脚本位于Jasper_for_TensorFlow / scripts/run_8p.sh） 
 
-    2.  加载预训练模型。_（预加载模型继续训练或者使用用户的数据集继续训练）_
+            `bash run_8p.sh` 
+        
+        说明：a. 在训练完成后，checkpoint将保存在`scripts/result/8p/${device_id}/jasper_log_folder/logs`路径下，训练日志保存在`scripts/result/8p/train_${device_id}.log`。
+b. 每次重新训练需要清理日志目录或者重新指定日志目录，否则默认在原有基础上继续训练。
 
-3.  模型训练。
 
-    _可以参考“模型训练”中训练步骤。（根据实际情况，开源数据集与自定义数据集的训练方法是否一致？）_
+<h2 id="开始测试.md">开始测试</h2>
 
-4.  模型评估。（根据实际情况）_可以参考“模型训练”中训练步骤。_
+ - 参数配置
+    1. 配置单卡测试参数（脚本位于Jasper_for_TensorFlow / configs / speech2text //jasper5x3_LibriSpeech_nvgrad_masks_1p.py），示例如下。请确保下面例子中的`logdir`参数修改为用户训练结果得到checkpoints的实际路径。
+        
+        ```
+        base_params = {
+        .    .    .   
+                 "logdir": "jasper_log_folder",
+        .    .    .
+                            }
+        ```
+
+- 执行测试指令
+    
+    1. 上述文件修改完成之后，执行单卡测试指令（脚本位于脚本位于Jasper_for_TensorFlow / scripts/run_1p.sh）
+        
+        `bash run_eval.sh`
+
 
 <h2 id="高级参考.md">高级参考</h2>
 
 ## 脚本和示例代码<a name="section08421615141513"></a>
+    
 
-_描述要点（key）：源码仓目录简介_
+```
+│   README.md              
+│   run.py                //网络训练与测试代码
+│   requirements.txt      //相关依赖说明
+├ ─ configs
+│   └ ─ speech2text
+│       └ ─    jasper5x3_LibriSpeech_nvgrad_masks_8p.py    //8卡参数脚本
+│       └ ─    jasper5x3_LibriSpeech_nvgrad_masks_1p.py    //单卡参数脚本
+├ ─ open_seq2seq
+└ ─ scripts
+    └ ─    8p.json      //rank table 配置文件
+    └ ─    eval_1p.sh   //单卡测试脚本
+    └ ─    run_1p.sh    //单卡训练脚本
+    └ ─    run_8p.sh    //多卡训练脚本
+    └ ─    run_eval.sh  //评测脚本
+    └ ─    train_1p.sh  //单卡配置脚本
+    └ ─    train_8p.sh  //8卡配置脚本
+```
 
-示例：
-
-![](figures/zh-cn_image_0000001093560097.png)
 
 ## 脚本参数<a name="section6669162441511"></a>
 
-_描述要点（key）：其他参数介绍_
-
-![](figures/zh-cn_image_0000001093276347.png)
-
-![](figures/zh-cn_image_0000001093560095.png)
+```
+--model_path	 #original path of pb model,default value: ../model/jasper_infer_float32.pb
+--data_dir       #parents dir of dev.json file，default value：../datasets
+--output_dir	 #the output dir of preprocess of jasper bin files.default value:../datasets
+--pre_process  	 #weather execute preprocess.option value:True/False，default value is: False
+--post_process   #weather execute postprocess.option value:True/False，default value is: True
+--batchSize	 #batch size of inference.default value is 1
+```
 
 ## 训练过程<a name="section1589455252218"></a>
 
-_描述要点（key）：通过整个训练过程脚本实现的说明介绍里面的原理_
+通过“快速上手”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持1，8P网络训练。训练脚本log样例如下（样例为8P网络训练的log）：
 
-![](figures/zh-cn_image_0000001093416821.png)
+```
+2020-10-20 22:59:46.245018: I tf_adapter/kernels/geop_npu.cc:104] BuildOutputTensorInfo, output index:405, total_bytes:4, shape:, tensor_ptr:281439481462080, output281439481304064
+2020-10-20 22:59:46.245032: I tf_adapter/kernels/geop_npu.cc:104] BuildOutputTensorInfo, output index:406, total_bytes:4, shape:, tensor_ptr:281439482227648, output281439484073872
+2020-10-20 22:59:46.245046: I tf_adapter/kernels/geop_npu.cc:104] BuildOutputTensorInfo, output index:407, total_bytes:8, shape:, tensor_ptr:281439476969152, output281439476590080
+2020-10-20 22:59:46.245066: I tf_adapter/kernels/geop_npu.cc:572] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp25_233[ 512908us]
+2020-10-20 23:00:11.606136: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 71
+2020-10-20 23:00:11.606288: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 71
+2020-10-20 23:00:11.606357: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 61
+2020-10-20 23:00:11.606381: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 61
+2020-10-20 23:00:11.606478: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 11
+2020-10-20 23:00:11.606495: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 11
+2020-10-20 23:00:11.606833: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 1
+2020-10-20 23:00:11.606861: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 1
+2020-10-20 23:00:11.607055: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 21
+2020-10-20 23:00:11.607076: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 21
+2020-10-20 23:00:11.607138: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 51
+2020-10-20 23:00:11.607156: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 51
+2020-10-20 23:00:11.607274: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 31
+2020-10-20 23:00:11.607291: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 31
+2020-10-20 23:00:11.607350: I tf_adapter/kernels/geop_npu.cc:215] [GEOP] GeOp start to finalize, tf session: directfea608cf02b1de31, graph_id_: 41
+2020-10-20 23:00:11.607368: I tf_adapter/util/session_manager.cc:69] find ge session connect with tf session directfea608cf02b1de31
+2020-10-20 23:00:13.947145: I tf_adapter/util/session_manager.cc:74] destroy ge session connect with tf session directfea608cf02b1de31 success.
+2020-10-20 23:00:15.115646: I tf_adapter/util/ge_plugin.cc:213] [GePlugin] Close TsdClient and destroy tdt.
+2020-10-20 23:00:15.127718: I tf_adapter/util/ge_plugin.cc:220] [GePlugin] Close TsdClient success.
+2020-10-20 23:00:15.127764: I tf_adapter/kernels/geop_npu.cc:233] [GEOP] GePlugin Finalize success
+2020-10-20 23:00:15.133104: I tf_adapter/kernels/geop_npu.cc:244] [GEOP] GeOp Finalize success, tf session: directfea608cf02b1de31, graph_id_: 41
+```
+
 
 ## 推理/验证过程<a name="section1465595372416"></a>
 
-_描述要点（key）：通过整个推理过程脚本实现的说明介绍里面的关键信息说明_
+通过“快速上手”中模型开始测试指令示例启动测试。
 
-![](figures/zh-cn_image_0000001093560093.png)
+当前只能针对该工程训练出的checkpoint进行推理，且默认仅使用最新保存的ckpt进行推理。测试log样例如下：
 
+```
+2020-10-22 17:05:28.467802: I tf_adapter/util/session_manager.cc:69] find ge session connect with tf session direct13deb7e4b2445521
+2020-10-22 17:05:28.883688: I tf_adapter/util/session_manager.cc:74] destroy ge session connect with tf session direct13deb7e4b2445521 success.
+2020-10-22 17:05:29.193900: I tf_adapter/util/ge_plugin.cc:210] [GePlugin] Close TsdClient and destroy tdt.
+2020-10-22 17:05:29.320977: I tf_adapter/util/ge_plugin.cc:217] [GePlugin] Close TsdClient success.
+2020-10-22 17:05:29.321010: I tf_adapter/kernels/geop_npu.cc:232] [GEOP] GePlugin Finalize success
+2020-10-22 17:05:29.321737: I tf_adapter/kernels/geop_npu.cc:243] [GEOP] GeOp Finalize success, tf session: direct13deb7e4b2445521, graph_id_: 1
+*** Processed 1/85 batches
+*** Processed 8/85 batches
+*** Processed 16/85 batches
+*** Processed 24/85 batches
+*** Processed 32/85 batches
+*** Processed 40/85 batches
+*** Processed 48/85 batches
+*** Processed 56/85 batches
+*** Processed 64/85 batches
+*** Processed 72/85 batches
+*** Processed 80/85 batches
+*** Processed 85/85 batches
+*** Avg time per step: 0.447s
+*** Avg objects per second: 119249.411
+***     Validation WER:  0.2259
+*** Finished evaluation
+2020-10-22 17:05:31.795524: I tf_adapter/util/ge_plugin.cc:57] [GePlugin] destroy constructor begin
+2020-10-22 17:05:31.795599: I tf_adapter/util/ge_plugin.cc:198] [GePlugin] Ge has already finalized.
+2020-10-22 17:05:31.795617: I tf_adapter/util/ge_plugin.cc:59] [GePlugin] destroy constructor end
+turing eval success
+
+```
