@@ -96,6 +96,7 @@ def parse_opts():
     args = parser.parse_args()
     return args
 
+
 def device_id_to_process_device_map(device_list):
     devices = device_list.split(",")
     devices = [int(x) for x in devices]
@@ -137,6 +138,7 @@ def main():
         # world_size means nums of all devices or nums of processes
         args.world_size = npus_per_node * args.world_size
         mp.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, args))
+
 
 def main_worker(npu, npus_per_node, args):
     process_device_map = device_id_to_process_device_map(args.device_list)
