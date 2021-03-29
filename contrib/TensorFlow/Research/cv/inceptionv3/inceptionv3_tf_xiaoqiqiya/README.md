@@ -84,4 +84,5 @@ epoch--------------------该值只在do_train 为True时有效，表示训练轮
 以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
 
  **离线推理** 
+
 请参考下面的链接：[offline_inference](https://gitee.com/xiaoqiqiyaya/modelzoo/tree/master/contrib/Research/cv/inceptionv3/inceptionv3_tf_xiaoqiqiya/offline_inference)
