@@ -59,9 +59,9 @@ http://download.tensorflow.org/models/inception_v3_2016_08_28.tar.gz \
 
 
 ### 训练过程及结果
-epoch=20
-batch_size=64
-lr=动态调整
+epoch=20 \
+batch_size=64 \
+lr=动态调整 \
 耗费近80小时
 
 model_path---------------加载模型的路径（例如 ./model/xception_model.ckpt）不加载预训练模型时设为None即可  
