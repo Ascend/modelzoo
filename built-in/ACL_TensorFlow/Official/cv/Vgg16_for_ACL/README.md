@@ -10,7 +10,7 @@ This repository provides a script and recipe to Inference the Vgg16 model.
 
 ```shell
 git clone https://gitee.com/ascend/modelzoo.git
-cd modelzoo/built-in/ACL/Official/cv/Vgg16_for_ACL
+cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Vgg16_for_ACL
 ```
 
 ### 2. Download and preprocess the dataset
@@ -29,7 +29,7 @@ cd modelzoo/built-in/ACL/Official/cv/Vgg16_for_ACL
   export install_path=/usr/local/Ascend
   export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
   export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
-  export LD_LIBRARY_PATH=${install_path}/atc/lib64:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=${install_path}/atc/lib64:${install_path}/acllib/lib64:$LD_LIBRARY_PATH
   export ASCEND_OPP_PATH=${install_path}/opp
   ```
 
@@ -58,7 +58,7 @@ cd modelzoo/built-in/ACL/Official/cv/Vgg16_for_ACL
 
 ### Result
 
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
+Our result were obtained by running the applicable inference script. To achieve the same results, follow the steps in the Quick Start Guide.
 
 #### Inference accuracy results
 
