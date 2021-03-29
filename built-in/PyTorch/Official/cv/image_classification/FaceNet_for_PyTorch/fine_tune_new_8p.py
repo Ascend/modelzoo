@@ -128,7 +128,7 @@ def main():
 
     if args.device_list != '':
         npus_per_node = len(process_device_map)
-    elif cfg.device_num > 0:
+    elif args.device_num > 0:
         npus_per_node = args.device_num
     else:
         npus_per_node = torch.npu.device_count()
