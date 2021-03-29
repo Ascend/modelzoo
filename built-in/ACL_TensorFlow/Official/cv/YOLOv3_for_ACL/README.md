@@ -24,10 +24,11 @@ opencv-python==4.2.0.34
   To compare with official implement, for example, we use [get_coco_dataset.sh](https://github.com/pjreddie/darknet/blob/master/scripts/get_coco_dataset.sh) to prepare our dataset.
 
 2. annotation file
-   Using script generate `coco2014_minival.txt` file. Modify the path in `coco_minival_anns.py`, then execute:
+
+   cd scripts
+   Using script generate `coco2014_minival.txt` file. Modify the path in `coco_minival_anns.py` and `5k.txt`, then execute:
 
    ```
-   cd scripts
    python3 coco_minival_anns.py
    ```
 
