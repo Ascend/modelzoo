@@ -85,7 +85,7 @@ opencv-python==4.2.0.34
 
 ### Result
 
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
+Our result were obtained by running the applicable inference script. To achieve the same results, follow the steps in the Quick Start Guide.
 
 #### Inference accuracy results
 
