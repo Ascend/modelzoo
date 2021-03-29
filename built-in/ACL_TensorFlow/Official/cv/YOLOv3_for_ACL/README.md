@@ -26,6 +26,7 @@ opencv-python==4.2.0.34
 2. annotation file
 
    cd scripts
+
    Using script generate `coco2014_minival.txt` file. Modify the path in `coco_minival_anns.py` and `5k.txt`, then execute:
 
    ```
