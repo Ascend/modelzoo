@@ -54,7 +54,7 @@ http://www.image-net.org/
 本模型在inception的基础上提出新的归一化方式，为方便模型训练，在模型的训练时替换归一化方式,但保留预训练模型的卷积层参数以减少训练时长，替换后模型精度为0。
 
 模型下载链接
-http://download.tensorflow.org/models/inception_v3_2016_08_28.tar.gz \
+http://download.tensorflow.org/models/inception_v3_2016_08_28.tar.gz
 
 
 
@@ -70,7 +70,19 @@ output_path--------------经过fine_turn后的模型保存路径 （若文件夹
 image_num----------------相应数据集包含图片数量\
 class_num----------------图片标签数目\
 batch_size---------------当do_train 为False时，该值需要能被图片数量整除，以确保最终准确率的准确性，do_train为True时则无该要求\
-epoch--------------------该值只在do_train 为True时有效，表示训练轮次\
+epoch--------------------该值只在do_train 为True时有效，表示训练轮次
+
+ **启动训练**
+执行shell脚本：
+```
+bash train_1p.sh
+```
+
+**验证精度**
+执行shell脚本：
+```
+bash test_1p.sh
+```
 
 ### 说明
 由于imagenet数据较大，制作难度大，所以在制作过程中将imagenet分为24个tfrecord文件，放入同一文件夹内 \
