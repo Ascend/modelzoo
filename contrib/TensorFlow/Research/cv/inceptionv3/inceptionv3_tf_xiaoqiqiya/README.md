@@ -81,7 +81,7 @@ bash train_1p.sh
 
 **验证精度**
 
-训练结束后，执行shell脚本：
+训练结束后，执行shell脚本，脚本会自动加载训练的ckpt评估精度：
 ```
 bash test_1p.sh
 ```
