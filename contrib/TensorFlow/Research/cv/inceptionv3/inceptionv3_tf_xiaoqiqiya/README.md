@@ -73,13 +73,15 @@ batch_size---------------当do_train 为False时，该值需要能被图片数�
 epoch--------------------该值只在do_train 为True时有效，表示训练轮次
 
  **启动训练**
+
 执行shell脚本：
 ```
 bash train_1p.sh
 ```
 
 **验证精度**
-执行shell脚本：
+
+训练结束后，执行shell脚本：
 ```
 bash test_1p.sh
 ```
