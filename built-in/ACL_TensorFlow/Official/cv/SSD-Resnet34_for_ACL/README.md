@@ -1,8 +1,8 @@
 
 
-# GoogleNet Inference for Tensorflow 
+# SSD Resnet34 Inference for Tensorflow 
 
-This repository provides a script and recipe to Inference the GoogleNet model.
+This repository provides a script and recipe to Inference the SSD Resnet34 model.
 
 ## Quick Start Guide
 
