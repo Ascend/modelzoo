@@ -37,6 +37,9 @@ import argparse
 import apex
 import numpy as np
 import torch.backends.cudnn as cudnn
+import torch.distributed as dist
+import torch.multiprocessing as mp
+import torch.utils.data.distributed
 from models.inception_resnet_v1 import InceptionResnetV1
 from models.mtcnn import MTCNN, fixed_image_standardization
 from models.utils import training
@@ -46,13 +49,15 @@ from torch.optim.lr_scheduler import MultiStepLR
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets, transforms
 from apex import amp
+import torch.npu
 
 
 def parse_opts():
     parser = argparse.ArgumentParser(description='facenet')
+    parser.add_argument('--npu', default=None, type=int, help='NPU id to use.')
     parser.add_argument('--seed', type=int, default=123456, help='random seed')
-    parser.add_argument('--amp_cfg', action='store_true',
-                        help='If true, use apex.')
+    parser.add_argument('--amp_cfg', action='store_true', help='If true, use'
+                                                               'apex.')
     parser.add_argument('--opt_level', default='O0', type=str,
                         help='set opt level.')
     parser.add_argument('--loss_scale_value', default=1024, type=int,
@@ -69,8 +74,38 @@ def parse_opts():
     parser.add_argument('--workers', default=0, type=int, help='set workers')
     parser.add_argument('--data_dir', default="", type=str,
                         help='set data_dir')
+    parser.add_argument('--addr', default='90.90.176.152', type=str,
+                        help='master addr')
+    parser.add_argument('--rank', default=-1, type=int,
+                        help='node rank for distributed training')
+    parser.add_argument('--dist_url', default='tcp://224.66.41.62:23456',
+                        type=str,
+                        help='url used to set up distributed training')
+    parser.add_argument('--dist_backend', default='hccl', type=str,
+                        help='distributed backend')
+    parser.add_argument('--multiprocessing_distributed', action='store_true',
+                        help='Use multi-processing distributed training to'
+                             'launch N processes per node, which has N NPUs.'
+                             'This is the fastest way to use PyTorch for'
+                             'either single node or multi node data parallel'
+                             'training')
+    parser.add_argument('--world_size', default=-1, type=int,
+                        help='number of nodes for distributed training')
+    parser.add_argument('--device_num', default=-1, type=int,
+                        help='device num')
     args = parser.parse_args()
     return args
+
+def device_id_to_process_device_map(device_list):
+    devices = device_list.split(",")
+    devices = [int(x) for x in devices]
+    devices.sort()
+
+    process_device_map = dict()
+    for process_id, device_id in enumerate(devices):
+        process_device_map[process_id] = device_id
+
+    return process_device_map
 
 
 def seed_everything(seed=0):
@@ -83,17 +118,58 @@ def seed_everything(seed=0):
 def main():
     args = parse_opts()
     seed_everything(args.seed)
-    device_id = int(args.device_list.split(",")[0])
-    device = 'npu:{}'.format(device_id)
-    print('Running on device: {}'.format(device))
-    torch.npu.set_device(device)
+    os.environ['MASTER_ADDR'] = args.addr
+    os.environ['MASTER_PORT'] = '29501'
+
+    if args.dist_url == "env://" and args.world_size == -1:
+        args.world_size = int(os.environ["WORLD_SIZE"])
+
+    process_device_map = device_id_to_process_device_map(args.device_list)
+
+    if args.device_list != '':
+        npus_per_node = len(process_device_map)
+    elif cfg.device_num > 0:
+        npus_per_node = args.device_num
+    else:
+        npus_per_node = torch.npu.device_count()
+
+    if args.multiprocessing_distributed:
+        # world_size means nums of all devices or nums of processes
+        args.world_size = npus_per_node * args.world_size
+        mp.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, args))
+
+def main_worker(npu, npus_per_node, args):
+    process_device_map = device_id_to_process_device_map(args.device_list)
+
+    args.npu = process_device_map[npu]
+
+    if npu is not None:
+        print("[npu id:", npu, "]", "Use NPU: {} for training".format(npu))
+
+    if args.dist_url == "env://" and args.rank == -1:
+        args.rank = int(os.environ["RANK"])
+    if args.multiprocessing_distributed:
+        # For multiprocessing distributed training, rank needs to be the
+        # global rank among all the processes
+        args.rank = args.rank * npus_per_node + npu
+    print("rank:", args.rank)
+    dist.init_process_group(backend=args.dist_backend,
+                            world_size=args.world_size, rank=args.rank)
+
+    calculate_device = 'npu:{}'.format(npu)
+    print(calculate_device)
+    torch.npu.set_device(calculate_device)
+
+    args.batch_size = int(args.batch_size / npus_per_node)
+    args.workers = int((args.workers + npus_per_node - 1) / npus_per_node)
+
     dataset = datasets.ImageFolder(args.data_dir, transform=None)
 
     resnet = InceptionResnetV1(
         classify=True,
         pretrained='vggface2',
         num_classes=len(dataset.class_to_idx)
-    ).to(device)
+    ).to(calculate_device)
 
     optimizer = apex.optimizers.NpuFusedAdam(resnet.parameters(), lr=args.lr)
     scheduler = MultiStepLR(optimizer, [5, 10])
@@ -101,6 +177,10 @@ def main():
         resnet, optimizer = amp.initialize(resnet, optimizer,
                                            opt_level=args.opt_level,
                                            loss_scale=args.loss_scale_value)
+
+    resnet = torch.nn.parallel.DistributedDataParallel(resnet,
+                                                      device_ids=[args.npu],
+                                                      broadcast_buffers=False)
 
     trans = transforms.Compose([
         np.float32,
@@ -114,20 +194,30 @@ def main():
     train_inds = img_inds[:int(0.8 * len(img_inds))]
     val_inds = img_inds[int(0.8 * len(img_inds)):]
 
+    distributed = args.world_size > 1 or args.multiprocessing_distributed
+    if distributed:
+        train_sampler = torch.utils.data.distributed.DistributedSampler(
+            SubsetRandomSampler(train_inds))
+        val_sampler = torch.utils.data.distributed.DistributedSampler(
+            SubsetRandomSampler(val_inds))
+    else:
+        train_sampler = SubsetRandomSampler(train_inds)
+        val_sampler = SubsetRandomSampler(val_inds)
+
     train_loader = DataLoader(
         dataset,
         num_workers=args.workers,
         batch_size=args.batch_size,
-        sampler=SubsetRandomSampler(train_inds)
+        sampler=train_sampler
     )
     val_loader = DataLoader(
         dataset,
         num_workers=args.workers,
         batch_size=args.batch_size,
-        sampler=SubsetRandomSampler(val_inds)
+        sampler=val_sampler
     )
 
-    loss_fn = torch.nn.CrossEntropyLoss()
+    loss_fn = torch.nn.CrossEntropyLoss().to(calculate_device)
     metrics = {
         'fps': training.BatchTimer(),
         'acc': training.accuracy
@@ -142,18 +232,20 @@ def main():
     resnet.eval()
     training.pass_epoch(
         args.amp_cfg, resnet, loss_fn, val_loader,
-        batch_metrics=metrics, show_running=True, device=device,
+        batch_metrics=metrics, show_running=True, device=calculate_device,
         writer=writer
     )
 
     for epoch in range(args.epochs):
+        if distributed:
+            train_sampler.set_epoch(epoch)
         print('\nEpoch {}/{}'.format(epoch + 1, args.epochs))
         print('-' * 10)
 
         resnet.train()
         training.pass_epoch(
             args.amp_cfg, resnet, loss_fn, train_loader, optimizer, scheduler,
-            batch_metrics=metrics, show_running=True, device=device,
+            batch_metrics=metrics, show_running=True, device=calculate_device,
             writer=writer
         )
         if (epoch + 1) % args.epochs_per_save == 0 or epoch + 1 == args.epochs:
@@ -162,17 +254,19 @@ def main():
                             'net': resnet.state_dict(),
                             'optimizer': optimizer.state_dict(),
                             'amp': amp.state_dict()},
+                            'npu_num_{}'.format(npus_per_node) +
                             'checkpoint_epoch%d.pth' % (epoch + 1))
             else:
                 torch.save({'epoch': epoch,
                             'net': resnet.state_dict(),
                             'optimizer': optimizer.state_dict()},
+                            'npu_num_{}'.format(npus_per_node) +
                             'checkpoint_epoch%d.pth' % (epoch + 1))
 
         resnet.eval()
         training.pass_epoch(
             args.amp_cfg, resnet, loss_fn, val_loader,
-            batch_metrics=metrics, show_running=True, device=device,
+            batch_metrics=metrics, show_running=True, device=calculate_device,
             writer=writer
         )
 
