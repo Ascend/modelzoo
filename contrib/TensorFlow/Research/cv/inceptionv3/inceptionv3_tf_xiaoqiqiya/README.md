@@ -1,4 +1,4 @@
-###   **  inceptionv3_frn ** 
+###   **inceptionv3_frn** 
 
 
 ###   **概述** 
@@ -59,9 +59,9 @@ http://download.tensorflow.org/models/inception_v3_2016_08_28.tar.gz \
 
 
 ### 训练过程及结果
-epoch=20
-batch_size=64
-lr=动态调整
+epoch=20 \
+batch_size=64 \
+lr=动态调整 \
 耗费近80小时
 
 model_path---------------加载模型的路径（例如 ./model/xception_model.ckpt）不加载预训练模型时设为None即可  
@@ -83,6 +83,6 @@ epoch--------------------该值只在do_train 为True时有效，表示训练轮
 	return tf_data_list  
 以上代码主要功能就是将所有训练集的tfrecord文件路径以list的形式存入tf_data_list,读取文件时将此作为参数进行传递。
 
- **offline_inference
-** 
-[offline_inference](https://gitee.com/xiaoqiqiyaya/modelzoo/tree/master/contrib/Research/cv/inceptionv3/inceptionv3_tf_xiaoqiqiya/offline_inference)
+ **离线推理** 
+
+请参考下面的链接：[offline_inference](https://gitee.com/xiaoqiqiyaya/modelzoo/tree/master/contrib/Research/cv/inceptionv3/inceptionv3_tf_xiaoqiqiya/offline_inference)
