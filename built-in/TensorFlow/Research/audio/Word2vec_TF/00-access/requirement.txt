@@ -1,0 +1,4 @@
+jieba
+sklearn
+matplotlib
+scipy
