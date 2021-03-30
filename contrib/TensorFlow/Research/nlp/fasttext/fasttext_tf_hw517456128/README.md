@@ -16,7 +16,7 @@ pyee
 
 # Results
 
-NPU  Top1 accuracy: 95.37  Top3 accuracy: 99.92
+NPU  Top1 accuracy: 95.37  Top3 accuracy: 99.92  
 GPU  Top1 accuracy: 91.26  Top3 accuracy: 99.74
 
 # Usage
