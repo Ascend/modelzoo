@@ -8,8 +8,9 @@ wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/mmt16_task1_test.tar.gz && 
 `
 
 二、安装依赖包：<br>
-ARM服务器安装spacy依赖包使用以下命令：<br>
-`BLIS_ARCH="generic" pip install spacy --no-binary blis`
+1.ARM服务器安装spacy依赖包使用以下命令：<br>
+`BLIS_ARCH="generic" pip install spacy --no-binary blis`<br>
+2.版本依赖 numpy>=1.20.0
 
 三、训练流程：<br>
 单卡训练流程：<br>
