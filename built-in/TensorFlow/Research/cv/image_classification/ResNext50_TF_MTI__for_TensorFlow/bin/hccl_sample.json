@@ -1,0 +1,12 @@
+{
+"group_count": "1",
+"group_list": [
+{
+    "group_name": "worker",
+    "device_count": "{device_count}",
+    "instance_count": "{instance_count}",
+    "instance_list": [{instance_list}]
+}
+],
+"status": "completed"
+}

@@ -1,0 +1,30 @@
+{
+    "graphId": "725",
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "59",
+            "match_times": "60"
+        },
+        "TbeBnupdateEltwiseEltwiseFusionPass": {
+            "effect_times": "16",
+            "match_times": "16"
+        },
+        "TbeConv2DBackpropElemwiseFusionPass": {
+            "effect_times": "32",
+            "match_times": "32"
+        },
+        "TbeConvBnreduceFusionPass": {
+            "effect_times": "53",
+            "match_times": "53"
+        },
+        "TbeFullyconnectionElemwiseDequantFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "TbeReduceElemwiseFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        }
+    }
+}
