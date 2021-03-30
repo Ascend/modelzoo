@@ -1,6 +1,6 @@
 # Fasttext 
-Bag of Tricks for Efﬁcient Text Classiﬁcation
-(Armand Joulin, Edouard Grave, and Piotr Bojanowski Tomas Mikolov. 2017. Bag of Tricks for Efficient Text Classiﬁcation. In Proceedings of EACL.)
+Bag of Tricks for Efﬁcient Text Classification
+(Armand Joulin, Edouard Grave, and Piotr Bojanowski Tomas Mikolov. 2017. In Proceedings of EACL.)
 
 Python Tensorflow Implementation on Ascend 910 environment
 
@@ -16,9 +16,8 @@ pyee
 
 # Results
 
-Top1 accuracy : 95.37
-
-Top3 accuracy : 99.92
+NPU  Top1 accuracy: 95.37  Top3 accuracy: 99.92
+GPU  Top1 accuracy: 91.26  Top3 accuracy: 99.74
 
 # Usage
 
