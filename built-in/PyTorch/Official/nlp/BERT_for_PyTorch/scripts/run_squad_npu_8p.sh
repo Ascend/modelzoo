@@ -97,7 +97,7 @@ CMD+=" --max_steps=$max_steps "
 CMD+=" $use_fp16"
 CMD+=" --use_npu"
 CMD+=" --num_npu=$num_npu"
-CMD+=" --loss_scale=1024"
+CMD+=" --loss_scale=4096"
 CMD+=" --addr=127.0.0.1"
 
 if [ $(uname -m) = "aarch64" ]
