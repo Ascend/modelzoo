@@ -11,7 +11,7 @@ export HCCL_SECURITY_MODE=1
 /usr/local/Ascend/driver/tools/msnpureport -e disable
 
 DATA_DIR="/data/chid/preprocessed/"
-CHECKPOINT_PATH="/data/checkpoints/CPM-large_1p"
+CHECKPOINT_PATH="/data/checkpoints/CPM-large_2p"
 RESULTS_DIR="results/"
 MODEL_NAME="zeroshot-test"
 TOKENIZER_PATH="bpe_3w_new/"
