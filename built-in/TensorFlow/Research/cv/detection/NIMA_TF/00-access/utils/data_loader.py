@@ -59,13 +59,19 @@ def parse_data_without_augmentation(filename, scores):
 
 def train_generator(batchsize, shuffle=True):
     '\n    Creates a python generator that loads the AVA dataset images with random data\n    augmentation and generates numpy arrays to feed into the Keras model for training.\n\n    Args:\n        batchsize: batchsize for training\n        shuffle: whether to shuffle the dataset\n\n    Returns:\n        a batch of samples (X_images, y_scores)\n    '
-    with tf.Session() as sess:
+    config = tf.ConfigProto()
+    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True
+    custom_op.parameter_map["enable_data_pre_proc"].b = True
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    with tf.Session(config=config) as sess:
         train_dataset = tf.data.Dataset.from_tensor_slices((train_image_paths, train_scores))
-        train_dataset = train_dataset.map(parse_data, num_parallel_calls=2)
-        train_dataset = train_dataset.batch(batchsize, drop_remainder=True)
         train_dataset = train_dataset.repeat()
         if shuffle:
             train_dataset = train_dataset.shuffle(buffer_size=4)
+        train_dataset = train_dataset.map(parse_data, num_parallel_calls=2)
+        train_dataset = train_dataset.batch(batchsize, drop_remainder=True)
         train_iterator = train_dataset.make_initializable_iterator()
         train_batch = train_iterator.get_next()
         sess.run(train_iterator.initializer)
@@ -91,11 +97,17 @@ def train_generator(batchsize, shuffle=True):
         '''
 def val_generator(batchsize):
     '\n    Creates a python generator that loads the AVA dataset images without random data\n    augmentation and generates numpy arrays to feed into the Keras model for training.\n\n    Args:\n        batchsize: batchsize for validation set\n\n    Returns:\n        a batch of samples (X_images, y_scores)\n    '
-    with tf.Session() as sess:
+    config = tf.ConfigProto()
+    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True
+    custom_op.parameter_map["enable_data_pre_proc"].b = True
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    with tf.Session(config=config) as sess:
         val_dataset = tf.data.Dataset.from_tensor_slices((val_image_paths, val_scores))
+        val_dataset = val_dataset.repeat()
         val_dataset = val_dataset.map(parse_data_without_augmentation)
         val_dataset = val_dataset.batch(batchsize, drop_remainder=True)
-        val_dataset = val_dataset.repeat()
         val_iterator = val_dataset.make_initializable_iterator()
         val_batch = val_iterator.get_next()
         sess.run(val_iterator.initializer)
