@@ -97,6 +97,6 @@ CMD+=" --max_steps=$max_steps "
 CMD+=" $use_fp16"
 CMD+=" --use_npu"
 CMD+=" --npu_id=$npu_id "
-CMD+=" --loss_scale=64"
+CMD+=" --loss_scale=4096 "
 
 $CMD

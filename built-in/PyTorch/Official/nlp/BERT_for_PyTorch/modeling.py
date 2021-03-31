@@ -391,9 +391,8 @@ class BertSelfAttention(nn.Module):
         attention_probs = self.dropout(attention_probs)
 
         context_layer = torch.matmul(attention_probs, value_layer)
-        context_layer = context_layer.permute(0, 2, 1, 3).contiguous()
-        new_context_layer_shape = context_layer.size()[:-2] + (self.all_head_size,)
-        context_layer = torch.reshape(context_layer, new_context_layer_shape)
+        context_layer = context_layer.npu_confusion_transpose((0, 2, 1, 3), (
+        context_layer.size()[0], context_layer.size()[2], self.all_head_size), True)
         return context_layer
 
 
