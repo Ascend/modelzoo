@@ -19,5 +19,7 @@ python3.7 fine_tune_new.py \
     --device_list '2' \
     --batch_size 512 \
     --epochs 8 \
+    --epochs_per_save 1 \
+    --lr 0.001 \
     --workers 8 \
     --data_dir '/home/VGG-Face2/data/train_cropped'

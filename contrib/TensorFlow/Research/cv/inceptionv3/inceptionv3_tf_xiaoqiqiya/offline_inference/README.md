@@ -102,7 +102,7 @@ images5 = preprocess_for_eval(images, 299, 299, 0.925)
 10000张测试集，每张图片生成5张预处理图片。由于文件过大
 
 首先是生成数据bin文件`python3 resnet152_data_preprocess.py /home/HwHiAiUser/zjut/datasets/val.tfrecord  /mnt/sdc/data/imageNet
- 0`  然后执行'./start_inference.sh'脚本
+ 0`
 ```log
 /mnt/sdc/data/imageNet/inference
 [INFO] output data success
@@ -131,8 +131,7 @@ Test Finish!
 >>>>> 共 25000 测试样本 accuracy:0.772360
 ```
 
-然后是再生成数据bin文件`python3 resnet152_data_preprocess.py /home/HwHiAiUser/zjut/datasets/val.tfrecord  /mnt/sdc/data/imageNet
- 1`  然后执行 `./start_inference.sh`脚本
+然后执行 `./start_inference.sh`脚本
 
 ```log
 /mnt/sdc/data/imageNet/inference

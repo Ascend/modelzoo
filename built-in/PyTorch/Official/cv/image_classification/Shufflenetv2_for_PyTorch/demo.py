@@ -4,11 +4,11 @@
 
 import torch
 
-def build_model(arch, loc):
+
+def build_model():
     # 请自定义模型并加载预训练模型
-    import models as models
-    model = models.__dict__[arch]()
-    model = model.to(loc)
+    from models import shufflenet_v2_x1_0
+    model = shufflenet_v2_x1_0(pretrained=True)
     model.eval()  # 注意设置eval模式
     return model
 
@@ -45,33 +45,14 @@ def post_process(output_tensor):
 
 
 if __name__ == '__main__':
-    arch = 'shufflenet_v2_x1_0'
-    loc = 'npu:0'
-    torch.npu.set_device(loc)
-
-    # 1.获取原始数据
+    # 1. 获取原始数据
     raw_data = get_raw_data()
 
-    # 2.构建模型并加载权重
-    # 获取checkpoint.pth方式：修改script/run_1p.sh脚本的参数epochs为10，执行bash script/run_1p.sh，训练10个epoch后模型自动生成
-    model = build_model(arch, loc)
-    ckpt = torch.load("checkpoint.pth", map_location=loc)
+    # 2. 构建模型
+    model = build_model()
 
-    try:
-        # for normal model save
-        model.load_state_dict(ckpt['state_dict'])
-    except:
-        # for ddp's model save
-        state_dict_ddp = ckpt['state_dict']
-        state_dict = {}
-        for key, value in state_dict_old.items():
-            key = key[7:]
-            state_dict[key] = value
-        model.load_state_dict(state_dict)
-
-    # 3.预处理
+    # 3. 预处理
     input_tensor = pre_process(raw_data)
-    input_tensor = input_tensor.to(loc)
 
     # 4. 执行forward
     output_tensor = model(input_tensor)

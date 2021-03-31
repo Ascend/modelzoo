@@ -1,0 +1,13 @@
+{
+    "rank_size": 16,
+    "cluster": {
+        "10.155.111.169": {
+            "user": "root",
+            "passwd": "Huawei%169"
+        },
+        "10.155.111.176": {
+            "user": "root",
+            "passwd": "huawei%176"
+        }
+    }
+}
