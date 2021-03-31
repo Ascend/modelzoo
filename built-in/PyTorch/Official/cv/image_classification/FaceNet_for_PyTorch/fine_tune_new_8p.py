@@ -210,13 +210,17 @@ def main_worker(npu, npus_per_node, args):
         dataset,
         num_workers=args.workers,
         batch_size=args.batch_size,
-        sampler=train_sampler
+        pin_memory=False,
+        sampler=train_sampler,
+        drop_last=True
     )
     val_loader = DataLoader(
         dataset,
         num_workers=args.workers,
         batch_size=args.batch_size,
-        sampler=val_sampler
+        pin_memory=False,
+        sampler=val_sampler,
+        drop_last=True
     )
 
     loss_fn = torch.nn.CrossEntropyLoss().to(calculate_device)
