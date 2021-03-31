@@ -59,7 +59,13 @@ def parse_data_without_augmentation(filename, scores):
 
 def train_generator(batchsize, shuffle=True):
     '\n    Creates a python generator that loads the AVA dataset images with random data\n    augmentation and generates numpy arrays to feed into the Keras model for training.\n\n    Args:\n        batchsize: batchsize for training\n        shuffle: whether to shuffle the dataset\n\n    Returns:\n        a batch of samples (X_images, y_scores)\n    '
-    with tf.Session() as sess:
+    config = tf.ConfigProto()
+    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    custom_op.parameter_map["use_off_line"].b = True
+    custom_op.parameter_map["enable_data_pre_proc"].b = True
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    with tf.Session(config=config) as sess:
         train_dataset = tf.data.Dataset.from_tensor_slices((train_image_paths, train_scores))
         train_dataset = train_dataset.map(parse_data, num_parallel_calls=2)
         train_dataset = train_dataset.batch(batchsize, drop_remainder=True)
