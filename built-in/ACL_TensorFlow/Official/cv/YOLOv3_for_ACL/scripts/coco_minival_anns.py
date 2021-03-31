@@ -23,6 +23,7 @@ with open(ban_path, 'r')as f:
 name_box_id = defaultdict(list)
 id_name = dict()
 
+'''
 f = open(
     "/opt/npu/dataset/coco/coco2014/annotations/instances_train2014.json",
     encoding='utf-8')
@@ -53,7 +54,7 @@ for ant in annotations:
         cat = cat - 11
 
     name_box_id[name].append([ant['bbox'], cat])
-
+'''
 
 
 
