@@ -42,8 +42,7 @@ VGG16是一个经典的目标分类网络。整个网络都使用（3x3）的卷
 -   适配昇腾 AI 处理器的实现：
     
         
-        https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/VGG16_for_TensorFlow/
-        commit_id=99c094f5f3020b423ac8902b85dfc257011ec95e
+    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/VGG16_for_TensorFlow
        
 
 -   通过Git获取对应commit\_id的代码方法如下：
