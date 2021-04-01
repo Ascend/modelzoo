@@ -264,11 +264,11 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
         tf.train.init_from_checkpoint(self.args.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})
         ```
 
-3.  模型训练。
+- 模型训练。
 
     参考“模型训练”中训练步骤。
 
-4.  模型评估。
+- 模型评估。
 
     可以参考“模型训练”中训练步骤。
 
