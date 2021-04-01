@@ -33,22 +33,18 @@
 
 Transformer是一个能够高效并行训练的序列到序列模型，该模型分为编码器（Encoder）和解码器（Decoder）两个部分，主要由多头注意力（Multi-head Attention）网络和前向（FeedForward）网络组成， 同时集成了位置编码（Position Encoding）、残差连接（Residual Connection）、层归一化（Layer Normalization）等多种技术。相比循环和卷积网络，注意力网络可以同时对任意两个输入位置的向量进行运算，提高了计算效率。 在包括翻译的多个自然语言处理任务上，该网络都取得了显著的提升。
 
-   -   参考论文：
-
-       [Ashish Vaswani, Noam Shazeer, Niki Parmar, JakobUszkoreit, Llion Jones, Aidan N Gomez, Ł ukaszKaiser, and Illia Polosukhin. 2017. Attention is all you need. In NIPS 2017, pages 5998–6008.](https://arxiv.org/abs/1706.03762)
-
-   -   参考实现：
-
-
-   -   适配昇腾 AI 处理器的实现：
+-   参考论文：
     
-        ```
-        https://gitee.com/zhou-biao-biao/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow/
-        commit_id= 477b07a1e95a35885b3a9a569b1c8ccb9ad5d7af
-        ```
+    [Ashish Vaswani, Noam Shazeer, Niki Parmar, JakobUszkoreit, Llion Jones, Aidan N Gomez, Ł ukaszKaiser, and Illia Polosukhin. 2017. Attention is all you need. In NIPS 2017, pages 5998–6008.](https://arxiv.org/abs/1706.03762)
+
+-   参考实现：
 
 
-   -   通过Git获取对应commit\_id的代码方法如下：
+-   适配昇腾 AI 处理器的实现：    
+    
+    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow
+
+-   通过Git获取对应commit\_id的代码方法如下：
     
         ```
         git clone {repository_url}    # 克隆仓库的代码
