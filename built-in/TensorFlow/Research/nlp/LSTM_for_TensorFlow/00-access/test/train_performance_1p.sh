@@ -31,7 +31,7 @@ data_dump_flag=0
 data_dump_step=10
 profiling=False
 random_remove=False
-data_path="../training_data"
+data_path="../training_data/"
 
 if [[ $1 == --help || $1== -h]]; then
     echo"usage:./train_full_1p.sh <args>"
