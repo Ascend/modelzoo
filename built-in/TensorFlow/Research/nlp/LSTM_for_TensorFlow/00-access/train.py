@@ -71,7 +71,7 @@ input_data = tf.placeholder(tf.int32, [batchSize, maxSeqLength])
 data = tf.Variable(tf.zeros([batchSize, maxSeqLength, numDimensions]),dtype=tf.float32)
 data = tf.nn.embedding_lookup(wordVectors,input_data)
 data = tf.transpose(data, [1, 0, 2], name='transpose_time_major')
-lstm = DynamicRNN(lstmUnits, dtypes.float32, time_major=True, forget_bias=1.0, is_training=False)
+lstm = DynamicRNN(lstmUnits, dtypes.float32, time_major=True, forget_bias=1.0, is_training=True)
 value, output_h, output_c, i, j, f, o, tanhct = lstm(data, seq_length= None, init_h = None, init_c = None)
 
 weight = tf.Variable(tf.truncated_normal([lstmUnits, numClasses]))
