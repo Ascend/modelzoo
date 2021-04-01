@@ -38,10 +38,10 @@
 
     -   参考实现：
         
-        ```
-        https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet
         
-        ```
+        [https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet](https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet)
+        
+        
  
     -   适配昇腾 AI 处理器的实现：
     
