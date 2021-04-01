@@ -18,7 +18,7 @@ export RANK_SIZE=1
 #base param, using user config in python scripts if not config in this shell
 batch_size=24
 learning_rate=0.1
-steps=100000
+steps=10000
 #epochs=0
 ckpt_count=100000
 
