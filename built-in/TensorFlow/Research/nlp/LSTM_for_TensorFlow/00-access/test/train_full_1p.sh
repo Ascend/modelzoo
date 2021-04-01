@@ -33,7 +33,7 @@ profiling=False
 random_remove=False
 data_path="../training_data/"
 
-if [[ $1 == --help || $1== -h]]; then
+if [[ $1 == --help || $1 == -h ]];then
     echo"usage:./train_full_1p.sh <args>"
 
     echo " "
@@ -75,15 +75,15 @@ do
     elif [[ $para == --random_remove* ]];then
         random_remove=`echo ${para#*=}`
     elif [[ $para == --batch_size* ]];then
-        batch_size=`echo ${para#*=}
+        batch_size=`echo ${para#*=}`
     elif [[ $para == --learning_rate* ]];then
-        learning_rate=`echo ${para#*=}
+        learning_rate=`echo ${para#*=}`
     elif [[ $para == --steps* ]];then
-        steps=`echo ${para#*=}
+        steps=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
-        data_path=`echo ${para#*=}
+        data_path=`echo ${para#*=}`
     elif [[ $para == --ckpt_count* ]];then
-        ckpt_count=`echo ${para#*=}
+        ckpt_count=`echo ${para#*=}`
     fi
 done
 
