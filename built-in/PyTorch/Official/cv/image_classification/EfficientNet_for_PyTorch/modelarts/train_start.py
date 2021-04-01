@@ -44,11 +44,11 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='efficientnet-b0',
                     help='model architecture (default: resnet18)')
 parser.add_argument('-j', '--workers', default=64, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
-parser.add_argument('--epochs', default=10, type=int, metavar='N',
+parser.add_argument('--epochs', default=100, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=128, type=int,
+parser.add_argument('-b', '--batch-size', default=512, type=int,
                     metavar='N',
                     help='mini-batch size (default: 256), this is the total '
                          'batch size of all GPUs on the current node when '
@@ -71,7 +71,7 @@ parser.add_argument('--pretrained', dest='pretrained', action='store_true',
 parser.add_argument('--pretrained_weight', default='', type=str, metavar='PATH',
                     help='path to pretrained weight')
 # -------------modelarts transfer leanrning---------------------
-parser.add_argument('--num_classes', default=10, type=int,
+parser.add_argument('--num_classes', default=1000, type=int,
                     help='number of class')
 # ------------modelarts transfer learning-----------------------
 parser.add_argument('--world-size', default=-1, type=int,
