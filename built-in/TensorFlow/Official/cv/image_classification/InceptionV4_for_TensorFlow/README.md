@@ -31,17 +31,16 @@
 <h2 id="概述.md">概述</h2>
 
 InceptionV4是2016年提出的Inception系列网络的第四个版本，随着ResNet网络的出现以及在主流数据集上的良好表现，谷歌希望将残差结构引入到Inception网络中得到更好的表现，同时注意到InceptionV3的部分结构有不必要的复杂性，于是尝试在不引入残差结构的情况下改进原来的的Inception结构，最终达到和与ResNet结合方式相同的精度。
- -   参考论文：
+-   参考论文：
 
-        [Christian Szegedy, Sergey Ioffe, Vincent Vanhoucke, Alex Alemi, ​​Inception-v4, Inception-ResNet and the Impact of Residual Connection on Learning.2016](https://arxiv.org/abs/1602.07261)
- -   参考实现：
+    [Christian Szegedy, Sergey Ioffe, Vincent Vanhoucke, Alex Alemi, ​​Inception-v4, Inception-ResNet and the Impact of Residual Connection on Learning.2016](https://arxiv.org/abs/1602.07261)
+-   参考实现：
 
-        [https://github.com/tensorflow/models/tree/master/research/slim](https://github.com/tensorflow/models/tree/master/research/slim)
+    [https://github.com/tensorflow/models/tree/master/research/slim](https://github.com/tensorflow/models/tree/master/research/slim)
 -   适配昇腾 AI 处理器的实现：
     
         
-        https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV4_for_TensorFlow/
-        commit_id=9887f0b4ae27f16a1e9f8b0a94dda87b0bf8430a
+     https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV4_for_TensorFlow
         
 
 -   通过Git获取对应commit\_id的代码方法如下：
