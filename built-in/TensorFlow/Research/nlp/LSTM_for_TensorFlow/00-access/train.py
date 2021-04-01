@@ -12,7 +12,7 @@ from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-c', '--ckpt_count', type=int, default='0',help="""deviceid""")
+    parser.add_argument('-c', '--ckpt_count', type=int, default='0',help="""save checkpoint counts""")
     parser.add_argument('-r', '--learning_rate', type=float, default='0.1',help="""rate""")
     parser.add_argument('-dir', '--data_path', type=str, default = './training_data',help = """the data dir path""")
     parser.add_argument('-b', '--batch_size', type=int, default = 24,help = """training batchsize""")
