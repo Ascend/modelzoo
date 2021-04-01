@@ -1,0 +1,73 @@
+{
+    "graphId": "41",
+    "graph_fusion": {
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "19"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "19",
+            "match_times": "20"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "9"
+        },
+        "SparseSoftMaxFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "ZConcatExt2FusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "ZConcatv2dFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "1",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "18",
+            "match_times": "18"
+        },
+        "TbeMultiOutputFusionPass": {
+            "effect_times": "0",
+            "match_times": "9"
+        },
+        "TbeReduceElemwiseFusionPass": {
+            "effect_times": "9",
+            "match_times": "9"
+        }
+    }
+}{
+    "graphId": "51",
+    "sessionId": "1",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "2",
+            "match_times": "2"
+        }
+    }
+}

@@ -1,0 +1,408 @@
+{
+    "graphId": "11",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "26"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "13",
+            "match_times": "13"
+        }
+    }
+}{
+    "graphId": "61",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "20"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "10",
+            "match_times": "10"
+        }
+    }
+}{
+    "graphId": "71",
+    "graph_fusion": {
+        "AABiasaddConvFusion": {
+            "effect_times": "23",
+            "match_times": "23"
+        },
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "21",
+            "match_times": "30"
+        },
+        "AddNFusionPass": {
+            "effect_times": "0",
+            "match_times": "29"
+        },
+        "BatchNormBnInferFusionPass": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "BatchNormGradBnInferGradFusion": {
+            "effect_times": "0",
+            "match_times": "7"
+        },
+        "BatchNormGradInfGradFusion": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "ClipFusionRule0": {
+            "effect_times": "61",
+            "match_times": "61"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "60",
+            "match_times": "60"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "9",
+            "match_times": "9"
+        },
+        "ConstToAttrResizeNearestNeighborGradFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "ConstToAttrStridedSliceFusion": {
+            "effect_times": "9",
+            "match_times": "11"
+        },
+        "Conv2DbpFilterMulFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "Conv2DbpInputDilationFusionPass": {
+            "effect_times": "0",
+            "match_times": "22"
+        },
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "DreluFusionPass": {
+            "effect_times": "20",
+            "match_times": "20"
+        },
+        "FusedBatchNormBertFusionPass": {
+            "effect_times": "0",
+            "match_times": "14"
+        },
+        "FusedBatchNormGradFusionPass": {
+            "effect_times": "7",
+            "match_times": "14"
+        },
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "251"
+        },
+        "MulAddNL2LossFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulAddNPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulGradFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "Pow2SquareFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "SingleBatchNormFusion": {
+            "effect_times": "7",
+            "match_times": "14"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "StridedSliceGradFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "TileConstToAttrFusion": {
+            "effect_times": "6",
+            "match_times": "6"
+        },
+        "ZConcatExt2FusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "ZConcatv2dFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "35",
+            "match_times": "35"
+        },
+        "TbeEltwiseFusionPass": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "TbeMultiOutputFusionPass": {
+            "effect_times": "118",
+            "match_times": "121"
+        }
+    }
+}{
+    "graphId": "81",
+    "graph_fusion": {
+        "AABiasaddConvFusion": {
+            "effect_times": "23",
+            "match_times": "23"
+        },
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "0",
+            "match_times": "8"
+        },
+        "BatchNormBnInferFusionPass": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "6",
+            "match_times": "6"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "8",
+            "match_times": "8"
+        },
+        "ConstToAttrStridedSliceFusion": {
+            "effect_times": "9",
+            "match_times": "11"
+        },
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "FusedBatchNormBertFusionPass": {
+            "effect_times": "0",
+            "match_times": "14"
+        },
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "10"
+        },
+        "MulGradFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "SingleBatchNormFusion": {
+            "effect_times": "7",
+            "match_times": "14"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "StrideHoistingPass": {
+            "effect_times": "0",
+            "match_times": "15"
+        },
+        "ZConcatExt2FusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "ZConcatv2dFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "TbeEltwiseFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "TbeMultiOutputFusionPass": {
+            "effect_times": "2",
+            "match_times": "4"
+        }
+    }
+}{
+    "graphId": "71",
+    "graph_fusion": {
+        "AABiasaddConvFusion": {
+            "effect_times": "23",
+            "match_times": "23"
+        },
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "3"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "21",
+            "match_times": "30"
+        },
+        "AddNFusionPass": {
+            "effect_times": "0",
+            "match_times": "29"
+        },
+        "BatchNormBnInferFusionPass": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "BatchNormGradBnInferGradFusion": {
+            "effect_times": "0",
+            "match_times": "7"
+        },
+        "BatchNormGradInfGradFusion": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "ClipFusionRule0": {
+            "effect_times": "61",
+            "match_times": "61"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "60",
+            "match_times": "60"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "9",
+            "match_times": "9"
+        },
+        "ConstToAttrResizeNearestNeighborGradFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "ConstToAttrStridedSliceFusion": {
+            "effect_times": "9",
+            "match_times": "11"
+        },
+        "Conv2DbpFilterMulFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "Conv2DbpInputDilationFusionPass": {
+            "effect_times": "0",
+            "match_times": "22"
+        },
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "23"
+        },
+        "DreluFusionPass": {
+            "effect_times": "20",
+            "match_times": "20"
+        },
+        "FusedBatchNormBertFusionPass": {
+            "effect_times": "0",
+            "match_times": "14"
+        },
+        "FusedBatchNormGradFusionPass": {
+            "effect_times": "7",
+            "match_times": "14"
+        },
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "251"
+        },
+        "MulAddNL2LossFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulAddNPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulGradFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "Pow2SquareFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "SingleBatchNormFusion": {
+            "effect_times": "7",
+            "match_times": "14"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "StridedSliceGradFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "TileConstToAttrFusion": {
+            "effect_times": "6",
+            "match_times": "6"
+        },
+        "ZConcatExt2FusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        },
+        "ZConcatv2dFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "35",
+            "match_times": "35"
+        },
+        "TbeEltwiseFusionPass": {
+            "effect_times": "7",
+            "match_times": "7"
+        },
+        "TbeMultiOutputFusionPass": {
+            "effect_times": "118",
+            "match_times": "121"
+        }
+    }
+}

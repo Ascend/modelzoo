@@ -1,0 +1,15 @@
+.env/
+__pycache__
+*.pyc
+saves/
+logs/
+TODO
+.vscode
+*.txt
+*.out
+test.list
+train.list
+*.DS_Store
+run.sh
+denseNet3d_result/
+*.tfrecord

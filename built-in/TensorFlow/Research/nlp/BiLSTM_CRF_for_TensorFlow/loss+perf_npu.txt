@@ -1,0 +1,291 @@
+WARNING:tensorflow:From /usr/local/Ascend/tfplugin/python/site-packages/npu_bridge/estimator/npu/npu_optimizer.py:266: The name tf.train.Optimizer is deprecated. Please use tf.compat.v1.train.Optimizer instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/modeling.py:43: The name tf.gfile.GFile is deprecated. Please use tf.io.gfile.GFile instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:359: The name tf.ConfigProto is deprecated. Please use tf.compat.v1.ConfigProto instead.
+
+I:NER Training:[ber:tra:371]:***** Running training *****
+I:NER Training:[ber:tra:372]:  Num examples = 20864
+I:NER Training:[ber:tra:373]:  Batch size = 32
+I:NER Training:[ber:tra:374]:  Num steps = 652
+I:NER Training:[ber:tra:376]:***** Running evaluation *****
+I:NER Training:[ber:tra:377]:  Num examples = 2318
+I:NER Training:[ber:tra:378]:  Batch size = 32
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:211: The name tf.python_io.TFRecordWriter is deprecated. Please use tf.io.TFRecordWriter instead.
+
+I:NER Training:[ber:fil:214]:Writing example 0 of 20864
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: train-0
+I:NER Training:[ber:con:200]:tokens: 海 钓 比 赛 地 点 在 厦 门 与 金 门 之 间 的 海 域 。
+I:NER Training:[ber:con:201]:input_ids: 101 3862 7157 3683 6612 1765 4157 1762 1336 7305 680 7032 7305 722 7313 4638 3862 1818 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 4 6 10 4 6 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: train-1
+I:NER Training:[ber:con:200]:tokens: 这 座 依 山 傍 水 的 博 物 馆 由 国 内 一 流 的 设 计 师 主 持 设 计 ， 整 个 建 筑 群 精 美 而 恢 宏 。
+I:NER Training:[ber:con:201]:input_ids: 101 6821 2429 898 2255 988 3717 4638 1300 4289 7667 4507 1744 1079 671 3837 4638 6392 6369 2360 712 2898 6392 6369 8024 3146 702 2456 5029 5408 5125 5401 5445 2612 2131 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: train-2
+I:NER Training:[ber:con:200]:tokens: 但 作 为 一 个 共 产 党 员 、 人 民 公 仆 ， 应 当 胸 怀 宽 阔 ， 真 正 做 到 [UNK] 先 天 下 之 忧 而 忧 ， 后 天 下 之 乐 而 乐 [UNK] ， 淡 化 个 人 的 名 利 得 失 和 宠 辱 悲 喜 ， 把 改 革 大 业 摆 在 首 位 ， 这 样 才 能 超 越 自 我 ， 摆 脱 世 俗 ， 有 所 作 为 。
+I:NER Training:[ber:con:201]:input_ids: 101 852 868 711 671 702 1066 772 1054 1447 510 782 3696 1062 789 8024 2418 2496 5541 2577 2160 7333 8024 4696 3633 976 1168 100 1044 1921 678 722 2569 5445 2569 8024 1400 1921 678 722 727 5445 727 100 8024 3909 1265 702 782 4638 1399 1164 2533 1927 1469 2143 6802 2650 1599 8024 2828 3121 7484 1920 689 3030 1762 7674 855 8024 6821 3416 2798 5543 6631 6632 5632 2769 8024 3030 5564 686 921 8024 3300 2792 868 711 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: train-3
+I:NER Training:[ber:con:200]:tokens: 在 发 达 国 家 ， 急 救 保 险 十 分 普 及 ， 已 成 为 社 会 保 障 体 系 的 重 要 组 成 部 分 。
+I:NER Training:[ber:con:201]:input_ids: 101 1762 1355 6809 1744 2157 8024 2593 3131 924 7372 1282 1146 3249 1350 8024 2347 2768 711 4852 833 924 7397 860 5143 4638 7028 6206 5299 2768 6956 1146 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: train-4
+I:NER Training:[ber:con:200]:tokens: 日 俄 两 国 国 内 政 局 都 充 满 变 数 ， 尽 管 日 俄 关 系 目 前 是 历 史 最 佳 时 期 ， 但 其 脆 弱 性 不 言 自 明 。
+I:NER Training:[ber:con:201]:input_ids: 101 3189 915 697 1744 1744 1079 3124 2229 6963 1041 4007 1359 3144 8024 2226 5052 3189 915 1068 5143 4680 1184 3221 1325 1380 3297 881 3198 3309 8024 852 1071 5546 2483 2595 679 6241 5632 3209 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 4 4 10 10 10 10 10 10 10 10 10 10 10 10 10 10 4 4 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:fil:214]:Writing example 5000 of 20864
+I:NER Training:[ber:fil:214]:Writing example 10000 of 20864
+I:NER Training:[ber:fil:214]:Writing example 15000 of 20864
+I:NER Training:[ber:fil:214]:Writing example 20000 of 20864
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:229: The name tf.FixedLenFeature is deprecated. Please use tf.io.FixedLenFeature instead.
+
+I:NER Training:[ber:fil:214]:Writing example 0 of 2318
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: dev-0
+I:NER Training:[ber:con:200]:tokens: 在 这 里 恕 弟 不 恭 之 罪 ， 敢 在 尊 前 一 诤 ： 前 人 论 书 ， 每 曰 [UNK] 字 字 有 来 历 ， 笔 笔 有 出 处 [UNK] ， 细 读 公 字 ， 何 尝 跳 出 前 人 藩 篱 ， 自 隶 变 而 后 ， 直 至 明 季 ， 兄 有 何 新 出 ？
+I:NER Training:[ber:con:201]:input_ids: 101 1762 6821 7027 2609 2475 679 2621 722 5389 8024 3140 1762 2203 1184 671 6420 8038 1184 782 6389 741 8024 3680 3288 100 2099 2099 3300 3341 1325 8024 5011 5011 3300 1139 1905 100 8024 5301 6438 1062 2099 8024 862 2214 6663 1139 1184 782 5974 5075 8024 5632 7405 1359 5445 1400 8024 4684 5635 3209 2108 8024 1040 3300 862 3173 1139 8043 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: dev-1
+I:NER Training:[ber:con:200]:tokens: 相 比 之 下 ， 青 岛 海 牛 队 和 广 州 松 日 队 的 雨 中 之 战 虽 然 也 是 0 ∶ 0 ， 但 乏 善 可 陈 。
+I:NER Training:[ber:con:201]:input_ids: 101 4685 3683 722 678 8024 7471 2270 3862 4281 7339 1469 2408 2336 3351 3189 7339 4638 7433 704 722 2773 6006 4197 738 3221 121 388 121 8024 852 726 1587 1377 7357 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 2 9 9 9 9 10 2 9 9 9 9 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: dev-2
+I:NER Training:[ber:con:200]:tokens: 理 由 多 多 ， 最 无 奈 的 却 是 ： 5 月 恰 逢 双 重 考 试 ， 她 攻 读 的 博 士 学 位 论 文 要 通 考 ； 她 任 教 的 两 所 学 校 ， 也 要 在 这 段 时 日 大 考 。
+I:NER Training:[ber:con:201]:input_ids: 101 4415 4507 1914 1914 8024 3297 3187 1937 4638 1316 3221 8038 126 3299 2623 6864 1352 7028 5440 6407 8024 1961 3122 6438 4638 1300 1894 2110 855 6389 3152 6206 6858 5440 8039 1961 818 3136 4638 697 2792 2110 3413 8024 738 6206 1762 6821 3667 3198 3189 1920 5440 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: dev-3
+I:NER Training:[ber:con:200]:tokens: 分 工 ， 各 有 各 的 责 任 ； 合 作 ， 正 副 经 理 之 间 ， 全 厂 的 事 ， 不 管 由 谁 分 管 ， 也 不 管 你 有 什 么 事 找 到 谁 ， 绝 不 会 把 你 推 给 第 二 个 人 。
+I:NER Training:[ber:con:201]:input_ids: 101 1146 2339 8024 1392 3300 1392 4638 6569 818 8039 1394 868 8024 3633 1199 5307 4415 722 7313 8024 1059 1322 4638 752 8024 679 5052 4507 6443 1146 5052 8024 738 679 5052 872 3300 784 720 752 2823 1168 6443 8024 5318 679 833 2828 872 2972 5314 5018 753 702 782 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:198]:*** Example ***
+I:NER Training:[ber:con:199]:guid: dev-4
+I:NER Training:[ber:con:200]:tokens: 胡 老 说 ， 当 画 画 疲 倦 时 就 到 院 里 去 看 看 ， 给 这 盆 花 浇 点 水 ， 给 那 棵 花 剪 剪 枝 ， 回 来 再 接 着 画 ， 画 累 了 再 出 去 ， 如 此 循 环 往 复 ， 脑 体 结 合 ， 有 益 健 康 ， 胜 过 吃 药 。
+I:NER Training:[ber:con:201]:input_ids: 101 5529 5439 6432 8024 2496 4514 4514 4558 958 3198 2218 1168 7368 7027 1343 4692 4692 8024 5314 6821 4658 5709 3842 4157 3717 8024 5314 6929 3484 5709 1198 1198 3363 8024 1726 3341 1086 2970 4708 4514 8024 4514 5168 749 1086 1139 1343 8024 1963 3634 2542 4384 2518 1908 8024 5554 860 5310 1394 8024 3300 4660 978 2434 8024 5526 6814 1391 5790 511 102 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:202]:input_mask: 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:203]:segment_ids: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+I:NER Training:[ber:con:204]:label_ids: 5 7 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:396: The name tf.train.SessionRunHook is deprecated. Please use tf.estimator.SessionRunHook instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:420: The name tf.train.StopAtStepHook is deprecated. Please use tf.estimator.StopAtStepHook instead.
+
+WARNING:tensorflow:From /usr/local/python3.7.5/lib/python3.7/site-packages/tensorflow_core/python/training/training_util.py:236: Variable.initialized_value (from tensorflow.python.ops.variables) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use Variable.read_value. Variables in 2.X are initialized automatically both in eager and graph (inside tf.defun) contexts.
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:246: map_and_batch (from tensorflow.python.data.experimental.ops.batching) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.map(map_func, num_parallel_calls)` followed by `tf.data.Dataset.batch(batch_size, drop_remainder)`. Static tf.data optimizations will take care of using the fused implementation.
+WARNING:tensorflow:From /usr/local/python3.7.5/lib/python3.7/site-packages/tensorflow_core/python/autograph/converters/directives.py:119: The name tf.parse_single_example is deprecated. Please use tf.io.parse_single_example instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:236: to_int32 (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.cast` instead.
+I:NER Training:[ber:mod:257]:*** Features ***
+I:NER Training:[ber:mod:259]:  name = input_ids, shape = (32, 202)
+I:NER Training:[ber:mod:259]:  name = input_mask, shape = (32, 202)
+I:NER Training:[ber:mod:259]:  name = label_ids, shape = (32, 202)
+I:NER Training:[ber:mod:259]:  name = segment_ids, shape = (32, 202)
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/modeling.py:72: The name tf.variable_scope is deprecated. Please use tf.compat.v1.variable_scope instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/modeling.py:169: The name tf.get_variable is deprecated. Please use tf.compat.v1.get_variable instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/modeling.py:197: The name tf.assert_less_equal is deprecated. Please use tf.compat.v1.assert_less_equal instead.
+
+WARNING:tensorflow:
+The TensorFlow contrib module will not be included in TensorFlow 2.0.
+For more information, please see:
+  * https://github.com/tensorflow/community/blob/master/rfcs/20180907-contrib-sunset.md
+  * https://github.com/tensorflow/addons
+  * https://github.com/tensorflow/io (for I/O related ops)
+If you depend on functionality not listed there, please file an issue.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/modeling.py:243: dense (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.Dense instead.
+WARNING:tensorflow:From /usr/local/python3.7.5/lib/python3.7/site-packages/tensorflow_core/python/layers/core.py:187: Layer.apply (from tensorflow.python.keras.engine.base_layer) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `layer.__call__` method instead.
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/lstm_crf_layer.py:88: The name tf.nn.xw_plus_b is deprecated. Please use tf.compat.v1.nn.xw_plus_b instead.
+
+WARNING:tensorflow:From /usr/local/python3.7.5/lib/python3.7/site-packages/tensorflow_core/contrib/crf/python/ops/crf.py:213: dynamic_rnn (from tensorflow.python.ops.rnn) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `keras.layers.RNN(cell)`, which is equivalent to this API
+WARNING:tensorflow:From /usr/local/python3.7.5/lib/python3.7/site-packages/tensorflow_core/python/ops/math_ops.py:2509: where (from tensorflow.python.ops.array_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.where in 2.0, which has the same broadcast rule as np.where
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:267: The name tf.trainable_variables is deprecated. Please use tf.compat.v1.trainable_variables instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:270: The name tf.train.init_from_checkpoint is deprecated. Please use tf.compat.v1.train.init_from_checkpoint instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/optimization.py:16: The name tf.train.get_or_create_global_step is deprecated. Please use tf.compat.v1.train.get_or_create_global_step instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/bert/optimization.py:18: The name tf.train.polynomial_decay is deprecated. Please use tf.compat.v1.train.polynomial_decay instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:277: The name tf.train.LoggingTensorHook is deprecated. Please use tf.estimator.LoggingTensorHook instead.
+
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:399: The name tf.get_default_graph is deprecated. Please use tf.compat.v1.get_default_graph instead.
+
+2021-03-17 18:06:10.532479: W tensorflow/core/platform/profile_utils/cpu_utils.cc:98] Failed to find bogomips in /proc/cpuinfo; cannot determine CPU frequency
+2021-03-17 18:06:10.540084: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0xaaab17d8fdc0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2021-03-17 18:06:10.540144: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2021-03-17 18:06:14.260507: W tf_adapter/util/npu_attrs.cc:48] [GePlugin] DEVICE_ID and ASCEND_DEVICE_ID is none, use default device id : 0, if set session_device_id, session_device_id has a higher priority
+2021-03-17 18:06:14.260594: W tf_adapter/util/ge_plugin.cc:131] [GePlugin] can not find Environment variable : JOB_ID
+usage: run.py -do_predict -data_dir NERdata -vocab_file model/vocab.txt -bert_config model/bert_config.json -init_checkpoint model/bert_model.ckpt -output_dir output -batch_size 32 -learning_rate 2e-5 -num_train_epochs 1
+                 ARG   VALUE
+__________________________________________________
+          batch_size = 32
+    bert_config_file = model/bert_config.json
+                cell = lstm
+               clean = True
+                clip = 0.5
+            data_dir = NERdata
+          device_map = 0
+             do_eval = True
+       do_lower_case = True
+          do_predict = False
+            do_train = True
+        dropout_rate = 0.5
+     filter_adam_var = False
+     init_checkpoint = model/bert_model.ckpt
+          label_list = None
+       learning_rate = 2e-05
+           lstm_size = 128
+      max_seq_length = 202
+                 ner = ner
+          num_layers = 1
+    num_train_epochs = 1.0
+          output_dir = output
+save_checkpoints_steps = 500
+  save_summary_steps = 500
+             verbose = False
+          vocab_file = model/vocab.txt
+   warmup_proportion = 0.1
+
+Namespace(batch_size=32, bert_config_file='model/bert_config.json', cell='lstm', clean=True, clip=0.5, data_dir='NERdata', device_map='0', do_eval=True, do_lower_case=True, do_predict=False, do_train=True, dropout_rate=0.5, filter_adam_var=False, init_checkpoint='model/bert_model.ckpt', label_list=None, learning_rate=2e-05, lstm_size=128, max_seq_length=202, ner='ner', num_layers=1, num_train_epochs=1.0, output_dir='output', save_checkpoints_steps=500, save_summary_steps=500, verbose=False, vocab_file='model/vocab.txt', warmup_proportion=0.1)
+shape of input_ids (32, 202)
+2021-03-17 18:06:16.621868: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:06:16.622016: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+2021-03-17 18:06:16.633304: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node group_deps_2 is null.
+[WARNING][2021-03-17 18:06:20,765]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:30: DeprecationWarning: register is expired, please replace it with the func register_op_compute
+[WARNING][2021-03-17 18:06:20,765]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:58: DeprecationWarning: te.utils.para_check is expired, please replace it with tbe.common.utils.para_check
+[WARNING][2021-03-17 18:06:20,866]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:97: DeprecationWarning: check_input_type in topi is expired, please do not use it
+[WARNING][2021-03-17 18:06:20,947]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/util/util_frac_z.py:18: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+[WARNING][2021-03-17 18:06:21,111]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/mul.py:396: DeprecationWarning: te.utils.shape_util is expired, please replace it with tbe.common.utils.shape_util
+[WARNING][2021-03-17 18:06:22,650]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:30: DeprecationWarning: register is expired, please replace it with the func register_op_compute
+[WARNING][2021-03-17 18:06:22,650]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:30: DeprecationWarning: register is expired, please replace it with the func register_op_compute
+[WARNING][2021-03-17 18:06:22,651]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:58: DeprecationWarning: te.utils.para_check is expired, please replace it with tbe.common.utils.para_check
+[WARNING][2021-03-17 18:06:22,651]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:58: DeprecationWarning: te.utils.para_check is expired, please replace it with tbe.common.utils.para_check
+[WARNING][2021-03-17 18:06:22,743]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:97: DeprecationWarning: check_input_type in topi is expired, please do not use it
+[WARNING][2021-03-17 18:06:22,743]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:97: DeprecationWarning: check_input_type in topi is expired, please do not use it
+[WARNING][2021-03-17 18:06:22,840]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/util/util_frac_z.py:18: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+[WARNING][2021-03-17 18:06:23,066]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/assign.py:142: DeprecationWarning: te.utils.shape_util is expired, please replace it with tbe.common.utils.shape_util
+[WARNING][2021-03-17 18:06:23,068]/usr/local/Ascend/fwkacllib/python/site-packages/te/platform/cce_intrin.py:43: DeprecationWarning: te.platform.cce_intrin is expired, please replace it with tbe.dsl.instrinsic.cce_intrin
+[WARNING][2021-03-17 18:06:24,160]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/mul.py:914: DeprecationWarning: te.lang.cce.broadcast is expired, please replace it with tbe.dsl.broadcast
+[WARNING][2021-03-17 18:06:24,163]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/mul.py:916: DeprecationWarning: te.lang.cce.vmul is expired, please replace it with tbe.dsl.vmul
+[WARNING][2021-03-17 18:06:24,166]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/mul.py:1041: DeprecationWarning: te.lang.cce.auto_schedule is expired, please replace it with tbe.dsl.auto_schedule
+[WARNING][2021-03-17 18:06:24,169]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/add.py:561: DeprecationWarning: te.lang.cce.vadd is expired, please replace it with tbe.dsl.vadd
+[WARNING][2021-03-17 18:06:24,199]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/mul.py:1044: DeprecationWarning: te.lang.cce.cce_build_code is expired, please replace it with tbe.dsl.build
+[WARNING][2021-03-17 18:06:24,199]/usr/local/Ascend/fwkacllib/python/site-packages/tbe/dsl/static_schedule/cce_schedule.py:1284: DeprecationWarning: cce_build_code is expired, please replace it with the func build in cce
+[WARNING][2021-03-17 18:06:24,234]/usr/local/Ascend/fwkacllib/python/site-packages/te/platform/fusion_util.py:652: DeprecationWarning: get_op_compute_func is expired, please replace it with the func get_op_compute
+[WARNING][2021-03-17 18:06:24,252]/usr/local/Ascend/fwkacllib/python/site-packages/te/utils/cce.py:37: DeprecationWarning: te.lang.cce.auto_schedule is deprecated, please replace it with the tbe.dsl.auto_schedule
+[WARNING][2021-03-17 18:06:24,464]/usr/local/Ascend/fwkacllib/python/site-packages/te/lang/cce/te_compute/util.py:818: DeprecationWarning: te.lang.cce.te_compute.shape_to_list is expired, please replace it with tbe.common.utils.shape_to_list
+[WARNING][2021-03-17 18:06:24,488]/usr/local/Ascend/fwkacllib/python/site-packages/te/platform/fusion_util.py:1259: DeprecationWarning: get_fusion_build_cfg is expired, please replace it with the func set_fusion_buildcfg
+[WARNING][2021-03-17 18:06:24,489]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:678: DeprecationWarning: check_kernel_name in topi is expired, please do not use it
+2021-03-17 18:06:27.197231: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:06:27.197334: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+2021-03-17 18:06:27.203638: W tf_adapter/util/infershape_util.cc:337] The shape of node report_uninitialized_variables_1/boolean_mask/Where output 0 is [?,1], unknown shape.
+2021-03-17 18:06:27.203702: W tf_adapter/util/infershape_util.cc:337] The shape of node report_uninitialized_variables_1/boolean_mask/Squeeze output 0 is [?], unknown shape.
+2021-03-17 18:06:28.434911: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:06:28.434991: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+2021-03-17 18:06:28.441100: W tf_adapter/util/infershape_util.cc:337] The shape of node report_uninitialized_variables/boolean_mask/Where output 0 is [?,1], unknown shape.
+2021-03-17 18:06:28.441160: W tf_adapter/util/infershape_util.cc:337] The shape of node report_uninitialized_variables/boolean_mask/Squeeze output 0 is [?], unknown shape.
+2021-03-17 18:06:28.796541: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:06:28.796632: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+2021-03-17 18:07:11.925511: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:07:11.925617: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+WARNING:tensorflow:From /home/sunjian/convert/BiLSTM/result/bert_base/train/bert_lstm_ner.py:407: The name tf.train.SessionRunArgs is deprecated. Please use tf.estimator.SessionRunArgs instead.
+
+2021-03-17 18:07:39.593947: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:07:39.594062: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+2021-03-17 18:07:39.605455: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/Select_1_grad/Select/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:07:39.605516: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/TensorArrayReadV3_grad/TensorArrayWrite/TensorArrayWriteV3/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:07:39.605542: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Log_grad/Reciprocal/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:07:39.605564: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Exp_grad/mul/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:07:39.609228: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Log_grad/Reciprocal output 0 is ?, unknown shape.
+2021-03-17 18:07:39.609293: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Log_grad/mul output 0 is ?, unknown shape.
+2021-03-17 18:07:39.609359: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Exp_grad/mul output 0 is ?, unknown shape.
+2021-03-17 18:07:39.609400: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/add_1_grad/Sum_1 output 0 is ?, unknown shape.
+2021-03-17 18:07:39.609425: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/add_1_grad/Sum output 0 is ?, unknown shape.
+2021-03-17 18:07:39.630332: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node group_deps_1 is null.
+[WARNING][2021-03-17 18:07:46,760]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:543: DeprecationWarning: scalar2tensor_one in topi is expired, please do not use it
+[WARNING][2021-03-17 18:07:59,256]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:51: DeprecationWarning: te.lang.cce.vabs is expired, please replace it with tbe.dsl.vabs
+[WARNING][2021-03-17 18:07:59,259]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/abs.py:53: DeprecationWarning: te.lang.cce.round is expired, please replace it with tbe.dsl.round
+[WARNING][2021-03-17 18:07:59,310]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/sign.py:50: DeprecationWarning: te.lang.cce.vmaxs is expired, please replace it with tbe.dsl.vmaxs
+[WARNING][2021-03-17 18:07:59,312]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/sign.py:51: DeprecationWarning: te.lang.cce.vmins is expired, please replace it with tbe.dsl.vmins
+[WARNING][2021-03-17 18:07:59,343]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/less.py:121: DeprecationWarning: te.lang.cce.cast_to is expired, please replace it with tbe.dsl.cast_to
+[WARNING][2021-03-17 18:07:59,351]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/less.py:50: DeprecationWarning: te.lang.cce.vsub is expired, please replace it with tbe.dsl.vsub
+[WARNING][2021-03-17 18:07:59,354]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/less.py:51: DeprecationWarning: te.lang.cce.vmin is expired, please replace it with tbe.dsl.vmin
+[WARNING][2021-03-17 18:07:59,356]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/layer_norm.py:506: DeprecationWarning: te.lang.cce.vmuls is expired, please replace it with tbe.dsl.vmuls
+[WARNING][2021-03-17 18:07:59,357]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/less.py:52: DeprecationWarning: te.lang.cce.vmax is expired, please replace it with tbe.dsl.vmax
+[WARNING][2021-03-17 18:07:59,360]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/layer_norm.py:507: DeprecationWarning: te.lang.cce.sum is expired, please replace it with tbe.dsl.sum
+[WARNING][2021-03-17 18:07:59,365]/usr/local/Ascend/fwkacllib/python/site-packages/te/platform/cce_intrin_md.py:37: DeprecationWarning: te.platform.cce_intrin_md.reset_mask_insn is expired, please replace it with tbe.dsl.instrinsic.cce_intrin_md.reset_mask_insn
+[WARNING][2021-03-17 18:07:59,382]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/layer_norm.py:522: DeprecationWarning: te.lang.cce.vadds is expired, please replace it with tbe.dsl.vadds
+[WARNING][2021-03-17 18:07:59,385]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/layer_norm.py:523: DeprecationWarning: te.lang.cce.vlog is expired, please replace it with tbe.dsl.vlog
+[WARNING][2021-03-17 18:07:59,390]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/layer_norm.py:526: DeprecationWarning: te.lang.cce.vexp is expired, please replace it with tbe.dsl.vexp
+[WARNING][2021-03-17 18:08:00,331]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:379: DeprecationWarning: axis_check in topi is expired, please do not use it
+[WARNING][2021-03-17 18:08:00,332]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:253: DeprecationWarning: shape_refine in topi is expired, please do not use it
+[WARNING][2021-03-17 18:08:00,332]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:208: DeprecationWarning: check_reduce_need_refine in topi is expired, please do not use it
+[WARNING][2021-03-17 18:08:00,332]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:314: DeprecationWarning: refine_axis in topi is expired, please do not use it
+[WARNING][2021-03-17 18:08:00,333]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:397: DeprecationWarning: simplify_axis_shape in topi is expired, please do not use it
+[WARNING][2021-03-17 18:08:00,334]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/softmax_v2.py:390: DeprecationWarning: te.lang.cce.reduce_max is expired, please replace it with tbe.dsl.reduce_max
+[WARNING][2021-03-17 18:08:00,348]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/softmax_v2.py:411: DeprecationWarning: te.lang.cce.vdiv is expired, please replace it with tbe.dsl.vdiv
+[WARNING][2021-03-17 18:08:01,181]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/reduce_max_d_tik.py:114: DeprecationWarning: check_tensor_shape_size is deprecated
+[WARNING][2021-03-17 18:08:01,184]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/select.py:220: DeprecationWarning: te.lang.cce.vsel is expired, please replace it with tbe.dsl.vsel
+[WARNING][2021-03-17 18:08:01,467]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/select_v2.py:73: DeprecationWarning: te.lang.cce.vcmpsel is expired, please replace it with tbe.dsl.vcmpsel
+[WARNING][2021-03-17 18:08:03,526]/usr/local/Ascend/fwkacllib/python/site-packages/te/lang/cce/te_compute/reduction_compute.py:133: DeprecationWarning: tuple_sum is expired, please replace it with the func sum
+[WARNING][2021-03-17 18:08:03,549]/usr/local/Ascend/fwkacllib/python/site-packages/topi/cce/util.py:543: DeprecationWarning: scalar2tensor_one in topi is expired, please do not use it
+[WARNING][2021-03-17 18:08:03,726]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/concat_v2_d.py:223: DeprecationWarning: te.lang.cce.concat is expired, please replace it with tbe.dsl.concat
+[WARNING][2021-03-17 18:08:05,246]/usr/local/Ascend/opp/op_impl/built-in/ai_core/tbe/impl/sqrt.py:58: DeprecationWarning: te.lang.cce.vsqrt is expired, please replace it with tbe.dsl.vsqrt
+2021-03-17 18:10:24.084982: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SOURCE is null.
+2021-03-17 18:10:24.085193: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node _SINK is null.
+2021-03-17 18:10:24.097171: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/Select_1_grad/Select/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:10:24.097248: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/TensorArrayReadV3_grad/TensorArrayWrite/TensorArrayWriteV3/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:10:24.097277: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Log_grad/Reciprocal/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:10:24.097300: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Exp_grad/mul/StackPopV2 output 0 is ?, unknown shape.
+2021-03-17 18:10:24.101240: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Log_grad/Reciprocal output 0 is ?, unknown shape.
+2021-03-17 18:10:24.101307: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Log_grad/mul output 0 is ?, unknown shape.
+2021-03-17 18:10:24.101384: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/ReduceLogSumExp/Exp_grad/mul output 0 is ?, unknown shape.
+2021-03-17 18:10:24.101434: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/add_1_grad/Sum_1 output 0 is ?, unknown shape.
+2021-03-17 18:10:24.101491: W tf_adapter/util/infershape_util.cc:337] The shape of node gradients/crf_loss/rnn/while/add_1_grad/Sum output 0 is ?, unknown shape.
+2021-03-17 18:10:24.123597: W tf_adapter/util/infershape_util.cc:313] The InferenceContext of node group_deps_1 is null.
+step: 1, cost time: 164.408s, losses: 121.096
+step: 2, cost time: 157.066s, losses: 111.109
+step: 3, cost time: 79.547s, losses: 99.554
+step: 4, cost time: 79.599s, losses: 93.504
+step: 5, cost time: 79.854s, losses: 102.702
