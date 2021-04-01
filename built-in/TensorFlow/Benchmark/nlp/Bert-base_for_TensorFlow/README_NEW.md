@@ -6,27 +6,27 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：_huawei_**
+**发布者（Publisher）：huawei**
 
-**应用领域（Application Domain）：_NLP_**
+**应用领域（Application Domain）：NLP**
 
-**版本（Version）：_1.2_**
+**版本（Version）：1.2**
 
-**修改时间（Modified） ：_2020.10.14_**
+**修改时间（Modified） ：2020.10.14**
 
-**大小（Size）**_**：**_1331.2M_
+**大小（Size）：1331.2M**
 
-**框架（Framework）：_TensorFlow 1.15.0_**
+**框架（Framework）：TensorFlow 1.15.0**
 
-**模型格式（Model Format）：_ckpt_**
+**模型格式（Model Format）：ckpt**
 
-**精度（Precision）：_Mixed_**
+**精度（Precision）：Mixed**
 
-**处理器（Processor）：_昇腾910_**
+**处理器（Processor）：昇腾910**
 
-**应用级别（Categories）：_Benchmark_**
+**应用级别（Categories）：Benchmark**
 
-**描述（Description）：_基于TensorFlow框架的BERT-Base及下游任务代码_**
+**描述（Description）：基于TensorFlow框架的BERT-Base及下游任务代码**
 
 <h2 id="概述.md">概述</h2>
 
@@ -39,15 +39,12 @@
         
 -   参考实现：
 
-    ```
-    https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/LanguageModeling/BERT
-    ```
+    [https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/LanguageModeling/BERT](https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/LanguageModeling/BERT)
 
 -   适配昇腾 AI 处理器的实现：
     
     ```
     https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Bert-base_for_TensorFlow
-    branch=master
     commit_id=2b23507343672251385e691458e37cc936d28d9f
 
     ```
@@ -128,8 +125,8 @@
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
-2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。_
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
     当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
