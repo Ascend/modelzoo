@@ -27,7 +27,7 @@ precision_mode="allow_fp32_to_fp16"
 loss_scale_value=1.0
 loss_scale_type="static"
 over_dump=False
-data_dump_falg=0
+data_dump_flag=0
 data_dump_step=10
 profiling=False
 random_remove=False
@@ -38,20 +38,20 @@ if [[ $1 == --help || $1== -h]]; then
 
     echo " "
     echo "parameter explain:
-    --precision_mode                    precision mode(allow_fp32_to_fp16/force_fp16/must_keep_origin_dtype/allow_mix_precision)
+    --precision_mode           precision mode(allow_fp32_to_fp16/force_fp16/must_keep_origin_dtype/allow_mix_precision)
     --loss_scale_value		   loss scale value, default is 1.0
     --loss_scale_type		   loss scale type (dynamic/static), default is static
-    --over_dump		   if or ont over detection, default is False
+    --over_dump		           if or not over detection, default is False
     --data_dump_flag		   data dump flag, default is 0
     --data_dump_step		   data dump step, default is 10
-    --profiling		   if or not profiong foe performance debug, default is False
-    --random_remove		   remove train random treament, default is False
-    --batch_size		   train batch size 
-    --learning_rate		   learn rate
-    --steps		                   training steps
-    --data_path		   source data of training
-    --ckpt_count		   save checkpoint counts
-    -h/--help		   show help message
+    --profiling		           if or not profiling for performance debug, default is False
+    --random_remove		       remove train random treament, default is False
+    --batch_size		       train batch size 
+    --learning_rate		       learning rate
+    --steps		               training steps
+    --data_path		           source data of training
+    --ckpt_count		       save checkpoint counts
+    -h/--help		           show help message
     "
     exit 1
 fi
