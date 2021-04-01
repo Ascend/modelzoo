@@ -51,7 +51,6 @@ def getTestBatch(j):
         #num = randint(11499, 13499)
         num = 11499+i+batchSize*j
         if (num <= 12499):
-            #num = randint(11499, 13499)
             labels.append([1, 0])
         else:
             labels.append([0, 1])
