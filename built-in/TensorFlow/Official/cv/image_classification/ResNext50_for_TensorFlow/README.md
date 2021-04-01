@@ -34,20 +34,17 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
  -   参考论文：
 
-        [Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, Kaiming He.Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/abs/1611.05431) 
+     [Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, Kaiming He.Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/abs/1611.05431) 
 
  -   参考实现：
         
  
  -   适配昇腾 AI 处理器的实现：
     
-        ```
-        https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_for_TensorFlow
-        commit_id=be78dd41dd3744a2b21c13a62eba829d59b111f2
-        ```
+     https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_for_TensorFlow
 
 
- -    通过Git获取对应commit\_id的代码方法如下：
+ -   通过Git获取对应commit\_id的代码方法如下：
     
         ```
         git clone {repository_url}    # 克隆仓库的代码
