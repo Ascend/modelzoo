@@ -10,12 +10,11 @@
 
 **应用领域（Application Domain）：Speech Recognition**
 
-**版本（Version）：_1.1_**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.12.28**
 
-**大小（Size）：**
-
+**大小（Size）：1536M**
 
 **框架（Framework）：TensorFlow 1.15.0**
 
@@ -202,7 +201,7 @@ sess_config = tf.ConfigProto()
 
         2.2 单卡训练指令（脚本位于Jasper_for_TensorFlow / scripts/run_1p.sh） 
 
-            `bash run_1p.sh` 
+            bash run_1p.sh 
 
     3. 8卡训练
         
@@ -241,7 +240,7 @@ sess_config = tf.ConfigProto()
 
         2.2 单卡训练指令（脚本位于Jasper_for_TensorFlow / scripts/run_8p.sh） 
 
-            `bash run_8p.sh` 
+            bash run_8p.sh 
         
         说明：a. 在训练完成后，checkpoint将保存在`scripts/result/8p/${device_id}/jasper_log_folder/logs`路径下，训练日志保存在`scripts/result/8p/train_${device_id}.log`。
 b. 每次重新训练需要清理日志目录或者重新指定日志目录，否则默认在原有基础上继续训练。
