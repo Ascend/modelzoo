@@ -11,7 +11,7 @@ export PYTHONPATH=${install_path}/tfplugin/python/site-packages:$PYTHONPATH
 export ASCEND_OPP_PATH=${install_path}/opp
 export ASCEND_AICPU_PATH=${install_path}
 export JOB_ID=10086
-exportASCEND_DEVICE_ID=0
+export ASCEND_DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
