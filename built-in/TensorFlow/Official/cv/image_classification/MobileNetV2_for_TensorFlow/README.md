@@ -32,8 +32,7 @@
 
 <h2 id="概述.md">概述</h2>
 
--   简述
-    MobileNetV2是一种轻量型的适用于移动端的网络，其主要是由depthwise separable，linear bottlenecks，以及inverted residuals构成。MobileNetV2作为一种轻量级backbone，被广泛应用在分类，目标检测，实例分割等计算机视觉任务中。
+MobileNetV2是一种轻量型的适用于移动端的网络，其主要是由depthwise separable，linear bottlenecks，以及inverted residuals构成。MobileNetV2作为一种轻量级backbone，被广泛应用在分类，目标检测，实例分割等计算机视觉任务中。
 -   参考论文：
 
     [Sandler, Mark, et al. "Mobilenetv2: Inverted residuals and linear bottlenecks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2018.](https://arxiv.org/abs/1801.04381)
@@ -45,8 +44,7 @@
 
 -   适配昇腾 AI 处理器的实现：
     
-     https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow/
-     commit_id=6ba647224a789698263fba8ea1fcfd86652a9050
+    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow
         
 
 -   通过Git获取对应commit\_id的代码方法如下：
