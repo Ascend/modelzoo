@@ -194,22 +194,22 @@ run_config = NPURunConfig(
         
         2.1 设置单卡训练参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_1p.sh），示例如下。请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的路径。
             
-            `--checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/`
+            --checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/
     
         2.2 单卡训练指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_1p.sh） 
 
-            `bash scripts/run_npu_1p.sh` 
+            bash scripts/run_npu_1p.sh
 
     3. 8卡训练
         
         3.1 设置8卡训练参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_8p.sh），示例如下。
     请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的实际路径。
            
-            ` --data_dir=/data/slimImagenet`
+             --data_dir=/data/slimImagenet
 
         3.2 8卡训练指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_8p.sh）
             
-            ` bash run_npu_8p.sh`
+             bash run_npu_8p.sh
    
 
 <h2 id="开始测试.md">开始测试</h2>
@@ -275,7 +275,7 @@ run_config = NPURunConfig(
 
         1.1 使用自有数据集进行分类，如需将分类类别修改为10，修改alexnet/model.py，将depth=1000设置为depth=10。
         
-            `labels_one_hot = tf.one_hot(labels, depth=1000)`
+            labels_one_hot = tf.one_hot(labels, depth=1000)
 
         1.2 修改alexnet/alexnet.py，将num_classes=1000修改为num_classes=10。将“x, 1000”设置为“x, 10”。
 
@@ -395,7 +395,7 @@ step:  1800  epoch:  1.4  FPS:34176.2, loss: 6.363, total_loss: 7.371  lr:0.0172
 
 ## 推理/验证过程<a name="section1465595372416"></a>
 
-在150 epoch训练执行完成后，请参见“模型训练”中的测试流程，需要修改脚本启动参数（脚本位于scripts/train_alexnet_8p.sh）将mode设置为evaluate，增加checkpoints的路径，“rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*”替换为“#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*”然后执行脚本。
+在150 epoch训练执行完成后，请参见“模型训练”中的测试流程，需要修改脚本启动参数（脚本位于scripts/train_alexnet_8p.sh）将mode设置为evaluate，增加checkpoints的路径，“`rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`”替换为“`#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`”然后执行脚本。
 
 bash run_npu_8p.sh
 
