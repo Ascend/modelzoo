@@ -48,7 +48,7 @@ def getTestBatch(j):
     labels = []
     arr = np.zeros([batchSize, maxSeqLength])
     for i in range(batchSize):
-        #num = randint(1, 11499)
+        #num = randint(11499, 13499)
         num = 11499+i+batchSize*j
         if (num <= 12499):
             #num = randint(11499, 13499)
