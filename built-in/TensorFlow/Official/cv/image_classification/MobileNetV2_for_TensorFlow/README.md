@@ -45,19 +45,22 @@
 
 -   适配昇腾 AI 处理器的实现：
     
-        https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow/
-        
-        commit_id=6ba647224a789698263fba8ea1fcfd86652a9050
+     https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow/
+     commit_id=6ba647224a789698263fba8ea1fcfd86652a9050
         
 
 -   通过Git获取对应commit\_id的代码方法如下：
     
    
+    
+    ```
     git clone {repository_url}    # 克隆仓库的代码
     cd {repository_name}    # 切换到模型的代码仓目录
     git checkout  {branch}    # 切换到对应分支
     git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
     cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    ```
+
     
 
 ## 默认配置<a name="section91661242121611"></a>
