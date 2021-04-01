@@ -261,7 +261,7 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
 
      1.1 使用自有数据集进行分类，如需将分类类别修改为10，修改densenet/model.py  ，将depth=1000设置为depth=10。
 
-         `labels_one_hot = tf.one_hot(labels, depth=1000）`
+         labels_one_hot = tf.one_hot(labels, depth=1000）
 
 
      1.2 修改densenet/densenet.py   将class_num = 1000 设置为10 。
