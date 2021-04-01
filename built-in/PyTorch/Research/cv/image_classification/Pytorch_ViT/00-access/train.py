@@ -14,7 +14,7 @@ import torch.distributed as dist
 
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-from apex import amp
+from apex import amp, optimizers
 from apex.parallel import DistributedDataParallel as DDP
 
 from models.modeling import VisionTransformer, CONFIGS
@@ -152,7 +152,13 @@ def train(args, model):
     train_loader, test_loader = get_loader(args)
 
     # Prepare optimizer and scheduler
-    optimizer = torch.optim.SGD(model.parameters(),
+    if args.npu_fused_sgd:
+        optimizer = optimizers.NpuFusedSGD(model.parameters(),
+                                lr=args.learning_rate,
+                                momentum=0.9,
+                                weight_decay=args.weight_decay)
+    else:
+        optimizer = torch.optim.SGD(model.parameters(),
                                 lr=args.learning_rate,
                                 momentum=0.9,
                                 weight_decay=args.weight_decay)
@@ -165,7 +171,8 @@ def train(args, model):
     if args.fp16:
         model, optimizer = amp.initialize(models=model,
                                           optimizers=optimizer,
-                                          opt_level=args.fp16_opt_level)
+                                          opt_level=args.fp16_opt_level,
+                                          combine_grad=args.combine_grad)
         amp._amp_state.loss_scalers[0]._loss_scale = 2**20
 
     # Distributed training
@@ -299,6 +306,9 @@ def main():
     parser.add_argument('--addr', default='10.136.181.115', type=str, help='master addr')
     parser.add_argument("--data_dir", default=".", type=str,
                         help="path to dataset.")
+
+    parser.add_argument('--npu-fused-sgd', action='store_true')
+    parser.add_argument('--combine-grad', action='store_true')
 
     args = parser.parse_args()
 
