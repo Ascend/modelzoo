@@ -41,7 +41,7 @@ import moxing as mox
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('-a', '--arch', metavar='ARCH', default='efficientnet-b0',
-                    help='model architecture (default: resnet18)')
+                    help='model architecture (default: efficientnet-b0)')
 parser.add_argument('-j', '--workers', default=64, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=100, type=int, metavar='N',
