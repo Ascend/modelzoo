@@ -46,8 +46,7 @@
 -   适配昇腾 AI 处理器的实现：
     
         
-    https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow/
-    commit_id=7d2c0ba1bbb6239977ca776180c79cd381e512dd
+    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow
         
         
 
