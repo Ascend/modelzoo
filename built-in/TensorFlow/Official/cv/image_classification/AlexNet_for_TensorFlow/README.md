@@ -30,33 +30,31 @@
 
 <h2 id="概述.md">概述</h2>
 
--   AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中获得图像分类冠军，AlexNet中包含了几个比较新的技术点， 也是首次在CNN中成功应用ReLU、Dropout和LRN等trick，同时AlexNet也使用了GPU进行运算加速。整个网络使用了1个11x11的卷积核、 1个5x5的卷积核和3个3x3的卷积核，AlexNet全部使用最大池化，避免了平均池化的模糊化效果。Ascend提供的AlexNet是基于TensorFlow实现的版本。
+AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中获得图像分类冠军，AlexNet中包含了几个比较新的技术点， 也是首次在CNN中成功应用ReLU、Dropout和LRN等trick，同时AlexNet也使用了GPU进行运算加速。整个网络使用了1个11x11的卷积核、 1个5x5的卷积核和3个3x3的卷积核，AlexNet全部使用最大池化，避免了平均池化的模糊化效果。Ascend提供的AlexNet是基于TensorFlow实现的版本。
 
-    -   参考论文：
+-   参考论文：
 
-        [Alex Krizhevsky. One weird trick for parallelizing convolutional neural networks. arXiv technical report arXiv:1404.5997 (2014).](https://arxiv.org/abs/1404.5997) 
+    [Alex Krizhevsky. One weird trick for parallelizing convolutional neural networks. arXiv technical report arXiv:1404.5997 (2014).](https://arxiv.org/abs/1404.5997) 
 
-    -   参考实现：
+-   参考实现：
         
         
-        [https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet](https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet)
+    [https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet](https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet)
         
         
  
-    -   适配昇腾 AI 处理器的实现：
+-   适配昇腾 AI 处理器的实现：
     
-        https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_for_TensorFlow
+    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_for_TensorFlow
 
-
-    -   通过Git获取对应commit\_id的代码方法如下：
+-   通过Git获取对应commit\_id的代码方法如下：
     
-        ```
         git clone {repository_url}    # 克隆仓库的代码
         cd {repository_name}    # 切换到模型的代码仓目录
         git checkout  {branch}    # 切换到对应分支
         git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
         cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-        ```
+     
 
 ## 默认配置<a name="section91661242121611"></a>
 -   网络结构
