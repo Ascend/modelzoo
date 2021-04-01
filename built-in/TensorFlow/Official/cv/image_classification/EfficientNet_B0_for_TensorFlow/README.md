@@ -42,7 +42,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
 
 -   适配昇腾 AI 处理器的实现：
     
-    https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_for_TensorFlow/
+    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_for_TensorFlow
 
 
 
