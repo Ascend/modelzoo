@@ -35,30 +35,30 @@ def getTrainBatch():
     labels = []
     arr = np.zeros([batchSize, maxSeqLength])
     for i in range(batchSize):
-        if ((i % 2) == 0):
+        if (i % 2 == 0):
             num = randint(1, 11499)
             labels.append([1, 0])
         else:
             num = randint(13499, 24999)
             labels.append([0, 1])
         arr[i] = ids[num-1:num]
-    return (arr, labels)
+    return arr, labels
 
-def getTrainBatch(j):
+def getTestBatch(j):
     labels = []
     arr = np.zeros([batchSize, maxSeqLength])
     for i in range(batchSize):
         #num = randint(1, 11499)
-        num = 11499+i+batchsize*j
-        if ((num <= 12499):
+        num = 11499+i+batchSize*j
+        if (num <= 12499):
             #num = randint(11499, 13499)
             labels.append([1, 0])
         else:
             labels.append([0, 1])
         arr[i] = ids[num-1:num]
-    return (arr, labels)
+    return arr, labels
 
-batchSize = args.batchsize
+batchSize = args.batch_size
 maxSeqLength = 250
 lstmUnits = 64
 numClasses = 2
@@ -71,7 +71,7 @@ input_data = tf.placeholder(tf.int32, [batchSize, maxSeqLength])
 data = tf.Variable(tf.zeros([batchSize, maxSeqLength, numDimensions]),dtype=tf.float32)
 data = tf.nn.embedding_lookup(wordVectors,input_data)
 data = tf.transpose(data, [1, 0, 2], name='transpose_time_major')
-lstm = DynamicRNN(lstmUnits, dtypes.float16, time_major=True, forget_bias=1.0, is_training=False)
+lstm = DynamicRNN(lstmUnits, dtypes.float32, time_major=True, forget_bias=1.0, is_training=False)
 value, output_h, output_c, i, j, f, o, tanhct = lstm(data, seq_length= None, init_h = None, init_c = None)
 
 weight = tf.Variable(tf.truncated_normal([lstmUnits, numClasses]))
@@ -83,18 +83,18 @@ accuracy = tf.reduce_mean(tf.cast(correctPred, tf.float32))
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=labels))
 
 #lr decay
-learning_rate_base = args.learningRate
+learning_rate_base = args.learning_rate
 learning_rate_decay = 0.99
 learning_rate_step = 900
-global_step = tf.Variable(0, training = False)
-learning_rate = tf.train_exponential_decay(learning_rate_base, global_step, learning_rate_step, learning_rate_decay, staitcase=True)
-optimizer = tf.train.GradientDescentOptimizer(args.learning_rate)#.minimize(loss, global_step=global_step)
+global_step = tf.Variable(0, trainable = False)
+learning_rate = tf.train.exponential_decay(learning_rate_base, global_step, learning_rate_step, learning_rate_decay, staitcase=True)
+optimizer = tf.train.GradientDescentOptimizer(learning_rate)#.minimize(loss, global_step=global_step)
 
 #gradient clipping
 grads = optimizer.compute_gradients(loss)
 for i, (g, v) in enumerate(grads):
     if g is not None:
-        grada[i] = (tf.clip_by_norm(g, 0.9), v)
+        grads[i] = (tf.clip_by_norm(g, 0.9), v)
 optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
 #sess = tf.InteractiveSession()
@@ -134,7 +134,7 @@ with tf.Session(config=config) as sess:
         
        #Save the network every 10,000 training iterations
         if ((((i+1) % args.ckpt_count) == 0) and (i != 0)):
-            save_path = saver.save(sess, './models_dc/pretrained_lstm.ckpt', global_step=i+1)
+            save_path = saver.save(sess, './output/pretrained_lstm.ckpt', global_step=i+1)
             print(('saved to %s' % save_path), flush=True)
 
     #writer.close()
@@ -143,10 +143,10 @@ with tf.Session(config=config) as sess:
     print("*******************validation for train**********************")
     terations = 83
     sum = 0
-    for i in range(terations)
+    for i in range(terations):
         nextBatch, nextBatchLabels = getTestBatch(i)
         acc = sess.run([accuracy], {input_data: nextBatch, labels: nextBatchLabels})
         #print(acc)
-        sum = sum=acc[0]
+        sum = sum+acc[0]
     print('Final Performance TotalTimeToTrain:%dS' % total_time)
     print('Final Accuracy acc:%f' % (sum/terations))
