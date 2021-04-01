@@ -86,7 +86,7 @@ learning_rate_base = args.learning_rate
 learning_rate_decay = 0.99
 learning_rate_step = 900
 global_step = tf.Variable(0, trainable = False)
-learning_rate = tf.train.exponential_decay(learning_rate_base, global_step, learning_rate_step, learning_rate_decay, staitcase=True)
+learning_rate = tf.train.exponential_decay(learning_rate_base, global_step, learning_rate_step, learning_rate_decay, staircase=True)
 optimizer = tf.train.GradientDescentOptimizer(learning_rate)#.minimize(loss, global_step=global_step)
 
 #gradient clipping
