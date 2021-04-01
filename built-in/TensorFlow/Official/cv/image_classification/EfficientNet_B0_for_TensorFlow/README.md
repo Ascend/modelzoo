@@ -30,33 +30,31 @@
 
 <h2 id="概述.md">概述</h2>
 
--   EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技术搜索得到。相比其他网络，EfficientNets在相似精度的条件下参数量明显更少、或者在相似参数量条件下精度明显更高。EfficientNet-B0是系列网路中最小的基础网络，其他较大尺度网络均基于它缩放生成。本文档描述的EfficientNet-B0是基于Pytorch实现的版本。
+EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技术搜索得到。相比其他网络，EfficientNets在相似精度的条件下参数量明显更少、或者在相似参数量条件下精度明显更高。EfficientNet-B0是系列网路中最小的基础网络，其他较大尺度网络均基于它缩放生成。本文档描述的EfficientNet-B0是基于Pytorch实现的版本。
 
-    -   参考论文（需优化）：
+-   参考论文（需优化）：
 
-        [Mingxing Tan and Quoc V. Le. EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019](https://arxiv.org/abs/1905.11946)
+    [Mingxing Tan and Quoc V. Le. EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019](https://arxiv.org/abs/1905.11946)
 
-    -   参考实现(需优化)：
+-   参考实现(需优化)：
 
-        [https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet](https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet)
+    [https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet](https://github.com/tensorflow/tpu/tree/r1.15/models/official/efficientnet)
 
-    -   适配昇腾 AI 处理器的实现：
+-   适配昇腾 AI 处理器的实现：
     
-        ```
-        https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_for_TensorFlow/
-        commit_id=579e9271b436906bc2a0423f1791de6c1829e247
-        ```
+    https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_for_TensorFlow/
 
 
-    -   通过Git获取对应commit\_id的代码方法如下：
+
+-   通过Git获取对应commit\_id的代码方法如下：
     
-        ```
-        git clone {repository_url}    # 克隆仓库的代码
-        cd {repository_name}    # 切换到模型的代码仓目录
-        git checkout  {branch}    # 切换到对应分支
-        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-        ```
+    ```
+    git clone {repository_url}    # 克隆仓库的代码
+    cd {repository_name}    # 切换到模型的代码仓目录
+    git checkout  {branch}    # 切换到对应分支
+    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    ```
 
 ## 默认配置<a name="section91661242121611"></a>
 
