@@ -1,0 +1,1 @@
+python3 ./double_unet_data.py /home/HwHiAiUser/zjut/datasets/cvcdb_val.h5  /mnt/sdc/data/imageNet

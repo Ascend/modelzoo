@@ -10,19 +10,26 @@ This repository provides a script and recipe to Inference the Yolov3 model.
 
 ```shell
 git clone https://gitee.com/ascend/modelzoo.git
-cd modelzoo/built-in/ACL/Official/cv/YOLOv3_for_ACL
+cd modelzoo/built-in/ACL_TensorFlow/Official/cv/YOLOv3_for_ACL
 ```
 
-### 2. Download and preprocess the dataset
+### 2. Requirements
+
+opencv-python==4.2.0.34
+
+
+### 3. Download and preprocess the dataset
 
 1. dataset
   To compare with official implement, for example, we use [get_coco_dataset.sh](https://github.com/pjreddie/darknet/blob/master/scripts/get_coco_dataset.sh) to prepare our dataset.
 
 2. annotation file
-   Using script generate `coco2014_minival.txt` file.
+
+   cd scripts
+
+   Using script generate `coco2014_minival.txt` file. Modify the path in `coco_minival_anns.py` and `5k.txt`, then execute:
 
    ```
-   cd scripts
    python3 coco_minival_anns.py
    ```
 
@@ -45,13 +52,13 @@ cd modelzoo/built-in/ACL/Official/cv/YOLOv3_for_ACL
 
 **Convert pb to om.**
 
-- configure the env
+- Configure the env according to your installation path 
 
   ```
   export install_path=/usr/local/Ascend
   export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
   export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
-  export LD_LIBRARY_PATH=${install_path}/atc/lib64:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=${install_path}/atc/lib64:${install_path}/acllib/lib64:$LD_LIBRARY_PATH
   export ASCEND_OPP_PATH=${install_path}/opp
   ```
 
@@ -80,7 +87,7 @@ cd modelzoo/built-in/ACL/Official/cv/YOLOv3_for_ACL
 
 ### Result
 
-Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
+Our result were obtained by running the applicable inference script. To achieve the same results, follow the steps in the Quick Start Guide.
 
 #### Inference accuracy results
 

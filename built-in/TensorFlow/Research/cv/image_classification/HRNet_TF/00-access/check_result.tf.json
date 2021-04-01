@@ -1,0 +1,76 @@
+{
+  "op": [
+    {
+      "is_support": false,
+      "name": "DATA/IteratorGetNext",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "IteratorGetNext"
+    },
+    {
+      "is_support": false,
+      "name": "HRNET/acc_top1",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "HRNET/acc_top5",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "HRNET/l2_loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "HRNET/loss",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "ScalarSummary"
+    },
+    {
+      "is_support": false,
+      "name": "Merge/MergeSummary",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "MergeSummary"
+    },
+    {
+      "is_support": false,
+      "name": "OptimizeDataset/DATA/list_files/MatchingFiles",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "MatchingFiles"
+    },
+    {
+      "is_support": false,
+      "name": "save/SaveV2",
+      "not_support_reason": {
+        "code": 1,
+        "message": "This op is not exsit on npu."
+      },
+      "type": "SaveV2"
+    }
+  ]
+}

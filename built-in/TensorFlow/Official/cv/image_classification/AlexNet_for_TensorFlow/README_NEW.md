@@ -6,31 +6,31 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：_huawei_**
+**发布者（Publisher）：huawei**
 
-**应用领域（Application Domain）：_Image Classification_**
+**应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：_1.2_**
+**版本（Version）：1.2**
 
-**修改时间（Modified） ：_2020.10.14_**
+**修改时间（Modified） ：2020.10.14**
 
-_**大小（Size）**_**：_471M_**
+**大小（Size）**_**：471M**
 
-**框架（Framework）：_TensorFlow 1.15.0_**
+**框架（Framework）：TensorFlow 1.15.0**
 
-**模型格式（Model Format）：_ckpt_**
+**模型格式（Model Format）：ckpt**
 
 **精度（Precision）：Mixed**
 
-**处理器（Processor）：_昇腾910_**
+**处理器（Processor）：昇腾910**
 
-**应用级别（Categories）：_Official_**
+**应用级别（Categories）：Official**
 
-**描述（Description）：_基于TensorFlow框架的AlexNet图像分类网络训练代码_**
+**描述（Description）：基于TensorFlow框架的AlexNet图像分类网络训练代码**
 
 <h2 id="概述.md">概述</h2>
 
--   AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中获得图像分类冠军，AlexNet中包含了几个比较新的技术点， 也是首次在CNN中成功应用ReLU、Dropout和LRN等trick，同时AlexNet也使用了GPU进行运算加速。整个网络使用了1个11x11的卷积核、 1个5x5的卷积核和3个3x3的卷积核，AlexNet全部使用最大池化，避免了平均池化的模糊化效果。Ascend提供的AlexNet是基于TensorFlow实现的版本。_
+-   AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中获得图像分类冠军，AlexNet中包含了几个比较新的技术点， 也是首次在CNN中成功应用ReLU、Dropout和LRN等trick，同时AlexNet也使用了GPU进行运算加速。整个网络使用了1个11x11的卷积核、 1个5x5的卷积核和3个3x3的卷积核，AlexNet全部使用最大池化，避免了平均池化的模糊化效果。Ascend提供的AlexNet是基于TensorFlow实现的版本。
 
     -   参考论文：
 
@@ -40,8 +40,7 @@ _**大小（Size）**_**：_471M_**
         
         ```
         https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet
-        branch=master
-        commit_id=3d400a58023086b5c128ecd4b3ea46c129b5988b
+        
         ```
  
     -   适配昇腾 AI 处理器的实现：
@@ -49,19 +48,19 @@ _**大小（Size）**_**：_471M_**
         ```
         https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_for_TensorFlow
         branch=master
-        commit_id=9887f0b4ae27f16a1e9f8b0a94dda87b0bf8430a
+        commit_id= 477b07a1e95a35885b3a9a569b1c8ccb9ad5d7af
         ```
 
 
-    通过Git获取对应commit\_id的代码方法如下：
+    -   通过Git获取对应commit\_id的代码方法如下：
     
-    ```
-    git clone {repository_url}    # 克隆仓库的代码
-    cd {repository_name}    # 切换到模型的代码仓目录
-    git checkout  {branch}    # 切换到对应分支
-    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    ```
+        ```
+        git clone {repository_url}    # 克隆仓库的代码
+        cd {repository_name}    # 切换到模型的代码仓目录
+        git checkout  {branch}    # 切换到对应分支
+        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+        ```
 
 ## 默认配置<a name="section91661242121611"></a>
 -   网络结构
@@ -126,12 +125,12 @@ run_config = NPURunConfig(
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-1.  _硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
-2.  _宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。_
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
-    _当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
-    **表 1** _镜像列表_
+    **表 1** 镜像列表
 
     <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
     <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
@@ -164,42 +163,8 @@ run_config = NPURunConfig(
 3. 这里是列表文本数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
    
 ## 模型训练<a name="section715881518135"></a>
-- 容器场景（以8p为例）：
-1.  下载训练脚本。
-2.  编译镜像。
-
-    docker build -t ascend-alexnet .
-
-3.  启动容器实例。
-
-    bash scripts/docker_start.sh
-
-    容器启动脚本docker_start.sh参数说明如下：
-   
-```
- #!/usr/bin/env bash
-    docker_image=$1 #接受第一个参数作为docker_image
-    data_dir=$2 #接受第二个参数作为训练数据集路径
-    model_dir=$3 #接受第三个参数作为训练脚本路径
-    docker run -it --ipc=host \
-        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5                         --device=/dev/davinci6 --device=/dev/davinci7 \  #docker使用卡数，当前使用0~7卡
-        --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
-        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
-        -v ${data_dir}:${data_dir} \    #训练数据集路径
-        -v ${model_dir}:${model_dir} \  #训练脚本路径
-        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
-        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
-        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \#docker_image为镜像名称
-        /bin/bash
-```
-4.  执行docker_start.sh后带三个参数：
-
-    -    生成的docker_image
-    -    数据集路径
-    -    训练脚本路径
-    bash docker_start.sh ${docker_image} ${data_dir} ${model_dir}
-
-5. 检查scripts/目录下是否有存在8卡IP的json配置文件“8p.json”。
+- 下载训练脚本。
+- 检查scripts/目录下是否有存在8卡IP的json配置文件“8p.json”。
    
 ```
  {"group_count": "1","group_list":     
@@ -216,174 +181,143 @@ run_config = NPURunConfig(
                                      "pod_name":"npu8p",        "server_id":"127.0.0.1"}]}],"status": "completed"}
 ```
 
-6.  开始训练。
+- 开始训练。
     
-    启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息示例内容如下。
-    当版本为Atlas Data Center Solution V100R020C00时，请使用以下环境变量：
-    
-```
-#!/bin/bash \
-    export install_path=/usr/local/Ascend \
-    export PATH=${install_path}/nnae/latest/fwkacllib/ccec_compiler/bin:${PATH} \
-    export ASCEND_OPP_PATH=${install_path}/nnae/latest/opp \
-    export PYTHONPATH=$PYTHONPATH:${install_path}/nnae/latest/opp/op_impl/built-in/ai_core/tbe:${install_path}/tfplugin/latest/tfplugin/python/site-packages/:${install_path}/nnae/latest/fwkacllib/python/site-packages/hccl:${install_path}/nnae/latest/fwkacllib/python/site-packages/te:${install_path}/nnae/latest/fwkacllib/python/site-packages/topi
-    export LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib/:${install_path}/nnae/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons
-    
-    当版本为Atlas Data Center Solution V100R020C10时，请使用以下环境变量：
-    export install_path=/usr/local/Ascend/nnae/latest
-    # driver包依赖
-    export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver:$LD_LIBRARY_PATH #仅容器训练场景配置
-    export LD_LIBRARY_PATH=/usr/local/Ascend/add-ons:$LD_LIBRARY_PATH
-    #fwkacllib 包依赖
-    export LD_LIBRARY_PATH=${install_path}/fwkacllib/lib64:$LD_LIBRARY_PATH
-    export 
-    PYTHONPATH=${install_path}/fwkacllib/python/site-packages:${install_path}/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:${install_path}/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
-    export
-    PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:$PATH
-    #tfplugin 包依赖
-    export PYTHONPATH=/usr/local/Ascend/tfplugin/latest/tfplugin/python/site-packages:$PYTHONPATH
-    # opp包依赖export ASCEND_OPP_PATH=${install_path}/opp
-```
-7. 单机八卡
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
 
-    设置8卡训练参数（脚本位于scripts/train_alexnet_8p.sh），示例如下。
-    请确保下面例子中的“--data_dir”修改为 用户生成的tfrecord的路径。
-    
-    
-```
-    start_id=$((device_id*24))
-    end_id=$((device_id*24+23))
-    taskset -c ${start_id}-${end_id} 
-    python3.7 ${EXEC_DIR}/train.py --rank_size=8 \                      
-                    --epochs_between_evals=1 \                      
-                    --mode=train \                      
-                    --max_epochs=150 \               
-                    --iterations_per_loop=100 \               
-                    --batch_size=128 \               
-                    --data_dir=/data/slimImagenet \               
-                    --lr=0.06 \                      
-                    --checkpoint_dir=./model_8p \               
-                    --log_dir=./model_8p > ./train_${device_id}.log 2>&1
-```
-    8卡训练指令（脚本位于scripts/run_npu_8p.sh）
-    bash run_npu_8p.sh
-- 非容器场景（以单p为例）：
+       环境变量配置信息参见：
 
-1. 启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息示例内容请参考容器场景中步骤6。
+          [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+    
 
-2. 单机单卡
+    2. 单卡训练
         
-    设置单卡训练参数（脚本位于scripts/train_alexnet_1p.sh），示例如下。请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的路径。
-   
-```
- `python3.7 ${EXEC_DIR}/train.py --rank_size=1 \ 
-            --iterations_per_loop=100 \ 
-            --batch_size=256 \ 
-            --data_dir=/opt/npu/slimImagenet \ 
-            --mode=train \ 
-            --checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/ \ 
-            --lr=0.015 \ 
-            --log_dir=./model_1p > ./train_${device_id}.log 2>&1 `
-```
-    单卡训练指令（脚本位于scripts/run_npu_1p.sh）
+        2.1 设置单卡训练参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_1p.sh），示例如下。请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的路径。
+            
+            `--checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/`
+    
+        2.2 单卡训练指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_1p.sh） 
 
-    bash scripts/run_npu_1p.sh
+            `bash scripts/run_npu_1p.sh` 
+
+    3. 8卡训练
+        
+        3.1 设置8卡训练参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_8p.sh），示例如下。
+    请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的实际路径。
+           
+            ` --data_dir=/data/slimImagenet`
+
+        3.2 8卡训练指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_8p.sh）
+            
+            ` bash run_npu_8p.sh`
+   
 
 <h2 id="开始测试.md">开始测试</h2>
 
-    测试的时候，需要修改脚本启动参数（脚本位于scripts/train_alexnet_8p.sh），将mode设置为evaluate，增加checkpoints的路径。将“rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*”替换为“#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*”
+ - 参数配置
+    1. 修改脚本启动参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_8p.sh），将mode设置为evaluate，如下所示：
 
+        `--mode=evaluate`
+
+    2. 增加checkpoints的路径，请用户根据checkpoints实际路径进行配置。
+       
+        `--checkpoint_dir=./results/0/model_8p/`
+
+    3. 将“`rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`”替换为“`#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`”，如下所示：
+ 
+        `#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`
+
+- 执行测试指令
     
-```
-python3.7 ${EXEC_DIR}/train.py --rank_size=1 \
-        --iterations_per_loop=100 \
-        --batch_size=256 \
-        --data_dir=/opt/npu/slimImagenet \
-        --mode=evaluate \
-        --checkpoint_dir=./results/0/model_8p/ \
-        --log_name=eval.log \
-        --log_dir=./model_8p > ./eval_${device_id}.log 2>&1 
-```
-    上述文件修改完成之后，执行8卡测试指令（脚本位于scripts/run_npu_8p.sh）
-    bash scripts/run_npu_8p.sh
+    1. 上述文件修改完成之后，执行8卡测试指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_8p.sh）
+        
+        `bash scripts/run_npu_8p.sh`
 
 <h2 id="迁移学习指导.md">迁移学习指导</h2>
 
-1.  数据集准备。
+- 数据集准备。
 
     1.  获取数据。
         请参见“快速上手”中的数据集准备，需要将数据集转化为tfrecord格式。类别数可以通过训练参数中的num_classes来设置。
     2.  数据集每个类别所占比例大致相同。
     3.  数据目录结构如下：
         
-```
-        |--|imagenet_tfrecord
-        |   train-00000-of-01024
-        |   train-00001-of-01024
-        |   train-00002-of-01024
-        |   ...
-        |   validation-00000-of-00128
-        |   validation-00000-of-00128
-        |   ...
-
-```
+        ```
+                |--|imagenet_tfrecord
+                |   train-00000-of-01024
+                |   train-00001-of-01024
+                |   train-00002-of-01024
+                |   ...
+                |   validation-00000-of-00128
+                |   validation-00000-of-00128
+                |   ...
+        
+        ```
 
     4.  设置合理的数据集预处理方法（裁剪大小、随机翻转、标准化）。
         
-```
-        def parse_and_preprocess_image_record(config, record, height, width,brightness, contrast, saturation, hue,
-                                      distort, nsummary=10, increased_aug=False, random_search_aug=False):
-        with tf.name_scope('preprocess_train'):
-            image = crop_and_resize_image(config, record, height, width, distort)   #解码，80%中心抠图并且Resize[224 224]
-            if distort:
-                image = tf.image.random_flip_left_right(image)            #随机左右翻转
-                image = tf.clip_by_value(image, 0., 255.)                     #归一化
-        image = normalize(image)                  #减均值[121.0, 115.0, 100.0]，除方差[70.0, 68.0, 71.0]
-        image = tf.cast(image, tf.float16)
-        return image
-```
+        ```
+                def parse_and_preprocess_image_record(config, record, height, width,brightness, contrast, saturation, hue,
+                                              distort, nsummary=10, increased_aug=False, random_search_aug=False):
+                with tf.name_scope('preprocess_train'):
+                    image = crop_and_resize_image(config, record, height, width, distort)   #解码，80%中心抠图并且Resize[224 224]
+                    if distort:
+                        image = tf.image.random_flip_left_right(image)            #随机左右翻转
+                        image = tf.clip_by_value(image, 0., 255.)                     #归一化
+                image = normalize(image)                  #减均值[121.0, 115.0, 100.0]，除方差[70.0, 68.0, 71.0]
+                image = tf.cast(image, tf.float16)
+                return image
+        ```
 
 
-2.  修改训练脚本。
+- 修改训练脚本。
     1.  修改配置文件。
-        使用自有数据集进行分类，如需将分类类别修改为10，修改alexnet/model.py，将depth=1000设置为depth=10。
-        `labels_one_hot = tf.one_hot(labels, depth=1000)`
-        修改alexnet/alexnet.py，将num_classes=1000修改为num_classes=10。将“x, 1000”设置为“x, 10”。
+
+        1.1 使用自有数据集进行分类，如需将分类类别修改为10，修改alexnet/model.py，将depth=1000设置为depth=10。
         
-```
+            `labels_one_hot = tf.one_hot(labels, depth=1000)`
+
+        1.2 修改alexnet/alexnet.py，将num_classes=1000修改为num_classes=10。将“x, 1000”设置为“x, 10”。
+
+        
+        ```
         def inference_alexnet_impl(inputs, num_classes=1000, is_training=True):
-            .  .  .
-            def inference_alexnet_impl_he_uniform(inputs,num_classes=1000, is_training=True):
-            .  .  .
-            x = tf.layers.dense(x, 1000, activation=tf.nn.relu, use_bias=True,
-            kernel_initializer= tf.variance_scaling_initializer(scale=scale, mode ='fan_in',distribution='uniform'))
-            .  .  .
-            def inference(inputs,version="xavier",num_classes=1000, is_training=False):
-```
+                    .  .  .
+                    def inference_alexnet_impl_he_uniform(inputs,num_classes=1000, is_training=True):
+                    .  .  .
+                    x = tf.layers.dense(x, 1000, activation=tf.nn.relu, use_bias=True,
+                    kernel_initializer= tf.variance_scaling_initializer(scale=scale, mode ='fan_in',distribution='uniform'))
+                    .  .  .
+                    def inference(inputs,version="xavier",num_classes=1000, is_training=False):
+        ```
+
+
+    
     2.  加载预训练模型。
-        配置文件增加参数，修改文件train.py（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。
         
-```
+        配置文件增加参数，修改文件train.py（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。    
+
+        ```
         parser.add_argument('--restore_path', default='/code/ckpt0/model.ckpt-188000',
                     help="""restore path""")            #配置预训练ckpt路径
         parser.add_argument('--restore_exclude', default=['dense_2'],
                     help="""restore_exclude""")  #不加载预训练网络中FC层权重
-```
+        ```
+    3. 模型加载修改，修改文件alexnet/model.py，增加以下代码行。
 
-        模型加载修改，修改文件alexnet/model.py，增加以下代码行。
-        
-```
+        ```
         assert (mode == tf.estimator.ModeKeys.TRAIN)
         #restore ckpt for finetune，
         variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.config.restore_exclude)
         tf.train.init_from_checkpoint(self.config.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})
-```
+        ```
 
-3.  模型训练。
+
+-  模型训练。
 
     请参考“快速上手”章节。
 
-4.  模型评估。
+-  模型评估。
     
     可以参考“模型训练”中训练步骤。
 
