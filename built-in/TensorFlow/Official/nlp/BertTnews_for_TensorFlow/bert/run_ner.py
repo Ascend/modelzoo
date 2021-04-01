@@ -36,9 +36,16 @@ import pickle
 import codecs
 import sys
 
+############## npu modify begin #############
+from npu_bridge.estimator.npu.npu_config import NPURunConfig
+from npu_bridge.estimator.npu.npu_estimator  import NPUEstimator
+from npu_bridge.estimator.npu.npu_optimizer import NPUDistributedOptimizer
+from npu_bridge.estimator.npu.npu_estimator import NPUEstimatorSpec
+############## npu modify end ###############
+
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+#reload(sys)
+#sys.setdefaultencoding('utf8')
 
 flags = tf.flags
 
@@ -453,6 +460,7 @@ def file_based_convert_examples_to_features(
         examples, label_list, max_seq_length, tokenizer, output_file, output_dir, mode=None):
     writer = tf.python_io.TFRecordWriter(output_file)
     for (ex_index, example) in enumerate(examples):
+        #print("=========================tf record=================")
         if ex_index % 5000 == 0:
             tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
         feature = convert_single_example(
@@ -488,10 +496,12 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
             if t.dtype == tf.int64:
                 t = tf.to_int32(t)
             example[name] = t
+        print("========example========",example)
         return example
 
     def input_fn(params):
         batch_size = params["batch_size"]
+        print("========batch_size======",batch_size)
         d = tf.data.TFRecordDataset(input_file)
         if is_training:
             d = d.repeat()
@@ -600,12 +610,23 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
             hook_dict['global_steps'] = tf.train.get_or_create_global_step()
             logging_hook = tf.train.LoggingTensorHook(
                 hook_dict, every_n_iter=200)
+            '''
             output_spec = tf.contrib.tpu.TPUEstimatorSpec(
                 mode=mode,
                 loss=total_loss,
                 train_op=train_op,
                 scaffold_fn=scaffold_fn,
                 training_hooks=[logging_hook])
+            '''
+            ##################modify for npu######################
+            # Modify `NPUEstimatorSpec`for NPU
+            output_spec = NPUEstimatorSpec(
+                mode=mode,
+                loss=total_loss,
+                train_op=train_op,
+                scaffold=scaffold_fn,
+                training_hooks=[logging_hook])
+            ##################npu modify end######################
         elif mode == tf.estimator.ModeKeys.EVAL:
 
             def metric_fn(per_example_loss, label_ids, logits):
@@ -632,7 +653,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
                     "eval_f": f,
                     # "eval_loss": loss,
                 }
-
+            '''
             eval_metrics = (metric_fn, [per_example_loss, label_ids, logits])
             # eval_metrics = (metric_fn, [label_ids, logits])
             output_spec = tf.contrib.tpu.TPUEstimatorSpec(
@@ -640,10 +661,29 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
                 loss=total_loss,
                 eval_metrics=eval_metrics,
                 scaffold_fn=scaffold_fn)
+            '''
+            ##################modify for npu######################
+            # Modify `NPUEstimatorSpec`for NPU
+            eval_metrics = metric_fn(per_example_loss, label_ids, logits)
+            output_spec = NPUEstimatorSpec(
+                mode=mode,
+                loss=total_loss,
+                eval_metric_ops=eval_metrics,
+                scaffold=scaffold_fn)
+            ##################npu modify end######################
         else:
+            '''
             output_spec = tf.contrib.tpu.TPUEstimatorSpec(
                 mode=mode, predictions=predicts, scaffold_fn=scaffold_fn
             )
+            '''
+            ##################modify for npu######################
+            # Modify `NPUEstimatorSpec`for NPU
+            output_spec = NPUEstimatorSpec(
+                mode=mode,
+                predictions=predicts,
+                scaffold=scaffold_fn)
+            ##################npu modify end######################
         return output_spec
 
     return model_fn
@@ -684,7 +724,7 @@ def main(_):
             FLAGS.tpu_name, zone=FLAGS.tpu_zone, project=FLAGS.gcp_project)
 
     is_per_host = tf.contrib.tpu.InputPipelineConfig.PER_HOST_V2
-
+    '''
     run_config = tf.contrib.tpu.RunConfig(
         cluster=tpu_cluster_resolver,
         master=FLAGS.master,
@@ -694,6 +734,25 @@ def main(_):
             iterations_per_loop=FLAGS.iterations_per_loop,
             num_shards=FLAGS.num_tpu_cores,
             per_host_input_for_training=is_per_host))
+    '''
+
+    ##################modify for npu######################
+    # Creates a `NPURunConfig`
+    session_config = tf.ConfigProto(allow_soft_placement=True)
+    run_config = NPURunConfig(
+        session_config=session_config,
+        model_dir=FLAGS.output_dir,
+        keep_checkpoint_max=5,
+        save_summary_steps=0,
+        save_checkpoints_steps=115200,
+        iterations_per_loop=10,
+        #enable_data_pre_proc=True,
+        precision_mode='allow_mix_precision',
+       # precision_mode='allow_fp32_to_fp16',
+        #hcom_parallel=True
+    )
+    ##################npu modify end######################
+
 
     train_examples = None
     num_train_steps = None
@@ -715,7 +774,7 @@ def main(_):
         num_warmup_steps=num_warmup_steps,
         use_tpu=FLAGS.use_tpu,
         use_one_hot_embeddings=FLAGS.use_tpu)
-
+    '''
     estimator = tf.contrib.tpu.TPUEstimator(
         use_tpu=FLAGS.use_tpu,
         model_fn=model_fn,
@@ -723,6 +782,17 @@ def main(_):
         train_batch_size=FLAGS.train_batch_size,
         eval_batch_size=FLAGS.eval_batch_size,
         predict_batch_size=FLAGS.predict_batch_size)
+    '''
+
+    ############## npu modify begin #############
+    # Creates a `NPUEstimator` instead of using tf.estimator.Estimator
+    estimator = NPUEstimator(
+        model_dir=None,
+        model_fn=model_fn,
+        config=run_config,
+        params={"batch_size": FLAGS.train_batch_size}
+    )
+    ############## npu modify end ###############
 
     if FLAGS.do_train:
         train_file = os.path.join(FLAGS.output_dir, "train.tf_record")
@@ -755,7 +825,7 @@ def main(_):
             input_file=eval_file,
             seq_length=FLAGS.max_seq_length,
             is_training=False,
-            drop_remainder=eval_drop_remainder)
+            drop_remainder=True)
         result = estimator.evaluate(input_fn=eval_input_fn, steps=eval_steps)
         output_eval_file = os.path.join(FLAGS.output_dir, "eval_results.txt")
         with open(output_eval_file, "w") as writer:
@@ -809,7 +879,7 @@ def main(_):
             input_file=predict_file,
             seq_length=FLAGS.max_seq_length,
             is_training=False,
-            drop_remainder=predict_drop_remainder)
+            drop_remainder=True)
 
         result = estimator.predict(input_fn=predict_input_fn)
         output_predict_file = os.path.join(FLAGS.output_dir, "label_test.txt")
