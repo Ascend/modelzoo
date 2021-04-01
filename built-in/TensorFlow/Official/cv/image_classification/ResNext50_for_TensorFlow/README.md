@@ -43,20 +43,19 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
     
         ```
         https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_for_TensorFlow
-        branch=master
         commit_id=be78dd41dd3744a2b21c13a62eba829d59b111f2
         ```
 
 
-    通过Git获取对应commit\_id的代码方法如下：
+ -    通过Git获取对应commit\_id的代码方法如下：
     
-    ```
-    git clone {repository_url}    # 克隆仓库的代码
-    cd {repository_name}    # 切换到模型的代码仓目录
-    git checkout  {branch}    # 切换到对应分支
-    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    ```
+        ```
+        git clone {repository_url}    # 克隆仓库的代码
+        cd {repository_name}    # 切换到模型的代码仓目录
+        git checkout  {branch}    # 切换到对应分支
+        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+        ```
 
 ## 默认配置<a name="section91661242121611"></a>
 
@@ -126,8 +125,8 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
-1.  _硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。_
-2.  _宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。_
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
     _当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
@@ -207,21 +206,21 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
        5.1 进行训练时，需要使用 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`）， `mode` 默认设置为         `train`。
 
-            ```
+           
             'mode':'train',                                         # "train","evaluate"
 
-            ```
+            
        5.2 进行验证时，需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate`。
 
-            ```
+            
             'mode':'evaluate',                                         # "train","evaluate"
-            ```
+            
         
        5.3 单卡训练指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_1p_host.sh`）
             
-            ```
+            
             bash  Resnext50_1p_host.sh
-            ```
+            
 
 - 8卡训练
 
@@ -263,21 +262,21 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
        5.1 进行训练时，需要使用 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`）， `mode` 默认设置为         `train`。
 
-            ```
+            
             'mode':'train',                                         # "train","evaluate"
-            ```
+            
        
        5.2 进行验证时，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
 
-            ```
+            
             'mode':'evaluate',                                         # "train","evaluate"
-            ```
+            
         
        5.3 8P训练指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_8p_host.sh`）
             
-            ```
+            
             bash Resnext50_8p_host.sh
-            ```
+            
 
 - 验证。
 
@@ -285,12 +284,12 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
         1.1 进行验证之前，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
 
-            ```
+            
             'mode':'evaluate',                                         # "train","evaluate"
-            ```
+            
         1.2 8P测试指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_8p_host.sh`）
             
-            ```
+            
             bash Resnext50_8p_host.sh    
 
     2. 在验证执行完成后，验证结果会输出到 ModelZoo_ResNext50_TF_MTI/result/cloud-localhost--0/0/resnet50_train/results/res50_32bs_8p目录中。 测试结束后会打印
@@ -317,30 +316,30 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
     4.  数据集文件结构，请用户自行参照tfrecord脚本生成train/eval使用的TFRecord文件，包含训练集和验证集两部分，目录参考：
         
        
-```
-        |--|imagenet_tfrecord
-        |   train-00000-of-01024
-        |   train-00001-of-01024
-        |   train-00002-of-01024
-        |   ...
-        |   validation-00000-of-00128
-        |   validation-00000-of-00128
-        |   ...
-```
+        ```
+                |--|imagenet_tfrecord
+                |   train-00000-of-01024
+                |   train-00001-of-01024
+                |   train-00002-of-01024
+                |   ...
+                |   validation-00000-of-00128
+                |   validation-00000-of-00128
+                |   ...
+        ```
     5.  设置合理的数据集预处理方法（裁剪大小、随机翻转、标准化）。
         
-```
-        def parse_and_preprocess_image_record(config, record, height, width,brightness, contrast, saturation, hue,
-                                              distort, nsummary=10, increased_aug=False, random_search_aug=False):
-                with tf.name_scope('preprocess_train'):
-                    image = crop_and_resize_image(config, record, height, width, distort)   #解码，80%中心抠图并且Resize[224 224]
-                    if distort:
-                        image = tf.image.random_flip_left_right(image)            #随机左右翻转
-                        image = tf.clip_by_value(image, 0., 255.)                     #归一化
-                image = normalize(image)                  #减均值[121.0, 115.0, 100.0]，除方差[70.0, 68.0, 71.0]
-                image = tf.cast(image, tf.float16)
-                return image
-```
+        ```
+                def parse_and_preprocess_image_record(config, record, height, width,brightness, contrast, saturation, hue,
+                                                      distort, nsummary=10, increased_aug=False, random_search_aug=False):
+                        with tf.name_scope('preprocess_train'):
+                            image = crop_and_resize_image(config, record, height, width, distort)   #解码，80%中心抠图并且Resize[224 224]
+                            if distort:
+                                image = tf.image.random_flip_left_right(image)            #随机左右翻转
+                                image = tf.clip_by_value(image, 0., 255.)                     #归一化
+                        image = normalize(image)                  #减均值[121.0, 115.0, 100.0]，除方差[70.0, 68.0, 71.0]
+                        image = tf.cast(image, tf.float16)
+                        return image
+        ```
 
 - 修改训练脚本。
 
@@ -351,7 +350,7 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
         1.1 使用自有数据集进行分类，如需将分类类别修改为10。 修改code/resnext50_train/models/resnet50/resnet.py文件，将units=1001设置为units=10。 
         
             
-```
+        
             axes = [1,2] 
             x = tf.reduce_mean( x, axes, keepdims=True ) 
             x = tf.identity(x, 'final_reduce_mean') 
@@ -359,16 +358,18 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
             x = tf.layers.dense(inputs=x, units=1001,kernel_initializer= tf.variance_scaling_initializer() ) 
             . . . 
             x = tf.layers.dense(inputs=x, units=1001,kernel_initializer=tf.random_normal_initializer(stddev=0.01)) 
-```
+       
 
         1.2 修改code/resnext50_train/models/resnet50/res50_model.py文件，将depth=1001设置为depth=10。
+            
             `labels_one_hot = tf.one_hot(labels, depth=1001) `
+        
         1.3 修改code/resnext50_train/configs/res50_32bs_1p_host.py文件，将num_classes=1001设置为num_classes=10。 
         
-```
+            
             'model_name': 'resnet50', 
             'num_classes': 1001,
-```
+            
 
 
     2.  加载预训练模型。
@@ -376,24 +377,31 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
         2.1 配置文件增加参数，修改code/resnext50_train/configs/res50_32bs_1p_host.py文件（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。                     
         
         `'restore_path': '/code/ckpt0/model.ckpt-601000', `
+
         2.2 用户根据预训练的实际ckpt进行配置 
+
         `'restore_exclude': ['fp32_vars/dense'], `
+
         2.3 不加载预训练网络中FC层权重 模型加载修改，修改code/resnext50_train/models/resnet50/res50_model.py文件，增加以下代码行。 
         
-```
-        #restore ckpt for finetune， 
-        variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.config.get('restore_exclude'))         
-        tf.train.init_from_checkpoint(self.config.get('restore_path'),{v.name.split(':')[0]: v for v in variables_to_restore})
-```
+       
+           
+            
+            #restore ckpt for finetune， 
+            variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.config.get('restore_exclude'))         
+            tf.train.init_from_checkpoint(self.config.get('restore_path'),{v.name.split(':')[0]: v for v in variables_to_restore})
+            
+
+        
  
 
 - 模型训练。
 
-    _可以参考“模型训练”中训练步骤。_
+    可以参考“模型训练”中训练步骤。
 
 - 模型评估。
 
-    _可以参考“模型训练”中训练步骤。_
+    可以参考“模型训练”中验证步骤。
 
 <h2 id="高级参考.md">高级参考</h2>
 
