@@ -186,6 +186,8 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
+参考：[Readme](https://gitee.com/ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README_NEW.md)
+
  **四、自测试用例**
 
 提供模型的自测试用例和readme，提交PR需要门禁及模型测试用例通过，性能和精度检查通过
