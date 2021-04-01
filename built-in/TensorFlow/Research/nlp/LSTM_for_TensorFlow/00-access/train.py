@@ -85,17 +85,17 @@ loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction,
 #lr decay
 learning_rate_base = args.learningRate
 learning_rate_decay = 0.99
-learning_rate_step = 1000
+learning_rate_step = 900
 global_step = tf.Variable(0, training = False)
 learning_rate = tf.train_exponential_decay(learning_rate_base, global_step, learning_rate_step, learning_rate_decay, staitcase=True)
 optimizer = tf.train.GradientDescentOptimizer(args.learning_rate)#.minimize(loss, global_step=global_step)
 
 #gradient clipping
-optimizer = tf.train.GradientDescentOptimizer(args.learningRate)
-# loss_scale_manager = ExponentialUpdateLossScaleManager(init_loss_scale=2**7, incr_every_n_steps=1000, decr_every_n_nan_or_inf=2, decr_ratio=0.7)
-loss_scale_manager = FixedLossScaleManager(loss_scale=1)#使用固定LossScale
-optimizer = NPULossScaleOptimizer(optimizer, loss_scale_manager, is_distributed=False)
-optimizer = optimizer.minimize(loss)
+grads = optimizer.compute_gradients(loss)
+for i, (g, v) in enumerate(grads):
+    if g is not None:
+        grada[i] = (tf.clip_by_norm(g, 0.9), v)
+optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
 #sess = tf.InteractiveSession()
 #tf.summary.scalar('Loss', loss)
