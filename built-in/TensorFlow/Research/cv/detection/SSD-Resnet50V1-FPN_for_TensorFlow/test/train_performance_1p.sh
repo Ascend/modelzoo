@@ -49,6 +49,16 @@ fi
 #############执行训练#########################
 cd $cur_path/models/research
 
+if [  -f ${pipeline_config}.bak];then
+   cp ${pipeline_config}.bak ${pipeline_config}
+else
+   cp ${pipeline_config} ${pipeline_config}.bak
+fi
+
+sed -i "s%/checkpoints%${ckpt_path}%p" ${pipeline_config} 
+sed -i "s%/data/coco2017_tfrecords%${data_path}/coco2017_tfrecords%p" ${pipeline_config} 
+
+
 start=$(date +%s)
 
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
@@ -65,21 +75,6 @@ for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
        --model_dir=${ckpt_path} \
        --alsologtostder \
        --amp \
-       --config_override={  \
-             train_config: {  \
-               fine_tune_checkpoint: "$ckpt_path/resnet_v1_50/model.ckpt"  \
-             }  \
-             train_input_reader: {  \
-               tf_record_input_reader {  \
-               input_path: "$data_path/coco2017_tfrecords/*train*"  \
-               }  \
-            }  \
-            eval_input_reader: {  \
-              tf_record_input_reader {  \
-              input_path: "$data_path/coco2017_tfrecords/*val*"  \
-              }  \
-            }  \
-	        }  \
        "${@:1}"  > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$RANK_ID.log 2>&1 &
 done
 wait
