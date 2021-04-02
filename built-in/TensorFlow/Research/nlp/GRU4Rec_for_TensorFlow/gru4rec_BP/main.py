@@ -19,8 +19,8 @@ def npu_session_config_init(session_config=None):
         custom_op.name = 'NpuOptimizer'
         session_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
     return session_config
-PATH_TO_TRAIN = '../data/rsc15_train_200000.txt'
-PATH_TO_TEST = '../data/rsc15_test.txt'
+PATH_TO_TRAIN = './data/rsc15_train_full.txt'
+PATH_TO_TEST = './data/rsc15_test.txt'
 
 class Args():
     is_training = False
@@ -31,7 +31,7 @@ class Args():
     dropout_p_hidden = 1
     learning_rate = 0.001
     decay = 0.96
-    decay_steps = 1000.0
+    decay_steps = 1e4
     sigma = 0
     init_as_normal = False
     reset_after_session = True
@@ -58,10 +58,11 @@ def parseArgs():
     parser.add_argument('--final_act', default='softmax', type=str)
     parser.add_argument('--loss', default='cross-entropy', type=str)
     parser.add_argument('--dropout', default='0.5', type=float)
+    parser.add_argument('--path_to_train', default='./data/rsc15_train_full.txt', type=str)
     return parser.parse_args()
 if (__name__ == '__main__'):
     command_line = parseArgs()
-    data = pd.read_csv(PATH_TO_TRAIN, sep='\t', dtype={'ItemId': np.int64})
+    data = pd.read_csv(command_line.path_to_train, sep='\t', dtype={'ItemId': np.int64})
     valid = pd.read_csv(PATH_TO_TEST, sep='\t', dtype={'ItemId': np.int64})
     args = Args()
     args.n_items = len(data['ItemId'].unique())
