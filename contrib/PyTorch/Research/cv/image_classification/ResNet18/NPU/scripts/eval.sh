@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source scripts/set_npu_env.sh 
-python3.7 ../main.py \
+python3.7 ./main.py \
 	/opt/npu/imagenet/ \
 	-a resnet18 \
 	--evaluate \

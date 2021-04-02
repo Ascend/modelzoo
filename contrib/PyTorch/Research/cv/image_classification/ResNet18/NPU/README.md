@@ -17,7 +17,7 @@ To train a model, run `main.py` with the desired model architecture and the path
 
 ```bash
 # O2 training
-bash scripts/train_8p.sh
+bash scripts/train_1p.sh
 
 # O2 training 8p
 bash scripts/train_8p.sh

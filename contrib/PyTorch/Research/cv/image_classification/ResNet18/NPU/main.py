@@ -1,3 +1,17 @@
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the BSD 3-Clause License  (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://opensource.org/licenses/BSD-3-Clause
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 import os
 import random
@@ -6,7 +20,6 @@ import time
 import warnings
 
 import torch
-# import torch.npu
 from apex import amp
 
 import torch.nn as nn
@@ -34,7 +47,7 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet34',
                     choices=model_names,
                     help='model architecture: ' +
                          ' | '.join(model_names) +
-                         ' (default: resnet18)')
+                         ' (default: resnet34)')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -253,8 +266,6 @@ def main_worker(gpu, ngpus_per_node, args):
             # When using a single GPU per process and per
             # DistributedDataParallel, we need to divide the batch size
             # ourselves based on the total number of GPUs we have
-            # args.batch_size = int(args.batch_size / ngpus_per_node)
-            # args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
             if args.pretrained:
                 model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
             else:
@@ -323,7 +334,7 @@ def main_worker(gpu, ngpus_per_node, args):
     val_loader = get_pytorch_val_loader(args.data, args.batch_size, args.workers, distributed=False)
 
     if args.evaluate:
-        validate(val_loader, model, criterion, args)
+        validate(val_loader, model, criterion, args, ngpus_per_node)
         return
         
     if args.prof:
@@ -380,12 +391,12 @@ def profiling(data_loader, model, criterion, optimizer, args):
     def update(model, images, target, optimizer):
         output = model(images)
         loss = criterion(output, target)
+        optimizer.zero_grad()
         if args.amp:
             with amp.scale_loss(loss, optimizer) as scaled_loss:
                 scaled_loss.backward()
         else:
             loss.backward()
-        optimizer.zero_grad()
         optimizer.step()
 
     for step, (images, target) in enumerate(data_loader):
@@ -514,8 +525,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
         else:
             loss.backward()
         optimizer.step()
-
-        # torch.npu.synchronize()
 
         # measure elapsed time
         cost_time = time.time() - end
