@@ -1,0 +1,4 @@
+Cython
+pycocotools==2.0.0
+contextlib2
+DLLogger==0.1.0

@@ -1,0 +1,25 @@
+#!/bin/bash
+cur_path=`pwd`
+export install_path=/usr/local/Ascend 
+#export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver:$LD_LIBRARY_PATH # 仅容器训练场景配置
+export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:$PATH
+export LD_LIBRARY_PATH=${install_path}/fwkacllib/lib64:$LD_LIBRARY_PATH
+export PYTHONPATH=${install_path}/fwkacllib/python/site-packages:$PYTHONPATH
+export PYTHONPATH=/usr/local/python3.7.5/lib/python3.7/site-packages:${install_path}/tfplugin/python/site-packages:$PYTHONPATH
+export ASCEND_OPP_PATH=${install_path}/opp
+export ASCEND_AICPU_PATH=${install_path}
+export PYTHONPATH=$cur_path/models/research:$cur_path/models/research/slim:$PYTHONPATH
+export JOB_ID=10087
+alias del="rm -rf /root/ascend/log/*; rm -rf /var/log/npu/report/*;"
+alias logd="cd /var/log/npu/report; /usr/local/Ascend/driver/tools/msnpureport"
+alias logh="cd /root/ascend/log/;"
+alias kai="/usr/local/Ascend/driver/tools/msnpureport -g info"
+alias guan="/usr/local/Ascend/driver/tools/msnpureport -g error"
+export ASCEND_GLOBAL_LOG_LEVEL=3
+export RANK_TABLE_FILE=$cur_path/configs/1p.json
+export RANK_SIZE=1
+export ASCEND_DEVICE_ID=0
+export RANK_ID=0
+#export PRINT_MODEL=1  
+#export DUMP_GE_GRAPH=2   
+#export DUMP_GRAPH_LEVEL=3
