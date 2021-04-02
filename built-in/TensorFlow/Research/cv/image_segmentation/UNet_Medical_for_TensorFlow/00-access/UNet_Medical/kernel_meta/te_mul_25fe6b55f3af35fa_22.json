@@ -1,0 +1,14 @@
+{
+    "batchBindOnly":1,
+    "binFileName":"te_mul_25fe6b55f3af35fa_22",
+    "binFileSuffix":".o",
+    "blockDim":32,
+    "kernelName":"te_mul_25fe6b55f3af35fa_22__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "parameters":[
+        0,
+        0,
+        0
+    ],
+    "sha256":"209f8f60c5b4183b3e35c58366ce938d6a605b82c99cf1b8dc6ebc8b13023c0b"
+}

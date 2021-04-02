@@ -1,0 +1,594 @@
+{
+    "graphId": "30",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "30"
+}{
+    "graphId": "36",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "36"
+}{
+    "graphId": "40",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "40"
+}{
+    "graphId": "41",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "41"
+}{
+    "graphId": "46",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "46"
+}{
+    "graphId": "47",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "47"
+}{
+    "graphId": "51",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "51"
+}{
+    "graphId": "55",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "55"
+}{
+    "graphId": "58",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "58"
+}{
+    "graphId": "61",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "61"
+}{
+    "graphId": "62",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "62"
+}{
+    "graphId": "63",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "63"
+}{
+    "graphId": "67",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "67"
+}{
+    "graphId": "71",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "71"
+}{
+    "graphId": "74",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "74"
+}{
+    "graphId": "77",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "77"
+}{
+    "graphId": "78",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "78"
+}{
+    "graphId": "79",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "79"
+}{
+    "graphId": "83",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "83"
+}{
+    "graphId": "87",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "87"
+}{
+    "graphId": "90",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "90"
+}{
+    "graphId": "93",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "93"
+}{
+    "graphId": "94",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "94"
+}{
+    "graphId": "95",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "95"
+}{
+    "graphId": "96",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "96"
+}{
+    "graphId": "97",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "97"
+}{
+    "graphId": "102",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "102"
+}{
+    "graphId": "103",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "103"
+}{
+    "graphId": "104",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "104"
+}{
+    "graphId": "105",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "105"
+}{
+    "graphId": "107",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "107"
+}{
+    "graphId": "108",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "108"
+}{
+    "graphId": "112",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "112"
+}{
+    "graphId": "117",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "117"
+}{
+    "graphId": "121",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "121"
+}{
+    "graphId": "122",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "122"
+}{
+    "graphId": "126",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "126"
+}{
+    "graphId": "128",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "128"
+}{
+    "graphId": "132",
+    "graph_fusion": {
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ZConcatDFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "132"
+}{
+    "graphId": "133",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "133"
+}{
+    "graphId": "136",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "136"
+}{
+    "graphId": "139",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "139"
+}{
+    "graphId": "142",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "142"
+}{
+    "graphId": "145",
+    "graph_fusion": {
+        "ConvToFullyConnectionFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ConvWeightCompressFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "145"
+}{
+    "graphId": "148",
+    "graph_fusion": {
+        "ConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "SplitConvConcatFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "ZConcatDFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        }
+    },
+    "sessionId": "148"
+}
