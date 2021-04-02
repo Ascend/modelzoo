@@ -1,5 +1,5 @@
 #!/bin/bash
-cur_path=`pwd`
+cur_path=`pwd`../
 export install_path=/usr/local/Ascend 
 export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver:$LD_LIBRARY_PATH # 仅容器训练场景配置
 export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:$PATH
@@ -11,5 +11,3 @@ export ASCEND_AICPU_PATH=${install_path}
 export PYTHONPATH=$cur_path/models/research:$cur_path/models/research/slim:$PYTHONPATH
 export JOB_ID=10087
 export ASCEND_GLOBAL_LOG_LEVEL=3
-
-
