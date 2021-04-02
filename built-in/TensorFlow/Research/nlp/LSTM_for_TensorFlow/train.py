@@ -25,6 +25,8 @@ def parse_args():
     return args
 
 args = parse_args()
+ASCEND_DEVICE_ID = os.getenv("ASCEND_DEVICE_ID")
+
 wordVectors = np.load(args.data_path + '/' + 'wordVectors.npy')
 print ('Loaded the word vectors!')
 print(wordVectors.shape)
@@ -115,7 +117,7 @@ with tf.Session(config=config) as sess:
     saver = tf.train.Saver()
     sess.run(tf.global_variables_initializer())
     total_time = time.time()
-    csvfile = open("./output/train.csv", "w+")
+    csvfile = open("./output/" + ASCEND_DEVICE_ID + "/train.csv", "w+")
     writer = csv.writer(csvfile)
     writer.writerow(('step', 'loss', 'acc'))
     for i in range(iterations):
@@ -133,7 +135,7 @@ with tf.Session(config=config) as sess:
         
        #Save the network every 10,000 training iterations
         if ((((i+1) % args.ckpt_count) == 0) and (i != 0)):
-            save_path = saver.save(sess, './output/pretrained_lstm.ckpt', global_step=i+1)
+            save_path = saver.save(sess, './output/' + ASCEND_DEVICE_ID + '/pretrained_lstm.ckpt', global_step=i+1)
             print(('saved to %s' % save_path), flush=True)
 
     #writer.close()
@@ -147,5 +149,5 @@ with tf.Session(config=config) as sess:
         acc = sess.run([accuracy], {input_data: nextBatch, labels: nextBatchLabels})
         #print(acc)
         sum = sum+acc[0]
-    print('Final Performance TotalTimeToTrain:%dS' % total_time)
-    print('Final Accuracy acc:%f' % (sum/terations))
+    print('Final Performance TotalTimeToTrain(s) : %d' % total_time)
+    print('Final Accuracy acc : %f' % (sum/terations))

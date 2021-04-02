@@ -2,16 +2,7 @@
 cur_dir=`pwd`
 
 #env variables
-export install_path=/usr/local/Ascend
-export LD_LIBRARY_PATH=${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver:$LD_LIBRARY_PATH
-export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:$PATH
-export LD_LIBRARY_PATH=${install_path}/fwkacllib/lib64:$LD_LIBRARY_PATH
-export PYTHONPATH=${install_path}/fwkacllib/python/site-packages:$PYTHONPATH
-export PYTHONPATH=${install_path}/tfplugin/python/site-packages:$PYTHONPATH
-export ASCEND_OPP_PATH=${install_path}/opp
-export ASCEND_AICPU_PATH=${install_path}
 export JOB_ID=10086
-export ASCEND_DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -92,9 +83,16 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
+mkdir -p ${cur_dir}/output/${ASCEND_DEVICE_ID}
+
 python3 ../train.py \
 --batch_size=$batch_size \
 --learning_rate=$learning_rate \
 --steps=$steps \
 --ckpt_count=$ckpt_count \
---data_path=$data_path
+--data_path=$data_path > ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log 2>&1
+
+performance=`grep "Final Performance TotalTimeToTrain" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
+Accuracy=`grep "Final Accuracy acc" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
+echo "Final Performance TotalTimeToTrain(s) : $performance"
+echo "Final Accuracy acc : $Accuracy"
