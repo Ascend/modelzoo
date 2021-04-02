@@ -73,7 +73,7 @@ def main(unused_argv):
     if True:
         session_config = tf.ConfigProto()
         #session_config.graph_options.optimizer_options.global_jit_level = config_pb2.OptimizerOptions.OFF
-    #### 增加集合通信初始化
+    ######################## NPU_modify add##################################
     npu_int = npu_ops.initialize_system()
     npu_shutdown = npu_ops.shutdown_system()
 
@@ -81,13 +81,14 @@ def main(unused_argv):
     custom_op.name =  "NpuOptimizer"
     custom_op.parameter_map["use_off_line"].b = True
     custom_op.parameter_map["mix_compile_mode"].b = True
+    custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
     session_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
     init_sess = tf.Session(config=session_config)
     init_sess.run(npu_int)
     init_sess.run(tf.tables_initializer())
     session_config.graph_options.optimizer_options.global_jit_level = config_pb2.OptimizerOptions.OFF
-    #### end
+    ####################### NPU_modify end#####################################
 
   
     session_config.gpu_options.per_process_gpu_memory_fraction = 0.9
