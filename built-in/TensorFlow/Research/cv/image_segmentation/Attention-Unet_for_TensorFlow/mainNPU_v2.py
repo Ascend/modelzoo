@@ -491,7 +491,7 @@ if (args.mode == 'train'):
 
         ######Modify for NPU begin#######
         FPS_list.append((cnt - args.batch_size) / np.sum(train_time))
-        print(('Average FPS for epoch # %04d = %.2f' % (epoch, (cnt - args.batch_size) / np.sum(train_time)))))
+        print(('Average FPS for epoch # %04d = %.2f' % (epoch, (cnt - args.batch_size) / np.sum(train_time))))
         print(('Average accuracy for epoch # %04d = %.4f' % (epoch, avg_score)))
         ######Modify for NPU end#######
         '''
