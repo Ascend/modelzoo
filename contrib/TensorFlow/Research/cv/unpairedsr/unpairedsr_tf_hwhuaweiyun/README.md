@@ -13,21 +13,19 @@ unpairedsr
 ├── LICENSE
 ├── README.md
 ├── data                # 数据集
-   ├── dev
-│   │   ├── SRtrainset_2_1.npy
-│   │   └── SRtrainset_2_2.npy
-│   ├── test
-│   │   └── LS3D_6000.npy
-│   └── train
-│       ├── celea_60000_SFD_1.npy
-│       ├── ...
-│       └── vggcrop_train_lp10_5.npy
+│   ├── dev
+│   ├── test
+│   └── train
 ├── low_high_model.py   # 模型代码
 ├── main.py             # 训练与测试代码
-└── output              # 训练结果
-    ├── checkpoint
-    ├── ...
-    └── model-0.meta
+├── offline_inference	# 离线推理
+│   ├── README.md
+│   ├── ckpt2pb.py
+│   ├── evaluate.py
+│   ├── img2bin.py
+│   └── low_high_model.py
+├── output              # 训练结果
+└── train_testcase.sh
 ```
 
 ### 数据集说明
@@ -37,13 +35,13 @@ data 目录下需要包含 train、test、dev 三个子目录，分别对应训�
 * sample：低分辨率图像
 * label：高分辨率图像
 
-[数据文件](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=WrkTg8PzzdAMSqfXzuGlEoPHJVkuOxg0zuDH1271OXQZDVQPHn/B4tObo9vCz5MUzmD1/1iG3/n44iZpfFQganJk7y0NZtrN+PeK7/unvLf0fr5hZR0VSqgFbG7OJI9bB44cxY9fy6vGJnWP4zaQG26E5nqBxMz7ljFWUs+PF9GW1RvPZCHHyadE1j2nzwDFmvCg+D3+LY8V1kqXG14X1gabPhQAMStwPlBsrUeDXSzuDtdKV8bsZO17t/7lDHYAElMxDJYp20fkuKgNfxZKoDcnicvifl9xMHkQLOKyAq9HcVVgSUdO/+wLFh6rwDtct0XL3tQCkwbEQuU0cJ9kkxRL0SsZXDwUyb9Iu88tYr+GnkyjDAIgpyuiZnCgLZNEHXn8xotsdJBlJiIeT66ThrUyW2Xv5w75ibPtgEg+trzVT2PbN4NIL9yb7aMe+l/wEeTI4rJDlWjW5T0rN00xS9Xy+4H7Ao6CWaBZPFilWClQQDj0JbIQgSaqS3RKeq0lkbtrUE0PLClyd2eQNJJ8isEr4rwakODtB/uNb3hNY2QrMjNhO0nzt81ksLLK4ETj)（提取码：123456）
+[数据文件](https://unpairedsr.obs.cn-north-4.myhuaweicloud.com:443/share/data.zip?AccessKeyId=GB2XLA5SI9AWHCYX2NLT&Expires=1648392862&Signature=cnOGtNnH523NR4H64BB6sfNbg08%3D)
 
 ### 模型文件
 
 训练过程中，模型会在开发集上进行测试，在开发集上取得最佳性能的模型文件会保存在 output 目录下。
 
-[预训练模型文件](https://e-share.obs-website.cn-north-1.myhuaweicloud.com?token=WrkTg8PzzdAMSqfXzuGlEoPHJVkuOxg0zuDH1271OXQZDVQPHn/B4tObo9vCz5MUzmD1/1iG3/n44iZpfFQganJk7y0NZtrN+PeK7/unvLf0fr5hZR0VSqgFbG7OJI9bB44cxY9fy6vGJnWP4zaQG26E5nqBxMz7ljFWUs+PF9GW1RvPZCHHyadE1j2nzwDFmvCg+D3+LY8V1kqXG14X1gabPhQAMStwPlBsrUeDXSx50wxYBSB3ZRXmnbxbYa6WDvftD1a0FSAq5dM7cg1Jjs/e/V8lFeF8kl3gLFVYv0P8egIODl/3ZfFiIl1/USt/7SnGv2ZJ0m9JEnvafY/tVM9NN1GjetqzNUkajkQ8zV6nylIa48/Uxw8PCKA7Y2lsQkBZ8i1KEMZ0E0I6dZABcHko1cGByNmP77Qs71sm/DjjTo0syzHQBs2hvjOsCv1G/rRNeuk89WW5fIUtNh2XuANuScLSegSxxFLw7f93Y3kYWH/Lm6B+6oNIhIxdBBk3ZDAetkuM/mdr8HJe1doTrK4goyMIeZlX4RMHYR++hqAJ+hqHuoNXMTVUcS7UofV92Ter1K5WkYjySQ09k6WE7g==)（提取码：123456）
+[预训练模型文件](https://unpairedsr.obs.cn-north-4.myhuaweicloud.com:443/share/output.zip?AccessKeyId=GB2XLA5SI9AWHCYX2NLT&Expires=1648392810&Signature=3DjXn0/os1rVt3FM4FOb3DsNmXA%3D)
 
 ### 参数说明
 
@@ -77,3 +75,6 @@ main.py [-h] [--train] [--test] [--max_epoch MAX_EPOCH]
 * 下载预训练模型，放置在 output 目录下
 * 执行测试命令：`python main.py --test`
 
+### 离线推理
+
+详见 [离线推理](./offline_inference/README.md) 部分

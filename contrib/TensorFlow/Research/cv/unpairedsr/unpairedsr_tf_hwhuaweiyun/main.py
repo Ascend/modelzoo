@@ -133,7 +133,6 @@ def train():
 
     global_steps = 0
     model = low_high_model.MODEL(args)
-    model.build_optimizer()
 
     sess_config = tf.ConfigProto()
     sess_config.gpu_options.allow_growth = True
@@ -214,7 +213,6 @@ def test():
     test_npy_paths.sort()
 
     model = low_high_model.MODEL(args)
-    model.build_optimizer()
     sess_config = tf.ConfigProto()
     sess_config.gpu_options.allow_growth = True
     sess_config.gpu_options.per_process_gpu_memory_fraction = 0.8
