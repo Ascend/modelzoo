@@ -1,5 +1,7 @@
 from __future__ import print_function
+######Modify for NPU begin#######
 from npu_bridge.npu_init import *
+######Modify for NPU end#######
 import os, time, cv2, sys, math
 
 import tensorflow as tf
@@ -18,7 +20,7 @@ import utils_ as utils
 from utils_ import get_model
 from pywt import wavedec2
 import matplotlib.pyplot as plt
-config = tf.ConfigProto(log_device_placement=False) #是否打印tensor、op是在哪台设备、哪颗CPU运行
+config = tf.ConfigProto(log_device_placement=False)
 
 def str2bool(v):
     if (v.lower() in ('yes', 'true', 't', 'y', '1')):
@@ -27,7 +29,7 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
-config.gpu_options.allow_growth = True #当allow_growth设置为True时，分配器将不会指定所有的GPU内存，而是根据需求增长
+config.gpu_options.allow_growth = True
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--num_epochs', type=int, default=100, help='Number of epochs to train for')
@@ -52,9 +54,9 @@ parser.add_argument('--brightness', type=float, default=None, help='Whether to r
 parser.add_argument('--rotation', type=float, default=None, help='Whether to randomly rotate the image for data augmentation. Specifies the max rotation angle.')
 parser.add_argument('--model', type=str, default='dunet', help='The model you are using. Currently supports:\
     encoder-decoder, deepUNet,attentionNet, deep, UNet')
-######Modify for NPU#######
+######Modify for NPU begin#######
 parser.add_argument('--loss_scale', type=int, default=0, help='The loss scale you are usring. 0: dynamic loss scale; >= 1: fix loss scale.')
-######Modify for NPU#######
+######Modify for NPU end#######
 
 args = parser.parse_args()
 
@@ -117,10 +119,10 @@ def check_available_gpus():
     gpu_names = [x.name for x in local_devices if (x.device_type == 'GPU')]
     gpu_num = len(gpu_names)
     print('{0} GPUs are detected : {1}'.format(gpu_num, gpu_names))
-    ######Modify for NPU#######
+    ######Modify for NPU begin#######
     # return gpu_names
     return '1'
-    ######Modify for NPU#######
+    ######Modify for NPU end#######
 
 def get_names(gpus):
     n_gpus = len(gpus)
@@ -181,12 +183,11 @@ for class_name in class_names_list:
         class_names_string = ((class_names_string + class_name) + ', ')
     else:
         class_names_string = (class_names_string + class_name)
-print('LABEL VALUES: ',label_values)
-print(class_names_string)
+
 num_classes = len(label_values)
 gpus = check_available_gpus()
 
-######Modify for NPU#######
+######Modify for NPU begin#######
 # config = tf.ConfigProto()
 # config.gpu_options.allow_growth = True
 config = tf.ConfigProto()
@@ -196,10 +197,11 @@ custom_op.parameter_map["use_off_line"].b = True
 config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_fp32_to_fp16")
 
-custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes("/autotest/c00271197/Road_extraction-main_npu_20210304101653/opdump")
-custom_op.parameter_map["enable_dump_debug"].b = True
-custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
-######Modify for NPU#######
+#算子溢出检测
+# custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes("./")
+# custom_op.parameter_map["enable_dump_debug"].b = True
+# custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
+######Modify for NPU end#######
 
 sess = tf.Session(config=config)
 model = args.model
@@ -210,26 +212,18 @@ output = tf.placeholder(tf.float32, shape=[None, None, None, num_classes], name=
 
 keep_prob = tf.placeholder(tf.float32)
 
-######Modify for NPU#######
+######Modify for NPU begin#######
 input_A = tf.split(input, int(len(gpus)))
 output_A = tf.split(output, int(len(gpus)))
-######Modify for NPU#######
+######Modify for NPU end#######
 
 print('Loading the data ...')
 (train_input_names, train_output_names, val_input_names, val_output_names, test_input_names, test_output_names) = prepare_data()
 
 if (model == 'sunet'):
     aux_output = tf.placeholder(tf.float32, shape=[None, None, None, num_classes], name='aux')
-
-print("=================", num_classes)
 network = None
 init_fn = None
-
-print("==================", model)
-print("==================", input)
-print("==================", num_classes)
-print("==================", keep_prob)
-print("==================", args.gpu)
 
 if (model != 'ssunet'):
     network = get_model(model, input, num_classes, keep_prob, args.gpu)
@@ -253,7 +247,6 @@ if args.class_balancing:
         loss = tf.reduce_mean((unweighted_loss * class_weights))
 else:
     if act:
-        print('act -->', act)
         for gpu_id in range(len(gpus)):
             with tf.device('/cpu:0'):
                 with tf.variable_scope(tf.get_variable_scope(), reuse=(gpu_id > 0)):
@@ -261,15 +254,13 @@ else:
                     _loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=network, labels=output_A[gpu_id])
                     loss_l.append(_loss)
     else:
-        print('act -->', act)
         # loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=output))
         loss = tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=output)
         loss_l.append(loss)
-######Modify for NPU#######
-loss = tf.reduce_mean(tf.concat(loss_l, axis=0))
-######Modify for NPU#######
 
-######Modify for NPU#######
+loss = tf.reduce_mean(tf.concat(loss_l, axis=0))
+
+######Modify for NPU begin#######
 # opt = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(loss, var_list=[var for var in tf.trainable_variables()],colocate_gradients_with_ops=True)
 opt = tf.train.AdamOptimizer(learning_rate=0.0001)
 if args.loss_scale == 0:
@@ -280,7 +271,7 @@ elif args.loss_scale >= 1:
 
 opt = NPULossScaleOptimizer(opt, loss_scale_manager)
 opt = opt.minimize(loss, var_list=[var for var in tf.trainable_variables()], colocate_gradients_with_ops=True)
-######Modify for NPU#######
+######Modify for NPU end#######
 
 saver = tf.train.Saver(max_to_keep=1000)
 sess.run(tf.global_variables_initializer())
@@ -312,6 +303,7 @@ if (args.mode == 'train'):
     print('Crop Width -->', args.crop_width)
     print('Num Epochs -->', args.num_epochs)
     print('Batch Size -->', args.batch_size)
+    print('Number Iterations -->', np.floor((len(train_input_names) / args.batch_size)))
     print('Num Classes -->', num_classes)
     print('Data Augmentation:')
     print('\tVertical Flip -->', args.v_flip)
@@ -319,30 +311,31 @@ if (args.mode == 'train'):
     print('\tBrightness Alteration -->', args.brightness)
     print('\tRotation -->', args.rotation)
     print('')
-    avg_loss_per_epoch = []
 
+    avg_loss_per_epoch = []
     # Which validation images do we want
     val_indices = []
     num_vals = min(args.num_val_images, len(val_input_names))
-    # args.num_val_images：默认200; len(val_input_names)： val文件夹中图片数量100，两种取最小值
     # Set random seed to make sure models are validated on the same validation images.
     # So you can compare the results of different models more intuitively.
     random.seed(16)
     val_indices = random.sample(range(0, len(val_input_names)), num_vals)
 
-    # print('==================val_indices', val_indices)
+    ######Modify for NPU begin#######
+    total_st = time.time()
+    FPS_list = []
+    accuracy_list = []
+    ######Modify for NPU end#######
     # Do the training here
     for epoch in range(0, args.num_epochs):
-        current_losses = []
         cnt = 0
         # Equivalent to shuffling
         id_list = np.random.permutation(len(train_input_names))
-
         num_iters = int(np.floor((len(id_list) / args.batch_size)))
+        
         st = time.time()
-        epoch_st = time.time()
-        print('==================num_epochs', args.num_epochs)
-        print('==================num_iters', num_iters)
+        train_time = []
+        current_losses = []
 
         for i in range(num_iters):
             input_image_batch = []
@@ -358,8 +351,8 @@ if (args.mode == 'train'):
                 input_image = load_image(train_input_names[id])[:args.crop_height, :args.crop_width]
                 output_image = load_image(train_output_names[id])[:args.crop_height, :args.crop_width]
 
-                ######Modify for NPU#######
-                # with tf.device('/cpu:0'):
+                ######Modify for NPU begin#######
+                with tf.device('/cpu:0'):
                 #     (input_image, output_image) = data_augmentation(input_image, output_image)
                 #     input_image = (np.float32(input_image) / 255.0)
                 #     output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
@@ -367,7 +360,7 @@ if (args.mode == 'train'):
                 #Prep the data. Make sure the labels are in one-hot format
                 input_image = (np.float32(input_image) / 255.0)
                 output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
-                ######Modify for NPU#######
+                ######Modify for NPU end#######
 
                 input_image_batch.append(np.expand_dims(input_image, axis=0))
                 output_image_batch.append(np.expand_dims(output_image, axis=0))
@@ -382,10 +375,15 @@ if (args.mode == 'train'):
             # Do the training
             (_, current) = sess.run([opt, loss], feed_dict={input: input_image_batch, output: output_image_batch, keep_prob: 0.5})
             current_losses.append(current)
+
             cnt = (cnt + args.batch_size)
-            ######Modify for NPU#######
+            ######Modify for NPU begin#######
             if ((cnt % args.batch_size) == 0):
-            ######Modify for NPU#######
+                pass
+            else:
+                train_time.append(time.time()-st)
+            ######Modify for NPU end#######
+            if ((cnt % arg.batch_size) == 0)：
                 string_print = ('Epoch = %03d Count = %03d Current_Loss = %.4f Time = %.2f' % (epoch, cnt, current, (time.time() - st)))
                 utils.LOG(string_print)
                 st = time.time()
@@ -394,17 +392,19 @@ if (args.mode == 'train'):
         avg_loss_per_epoch.append(mean_loss)
 
         # Create directories if needed
-        if (not os.path.isdir(('%s/%04d' % (check, epoch)))):
-            os.makedirs(('%s/%04d' % (check, epoch)))
-        saver.save(sess, model_checkpoint_name)
-
-        if ((val_indices != 0) and ((epoch % 50) == 0)):
-            saver.save(sess, ('%s/%04d/model.ckpt' % (check, epoch)))
+        ######Modify for NPU begin#######
+        #if (not os.path.isdir(('%s/%04d' % (check, epoch)))):
+        #    os.makedirs(('%s/%04d' % (check, epoch)))
+        
+        #saver.save(sess, model_checkpoint_name)
+        if ((val_indices != 0) and (epoch != 0) and ((epoch % 100) == 0)):
+            saver.save(sess, model_checkpoint_name)
+            #saver.save(sess, ('%s/%04d/model.ckpt' % (check, epoch)))
+        ######Modify for NPU end#######
 
         target = open(('%s/%04d/val_scores.csv' % (check, epoch)), 'w')
         target.write('val_name, avg_accuracy, precision, recall, f1 score, mean iou \n')
         target.write(class_names_string)
-
 
         scores_list = []
         class_scores_list = []
@@ -423,7 +423,7 @@ if (args.mode == 'train'):
 
             file_name = utils.filepath_to_name(val_input_names[ind])
             input_l = []
-            ######Modify for NPU#######
+            ######Modify for NPU begin#######
             # for _ in range(len(gpus)):
             #     input_l.append(input_image)
             #     input_l = np.squeeze(np.stack(input_l, axis=1))
@@ -432,7 +432,7 @@ if (args.mode == 'train'):
             input_l.append(input_image)
             input_l = np.squeeze(np.stack(input_l, axis=1))
             input_l = np.expand_dims(input_l, axis=0)
-            ######Modify for NPU#######
+            ######Modify for NPU end#######
             if (model != 'ssunet'):
                 output_image = sess.run(network, feed_dict={input: input_l, keep_prob: 1.0})
             else:
@@ -476,6 +476,9 @@ if (args.mode == 'train'):
         avg_recall = np.mean(recall_list)
         avg_f1 = np.mean(f1_list)
         avg_iou = np.mean(iou_list)
+        ######Modify for NPU begin#######
+        accuracy_list.append(avg_score)
+        ######Modify for NPU end#######
 
         target.write('\n\n')
         target.write(('%s, %s, %s, %s, %s' % ('avg_score', 'avg_precision', 'avg_recall', 'avg_f1', 'avg_iou')))
@@ -486,17 +489,16 @@ if (args.mode == 'train'):
             target.write('\n')
         target.close()
 
-        print(('\nAverage validation accuracy for epoch # %04d = %f' % (epoch, avg_score)))
+        ######Modify for NPU begin#######
+        FPS_list.append((cnt - arg.batch_size) / np.sum(train_time))
+        print(('Average FPS for epoch # %04d = %.4f' % (epoch, (cnt - arg.batch_size) / np.sum(train_time)))))
+        print(('Average accuracy for epoch # %04d = %.4f' % (epoch, avg_score)))
+        ######Modify for NPU end#######
+        '''
         print(('Model name %s' % args.model))
         print(('Average per class validation accuracies for epoch # %04d:' % epoch))
         for (index, item) in enumerate(class_avg_scores):
             print(('%s = %f' % (class_names_list[index], item)))
-        print('Validation precision = ', avg_precision)
-        print('Validation recall = ', avg_recall)
-        print('Validation F1 score = ', avg_f1)
-        print('Validation IoU score = ', avg_iou)
-        
-        epoch_time = (time.time() - epoch_st)
         remain_time = (epoch_time * ((args.num_epochs - 1) - epoch))
         (m, s) = divmod(remain_time, 60)
         (h, m) = divmod(m, 60)
@@ -506,7 +508,13 @@ if (args.mode == 'train'):
             train_time = 'Remaining training time : Training completed.\n'
         utils.LOG(train_time)
         scores_list = []
+        '''
 
+    print('\nFinal training duration：%.4f' % (time.time() - total_st))
+    print('Final accuracy：%.4f' % accuracy_list[-1])
+    print('Final performance FPS: %.4f' % np.mean(FPS_list))
+
+    '''
     fig = plt.figure(figsize=(11, 8))
 
     ax1 = fig.add_subplot(111)
@@ -523,7 +531,7 @@ if (args.mode == 'train'):
     ax1.set_xlabel('Epoch')
     ax1.set_ylabel('Current loss')
     plt.savefig('loss_vs_epochs.png')
-
+    '''
 elif (args.mode == 'test'):
     print('\n***** Begin testing *****')
     print('Model -->', args.model)
