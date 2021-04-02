@@ -8,7 +8,7 @@ RANK_ID_START=0
 #参数配置
 #base param, using user config in python scripts if not config in this shell
 num_train_steps=10
-ckpt_dir=$cur_path/checkpoints
+ckpt_path=$cur_path/checkpoints
 pipeline_config=$cur_path/models/research/configs/ssd320_full_1gpus.config
 
 #npu param
@@ -21,7 +21,7 @@ if [[ $1 == --help || $1 == -h ]];then
 	echo "parameter explain:
 	--num_train_steps           training steps
 	--data_path                 source data of training
-	--ckpt_dir                  pre-checkpoint path
+	--ckpt_path                  pre-checkpoint path
 	--pipeline_config           pipeline config path
 	-h/--help             Show help message
 	"
@@ -34,8 +34,8 @@ do
 		num_train_steps=`echo ${para#*=}`
 	elif [[ $para == --data_path* ]];then
 		data_path=`echo ${para#*=}`
-	elif [[ $para == --ckpt_dir* ]];then
-		ckpt_dir=`echo ${para#*=}`
+	elif [[ $para == --ckpt_path* ]];then
+		ckpt_path=`echo ${para#*=}`
 	elif [[ $para == --pipeline_config* ]];then
 		pipeline_config=`echo ${para#*=}`
     fi
@@ -62,12 +62,12 @@ for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 
   nohup python3 -u ./object_detection/model_main.py \
        --pipeline_config_path=${pipeline_config} \
-       --model_dir=${ckpt_dir} \
+       --model_dir=${ckpt_path} \
        --alsologtostder \
        --amp \
        --config_override={  \
              train_config: {  \
-               fine_tune_checkpoint: "$ckpt_dir/resnet_v1_50/model.ckpt"  \
+               fine_tune_checkpoint: "$ckpt_path/resnet_v1_50/model.ckpt"  \
              }  \
              train_input_reader: {  \
                tf_record_input_reader {  \
@@ -87,7 +87,7 @@ end=$(date +%s)
 e2etime=$(( $end - $start ))
 
 #############结果处理#########################
-cp -r ${ckpt_dir} $cur_path/test/output/$ASCEND_DEVICE_ID
+cp -r ${ckpt_path} $cur_path/test/output/$ASCEND_DEVICE_ID
    
 sum_perf=0
 sum_prec=0
