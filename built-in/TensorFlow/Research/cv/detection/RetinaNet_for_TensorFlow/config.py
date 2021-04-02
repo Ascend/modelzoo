@@ -19,5 +19,5 @@ LEARNING_RATE = 0.001
 
 #XML_PATH = "./VOCdevkit/VOC2007/Annotations/"
 #IMG_PATH = "./VOCdevkit/VOC2007/JPEGImages/"
-XML_PATH = data_path + "./VOCdevkit/VOC2007/Annotations/"
-IMG_PATH = data_path + "./VOCdevkit/VOC2007/JPEGImages/"
+XML_PATH = data_path + "/VOCdevkit/VOC2007/Annotations/"
+IMG_PATH = data_path + "/VOCdevkit/VOC2007/JPEGImages/"
