@@ -1,5 +1,5 @@
 import time
-import agrparse
+import argparse
 from npu_bridge.npu_init import *
 import tensorflow as tf
 import numpy as np
@@ -18,6 +18,7 @@ def parse_args():
     return args
 
 args = parse_args()
+data_path = args.data_path
 ASCEND_DEVICE_ID = os.getenv("ASCEND_DEVICE_ID")
 
 def npu_tf_optimizer(opt):
