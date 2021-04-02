@@ -11,3 +11,4 @@ export ASCEND_AICPU_PATH=${install_path}
 export PYTHONPATH=$cur_path/models/research:$cur_path/models/research/slim:$PYTHONPATH
 export JOB_ID=10087
 export ASCEND_GLOBAL_LOG_LEVEL=3
+export ASCEND_DEVICE_ID=0
