@@ -1,0 +1,12 @@
+{
+    "binFileName":"te_assign_8c701f974c08761e_9",
+    "binFileSuffix":".o",
+    "blockDim":3,
+    "kernelName":"te_assign_8c701f974c08761e_9__kernel0",
+    "magic":"RT_DEV_BINARY_MAGIC_ELF",
+    "parameters":[
+        0,
+        0
+    ],
+    "sha256":"4d7bace77fd82582f9d5e3569b88b45fecfca95890405310d73bcf1ea314eb29"
+}
