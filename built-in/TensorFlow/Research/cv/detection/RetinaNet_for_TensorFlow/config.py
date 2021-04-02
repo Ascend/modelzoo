@@ -1,4 +1,4 @@
-form train import data_path
+from train import data_path
 CLASSES = ["aeroplane", "bicycle", "bird", "boat", "bottle",
          "bus", "car", "cat", "chair", "cow",
          "diningtable", "dog", "horse", "motorbike", "person",
