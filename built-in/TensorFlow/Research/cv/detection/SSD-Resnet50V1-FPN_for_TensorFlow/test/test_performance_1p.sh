@@ -53,7 +53,7 @@ start=$(date +%s)
 
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
  do
-  if [-d $cur_path/test/output ];then
+  if [   -d $cur_path/test/output ];then
      rm -rf $cur_path/test/output/*
      mkdir -p $cur_path/test/output/$ASCEND_DEVICE_ID
   else
