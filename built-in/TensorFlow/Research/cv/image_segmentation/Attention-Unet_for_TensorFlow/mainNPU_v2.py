@@ -356,10 +356,10 @@ if (args.mode == 'train'):
                 #     (input_image, output_image) = data_augmentation(input_image, output_image)
                 #     input_image = (np.float32(input_image) / 255.0)
                 #     output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
-                (input_image, output_image) = data_augmentation(input_image, output_image)
+                    (input_image, output_image) = data_augmentation(input_image, output_image)
                 #Prep the data. Make sure the labels are in one-hot format
-                input_image = (np.float32(input_image) / 255.0)
-                output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
+                    input_image = (np.float32(input_image) / 255.0)
+                    output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
                 ######Modify for NPU end#######
 
                 input_image_batch.append(np.expand_dims(input_image, axis=0))
@@ -378,12 +378,12 @@ if (args.mode == 'train'):
 
             cnt = (cnt + args.batch_size)
             ######Modify for NPU begin#######
-            if ((cnt % args.batch_size) == 0):
+            if (cnt == args.batch_size):
                 pass
             else:
                 train_time.append(time.time()-st)
             ######Modify for NPU end#######
-            if ((cnt % arg.batch_size) == 0)：
+            if ((cnt % args.batch_size) == 0):
                 string_print = ('Epoch = %03d Count = %03d Current_Loss = %.4f Time = %.2f' % (epoch, cnt, current, (time.time() - st)))
                 utils.LOG(string_print)
                 st = time.time()
@@ -393,8 +393,8 @@ if (args.mode == 'train'):
 
         # Create directories if needed
         ######Modify for NPU begin#######
-        #if (not os.path.isdir(('%s/%04d' % (check, epoch)))):
-        #    os.makedirs(('%s/%04d' % (check, epoch)))
+        if (not os.path.isdir(('%s/%04d' % (check, epoch)))):
+            os.makedirs(('%s/%04d' % (check, epoch)))
         
         #saver.save(sess, model_checkpoint_name)
         if ((val_indices != 0) and (epoch != 0) and ((epoch % 100) == 0)):
@@ -490,8 +490,8 @@ if (args.mode == 'train'):
         target.close()
 
         ######Modify for NPU begin#######
-        FPS_list.append((cnt - arg.batch_size) / np.sum(train_time))
-        print(('Average FPS for epoch # %04d = %.4f' % (epoch, (cnt - arg.batch_size) / np.sum(train_time)))))
+        FPS_list.append((cnt - args.batch_size) / np.sum(train_time))
+        print(('Average FPS for epoch # %04d = %.2f' % (epoch, (cnt - args.batch_size) / np.sum(train_time))))
         print(('Average accuracy for epoch # %04d = %.4f' % (epoch, avg_score)))
         ######Modify for NPU end#######
         '''
@@ -510,9 +510,9 @@ if (args.mode == 'train'):
         scores_list = []
         '''
 
-    print('\nFinal training duration：%.4f' % (time.time() - total_st))
-    print('Final accuracy：%.4f' % accuracy_list[-1])
-    print('Final performance FPS: %.4f' % np.mean(FPS_list))
+    print('\nFinal training duration: %.2f' % (time.time() - total_st))
+    print('Final accuracy MAP: %.4f' % accuracy_list[-1])
+    print('Final performance FPS: %.2f' % np.mean(FPS_list))
 
     '''
     fig = plt.figure(figsize=(11, 8))

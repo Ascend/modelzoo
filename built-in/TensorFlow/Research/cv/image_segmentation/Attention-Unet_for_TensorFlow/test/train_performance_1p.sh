@@ -56,15 +56,16 @@ do
     fi
 done
 
-if [[ $data_path == "" ]];then
-    echo "[Error] para \"dataset\" must be confing"
-    exit 1
-fi
+#if [[ $data_path == "" ]];then
+#    echo "[Error] para \"dataset\" must be confing"
+#    exit 1
+#fi
 
 
 mkdir -p ${cur_dir}/output/${ASCEND_DEVICE_ID}
 
-python3 ../mainNPU.py \
+cd ..
+python3 mainNPU_v2.py \
 --model $model \
 --mode $mode \
 --dataset=$dataset \
@@ -74,8 +75,10 @@ python3 ../mainNPU.py \
 --batch_size $batch_size \
 --num_epoch $num_epoch  > ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log 2>&1
 
-performance=`grep -a "Final performance FPS" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk -F" " {print $4}'`
-Accuracy=`grep -a "Final accuracy" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $3}'`
+duration=`grep -a "Final training duration" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log | awk -F" " {print $4}'`
+performance=`grep -a "Final performance FPS" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log | awk -F" " '{print $4}'`
+accuracy=`grep -a "Final accuracy" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log | awk -F" " '{print $4}'`
 
+echo "Final training duration(s) : $performance"
 echo "Final performance FPS : $performance"
-echo "Final accuracy : $Accuracy"
+echo "Final accuracy : $accuracy"
