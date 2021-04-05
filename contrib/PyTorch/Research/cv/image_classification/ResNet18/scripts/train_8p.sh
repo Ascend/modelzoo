@@ -5,7 +5,7 @@ python3.7 ./main.py \
 	-a resnet18 \
 	--addr=$(hostname -I |awk '{print $1}') \
 	--seed=49 \
-	--workers=64 \
+	--workers=$(nproc) \
 	--learning-rate=1.6 \
 	--mom=0.9 \
 	--weight-decay=1.0e-04  \
