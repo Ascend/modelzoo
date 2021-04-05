@@ -26,10 +26,9 @@ def val_epoch(epoch,
               data_loader,
               model,
               criterion,
-              device,
+              opt,
               logger,
-              tb_writer=None,
-              distributed=False):
+              tb_writer=None):
     print('validation at epoch {}'.format(epoch))
 
     model.eval()
@@ -45,7 +44,7 @@ def val_epoch(epoch,
         for i, (inputs, targets) in enumerate(data_loader):
             data_time.update(time.time() - end_time)
 
-            targets = targets.to(device, non_blocking=True)
+            targets = targets.to(opt.device, non_blocking=True)
             outputs = model(inputs.npu())
             loss = criterion(outputs, targets.int())
             acc = calculate_accuracy(outputs, targets)
@@ -60,32 +59,33 @@ def val_epoch(epoch,
                 batch_time.reset()
                 data_time.reset()
 
-            print('Epoch: [{0}][{1}/{2}]\t'
-                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
-                      epoch,
-                      i + 1,
-                      len(data_loader),
-                      batch_time=batch_time,
-                      data_time=data_time,
-                      loss=losses,
-                      acc=accuracies))
+            if opt.is_master_node:
+                print('Epoch: [{0}][{1}/{2}]\t'
+                    'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                    'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
+                    'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                    'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
+                        epoch,
+                        i + 1,
+                        len(data_loader),
+                        batch_time=batch_time,
+                        data_time=data_time,
+                        loss=losses,
+                        acc=accuracies))
 
-    if distributed:
+    if opt.distributed:
         loss_sum = torch.tensor([losses.sum],
                                 dtype=torch.float32,
-                                device=device)
+                                device=opt.device)
         loss_count = torch.tensor([losses.count],
                                   dtype=torch.float32,
-                                  device=device)
+                                  device=opt.device)
         acc_sum = torch.tensor([accuracies.sum],
                                dtype=torch.float32,
-                               device=device)
+                               device=opt.device)
         acc_count = torch.tensor([accuracies.count],
                                  dtype=torch.float32,
-                                 device=device)
+                                 device=opt.device)
 
         dist.all_reduce(loss_sum, op=dist.ReduceOp.SUM)
         dist.all_reduce(loss_count, op=dist.ReduceOp.SUM)
