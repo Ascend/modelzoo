@@ -29,13 +29,11 @@ def train_epoch(epoch,
                 model,
                 criterion,
                 optimizer,
-                device,
+                opt,
                 current_lr,
                 epoch_logger,
                 batch_logger,
-                tb_writer=None,
-                distributed=False,
-                amp_cfg=False):
+                tb_writer=None):
     print('train at epoch {}'.format(epoch))
 
     model.train()
@@ -50,14 +48,14 @@ def train_epoch(epoch,
         data_time.update(time.time() - end_time)
         #if i == 20:
         #    with torch.autograd.profiler.profile(record_shapes=True, use_npu=True) as prof:
-        #        targets = targets.to(device, non_blocking=True)
+        #        targets = targets.to(opt.device, non_blocking=True)
         #        outputs = model(inputs.npu())
         #        loss = criterion(outputs, targets.int())
         #        acc = calculate_accuracy(outputs, targets)
         #        losses.update(loss.item(), inputs.size(0))
         #        accuracies.update(acc, inputs.size(0))
         #        optimizer.zero_grad()
-        #        if amp_cfg:
+        #        if opt.amp_cfg:
         #            with amp.scale_loss(loss, optimizer) as scaled_loss:
         #                scaled_loss.backward()
         #        else:
@@ -66,7 +64,7 @@ def train_epoch(epoch,
         #    prof.export_chrome("Resnet3d_o2.prof")
         #    import sys
         #    sys.exit()
-        targets = targets.to(device, non_blocking=True)
+        targets = targets.to(opt.device, non_blocking=True)
         outputs = model(inputs.npu())
         loss = criterion(outputs, targets.int())
         acc = calculate_accuracy(outputs, targets)
@@ -75,7 +73,7 @@ def train_epoch(epoch,
         accuracies.update(acc, inputs.size(0))
 
         optimizer.zero_grad()
-        if amp_cfg:
+        if opt.amp_cfg:
             with amp.scale_loss(loss, optimizer) as scaled_loss:
                 scaled_loss.backward()
         else:
@@ -99,11 +97,12 @@ def train_epoch(epoch,
                 'lr': current_lr
             })
 
-        print('Epoch: [{0}][{1}/{2}]\t'
-              'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-              'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-              'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-              'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(epoch,
+        if opt.is_master_node:
+            print('Epoch: [{0}][{1}/{2}]\t'
+                'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
+                'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(epoch,
                                                          i + 1,
                                                          len(data_loader),
                                                          batch_time=batch_time,
@@ -111,19 +110,19 @@ def train_epoch(epoch,
                                                          loss=losses,
                                                          acc=accuracies))
 
-    if distributed:
+    if opt.distributed:
         loss_sum = torch.tensor([losses.sum],
                                 dtype=torch.float32,
-                                device=device)
+                                device=opt.device)
         loss_count = torch.tensor([losses.count],
                                   dtype=torch.float32,
-                                  device=device)
+                                  device=opt.device)
         acc_sum = torch.tensor([accuracies.sum],
                                dtype=torch.float32,
-                               device=device)
+                               device=opt.device)
         acc_count = torch.tensor([accuracies.count],
                                  dtype=torch.float32,
-                                 device=device)
+                                 device=opt.device)
 
         dist.all_reduce(loss_sum, op=dist.ReduceOp.SUM)
         dist.all_reduce(loss_count, op=dist.ReduceOp.SUM)

@@ -53,17 +53,21 @@ def inference(data_loader, model, result_path, class_names, no_average,
             data_time.update(time.time() - end_time)
 
             video_ids, segments = zip(*targets)
-            outputs = model(inputs)
-            outputs = F.softmax(outputs, dim=1).cpu()
-
-            for j in range(outputs.size(0)):
+            inputs = inputs.npu()
+            for j in range(len(video_ids)):
+                output = model(inputs[j:j+1, ...])
+                output = F.softmax(output, dim=1).cpu()
                 results['results'][video_ids[j]].append({
                     'segment': segments[j],
-                    'output': outputs[j]
+                    'output': output[0]
                 })
 
             batch_time.update(time.time() - end_time)
             end_time = time.time()
+
+            if i == 0:
+                batch_time.reset()
+                data_time.reset()
 
             print('[{}/{}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
