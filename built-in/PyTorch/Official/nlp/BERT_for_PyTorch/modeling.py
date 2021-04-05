@@ -128,7 +128,8 @@ def bias_gelu(bias, y):
 # used specifically for training since torch.nn.functional.gelu breaks ONNX export
 def bias_gelu_training(bias, y):
     x = bias + y
-    return torch.nn.functional.gelu(x) # Breaks ONNX export
+    #return torch.nn.functional.gelu(x) # Breaks ONNX export
+    return torch.fast_gelu(x)
 
 def bias_tanh(bias, y):
     x = bias + y
