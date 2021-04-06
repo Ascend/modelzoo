@@ -84,6 +84,7 @@ if [[ $data_path == "" ]];then
 fi
 
 mkdir -p ${cur_dir}/output/${ASCEND_DEVICE_ID}
+start=$(date +%s)
 
 python3 ../train.py \
 --batch_size=$batch_size \
@@ -92,7 +93,11 @@ python3 ../train.py \
 --ckpt_count=$ckpt_count \
 --data_path=$data_path > ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log 2>&1
 
-performance=`grep "Final Performance TotalTimeToTrain" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
-Accuracy=`grep "Final Accuracy acc" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
-echo "Final Performance TotalTimeToTrain(s) : $performance"
-echo "Final Accuracy acc : $Accuracy"
+end=$(date +%s)
+e2etime=$(( $end - $start ))
+accuracy=`grep "Final Precision Accuracy" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
+average_perf=`grep "Final Performance ms/step" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
+echo "-------------Final Result-------------"
+echo "Final Precision Accuracy : $accuracy"
+echo "Final Performance  ms/step : $average_perf"
+echo "Final Performance  Duration sec : $e2etime"
