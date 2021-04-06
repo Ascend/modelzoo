@@ -97,5 +97,5 @@ average_perf=`grep "Final Performance ms/step" ${cur_dir}/output/${ASCEND_DEVICE
 total_loss=`grep "Final Precision Total_loss" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
 echo "-------------Final Result-------------"
 echo "Final Precision Total_loss : $total_loss"
-echo "Final Performance  ms/step : $average_perf"
-echo "Final Performance  Duration sec : $e2etime"
+echo "Final Performance ms/step : $average_perf"
+echo "Final Performance Duration sec : $e2etime"
