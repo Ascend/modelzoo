@@ -94,7 +94,7 @@ python3 ../train.py \
 end=$(date +%s)
 e2etime=$(( $end - $start ))
 average_perf=`grep "Final Performance ms/step" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
-total_loss=`grep "Final Accuracy Total_loss" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
+total_loss=`grep "Final Precision Total_loss" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
 echo "-------------Final Result-------------"
 echo "Final Precision Total_loss : $total_loss"
 echo "Final Performance  ms/step : $average_perf"
