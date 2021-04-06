@@ -27,7 +27,7 @@ class MODEL(object):
         self.config = config
         self.lr_img = tf.placeholder(tf.float32, [None, 16, 16, 3], name='input')
         self.hr_img = tf.placeholder(tf.float32, [None, 64, 64, 3], name='label')
-        self.is_train = tf.placeholder(tf.bool)
+        self.is_train = tf.constant(False, dtype=tf.bool)
 
         self.global_steps_gen = tf.Variable(0, trainable=False)
         self.global_steps_dis = tf.Variable(0, trainable=False)

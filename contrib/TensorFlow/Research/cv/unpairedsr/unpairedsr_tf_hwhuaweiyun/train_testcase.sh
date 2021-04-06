@@ -13,7 +13,7 @@ fi
 
 python3.7 main.py --test > test.log
 psnr=`grep -o "\(1[89]\.[[:digit:]]\{4\}\)" test.log`
-if [ ${psnr}=''  ]; then
+if [ ${psnr}='' ]; then
     ok=0
 fi
 
