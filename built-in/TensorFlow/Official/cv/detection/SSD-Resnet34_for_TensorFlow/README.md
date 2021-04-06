@@ -16,7 +16,7 @@
     * [推理](#推理)
 * [高级](#高级)
   * [脚本参数](#脚本参数) 
- 
+
 
 
 ## 概述
@@ -32,8 +32,8 @@ Ascend本次提供的是以ResNet34为主干网络、输入shape为300的SSD-Res
 ## 要求
 
 - 安装有昇腾AI处理器的硬件环境
-
-- 下载并预处理COCO或pascal voc数据集以进行培训和评估。
+- 根据requirements.txt安装必要的依赖包
+- 下载并预处理COCO或pascal voc数据集以进行训练和评估。
 
 
 ## 默认配置
@@ -143,7 +143,7 @@ docker run -it --ipc=host \
 ### 检查json
 
 修改 `npu_config` 目录下 `*.json` 配置文件，将对应IP修改成当前IP，board_id改为本机主板ID。
-  
+
 1P 情况下不需要rank_table配置文件，8P rank_table json配置文件如下。
 
 ```
