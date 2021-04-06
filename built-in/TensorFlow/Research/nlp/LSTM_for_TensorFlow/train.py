@@ -149,5 +149,5 @@ with tf.Session(config=config) as sess:
         acc = sess.run([accuracy], {input_data: nextBatch, labels: nextBatchLabels})
         #print(acc)
         sum = sum+acc[0]
-    print('Final Performance TotalTimeToTrain(s) : %d' % total_time)
-    print('Final Accuracy acc : %f' % (sum/terations))
+    print('Final Precision accuracy : %f' % (sum/terations))
+    print('Final Performance ms/step : %d' % (total_time*1000/iterations))
