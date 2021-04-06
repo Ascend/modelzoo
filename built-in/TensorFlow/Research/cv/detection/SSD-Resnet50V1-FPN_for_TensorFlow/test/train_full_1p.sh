@@ -8,7 +8,7 @@ RANK_ID_START=0
 #参数配置
 #base param, using user config in python scripts if not config in this shell
 num_train_steps=0
-ckpt_path=$cur_path/checkpoints
+ckpt_path=/checkpoints
 pipeline_config=$cur_path/models/research/configs/ssd320_full_1gpus.config
 
 #npu param
@@ -53,6 +53,7 @@ start=$(date +%s)
 
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
  do
+  export RANK_ID=$RANK_ID
   if [-d $cur_path/test/output ];then
      rm -rf $cur_path/test/output/*
      mkdir -p $cur_path/test/output/$ASCEND_DEVICE_ID
