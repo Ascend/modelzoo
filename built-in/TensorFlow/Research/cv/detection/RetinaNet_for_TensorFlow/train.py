@@ -82,8 +82,8 @@ def train():
             saver.save(sess, './output/' + ASCEND_DEVICE_ID + '/model.ckpt')
         if ((i+1) == args.steps):
             total_time = (time.time() - total_time)
-            print('Final Performance TotalTimeToTrain(s) : %d' % total_time)
-            print('Final Accuracy total_loss : %f' % (TOTAL_LOSS))
+            print('Final Performance ms/step : %d' % (total_time*1000/args.steps)
+            print('Final Precision Total_loss : %f' % (TOTAL_LOSS))
         pass
 
 if (__name__ == '__main__'):
