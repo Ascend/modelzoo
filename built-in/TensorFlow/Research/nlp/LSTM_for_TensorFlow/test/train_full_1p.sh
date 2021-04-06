@@ -99,5 +99,5 @@ accuracy=`grep "Final Precision Accuracy" ${cur_dir}/output/${ASCEND_DEVICE_ID}/
 average_perf=`grep "Final Performance ms/step" ${cur_dir}/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $5}'`
 echo "-------------Final Result-------------"
 echo "Final Precision Accuracy : $accuracy"
-echo "Final Performance  ms/step : $average_perf"
-echo "Final Performance  Duration sec : $e2etime"
+echo "Final Performance ms/step : $average_perf"
+echo "Final Performance Duration sec : $e2etime"
