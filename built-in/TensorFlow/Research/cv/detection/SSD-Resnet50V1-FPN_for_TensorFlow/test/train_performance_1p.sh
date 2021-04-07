@@ -7,7 +7,7 @@ RANK_ID_START=0
 
 #参数配置
 #base param, using user config in python scripts if not config in this shell
-num_train_steps=10
+num_train_steps=200
 ckpt_path=/checkpoints
 pipeline_config=$cur_path/models/research/configs/ssd320_full_1gpus.config
 
@@ -85,24 +85,11 @@ e2etime=$(( $end - $start ))
 #############结果处理#########################
 cp -r ${ckpt_path} $cur_path/test/output/$ASCEND_DEVICE_ID
    
-sum_perf=0
-sum_prec=0
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
  do
    echo "--------Result on Device-$ASCEND_DEVICE_ID/RANK-$RANK_ID ----------"
-   #Precision = `grep -a 'Average Precision  (AP)'   $cur_path/test/output/$ASCEND_DEVICE_ID/train_$RANK_ID.log| grep -a 'IoU=0.50:0.95'` | awk '{print $13}'`
    step_sec=`grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/test/output/$ASCEND_DEVICE_ID/train_$RANK_ID.log|awk 'END {print $2}'`
-   Performance=`awk 'BEGIN{printf "%.2f\n",'1000'/$step_sec}'`
-   #echo "Final Performance MAP : $Precision"
-   echo "Final Performance ms/step : $Performance"
-   sum_perf=$((sum_perf+step_sec))
-   sum_prec=$((sum_prec+Performance))
+   echo "Final Performance global_step/sec : $step_sec"
  done
 
-average_perf=$((sum_perf/$RANK_SIZE))
-average_prec=$((sum_prec/$RANK_SIZE))
- 
-echo "--------Final Result ----------"
-#echo "Final Precision MAP : $average_prec"
-echo "Final Performance ms/step : $average_perf"
 echo "Final Training Duration sec : $e2etime"

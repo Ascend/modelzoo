@@ -84,14 +84,19 @@ Moreover the script will download pre-trained RN50 checkpoint in the `<checkpoin
 单P训练，以数据目录为`/data`、checkpoints目录为 `/checkpoints` 为例:
 
 ```
+cd test
 source ./env.sh
-bash npu_train_1p.sh
+bash train_full_1p.sh
 ```
 
 8P训练，以数据目录为`/data`、checkpoints目录为 `/checkpoints` 为例:
 
 ```
+cd test
 source ./env.sh
+bash train_full_8p.sh
+```
+
 # SSD320 v1.2 For TensorFlow
 
 ## 目录
