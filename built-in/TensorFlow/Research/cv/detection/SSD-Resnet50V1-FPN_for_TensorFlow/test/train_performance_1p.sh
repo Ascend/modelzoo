@@ -49,7 +49,7 @@ fi
 #############执行训练#########################
 cd $cur_path/models/research
 
-if [  -f ${pipeline_config}.bak];then
+if [  -f ${pipeline_config}.bak ];then
    cp ${pipeline_config}.bak ${pipeline_config}
 else
    cp ${pipeline_config} ${pipeline_config}.bak
