@@ -1,1 +1,0 @@
-python eval.py --device_id $1 --model_dir $2

@@ -42,7 +42,9 @@ def convert():
     input_names = ["actual_input_1"]
     output_names = ["output1"]
     dummy_input = torch.randn(1, 3, 224, 224)
-    torch.onnx.export(model, dummy_input, "mobilenet_npu_16.onnx", input_names=input_names, output_names=output_names, opset_version=11)
+    torch.onnx.export(model, dummy_input, "mobilenet_npu_16.onnx",
+                      input_names=input_names, output_names=output_names,
+                      opset_version=11)
 
 
 if __name__ == "__main__":

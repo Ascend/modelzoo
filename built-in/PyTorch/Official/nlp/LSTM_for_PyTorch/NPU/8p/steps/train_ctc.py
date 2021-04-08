@@ -202,9 +202,6 @@ def main(conf):
         print('{:50}:{}'.format(k, v))
     print("===============main()=================")
     print(args)
-    print("===============main()=================")
-    os.environ['KERNEL_NAME_ID'] = str(0)
-    print("++++++++++++++++++ KERNEL_NAME_ID:", os.environ['KERNEL_NAME_ID'])
     os.environ['MASTER_ADDR'] = args.addr  # '10.136.181.51'
     os.environ['MASTER_PORT'] = '29501'
     # if opts.gpu is not None:

@@ -12,7 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Runs a ResNet model on the ImageNet dataset."""
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -54,6 +66,9 @@ _NUM_TRAIN_FILES = 1024
 _SHUFFLE_BUFFER = 10000
 
 DATASET_NAME = 'ImageNet'
+
+rank_size = int(os.getenv("RANK_SIZE"))
+rank_id = int(os.getenv("DEVICE_INDEX"))
 
 ###############################################################################
 # Data processing
@@ -205,8 +220,8 @@ def input_fn(is_training,
 
   if input_context:
     ############## npu modify begin #############
-    dataset = dataset.shard(get_rank_size(),
-                              get_rank_id())
+    dataset = dataset.shard(rank_size,
+                              rank_id)
     ############## npu modify end ###############
 
   if is_training:

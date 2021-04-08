@@ -7,7 +7,7 @@
 5.  get_coco_info.py： yolov3.info生成脚本 
 6.  bin_to_predict_yolo_pytorch.py： benchmark输出bin文件解析脚本
 7.  map_calculate.py： 精度统计脚本
-8.  benchmark工具源码地址：https://gitee.com/ascend/cann-benchmark/tree/master/infer
+8.  benchmark工具源码地址：https://github.com/Ascend/cann-benchmark/tree/master/infer
 
 推理端到端步骤：
 

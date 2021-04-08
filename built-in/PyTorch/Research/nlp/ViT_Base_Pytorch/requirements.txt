@@ -1,5 +1,0 @@
-torch
-numpy
-tqdm
-tensorboard
-ml-collections

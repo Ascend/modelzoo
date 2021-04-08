@@ -150,3 +150,22 @@ To fine tune a pretrained resnet you must make three changes to your training pr
 We can perform these three operations by specifying two flags: ```--pretrained_model_checkpoint_path``` and ```--fine_tune```. The first flag is a string that points to the path of a pre-trained resnet model. If this flag is specified, it will load all but the final classification layer. A key thing to note: if both ```--pretrained_model_checkpoint_path``` and a non empty ```model_dir``` directory are passed, the tensorflow estimator will load only the ```model_dir```. For more on this please see [WarmStartSettings](https://www.tensorflow.org/versions/master/api_docs/python/tf/estimator/WarmStartSettings) and [Estimators](https://www.tensorflow.org/guide/estimators).
 
 The second flag ```--fine_tune``` is a boolean that indicates whether earlier layers of the network should be frozen. You may set this flag to false if you wish to continue training a pre-trained model from a checkpoint. If you set this flag to true, you can train a new classification layer from scratch.
+
+#### Train on NPU
+## prepare
+1) change DATA_DIR to the real path in scripts/train_*.sh
+2) change BASE_PATH to the real path of official in scripts/run_*.sh
+3) set env in scripts/run_*.sh
+
+## start train
+train for 1P:
+cd scripts;
+bash run_1p.sh
+you can monitor training progress in result/1p/train_*.log
+
+train for 8P:
+cd scripts;
+bash run_8p.sh
+you can monitor training progress in result/8p/train_*.log
+
+## start eval

@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """Hook that counts examples per second every N steps or seconds."""
 
@@ -27,6 +40,10 @@ from official.utils.logs import logger
 import time
 import os
 import logging
+
+rank_size = int(os.getenv("RANK_SIZE"))
+rank_id = int(os.getenv("DEVICE_INDEX"))
+
 class ExamplesPerSecondHook(tf.estimator.SessionRunHook):
   """Hook to print out examples per second.
 
@@ -124,7 +141,7 @@ class ExamplesPerSecondHook(tf.estimator.SessionRunHook):
           self._total_steps / self._step_train_time)
       # current examples per second is based on the elapsed training steps
       # and training time per batch
-      current_examples_per_sec = self._batch_size * get_rank_size() * (
+      current_examples_per_sec = self._batch_size * rank_size * (
           elapsed_steps / elapsed_time)
       # Logs entries to be read from hook during or after run.
       self.current_examples_per_sec_list.append(current_examples_per_sec)

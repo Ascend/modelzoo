@@ -1,2 +1,0 @@
-aclrtMemMallocPolicy=2
-backend_loglevel=0

@@ -1,1 +1,0 @@
-python train.py --device_id $1

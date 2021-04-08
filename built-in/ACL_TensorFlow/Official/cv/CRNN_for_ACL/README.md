@@ -2,14 +2,14 @@
 
 # CRNN Inference for Tensorflow 
 
-This repository provides a script and recipe to Inference the CRNN model. Original train implement please follow this link: [CRNN_for_Tensorflow](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow)
+This repository provides a script and recipe to Inference the CRNN model. Original train implement please follow this link: [CRNN_for_Tensorflow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow)
 
 ## Quick Start Guide
 
 ### 1. Clone the respository
 
 ```shell
-git clone https://gitee.com/ascend/modelzoo.git
+git clone https://github.com/Ascend/modelzoo.git
 cd modelzoo/built-in/ACL/Official/cv/CRNN_for_ACL
 ```
 
@@ -38,7 +38,7 @@ labels
 ### 3. Offline Inference
 **Freeze ckpt to pb**
 
-Please use the frozen_graph.py from the train scripts: [frozen_graph.py](https://gitee.com/ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow/tools/frozen_graph.py)
+Please use the frozen_graph.py from the train scripts: [frozen_graph.py](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow/tools/frozen_graph.py)
 ```
 python3 frozen_graph.py --ckpt_path= ckpt_path/shadownet_xxx.ckpt-600000
 ```

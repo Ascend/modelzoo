@@ -27,7 +27,7 @@
 
 FineTuning的代码路径：
 
-[FineTuning代码参考](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertTnews_for_TensorFlow)
+[FineTuning代码参考](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertTnews_for_TensorFlow)
 
 获取在线推理的数据集目录下的文件，拷贝到./datasets/bert_tnews_origin/目录下
 

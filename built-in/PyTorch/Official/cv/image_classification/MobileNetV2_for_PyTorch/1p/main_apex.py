@@ -151,7 +151,7 @@ def main_worker(args):
     if 'cuda' in args.device:
         torch.cuda.set_device(args.device)
 
-    model = mobilenet_v2()
+    model = mobilenet_v2(num_classes=args.class_nums)
 
     # set hook
     if args.hook:
@@ -192,15 +192,13 @@ def main_worker(args):
     if args.pretrain:
         if not os.path.isfile(args.pretrain):
             print("no chechpoint found at {}".format(args.pretrain))
-
-        print("loading checkpoint '{}'".format(args.pretrain))
-        checkpoint = torch.load(args.pretrain, map_location=args.device)
-        model.load_state_dict(checkpoint['state_dict'])
-        print("loaded checkpoint '{}'".format(args.pretrain))
-
-        # modify the class number of last fc/Linear layer
-        model.classifier[1] = nn.Linear(model.classifier[1].in_features, args.class_nums)
-
+        else:
+            print("loading checkpoint '{}'".format(args.pretrain))
+            pretrained_dict = torch.load(args.pretrain, map_location="cpu")['state_dict']
+            pretrained_dict.pop('classifier.1.weight')
+            pretrained_dict.pop('classifier.1.bias')
+            model.load_state_dict(pretrained_dict, strict=False)
+            print("loaded checkpoint '{}'".format(args.pretrain))
 
     # Data loading code
     traindir = os.path.join(args.data, 'train')

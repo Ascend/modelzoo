@@ -372,7 +372,7 @@ aclError DvppInitInput(std::vector<std::string> files)
         H_Aligned = (H + 15) / 16 * 16;
         outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
 
-        // 分配device图片输入内存
+        // device图片诖
         void* jpeg_dev_mem_in_ptr = nullptr;
  
         ret = acldvppMalloc(&jpeg_dev_mem_in_ptr, fileSize);
@@ -381,7 +381,7 @@ aclError DvppInitInput(std::vector<std::string> files)
             return ret;
         }
 
-        // host内存拷贝至device输入内存
+        // host诖婵絛evice诖
         ret = aclrtMemcpy(jpeg_dev_mem_in_ptr, fileSize, buff, fileSize, ACL_MEMCPY_HOST_TO_DEVICE);
         if (ret != ACL_ERROR_NONE) {
             LOG("copy host to device failed[%d]\n", ret);
@@ -389,7 +389,7 @@ aclError DvppInitInput(std::vector<std::string> files)
         }
 
         aclrtFreeHost(buff);
-        // 分配device图片解码内存
+        // device图片诖
         void* jpeg_dev_mem_out_ptr = nullptr;
         //ret = aclrtMalloc(&jpeg_dev_mem_out_ptr, outputBuffSize, ACL_MEM_MALLOC_HUGE_ONLY);
         ret = acldvppMalloc(&jpeg_dev_mem_out_ptr, outputBuffSize);

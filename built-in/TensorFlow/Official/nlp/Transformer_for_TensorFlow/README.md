@@ -42,7 +42,7 @@ Transformer是一个能够高效并行训练的序列到序列模型，该模型
 
 -   适配昇腾 AI 处理器的实现：    
     
-    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow
 
 -   通过Git获取对应commit\_id的代码方法如下：
     
@@ -173,7 +173,7 @@ run_config = NPURunConfig(
 
        环境变量配置信息参见：
 
-          [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+          [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
     2. 配置configs/transformer_big.yml中的网络参数，请用户根据自己需求进行配置；
     
     3. 配置train-ende.sh中`DATA_PATH`训练参数（脚本位于Transformer_for_TensorFlow目录下），请用户根据实际数据集路径进行配置，确保`DATA_PATH`下存在已准备的数据集，如下所示（仅供参考）：

@@ -42,7 +42,7 @@ VGG16是一个经典的目标分类网络。整个网络都使用（3x3）的卷
 -   适配昇腾 AI 处理器的实现：
     
         
-    https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/VGG16_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/VGG16_for_TensorFlow
        
 
 -   通过Git获取对应commit\_id的代码方法如下：
@@ -152,7 +152,7 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
 
    环境变量配置信息参见：
 
-    [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+    [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 -  单卡训练
     
     1. 配置训练参数。 

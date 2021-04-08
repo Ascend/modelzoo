@@ -9,7 +9,7 @@ This repository provides a script and recipe to Inference the AlexNet model.
 ### 1. Clone the respository
 
 ```shell
-git clone https://gitee.com/ascend/modelzoo.git
+git clone https://github.com/Ascend/modelzoo.git
 cd modelzoo/built-in/ACL_TensorFlow/Official/cv/EfficientNet_B0_for_ACL
 ```
 

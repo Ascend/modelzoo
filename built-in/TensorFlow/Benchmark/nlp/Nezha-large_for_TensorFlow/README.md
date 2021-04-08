@@ -126,7 +126,7 @@ docker run -it --ipc=host \
 
 启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
 
-- [Ascend 910训练平台环境变量设置](https://gitee.com/ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
 原则上NEZHA只能用集群进行训练，以NEZHA-Large为例，至少需要以8*8p的集群规模训练若干天。具体训练时间以您的数据集大小为准。配置多级多卡分布式训练，需要您修改configs目录下NEZHA_large_64p_poc.json配置文件，将对应IP修改为您的集群对应的IP。
 

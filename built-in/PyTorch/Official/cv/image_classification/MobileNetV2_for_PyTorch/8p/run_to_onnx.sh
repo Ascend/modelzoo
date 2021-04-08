@@ -2,4 +2,4 @@
 
 source npu_set_env.sh
 
-python3.7 pthtar2onx.py
+python3.7 pthtar2onnx.py

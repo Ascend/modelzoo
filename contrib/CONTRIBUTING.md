@@ -14,7 +14,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 1、训练及在线推理请使用python代码实现，Ascend平台离线推理请使用C++或python代码，符合第四部分编码规范
 
-2、参考[sample](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
+2、参考[sample](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 
 3、贡献者模型代码目录规则："modelzoo/contrib/框架/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
 
@@ -186,7 +186,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
-参考：[Readme](https://gitee.com/ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README_NEW.md)
+参考：[Readme](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README_NEW.md)
 
  **四、自测试用例**
 
@@ -214,12 +214,12 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 4、数据集和模型：小于500M的文件，建议使用`obsutil`命令下载(已预装)，过大的文件，建议提交Issue，注明数据集和下载地址，会提前下载到执行环境上,
 
-已预置数据集&python第三方库: [Environments](https://gitee.com/ascend/modelzoo/blob/master/contrib/ENVIRONMENTS.md)
+已预置数据集&python第三方库: [Environments](https://github.com/Ascend/modelzoo/blob/master/contrib/ENVIRONMENTS.md)
 
 5、环境和其他问题，请提交Issue跟踪；
 
 6、测试用例开发参考：
-- [训练](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
+- [训练](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 - [离线推理](https://gitee.com/alexcheng88/modelzoo/tree/master/contrib/TensorFlow/Research/cv/efficientnet-b8/ATC_efficientnet-b8_tf_nkxiaolei)
 
  **五、PR提交**

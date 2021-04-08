@@ -26,7 +26,7 @@
 
 Jasper NPU训练代码参考：
 
-[训练代码参考](https://gitee.com/ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
+[训练代码参考](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Research/audio/Jasper_for_TensorFlow)
 
 获取在线推理的数据集目录下的文件，拷贝到./datasets/目录下
 

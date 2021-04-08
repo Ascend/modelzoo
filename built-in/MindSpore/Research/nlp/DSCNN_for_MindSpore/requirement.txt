@@ -1,4 +1,0 @@
-tqdm
-numpy
-soundfile
-python_speech_features

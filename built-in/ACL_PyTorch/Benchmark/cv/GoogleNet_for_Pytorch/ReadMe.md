@@ -16,7 +16,7 @@
 
 8.val_label.txt：ImageNet数据集标签，用于验证推理结果
 
-9.benchmark工具源码地址：https://gitee.com/ascend/cann-benchmark/tree/master/infer
+9.benchmark工具源码地址：https://github.com/Ascend/cann-benchmark/tree/master/infer
 
 10.vision_metric_ImageNet.py：验证推理结果脚本，比对benchmark输出的分类结果和标签，给出Accuracy
 
