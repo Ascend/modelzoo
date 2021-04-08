@@ -1,6 +1,0 @@
-pywavelets
-imageio
-scikit-learn
-matplotlib
-opencv-python
-numpy
