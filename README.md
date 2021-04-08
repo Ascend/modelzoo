@@ -47,22 +47,9 @@ Thank You!
             
 		
 
-- PyTorch
 
      -Official
 	
-	- [CRNN_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/CRNN_for_PyTorch)
-	- [DeepMar_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/DeepMar_for_PyTorch)
-	- [Densenet121_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/Densenet121_for_PyTorch)
-	- [EfficientNet_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/EfficientNet_for_PyTorch)
-	- [MobileNetV2_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/MobileNetV2_for_PyTorch)
-	- [ResNet50_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/ResNet50_for_PyTorch)
-	- [Shufflenetv2_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_classification/Shufflenetv2_for_PyTorch)
-	- [Faster_Mask_RCNN_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/image_object_detection/Faster_Mask_RCNN_for_PyTorch)
-	- [PSENet_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/cv/scene_text_detection/PSENet_for_PyTorch)
-	- [GRU_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/GRU_for_PyTorch)
-	- [LSTM_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/LSTM_for_PyTorch)
-	- [Transformer_for_PyTorch](https://github.com/Ascend/modelzoo/tree/master/built-in/PyTorch/Official/nlp/Transformer_for_PyTorch)
  
 	
 
