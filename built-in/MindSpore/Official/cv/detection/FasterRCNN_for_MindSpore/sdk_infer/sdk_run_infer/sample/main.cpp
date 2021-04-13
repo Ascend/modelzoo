@@ -204,7 +204,7 @@ APP_ERROR WriteResult(std::string &imgPath, std::stringstream &result) {
                 << "    classId: " << detObj.classId << "\n"
                 << "    label: " << detObj.label << "\n"
                 << "    confidence: " << detObj.confidence << "\n"
-                << "    bbox: [" << detObj.x0 << ", " << detObj.y1 << ", " << detObj.x0 << ", " << detObj.y0 << "]\n"
+                << "    bbox: [" << detObj.x0 << ", " << detObj.y0 << ", " << detObj.x1 << ", " << detObj.y1 << "]\n"
                 << "-----------------------\n";
         detects.push_back(detObj);
     }

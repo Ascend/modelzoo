@@ -32,6 +32,7 @@ export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME
 # compile
 if g++ main.cpp -I ${MX_SDK_HOME}/include/ \
              -I ${MX_SDK_HOME}/opensource/include/ \
+             -I ${MX_SDK_HOME}/opensource/include/opencv4 \ 
              -L ${MX_SDK_HOME}/lib/ \
              -L ${MX_SDK_HOME}/opensource/lib/ \
              -L ${MX_SDK_HOME}/opensource/lib64/ \
@@ -39,9 +40,12 @@ if g++ main.cpp -I ${MX_SDK_HOME}/include/ \
              -D_GLIBCXX_USE_CXX11_ABI=0 \
              -fPIC -fstack-protector-all \
              -g -Wl,-z,relro,-z,now,-z,noexecstack -pie -Wall -lglog \
-             -lmxbase -lstreammanager -lcpprest \
+             -lmxbase -lstreammanager -lopencv_world -lcpprest \
              -o main;
 
-# run
-./main
+then
+  info "Build successfully."
+else
+  warn "Build failed."
+fi
 exit 0

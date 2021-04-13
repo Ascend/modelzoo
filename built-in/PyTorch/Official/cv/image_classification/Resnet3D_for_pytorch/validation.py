@@ -29,7 +29,8 @@ def val_epoch(epoch,
               opt,
               logger,
               tb_writer=None):
-    print('validation at epoch {}'.format(epoch))
+    if opt.is_master_node:
+        print('validation at epoch {}'.format(epoch))
 
     model.eval()
 
@@ -55,7 +56,7 @@ def val_epoch(epoch,
             batch_time.update(time.time() - end_time)
             end_time = time.time()
 
-            if i == 0:
+            if epoch == 1 and i == 0:
                 batch_time.reset()
                 data_time.reset()
 

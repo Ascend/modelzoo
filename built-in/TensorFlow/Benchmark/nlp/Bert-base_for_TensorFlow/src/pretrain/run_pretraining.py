@@ -174,7 +174,7 @@ class _LogSessionRunHook(tf.train.SessionRunHook):
             return tf.train.SessionRunArgs(
                 fetches=['global_step:0', 'total_loss:0',
                          'learning_rate:0', 'nsp_loss:0',
-                         'mlm_loss:0', 'loss_scale:0', 'apply_grads/All:0'])
+                         'mlm_loss:0', 'loss_scale:0', 'apply_grads/overflow_status_reduce_all:0'])
         else:
             return tf.train.SessionRunArgs(
                 fetches=['global_step:0', 'total_loss:0',

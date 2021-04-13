@@ -116,6 +116,12 @@ def parse_args():
                         help="""the frequency to display info""")
     parser.add_argument('--do_checkpoint', default=True, type=ast.literal_eval,
                         help="""whether to save checkpoints or not.""")
+    # 配置预训练ckpt路径
+    parser.add_argument('--restore_path', default='',
+                        help="""restore path of pretrained model""")
+    # 不加载预训练网络中FC层权重
+    parser.add_argument('--restore_exclude', default=['dense_2'],
+                        help="""restore_exclude""")
 
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:

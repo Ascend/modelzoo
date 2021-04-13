@@ -3,7 +3,7 @@ source npu_set_env.sh
 export WHICH_OP=GEOP
 export NEW_GE_FE_ID=1
 export GE_AICPU_FLAG=1
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export TASK_QUEUE_ENABLE=1
 
 device_id=0

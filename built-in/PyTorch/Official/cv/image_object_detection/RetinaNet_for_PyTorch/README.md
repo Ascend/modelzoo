@@ -5,7 +5,7 @@
 * Python 3.7.5
 * PyTorch(NPU版本)
 * apex(NPU版本)
-
+* (可选)参考《Pytorch 网络模型移植&训练指南》6.4.2章节，配置cpu为性能模式，以达到模型最佳性能；不开启不影响功能。
 
 ## Dataset Prepare
 1. 下载COCO数据集
@@ -21,6 +21,7 @@ git clone https://github.com/open-mmlab/mmcv.git
 
 export MMCV_WITH_OPS=1
 export MAX_JOBS=8
+source pt_set_env.sh
 
 cd mmcv
 python setup.py build_ext
@@ -56,7 +57,7 @@ pip list | grep mm
 
 ## Train MODEL
 
-### 导入环境变量
+### 导入环境变量(若安装mmcv时已导入，这步可跳过)
 ```
 source pt_set_env.sh
 ```

@@ -149,7 +149,8 @@ def make_data_parallel(model, optimizer, opt):
         model.to(device)
         if not opt.no_train and opt.amp_cfg:
             model, optimizer = amp.initialize(model, optimizer, opt_level=opt.opt_level,
-                                              loss_scale=opt.loss_scale_value)
+                                              loss_scale=opt.loss_scale_value,
+                                              combine_grad=True)
         model = nn.DataParallel(model, device_ids=None)
 
     return model, optimizer

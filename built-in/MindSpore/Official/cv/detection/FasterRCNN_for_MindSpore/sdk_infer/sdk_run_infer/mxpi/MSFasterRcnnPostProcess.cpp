@@ -221,19 +221,11 @@ void MSFasterRcnnPostProcessor::ConvertObjInfoFromDetectBox(std::vector<MxBase::
         objInfo.classId = (float)detBoxe.classID;
         objInfo.confidence = detBoxe.prob;
 
-        objInfo.x0 = std::max<float>(detBoxe.x - detBoxe.width / COORDINATE_PARAM, 0) / (float)imageInfo.modelWidth;
-        objInfo.y0 = std::max<float>(detBoxe.y - detBoxe.height / COORDINATE_PARAM, 0) / (float)imageInfo.modelHeight;
-        objInfo.x1 = std::max<float>(detBoxe.x + detBoxe.width / COORDINATE_PARAM, 0) / (float)imageInfo.modelWidth;
-        objInfo.y1 = std::max<float>(detBoxe.y + detBoxe.height / COORDINATE_PARAM, 0) / (float)imageInfo.modelHeight;
+        objInfo.x0 = std::max<float>(detBoxe.x - detBoxe.width / COORDINATE_PARAM, 0) / (float)imgInfo.modelWidth;
+        objInfo.y0 = std::max<float>(detBoxe.y - detBoxe.height / COORDINATE_PARAM, 0) / (float)imgInfo.modelHeight;
+        objInfo.x1 = std::max<float>(detBoxe.x + detBoxe.width / COORDINATE_PARAM, 0) / (float)imgInfo.modelWidth;
+        objInfo.y1 = std::max<float>(detBoxe.y + detBoxe.height / COORDINATE_PARAM, 0) / (float)imgInfo.modelHeight;
 
-        float coordinateX0 = objInfo.x0 * (float)image.imgWidth;
-        float coordinateY0 = objInfo.y0 * (float)image.imgHeight;
-        float coordinateX1 = objInfo.x1 * (float)image.imgWidth;
-        float coordinateY1 = objInfo.y1 * (float)image.imgHeight;
-
-        LogDebug << "Find object: "
-                 << "classId(" << objInfo.classId << "), confidence(" << objInfo.confidence << "), Coordinates("
-                 << coordinateX0 << ", " << coordinateY0 << "; " << coordinateX1 << ", " << coordinateY1 << ").";
         objInfos.push_back(objInfo);
     }
 }

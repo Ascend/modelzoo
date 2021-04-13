@@ -152,9 +152,9 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
     
     2. 单卡训练 
 
-        2.1 配置run_1p.sh脚本中`data_dir`（脚本路径InceptionV4_for_TensorFlow/script/run_1p.sh）,请用户根据实际路径配置，数据集参数如下所示：
+        2.1 配置train_1p.sh脚本中`data_dir`（脚本路径InceptionV4_for_TensorFlow/script/train_1p.sh）,请用户根据实际路径配置，数据集参数如下所示：
 
-            --data_dir=/opt/npu/imagenet_data
+            --data_dir=/path/to/data  
 
         2.2 单p指令如下:
 
@@ -162,9 +162,9 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 
     3. 8卡训练  
     
-        3.1 配置run_8p.sh脚本中`data_dir`（脚本路径InceptionV4_for_TensorFlow/script/run_8p.sh）,请用户根据实际路径配置，数据集参数如下所示：
+        3.1 配置train_8p.sh脚本中`data_dir`（脚本路径InceptionV4_for_TensorFlow/script/train_8p.sh）,请用户根据实际路径配置，数据集参数如下所示：
             
-            --data_dir=/opt/npu/imagenet_data
+            --data_dir=/path/to/data 
 
         3.2 8p指令如下: 
             
@@ -172,12 +172,12 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 
 -  验证。
 
-    1. 将运行模式mode修改为evaluate，并配置训练ckpt路径,请用户根据实际路径进行修改,如下所示：
+    1. 配置test.sh脚本（脚本路径InceptionV4_for_TensorFlow/script/test.sh）将运行模式mode修改为evaluate，并配置训练ckpt路径,请用户根据实际路径进行修改,如下所示：
     
         
         ```
         --mode=evaluate  
-        --data_dir=/opt/npu/imagenet_data
+        --eval_dir=${dname}/scripts/result/8p/2/model 
         ```
 
 

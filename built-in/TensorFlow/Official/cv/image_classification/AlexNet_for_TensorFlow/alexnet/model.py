@@ -29,6 +29,7 @@
 # limitations under the License.
 # ============================================================================
 
+import os
 import tensorflow as tf
 from . import alexnet
 
@@ -58,7 +59,7 @@ class Model(object):
         predicted_classes = tf.argmax(logits, axis=1, output_type=tf.int32)
         logits = tf.cast(logits, tf.float32)
 
-        labels_one_hot = tf.one_hot(labels, depth=1000)
+        labels_one_hot = tf.one_hot(labels, depth=self.config.num_classes)
         loss = tf.losses.softmax_cross_entropy(
             logits=logits, onehot_labels=labels_one_hot, label_smoothing=self.config.label_smoothing)
 
@@ -78,6 +79,12 @@ class Model(object):
                 mode, loss=loss, eval_metric_ops=metrics)
 
         assert (mode == tf.estimator.ModeKeys.TRAIN)
+        if self.config.restore_path and os.path.exists('{}.meta'.format(self.config.restore_path)):
+            print('num_classes: {}'.format(self.config.num_classes))
+            print('restore_path: {}'.format(self.config.restore_path))
+            variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.config.restore_exclude)
+            tf.train.init_from_checkpoint(self.config.restore_path,
+                                          {v.name.split(':')[0]: v for v in variables_to_restore})
 
         batch_size = tf.shape(inputs)[0]
 

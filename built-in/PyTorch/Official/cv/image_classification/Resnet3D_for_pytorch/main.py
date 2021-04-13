@@ -26,7 +26,7 @@ import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.backends import cudnn
 import torchvision
-
+from multi_epochs_dataloader import MultiEpochsDataLoader
 from opts import parse_opts
 from model import (generate_model, load_pretrained_model, make_data_parallel,
                    get_fine_tuning_parameters)
@@ -186,13 +186,13 @@ def get_train_utils(opt, model_parameters):
             train_data)
     else:
         train_sampler = None
-    train_loader = torch.utils.data.DataLoader(train_data,
-                                               batch_size=opt.batch_size,
-                                               shuffle=(train_sampler is None),
-                                               num_workers=opt.n_threads,
-                                               pin_memory=True,
-                                               sampler=train_sampler,
-                                               worker_init_fn=worker_init_fn)
+    train_loader = MultiEpochsDataLoader(train_data,
+                                         batch_size=opt.batch_size,
+                                         shuffle=(train_sampler is None),
+                                         num_workers=opt.n_threads,
+                                         pin_memory=False,
+                                         sampler=train_sampler,
+                                         worker_init_fn=worker_init_fn)
 
     if opt.is_master_node:
         train_logger = Logger(opt.result_path / 'train.log',
@@ -258,15 +258,14 @@ def get_val_utils(opt):
             val_data, shuffle=False)
     else:
         val_sampler = None
-    val_loader = torch.utils.data.DataLoader(val_data,
-                                             batch_size=(opt.batch_size //
-                                                         opt.n_val_samples),
-                                             shuffle=False,
-                                             num_workers=opt.n_threads,
-                                             pin_memory=True,
-                                             sampler=val_sampler,
-                                             worker_init_fn=worker_init_fn,
-                                             collate_fn=collate_fn)
+    val_loader = MultiEpochsDataLoader(val_data,
+                                       batch_size=(opt.batch_size // opt.n_val_samples),
+                                       shuffle=False,
+                                       num_workers=opt.n_threads,
+                                       pin_memory=False,
+                                       sampler=val_sampler,
+                                       worker_init_fn=worker_init_fn,
+                                       collate_fn=collate_fn)
 
     if opt.is_master_node:
         val_logger = Logger(opt.result_path / 'val.log',
@@ -426,17 +425,15 @@ def main_worker(index, opt):
                             inference_class_names, opt.inference_no_average,
                             opt.output_topk)
 
-
 if __name__ == '__main__':
     opt = get_opt()
-
-    os.environ['MASTER_ADDR'] = '127.0.0.1'
-    os.environ['MASTER_PORT'] = '29688'
 
     if opt.accimage:
         torchvision.set_image_backend('accimage')
 
     if opt.distributed:
+        os.environ['MASTER_ADDR'] = '127.0.0.1'
+        os.environ['MASTER_PORT'] = '29688'
         assert opt.ngpus_per_node <= torch.npu.device_count()
         opt.world_size = opt.ngpus_per_node * opt.world_size
         mp.spawn(main_worker, nprocs=opt.ngpus_per_node, args=(opt,))

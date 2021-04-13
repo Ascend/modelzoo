@@ -26,7 +26,7 @@ device_group="0 1 2 3 4 5 6 7"
 for device_phy_id in ${device_group}
 do
     echo "[`date +%Y%m%d-%H:%M:%S`] [INFO] start: train.sh ${device_phy_id} & " >> ${currentDir}/result/8p/main.log
-    ${currentDir}/train_8p.sh ${device_phy_id}  &
+    bash ${currentDir}/train_8p.sh ${device_phy_id}  &
 done
 
 wait

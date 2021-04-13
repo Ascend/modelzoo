@@ -1,0 +1,73 @@
+{
+    "im_resnext50": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_imagedecoder0"
+        },
+        "mxpi_imagedecoder0": {
+            "props": {
+                "handleMethod": "opencv"
+            },
+            "factory": "mxpi_imagedecoder",
+            "next": "mxpi_imagecrop0"
+        },
+        "mxpi_imagecrop0": {
+            "props": {
+                "dataSource": "ExternalObjects",
+                "handleMethod":"opencv"
+            },
+            "factory": "mxpi_imagecrop",
+            "next": "mxpi_imageresize0"
+        },
+        "mxpi_imageresize0": {
+            "props": {
+                "parentName": "mxpi_imagecrop0",
+                "handleMethod": "opencv",
+                "resizeHeight": "224",
+                "resizeWidth": "224",
+                "resizeType": "Resizer_Stretch"
+            },
+            "factory": "mxpi_imageresize",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "mxpi_imageresize0",
+                "modelPath": "../models/resnext50/resnext50_tf_aipp.om",
+                "waitingTime": "2000",
+                "outputDeviceId": "-1"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_classpostprocessor0"
+        },
+        "mxpi_classpostprocessor0": {
+            "props": {
+                "dataSource": "mxpi_tensorinfer0",
+                "postProcessConfigPath": "../models/resnext50/resnext50_aipp_tf.cfg",
+                "labelPath": "../models/resnext50/imagenet1001_clsidx_to_labels.names",
+                "postProcessLibPath": "../../../lib/modelpostprocessors/libresnet50postprocess.so"
+            },
+            "factory": "mxpi_classpostprocessor",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_classpostprocessor0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+            "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+}

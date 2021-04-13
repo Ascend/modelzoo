@@ -25,7 +25,7 @@ python3.7 -m pip install -e Faster_Mask_RCNN_for_PyTorch
 ```
 source ./env_b031.sh   #设置环境变量
 export PYTHONPATH=./:$PYTHONPATH
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"  #0-3的device日志格式设置为error级别
 su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(2)[disable]\" "
 
@@ -54,7 +54,7 @@ nohup python3.7 tools/train_net.py \     # 运行入口文件
 ```
 source ./env_b031.sh
 export PYTHONPATH=./:$PYTHONPATH
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device 0"
 su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(2)[disable]\" "
 
