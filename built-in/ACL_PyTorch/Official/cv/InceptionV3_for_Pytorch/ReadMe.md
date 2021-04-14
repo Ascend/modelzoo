@@ -60,3 +60,16 @@
 
 验证推理结果
 
+
+模型获取
+
+可以使用如下命令获取PyTorch框架的原始模型和转换后的Onnx模型
+
+Pytorch：
+```
+wget https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/InceptionV3/inception_v3.pth
+```
+ONNX：
+```
+wget https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/AE/ATC%20Model/InceptionV3/inceptionv3.onnx
+```

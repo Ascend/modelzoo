@@ -46,7 +46,7 @@ from models.utils import training
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torch import optim
 from torch.optim.lr_scheduler import MultiStepLR
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets, transforms
 from apex import amp
 import torch.npu
@@ -229,8 +229,8 @@ def main_worker(npu, npus_per_node, args):
         'acc': training.accuracy
     }
 
-    writer = SummaryWriter()
-    writer.iteration, writer.interval = 0, 10
+    # writer = SummaryWriter()
+    # writer.iteration, writer.interval = 0, 10
 
     print('\n\nInitial')
     print('-' * 10)
@@ -239,7 +239,7 @@ def main_worker(npu, npus_per_node, args):
     training.pass_epoch(
         args.amp_cfg, resnet, loss_fn, val_loader,
         batch_metrics=metrics, show_running=True, device=calculate_device,
-        writer=writer
+        # writer=writer
     )
 
     for epoch in range(args.epochs):
@@ -252,7 +252,7 @@ def main_worker(npu, npus_per_node, args):
         training.pass_epoch(
             args.amp_cfg, resnet, loss_fn, train_loader, optimizer, scheduler,
             batch_metrics=metrics, show_running=True, device=calculate_device,
-            writer=writer
+            # writer=writer
         )
         if (epoch + 1) % args.epochs_per_save == 0 or epoch + 1 == args.epochs:
             if args.amp_cfg:
@@ -273,10 +273,10 @@ def main_worker(npu, npus_per_node, args):
         training.pass_epoch(
             args.amp_cfg, resnet, loss_fn, val_loader,
             batch_metrics=metrics, show_running=True, device=calculate_device,
-            writer=writer
+            # writer=writer
         )
 
-    writer.close()
+    # writer.close()
 
 
 if __name__ == "__main__":
