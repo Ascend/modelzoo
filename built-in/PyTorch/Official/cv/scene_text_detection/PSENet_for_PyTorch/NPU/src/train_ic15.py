@@ -31,7 +31,7 @@ import torch.npu
 import torch.utils.data.distributed
 from apex import amp
 
-from combined_sgd_v2 import CombinedSGD
+import apex
 import models
 from data_loader import IC15Loader
 from metrics import runningScore
@@ -295,7 +295,7 @@ def main(npu, npu_per_node, args):
     model = model.to(loc)
 
     if args.combine_sgd:
-        optimizer = CombinedSGD(model.parameters(), lr=args.lr, momentum=0.99, weight_decay=5e-4, combine_grad=True)
+        optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), lr=args.lr, momentum=0.99, weight_decay=5e-4)
     else:
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.99, weight_decay=5e-4)
 

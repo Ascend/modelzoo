@@ -38,7 +38,7 @@ from apex import amp
 from schedulers import LinearWarmUpScheduler
 from file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 import modeling
-from optimization import BertAdam, warmup_linear, NPUFusedBertAdam
+from optimization import BertAdam, warmup_linear
 from tokenization import (BasicTokenizer, BertTokenizer, whitespace_tokenize)
 from utils import is_main_process, format_step
 import dllogger, time
@@ -986,8 +986,9 @@ def main():
             #         "Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
             # optimizer = NpuFusedAdam(optimizer_grouped_parameters,
             #                       lr=args.learning_rate)
+            from apex.optimizers import NpuFusedBertAdam
 
-            optimizer = NPUFusedBertAdam(optimizer_grouped_parameters,
+            optimizer = NpuFusedBertAdam(optimizer_grouped_parameters,
                                          lr=args.learning_rate,
                                          warmup=args.warmup_proportion,
                                          t_total=num_train_optimization_steps)
