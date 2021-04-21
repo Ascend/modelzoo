@@ -17,16 +17,16 @@
 #### MMCV full version with CPU
 ```
 cd ../
-git clone https://github.com/open-mmlab/mmcv.git
+git clone -b v1.2.6 --depth=1 https://github.com/open-mmlab/mmcv.git
 
 export MMCV_WITH_OPS=1
 export MAX_JOBS=8
 source pt_set_env.sh
 
 cd mmcv
-python setup.py build_ext
-python setup.py develop
-pip list | grep mmcv
+python3.7.5 setup.py build_ext
+python3.7.5 setup.py develop
+pip3.7.5 list | grep mmcv
 ```
 
 #### Modified MMCV
@@ -49,9 +49,9 @@ pip list | grep mmcv
 4. 执行以下命令，安装mmdet
 ```
 cd RetinaNet_for_PyTorch
-pip install -r requirements/build.txt
-pip install -v -e .
-pip list | grep mm
+pip3.7.5 install -r requirements/build.txt
+pip3.7.5 install -v -e .
+pip3.7.5 list | grep mm
 ```
 
 

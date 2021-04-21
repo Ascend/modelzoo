@@ -220,7 +220,8 @@ def input_fn(is_training,
 
   if input_context:
     ############## npu modify begin #############
-    dataset = dataset.shard(rank_size,
+    if rank_size > 1:
+        dataset = dataset.shard(rank_size,
                               rank_id)
     ############## npu modify end ###############
 

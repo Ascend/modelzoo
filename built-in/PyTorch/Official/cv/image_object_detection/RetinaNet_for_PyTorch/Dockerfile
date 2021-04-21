@@ -8,9 +8,10 @@ COPY requirements/* ./requirements/
 RUN pip3.7 install -r requirements.txt
 RUN apt-get update && apt-get install -y git 2to3 libgl1-mesa-glx
 RUN git config --global http.sslverify false
-RUN git clone https://github.com/open-mmlab/mmcv.git
+RUN git clone -b v1.2.6 --depth=1 https://github.com/open-mmlab/mmcv.git
 WORKDIR ./mmcv
-ENV export MMCV_WITH_OPS=1 && export MAX_JOBS=8
+ENV MMCV_WITH_OPS=1
+ENV MAX_JOBS=8
 COPY mmcv_need/_functions.py ./mmcv/parallel/
 COPY mmcv_need/distributed.py ./mmcv/parallel/
 COPY mmcv_need/data_parallel.py ./mmcv/parallel/

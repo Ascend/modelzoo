@@ -719,7 +719,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
       output_spec = NPUEstimatorSpec(
           mode=mode,
           loss=total_loss,
-          eval_metrics_ops=eval_metrics,
+          eval_metric_ops=eval_metrics,
           scaffold=scaffold_fn)
     else:
       #output_spec = tf.contrib.tpu.TPUEstimatorSpec(
@@ -728,7 +728,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
       #    predictions={"probabilities": probabilities},
       #    scaffold_fn=scaffold_fn)
       output_spec = NPUEstimatorSpec(
-          mode=mode, preditions={"probabilities": probabilities}, scaffold=scaffold_fn)
+          mode=mode, predictions={"probabilities": probabilities}, scaffold=scaffold_fn)
     return output_spec
 
   return model_fn
@@ -862,16 +862,16 @@ def main(_):
   #        per_host_input_for_training=is_per_host))
   
   config = tf.ConfigProto(
-      iter_op_parallelism_threads=0,
+      inter_op_parallelism_threads=0,
       intra_op_parallelism_threads=0,
       allow_soft_placement=True)
 
   run_config = NPURunConfig(
-      mode_dir=FLAGS.output_dir,
+      model_dir=FLAGS.output_dir,
       save_checkpoints_steps=FLAGS.save_checkpoints_steps,
       iterations_per_loop=FLAGS.iterations_per_loop,
       session_config=config,
-      precision_mode="allow_mix_precision"
+      precision_mode="allow_mix_precision",
       keep_checkpoint_max=5)
       
   train_examples = None
@@ -993,7 +993,7 @@ def main(_):
     tf.logging.info("  Batch size = %d", FLAGS.predict_batch_size)
 
     #predict_drop_remainder = True if FLAGS.use_tpu else False
-    eval_drop_remainder = True
+    predict_drop_remainder = True
     predict_input_fn = file_based_input_fn_builder(
         input_file=predict_file,
         seq_length=FLAGS.max_seq_length,

@@ -154,8 +154,8 @@ run_config = NPURunConfig(
 
 3. 当前提供的训练脚本中，是以wmt16en-de数据集为例，训练过程中进行数据预处理操作，请用户使用该脚本之前自行修改训练脚本中的数据集加载和预处理方法。
 
-4. 将数据转成tfrecord格式，命令如下：
-    
+4. 将训练数据集转成tfrecord格式，命令如下：
+   
 
     ```
     paste train.tok.clean.bpe.32000.en train.tok.clean.bpe.32000.de > train.all 
@@ -163,6 +163,16 @@ run_config = NPURunConfig(
     python3 create_training_data_concat.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/train.l128.tfrecord --max_seq_length 128
     ```
     说明：配置`--output_file` 参数，请用户根据实际路径进行配置；
+    
+    5.将推理数据集转成tfrecord格式，命令如下：
+    
+    ```
+    paste newstest2014.tok.clean.bpe.32000.en newstest2014.tok.clean.bpe.32000.de > test.all 
+    
+    python3 create_eval_data.py --input_file test.all --vocab_file vocab.bpe.32000 --output_file /path/newstest2014.l128.tfrecord --max_seq_length 128 --num_splits 1 --clip_to_max_len True
+    ```
+    
+    
 ## 模型训练<a name="section715881518135"></a>
 
 - 下载训练脚本。（单击“立即下载”，并选择合适的下载方式下载源码包。）
@@ -190,12 +200,11 @@ run_config = NPURunConfig(
                 DEV_TARGETS=${DATA_PATH}/dev2010.tok.en
         ```
 
-            
     4.  单卡训练。
-
-        单卡训练指令如下（脚本位于Transformer_for_TensorFlow/transformer_1p目录下）：
-
-        ```
+    
+    单卡训练指令如下（脚本位于Transformer_for_TensorFlow/transformer_1p目录下）：
+    
+    ```
             bash transformer_1p/transformer_main_1p.sh
         ```
 
@@ -211,8 +220,8 @@ run_config = NPURunConfig(
 -  开始推理。
 
     1. 配置inference.sh中的参数，'DATA_PATH', 'TEST_SOURCES', 'MODEL_DIR' 和'output'请用户设置为自己的路径；
-        
-        
+       
+       
         ```
         DATA_PATH="../wmt-ende"
         TEST_SOURCES="${DATA_PATH}/tfrecord/newstest2014.l128.tfrecord"
@@ -246,9 +255,9 @@ run_config = NPURunConfig(
         4.2 执行指令：
 
             perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
-
+    
             例如：
-
+    
             perl multi-bleu.perl /data/wmt-ende/newstest2014.tok.de.forbleu < output-0603.forbleu
 
 <h2 id="高级参考.md">高级参考</h2>
@@ -403,4 +412,39 @@ I0928 11:44:47.106539 281473395838992 basic_session_run_hooks.py:692] global_ste
 通过“快速上手”中的测试指令启动单卡或者多卡测试。单卡和多卡的配置与训练过程一致。
 
 BLEU = 28.74, 59.5/34.3/22.2/15.0 (BP=1.000, ratio=1.029, hyp_len=66369, ref_len=64504)
+
+
+
+## 模型固化
+
+执行下面的命令做模型固化
+
+```
+./frozen_graph.sh
+
+MODEL_DIR="./model_dir_base"  ckpt的路径
+vocab_source: /home/wmt-ende/vocab.share   --- vocab文件的路径
+vocab_target: /home/wmt-ende/vocab.share   --- vocab文件的路径
+--output_filename: "infer-b${beam}.pb"  --- 输出的pb模型的文件名
+
+注意：模型固化大概需要一个小时
+```
+
+
+
+## 在线推理
+
+执行下面的命令做在线推理
+
+```
+cd onlineInference/infer
+python3.7.5 transformer_online_inference.py
+
+--model_path  原始pb模型的路径
+--data_dir  数据集的路径，dev.json文件的父目录
+--output_dir  经过预处理之后的输出文件路径
+--pre_process  是否执行预处理，如果已经将json文件转换为bin文件，预处理这一步可以设置为False
+--post_process 是否执行后处理，默认值为True;
+--batchSize  在线推理的BatchSize
+```
 

@@ -1,6 +1,5 @@
 一、准数据集：<br>
-下载数据集，并在模型脚本目录创建data/multi30k，在该目录下下载解压数据集。
-
+下载数据集，并在模型脚本目录创建data/multi30k，使用以下命令或登录对应网址下载数据集，在该目录下下载解压数据集。<br>
 `mkdir -p ./.data/multi30k
 wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/training.tar.gz &&  tar -xf training.tar.gz -C data/multi30k && rm training.tar.gz
 wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/validation.tar.gz && tar -xf validation.tar.gz -C data/multi30k && rm validation.tar.gz
@@ -8,9 +7,15 @@ wget http://www.quest.dcs.shef.ac.uk/wmt16_files_mmt/mmt16_task1_test.tar.gz && 
 `
 
 二、安装依赖包：<br>
-1.ARM服务器安装spacy依赖包使用以下命令：<br>
-`BLIS_ARCH="generic" pip install spacy --no-binary blis`<br>
-2.版本依赖 numpy>=1.20.0
+1.安装spacy：<br>
+`pip3.7 install spacy==2.0.18`
+
+2.安装分词包，使用以下命令或登录对应网址下载分词包<br>
+`wget https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz
+wget https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-2.0.0/de_core_news_sm-2.0.0.tar.gz`
+
+解压并在分词包目录下，使用以下命令安装：<br>
+`python3.7 setup.py install`
 
 三、训练流程：<br>
 单卡训练流程：<br>

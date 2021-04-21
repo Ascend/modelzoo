@@ -40,7 +40,7 @@ if g++ main.cpp -I ${MX_SDK_HOME}/include/ \
              -D_GLIBCXX_USE_CXX11_ABI=0 \
              -fPIC -fstack-protector-all \
              -g -Wl,-z,relro,-z,now,-z,noexecstack -pie -Wall -lglog \
-             -lmxbase -lstreammanager -lopencv_world -lcpprest \
+             -lmxbase -lplugintookit -lstreammanager -lopencv_world -lcpprest \
              -o main;
 
 then

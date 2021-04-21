@@ -26,5 +26,5 @@ python3.7 ${dname}/train.py --rank_size=1 \
     --data_dir=/opt/npu/data/ \
     --eval_dir=${dname}/scripts/result/8p/2/model \
     --log_dir=./ \
-    --log_name=eval_inceptionv4.log > eval.log 2>&1
+    --log_name=eval_inceptionv4.log > eval.log 2>&1 &
 
