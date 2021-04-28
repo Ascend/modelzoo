@@ -19,13 +19,20 @@ from tensorflow.python.framework import graph_util
 from densenet import Dense_net
 from npu_bridge.estimator import npu_ops
 import argparse
+import os
 
+CUR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def parse_args():
+    """parse args from command line"""
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--ckpt_path', default=1,
                         help="""set checkpoint path""")
+    parser.add_argument('--output_path', default=CUR_PATH,
+                        help="""set output path""")
+    parser.add_argument('--num_classes', default=1000, type=int,
+                        help="""number of classes for datasets """)
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -34,28 +41,31 @@ def parse_args():
     return args
 
 
-def main(): 
+def main():
+    """freeze model from ckpt to pb"""
     args = parse_args()
+    print("ckpt_path:{}, output_path:{}, num_classes: {}".format(
+        args.ckpt_path, args.output_path, args.num_classes))
     tf.reset_default_graph()
     # set inputs node
     inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="input")
     # create inference graph
-    top_layer = Dense_net(inputs, False)
+    top_layer = Dense_net(inputs, False, args.num_classes)
     with tf.Session() as sess:
-        tf.train.write_graph(sess.graph_def, './', 'model.pb')
+        tf.train.write_graph(sess.graph_def, args.output_path, 'model.pb')
         freeze_graph.freeze_graph(
-            input_graph='./model.pb',
+            input_graph=os.path.join(args.output_path, './model.pb'),
             input_saver='',
-            input_binary=False, 
-            input_checkpoint=args.ckpt_path, 
+            input_binary=False,
+            input_checkpoint=args.ckpt_path,
             output_node_names='linear/BiasAdd',  # graph outputs node
             restore_op_name='save/restore_all',
             filename_tensor_name='save/Const:0',
-            output_graph='./densenet_tf_910.pb',   # graph outputs name
+            output_graph=os.path.join(args.output_path, 'densenet121_tf_910.pb'),  # graph outputs name
             clear_devices=False,
             initializer_nodes='')
     print("done")
 
-if __name__ == '__main__': 
-    main()
 
+if __name__ == '__main__':
+    main()

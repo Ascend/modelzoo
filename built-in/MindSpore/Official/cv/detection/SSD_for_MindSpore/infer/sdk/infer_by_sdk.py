@@ -20,7 +20,7 @@ import os
 from StreamManagerApi import MxDataInput
 from StreamManagerApi import StreamManagerApi
 
-SUPPORT_IMG_SUFFIX = ('.jpg', '.JPG')
+SUPPORT_IMG_SUFFIX = ('.jpg', '.JPG', '.jpeg', '.JPEG')
 
 parser = argparse.ArgumentParser(description='SSD MobileNet V1 FPN infer '
                                  'example.',

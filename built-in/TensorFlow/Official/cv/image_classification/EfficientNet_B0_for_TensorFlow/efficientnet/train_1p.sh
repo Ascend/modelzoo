@@ -16,7 +16,7 @@ fi
 # Autotune
 export FLAG_AUTOTUNE="" #"RL,GA"
 export TUNE_BANK_PATH=/home/HwHiAiUser/custom_tune_bank
-export ASCEND_DEVICE_ID=0
+export ASCEND_DEVICE_ID=$1
 #export TUNE_OPS_NAME=
 #export REPEAT_TUNE=True
 #export ENABLE_TUNE_BANK=True

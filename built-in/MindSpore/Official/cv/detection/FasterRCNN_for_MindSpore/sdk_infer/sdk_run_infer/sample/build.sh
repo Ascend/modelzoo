@@ -38,6 +38,7 @@ if g++ main.cpp -I ${MX_SDK_HOME}/include/ \
              -L ${MX_SDK_HOME}/opensource/lib64/ \
              -std=c++11 \
              -D_GLIBCXX_USE_CXX11_ABI=0 \
+             -Dgoogle=mindxsdk_private \
              -fPIC -fstack-protector-all \
              -g -Wl,-z,relro,-z,now,-z,noexecstack -pie -Wall -lglog \
              -lmxbase -lplugintookit -lstreammanager -lopencv_world -lcpprest \

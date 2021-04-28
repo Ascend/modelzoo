@@ -60,12 +60,6 @@ class Decoder(nn.Module):
                                        nn.ReLU(),
                                        #nn.Dropout(0.1),
                                        nn.Conv2d(256, num_classes, kernel_size=1, stride=1))
-        #self._init_weight()
-        
-        self.austin_conv1 = nn.Conv2d(304, 256, kernel_size=3, stride=1, padding=1, bias=False)
-        self.austin_bn = BatchNorm(256)
-        self.austin_conv2 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=False)
-        self.austin_conv3 = nn.Conv2d(256, num_classes, kernel_size=1, stride=1)
         self.seed_tensor = torch.tensor([0,1])
         self._init_weight()   
         self.is_train = False
@@ -84,21 +78,6 @@ class Decoder(nn.Module):
         x = torch.cat((x, low_level_feat), dim=1)
         x = self.last_conv(x)
         
-        # replicate what last_conv do
-        #x = self.austin_conv1(x)
-        #x = self.austin_bn(x)
-        #x = self.relu(x)
-        #if self.is_train:
-        #	x,_,_ = torch.npu_dropoutV2(x, self.seed, p=0.5)
-        #x = self.austin_conv2(x)
-        #x = self.austin_bn(x)
-        #x = self.relu(x)
-        #if self.is_train:
-        #	x,_,_ = torch.npu_dropoutV2(x, self.seed, p=0.1)
-        #x = self.austin_conv3(x)
-
-
-
         return x
 
     def _init_weight(self):
@@ -114,3 +93,4 @@ class Decoder(nn.Module):
 
 def build_decoder(num_classes, backbone, BatchNorm):
     return Decoder(num_classes, backbone, BatchNorm)
+

@@ -741,7 +741,7 @@ def input_fn_builder(input_file, seq_length, is_training, drop_remainder=True):
     d = tf.data.TFRecordDataset(input_file)
     if is_training:
       d = d.repeat()
-      if rankk_size > 1:
+      if rank_size > 1:
           d = d.shard(rank_size, rank_id)
       d = d.shuffle(buffer_size=100)
     d = d.apply(

@@ -126,6 +126,8 @@ parser.add_argument('--loss-scale', default=64., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+parser.add_argument('--num-classes', default=1000, type=int,
+                    help='number of classes')
 
 warnings.filterwarnings('ignore')
 best_acc1 = 0
@@ -237,7 +239,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # create model
     print("[npu id:", args.gpu, "]", "=> creating model '{}'".format(args.arch))
-    model = models.__dict__[args.arch]()
+    model = models.__dict__[args.arch](num_classes=args.num_classes)
     model = model.to(loc)
 
     # define loss function (criterion) and optimizer

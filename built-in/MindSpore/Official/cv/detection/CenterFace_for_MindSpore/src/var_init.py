@@ -16,17 +16,24 @@
 
 import math
 import numpy as np
+
 from mindspore.common import initializer as init
-import mindspore as ms
-
-try:
-    from mindspore.common.initializer import _Initializer as MeInitializer
-except:
-    from mindspore.common.initializer import Initializer as MeInitializer
-
+from mindspore.common.initializer import Initializer as MeInitializer
 import mindspore.nn as nn
 from mindspore import Tensor
 
+def assignment(arr, num):
+    """Assign the value of `num` to `arr`."""
+    if arr.shape == ():
+        arr = arr.reshape((1))
+        arr[:] = num
+        arr = arr.reshape(())
+    else:
+        if isinstance(num, np.ndarray):
+            arr[:] = num[:]
+        else:
+            arr[:] = num
+    return arr
 
 def calculate_gain(nonlinearity, param=None):
     r"""Return the recommended gain value for the given nonlinearity function.
@@ -53,11 +60,11 @@ def calculate_gain(nonlinearity, param=None):
     linear_fns = ['linear', 'conv1d', 'conv2d', 'conv3d', 'conv_transpose1d', 'conv_transpose2d', 'conv_transpose3d']
     if nonlinearity in linear_fns or nonlinearity == 'sigmoid':
         return 1
-    elif nonlinearity == 'tanh':
+    if nonlinearity == 'tanh':
         return 5.0 / 3
-    elif nonlinearity == 'relu':
+    if nonlinearity == 'relu':
         return math.sqrt(2.0)
-    elif nonlinearity == 'leaky_relu':
+    if nonlinearity == 'leaky_relu':
         if param is None:
             negative_slope = 0.01
         elif not isinstance(param, bool) and isinstance(param, int) or isinstance(param, float):
@@ -66,8 +73,8 @@ def calculate_gain(nonlinearity, param=None):
         else:
             raise ValueError("negative_slope {} not a valid number".format(param))
         return math.sqrt(2.0 / (1 + negative_slope ** 2))
-    else:
-        raise ValueError("Unsupported nonlinearity {}".format(nonlinearity))
+
+    raise ValueError("Unsupported nonlinearity {}".format(nonlinearity))
 
 
 def _calculate_correct_fan(array, mode):
@@ -148,6 +155,9 @@ def kaiming_normal_(arr, a=0, mode='fan_in', nonlinearity='leaky_relu'):
 
 
 def _calculate_fan_in_and_fan_out(arr):
+    """
+    Calculate fan in and fan out
+    """
     dimensions = len(arr.shape)
     if dimensions < 2:
         raise ValueError("Fan in and fan out can not be computed for array with fewer than 2 dimensions")
@@ -198,7 +208,7 @@ class XavierUniform(MeInitializer):
 
     def _initialize(self, arr):
         tmp = xavier_uniform_(arr, self.gain)
-        init._assignment(arr, tmp)
+        assignment(arr, tmp)
 
 
 class KaimingUniform(MeInitializer):
@@ -210,7 +220,7 @@ class KaimingUniform(MeInitializer):
 
     def _initialize(self, arr):
         tmp = kaiming_uniform_(arr, self.a, self.mode, self.nonlinearity)
-        init._assignment(arr, tmp)
+        assignment(arr, tmp)
 
 
 class KaimingNormal(MeInitializer):
@@ -222,7 +232,7 @@ class KaimingNormal(MeInitializer):
 
     def _initialize(self, arr):
         tmp = kaiming_normal_(arr, self.a, self.mode, self.nonlinearity)
-        init._assignment(arr, tmp)
+        assignment(arr, tmp)
 
 class RandomNormal(MeInitializer):
     def __init__(self, std=0.001):
@@ -232,42 +242,44 @@ class RandomNormal(MeInitializer):
     def _initialize(self, arr):
         std = self.std
         tmp = np.random.normal(0, std, arr.shape)
-        init._assignment(arr, tmp)
+        assignment(arr, tmp)
 
 def default_recurisive_init(custom_cell):
+    """
+    Parameters init
+    """
     np.random.seed(123)
     for name, cell in custom_cell.cells_and_names():
         if 'hm' in name or 'wh' in name or 'off' in name or 'kps' in name:
             if isinstance(cell, (nn.Conv2d)):
-                cell.weight.set_data(init.initializer(RandomNormal(),
-                                                         cell.weight.data.shape,
-                                                         cell.weight.data.dtype).to_tensor())
+                cell.weight.set_data(init.initializer(RandomNormal(), cell.weight.data.shape,
+                                                      cell.weight.data.dtype).to_tensor())
                 if cell.bias is not None:
                     cell.bias.set_data(init.initializer('zeros', cell.bias.data.shape,
-                                                            cell.bias.data.dtype).to_tensor())
+                                                        cell.bias.data.dtype).to_tensor())
                 continue
 
         if isinstance(cell, (nn.Conv2d)):
-            cell.weight.set_data(init.initializer(KaimingNormal(mode='fan_out'), #KaimingUniform(a=math.sqrt(5)),
-                                                         cell.weight.data.shape,
-                                                         cell.weight.data.dtype).to_tensor())
+            cell.weight.set_data(init.initializer(KaimingNormal(mode='fan_out'),
+                                                  cell.weight.data.shape,
+                                                  cell.weight.data.dtype).to_tensor())
             if cell.bias is not None:
                 cell.bias.set_data(init.initializer('zeros', cell.bias.data.shape,
-                                                           cell.bias.data.dtype).to_tensor())
+                                                    cell.bias.data.dtype).to_tensor())
         elif isinstance(cell, nn.Dense):
-            cell.weight.set_data(init.initializer(KaimingNormal(mode='fan_out'), #KaimingUniform(a=math.sqrt(5)),
-                                                         cell.weight.data.shape,
-                                                         cell.weight.data.dtype).to_tensor())
+            cell.weight.set_data(init.initializer(KaimingNormal(mode='fan_out'),
+                                                  cell.weight.data.shape,
+                                                  cell.weight.data.dtype).to_tensor())
             if cell.bias is not None:
                 cell.bias.set_data(init.initializer('zeros', cell.bias.data.shape,
-                                                           cell.bias.data.dtype).to_tensor())
-        elif isinstance(cell, nn.BatchNorm2d) or isinstance(cell, nn.BatchNorm1d):
+                                                    cell.bias.data.dtype).to_tensor())
+        elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d)):
             cell.gamma.set_data(init.initializer('ones', cell.gamma.data.shape).to_tensor())
             cell.beta.set_data(init.initializer('zeros', cell.beta.data.shape).to_tensor())
         elif isinstance(cell, nn.Conv2dTranspose):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5), mode='fan_out'), #KaimingUniform(a=math.sqrt(5)),
-                                                         cell.weight.data.shape,
-                                                         cell.weight.data.dtype).to_tensor())
+            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5), mode='fan_out'),
+                                                  cell.weight.data.shape,
+                                                  cell.weight.data.dtype).to_tensor())
             if cell.bias is not None:
                 cell.bias.set_data(init.initializer('zeros', cell.bias.data.shape,
-                                                           cell.bias.data.dtype).to_tensor())
+                                                    cell.bias.data.dtype).to_tensor())

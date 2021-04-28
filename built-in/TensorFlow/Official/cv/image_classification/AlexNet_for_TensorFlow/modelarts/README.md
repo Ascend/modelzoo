@@ -18,11 +18,11 @@ AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中
 ---|---|---|---|---|
 max_epochs|150|int|True|训练轮数
 lr|0.015|float|True|初始学习率
-iterations_per_loop|100|int|True|每次迭代的步驟数
+iterations_per_loop|100|int|True|每次迭代的步数
 batch_size|256|int|True|一次训练所抓取的数据样本数量
 freeze_pb|True|bool|False|训练结束是否将最后一个ckpt冻结为pb模型文件
 num_classes|1000|int|False|数据集类别数（迁移学习必填）
-restore_path|-|string|Flase|迁移学习预加载模型路径（迁移学习必填，正常训练不需要上传预训练模型）
+restore_path|-|string|False|迁移学习预加载模型路径（迁移学习必填；若正常训练，则不需要上传预训练模型，创建训练任务时不配置该参数）
 
 ### 2.3.训练输出文件
 训练完成后的输出文件如下

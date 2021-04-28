@@ -14,9 +14,7 @@
 # ============================================================================
 """centerface networks"""
 
-import numpy as np
-
-from src.config import Config_centerface
+from src.config import ConfigCenterface
 from src.mobile_v2 import mobilenet_v2
 from src.losses import FocalLoss, SmoothL1LossNew, SmoothL1LossNewCMask
 
@@ -30,12 +28,8 @@ from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore.common import dtype as mstype
-from mindspore.ops.operations import NPUGetFloatStatus, NPUAllocFloatStatus, NPUClearFloatStatus, ReduceSum, LessEqual, \
-    ControlDepend
-try:
-    from mindspore.train import ParallelMode
-except:
-    from mindspore.context import ParallelMode
+from mindspore.ops.operations import NPUGetFloatStatus, NPUAllocFloatStatus, NPUClearFloatStatus, ReduceSum, LessEqual
+from mindspore.context import ParallelMode
 
 _grad_scale = C.MultitypeFuncGraph("grad_scale")
 reciprocal = P.Reciprocal()
@@ -45,7 +39,8 @@ def tensor_grad_scale(scale, grad):
     return grad * reciprocal(scale)
 
 def conv1x1(in_channels, out_channels, stride=1, padding=0, has_bias=False):
-    return nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, has_bias=has_bias, padding=padding, pad_mode="pad")#"pad")
+    return nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, has_bias=has_bias,
+                     padding=padding, pad_mode="pad")
 
 
 def conv3x3(in_channels, out_channels, stride=1, padding=1, has_bias=False):
@@ -54,21 +49,25 @@ def conv3x3(in_channels, out_channels, stride=1, padding=1, has_bias=False):
 
 
 def convTranspose2x2(in_channels, out_channels, has_bias=False): #  Davinci devices only support 'groups=1'
-    return nn.Conv2dTranspose(in_channels, out_channels, kernel_size=2, stride=2,  has_bias=has_bias, weight_init='normal', bias_init='zeros')
+    return nn.Conv2dTranspose(in_channels, out_channels, kernel_size=2, stride=2, has_bias=has_bias,
+                              weight_init='normal', bias_init='zeros')
 
 
 class IDAUp(nn.Cell):
+    """
+    IDA Module.
+    """
     def __init__(self, out_dim, channel):
         super(IDAUp, self).__init__()
         self.out_dim = out_dim
         self.up = nn.SequentialCell([
-                    convTranspose2x2(out_dim, out_dim, has_bias=False),
-                    nn.BatchNorm2d(out_dim, eps=0.001, momentum=0.9).add_flags_recursive(fp32=True),
-                    nn.ReLU()])
+            convTranspose2x2(out_dim, out_dim, has_bias=False),
+            nn.BatchNorm2d(out_dim, eps=0.001, momentum=0.9).add_flags_recursive(fp32=True),
+            nn.ReLU()])
         self.conv = nn.SequentialCell([
-                    conv1x1(channel, out_dim),
-                    nn.BatchNorm2d(out_dim, eps=0.001, momentum=0.9).add_flags_recursive(fp32=True),
-                    nn.ReLU()])
+            conv1x1(channel, out_dim),
+            nn.BatchNorm2d(out_dim, eps=0.001, momentum=0.9).add_flags_recursive(fp32=True),
+            nn.ReLU()])
 
     def construct(self, x0, x1):
         x = self.up(x0)
@@ -78,17 +77,20 @@ class IDAUp(nn.Cell):
 
 
 class MobileNetUp(nn.Cell):
-    def __init__(self, channels, out_dim = 24):
+    """
+    Mobilenet module.
+    """
+    def __init__(self, channels, out_dim=24):
         super(MobileNetUp, self).__init__()
         channels = channels[::-1]
         self.conv = nn.SequentialCell([
-                    conv1x1(channels[0], out_dim),
-                    nn.BatchNorm2d(out_dim, eps=0.001).add_flags_recursive(fp32=True),
-                    nn.ReLU()])
+            conv1x1(channels[0], out_dim),
+            nn.BatchNorm2d(out_dim, eps=0.001).add_flags_recursive(fp32=True),
+            nn.ReLU()])
         self.conv_last = nn.SequentialCell([
-                    conv3x3(out_dim, out_dim),
-                    nn.BatchNorm2d(out_dim, eps=1e-5, momentum=0.99).add_flags_recursive(fp32=True),
-                    nn.ReLU()])
+            conv3x3(out_dim, out_dim),
+            nn.BatchNorm2d(out_dim, eps=1e-5, momentum=0.99).add_flags_recursive(fp32=True),
+            nn.ReLU()])
 
         self.up1 = IDAUp(out_dim, channels[1])
         self.up2 = IDAUp(out_dim, channels[2])
@@ -111,7 +113,7 @@ class Cast(nn.Cell):
     def construct(self, x):
         return self.cast(x, ms.float32)
 
-class centerface_mobilev2(nn.Cell):
+class CenterfaceMobilev2(nn.Cell):
     """
     Mobilev2 based CenterFace network.
 
@@ -129,14 +131,15 @@ class centerface_mobilev2(nn.Cell):
     """
 
     def __init__(self):
-        super(centerface_mobilev2, self).__init__()
-        self.config = Config_centerface()
+        super(CenterfaceMobilev2, self).__init__()
+        self.config = ConfigCenterface()
 
         self.base = mobilenet_v2()
         channels = self.base.feat_channel
         self.dla_up = MobileNetUp(channels, out_dim=self.config.head_conv)
 
-        self.hm_head = nn.SequentialCell([conv1x1(self.config.head_conv, 1, has_bias=True), nn.Sigmoid().add_flags_recursive(fp32=True)])
+        self.hm_head = nn.SequentialCell([conv1x1(self.config.head_conv, 1, has_bias=True),
+                                          nn.Sigmoid().add_flags_recursive(fp32=True)])
         self.wh_head = conv1x1(self.config.head_conv, 2, has_bias=True)
         self.off_head = conv1x1(self.config.head_conv, 2, has_bias=True)
         self.kps_head = conv1x1(self.config.head_conv, 10, has_bias=True)
@@ -152,6 +155,9 @@ class centerface_mobilev2(nn.Cell):
         return output_hm, output_wh, output_off, output_kps
 
 class CenterFaceLoss(nn.Cell):
+    """
+    Loss method defination.
+    """
     def __init__(self, wh_weight, reg_offset, off_weight, hm_weight, lm_weight):
         super(CenterFaceLoss, self).__init__()
         # --- config parameter
@@ -167,13 +173,18 @@ class CenterFaceLoss(nn.Cell):
         self.print = P.Print()
         # self.reduce_sum = P.ReduceSum()
 
-    def construct(self, output_hm, output_wh, output_off, output_kps, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks):
+    def construct(self, output_hm, output_wh, output_off, output_kps, hm, reg_mask, ind, wh, wight_mask, hm_offset,
+                  hps_mask, landmarks):
+        """
+        Construct method.
+        """
         hm_loss = self.cls_loss(output_hm, hm)  # 1. focal loss, center points
         wh_loss = self.reg_loss(output_wh, ind, wh, wight_mask)  # 2. weight and height
         off_loss = self.reg_loss(output_off, ind, hm_offset, wight_mask)  # 3. offset
         lm_loss = self.reg_loss_cmask(output_kps, hps_mask, ind, landmarks)  # 4. landmark loss
 
-        loss = self.hm_weight * hm_loss + self.wh_weight * wh_loss + self.off_weight * off_loss + self.lm_weight * lm_loss
+        loss = self.hm_weight * hm_loss + self.wh_weight * wh_loss + \
+               self.off_weight * off_loss + self.lm_weight * lm_loss
 
         # depend is needed when wight_mask and reg_mask is not been used
         F.depend(loss, F.sqrt(F.cast(wight_mask, mstype.float32)))
@@ -184,20 +195,28 @@ class CenterFaceLoss(nn.Cell):
 
 
 class CenterFaceWithLossCell(nn.Cell):
+    """
+    Centerface with loss cell.
+    """
     def __init__(self, network):
         super(CenterFaceWithLossCell, self).__init__()
         self.centerface_network = network
-        self.config = Config_centerface()
-        self.loss = CenterFaceLoss(self.config.wh_weight, self.config.reg_offset, self.config.off_weight, self.config.hm_weight, self.config.lm_weight)
+        self.config = ConfigCenterface()
+        self.loss = CenterFaceLoss(self.config.wh_weight, self.config.reg_offset, self.config.off_weight,
+                                   self.config.hm_weight, self.config.lm_weight)
         self.reduce_sum = P.ReduceSum()
         self.print = P.Print()
 
     def construct(self, x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks):
         output_hm, output_wh, output_off, output_kps = self.centerface_network(x)
-        loss = self.loss(output_hm, output_wh, output_off, output_kps, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks)
+        loss = self.loss(output_hm, output_wh, output_off, output_kps, hm, reg_mask, ind, wh, wight_mask, hm_offset,
+                         hps_mask, landmarks)
         return loss
 
 class TrainingWrapper(nn.Cell):
+    """
+    Training wrapper
+    """
     def __init__(self, network, optimizer, sens=1.0):
         super(TrainingWrapper, self).__init__(auto_prefix=False)
         self.network = network
@@ -232,7 +251,10 @@ class TrainingWrapper(nn.Cell):
         self.is_distributed = self.parallel_mode != ParallelMode.STAND_ALONE
 
     # x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks
-    def construct(self, x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks): # sens_input=1.0):
+    def construct(self, x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks):
+        """
+        Construct method.
+        """
         weights = self.weights
         loss = self.network(x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks)
 
@@ -243,7 +265,8 @@ class TrainingWrapper(nn.Cell):
 
         #sens = sens_input #P.Fill()(P.DType()(loss), P.Shape()(loss), sens_input) # user can contral loss scale by add a sens_input
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
-        grads = self.grad(self.network, weights)(x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks, sens)
+        grads = self.grad(self.network, weights)(x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks,
+                                                 sens)
         #grads = self.hyper_map(F.partial(_grad_scale, sens), grads) # if add this, the loss_scale optimizer is needed to set to 1
         if self.reducer_flag:
             grads = self.grad_reducer(grads)
@@ -258,7 +281,44 @@ class TrainingWrapper(nn.Cell):
             cond = self.less_equal(self.base, flag_reduce)
         else:
             cond = self.less_equal(self.base, flag_sum)
-        overflow = cond
 
         ret = (loss, cond, sens)
         return F.depend(ret, self.optimizer(grads))
+
+
+class CenterFaceWithNms(nn.Cell):
+    """
+    CenterFace with nms.
+    """
+    def __init__(self, network):
+        super(CenterFaceWithNms, self).__init__()
+        self.centerface_network = network
+        self.config = ConfigCenterface()
+        # two type of maxpool self.maxpool2d = nn.MaxPool2d(kernel_size=3, stride=1, pad_mode='same')
+        self.maxpool2d = P.MaxPoolWithArgmax(kernel_size=3, strides=1, pad_mode='same')
+        self.topk = P.TopK(sorted=True)
+        self.reshape = P.Reshape()
+        self.print = P.Print()
+        self.test_batch = self.config.test_batch_size
+        self.k = self.config.K
+
+    def construct(self, x):
+        """
+        Construct method.
+        """
+        output_hm, output_wh, output_off, output_kps = self.centerface_network(x)
+        output_hm_nms, _ = self.maxpool2d(output_hm)
+        abs_error = P.Abs()(output_hm - output_hm_nms)
+        abs_out = P.Abs()(output_hm)
+        error = abs_error / (abs_out + 1e-12)
+
+        # cannot use P.Equal()(output_hm, output_hm_nms), since maxpooling output has 0.1% error
+        keep = P.Select()(P.LessEqual()(error, 1e-3), \
+           P.Fill()(ms.float32, P.Shape()(error), 1.0), \
+           P.Fill()(ms.float32, P.Shape()(error), 0.0))
+        output_hm = output_hm * keep
+
+        # get topK and index
+        scores = self.reshape(output_hm, (self.test_batch, -1))
+        topk_scores, topk_inds = self.topk(scores, self.k)
+        return topk_scores, output_wh, output_off, output_kps, topk_inds

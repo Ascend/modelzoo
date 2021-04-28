@@ -29,7 +29,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ============================================================================
-
+import numpy as np
 import os
 import shutil
 import torch
@@ -63,7 +63,11 @@ class Saver(object):
                     path = os.path.join(self.directory, 'experiment_{}'.format(str(run_id)), 'best_pred.txt')
                     if os.path.exists(path):
                         with open(path, 'r') as f:
-                            miou = float(f.readline())
+                            try:
+                               miou = np.float(f.readline())
+                            except:
+                               print("An exception occurred")
+                            
                             previous_miou.append(miou)
                     else:
                         continue

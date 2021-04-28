@@ -115,7 +115,13 @@ def parse_args():
     # pre_train model path
     parser.add_argument("--restore_path", default=None,
                         help="restore path")
-
+    # modify for npu overflow start
+    # enable overflow
+    parser.add_argument("--over_dump", default=None,
+                        help="whether to enable overflow")
+    parser.add_argument("--over_dump_path", default=None,
+                        help="path to save overflow dump files")
+    # modify for npu overflow end
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:

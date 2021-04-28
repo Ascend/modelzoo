@@ -152,9 +152,9 @@ run_config = NPURunConfig(
 
 1. 模型训练使用ImageNet2012数据集，数据集请用户自行获取。
 
-2. 这里是列表文本数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
+2. 数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
 
-3. 这里是列表文本数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
+3. 数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
    
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。

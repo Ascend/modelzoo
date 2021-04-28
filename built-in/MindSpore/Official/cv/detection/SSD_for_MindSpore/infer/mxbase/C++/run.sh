@@ -12,6 +12,7 @@ export MXSDK_OPENSOURCE_DIR=${MXBASE_CODE_DIR}/opensource/dist
 export LD_LIBRARY_PATH=${MXBASE_CODE_DIR}/dist/opensource/lib:/usr/local/Ascend/ascend-toolkit/latest/acllib/lib64
 
 cd $MXBASE_CODE_DIR
+rm -rf dist
 mkdir dist
 cd dist
 cmake ..

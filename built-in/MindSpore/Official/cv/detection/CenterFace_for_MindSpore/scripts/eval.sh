@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2020 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-#!/bin/bash
+
 root=$PWD
 save_path=$root/output/centerface/
 ground_truth_path=$root/dataset/centerface/ground_truth
 echo "start eval"
-python ../eval.py --pred=$save_path --gt=$ground_truth_path
+python ../dependency/evaluate/eval.py --pred=$save_path --gt=$ground_truth_path
 echo "end eval"

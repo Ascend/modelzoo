@@ -15,19 +15,19 @@
 """auxiliary functions for train, to print and preload"""
 
 import math
-import numpy as np
 import logging
 import os
 import sys
 from datetime import datetime
+import numpy as np
 
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.train.serialization import load_checkpoint
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-
-from src.mobile_v2 import DepthWiseConv
 
 def load_backbone(net, ckpt_path, args):
+    """
+    Load backbone
+    """
     param_dict = load_checkpoint(ckpt_path)
     centerface_backbone_prefix = 'base'
     mobilev2_backbone_prefix = 'network.backbone'
@@ -50,7 +50,7 @@ def load_backbone(net, ckpt_path, args):
     for name, cell in net.cells_and_names():
         if name.startswith(centerface_backbone_prefix):
             name = name.replace(centerface_backbone_prefix, mobilev2_backbone_prefix)
-            if isinstance(cell, (nn.Conv2d, nn.Dense, DepthWiseConv)):
+            if isinstance(cell, (nn.Conv2d, nn.Dense)):
                 name, replace_name, replace_idx = replace_names(name, replace_name, replace_idx)
                 mobilev2_weight = '{}.weight'.format(name)
                 mobilev2_bias = '{}.bias'.format(name)
@@ -100,6 +100,9 @@ def load_backbone(net, ckpt_path, args):
     return net
 
 def get_param_groups(network):
+    """
+    Get param groups
+    """
     decay_params = []
     no_decay_params = []
     for x in network.trainable_params():
@@ -122,7 +125,10 @@ def get_param_groups(network):
     return [{'params': no_decay_params, 'weight_decay': 0.0}, {'params': decay_params}]
 
 
-class DistributedSampler(object):
+class DistributedSampler():
+    """
+    Distributed sampler
+    """
     def __init__(self, dataset, rank, group_size, shuffle=True, seed=0):
         self.dataset = dataset
         self.rank = rank
@@ -153,7 +159,7 @@ class DistributedSampler(object):
         return self.num_samples
 
 
-class AverageMeter(object):
+class AverageMeter():
     """Computes and stores the average and current value"""
 
     def __init__(self, name, fmt=':f', tb_writer=None):
@@ -182,8 +188,10 @@ class AverageMeter(object):
         fmtstr = '{name}:{avg' + self.fmt + '}'
         return fmtstr.format(**self.__dict__)
 
-logger_name = 'mindvision'
 class LOGGER(logging.Logger):
+    """
+    Logger class
+    """
     def __init__(self, logger_name, rank=0):
         super(LOGGER, self).__init__(logger_name)
         if rank % 8 == 0:
@@ -194,6 +202,9 @@ class LOGGER(logging.Logger):
             self.addHandler(console)
 
     def setup_logging_file(self, log_dir, rank=0):
+        """
+        Setup logging file
+        """
         self.rank = rank
         if not os.path.exists(log_dir):
             os.makedirs(log_dir, exist_ok=True)
@@ -213,7 +224,8 @@ class LOGGER(logging.Logger):
         self.info('Args:')
         args_dict = vars(args)
         for key in args_dict.keys():
-            self.info('--> {}: {}'.format(key, args_dict[key]))
+            # self.info('--> {}: {}'.format(key, args_dict[key]))
+            self.info('--> %s', key)
         self.info('')
 
     def important_info(self, msg, *args, **kwargs):
@@ -228,8 +240,6 @@ class LOGGER(logging.Logger):
             self.info(important_msg, *args, **kwargs)
 
 def get_logger(path, rank):
-    logger = LOGGER(logger_name, rank)
+    logger = LOGGER("centerface", rank)
     logger.setup_logging_file(path, rank)
     return logger
-
-

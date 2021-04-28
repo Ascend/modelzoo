@@ -44,7 +44,6 @@ link_directories(${MXBASE_LIB_DIR})
 link_directories(${MXBASE_POST_LIB_DIR})
 
 add_executable(${TARGET_ssd} main_ssd.cpp SSDMobileNetV1Fpn.cpp)
-target_link_libraries(${TARGET} glog cpprest mxbase resnet50postprocess)
 target_link_libraries(${TARGET_ssd} glog cpprest mxbase SsdMobilenetFpn_MindsporePost)
 
 install(TARGETS ${TARGET} RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/)

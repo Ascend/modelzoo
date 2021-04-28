@@ -112,6 +112,8 @@ class DeepLab(nn.Module):
                             if p.requires_grad:
                                 yield p
 
+
+
 if __name__ == "__main__":
     model = DeepLab(backbone='mobilenet', output_stride=16)
     model.eval()

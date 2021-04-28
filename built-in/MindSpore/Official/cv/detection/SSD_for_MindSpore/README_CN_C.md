@@ -338,7 +338,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 
 4. **修改数据集根目录：**
     ```shell script
-    vim config/config_ssd_mobilenet_v1_fpn.py
+    vim src/config_ssd_mobilenet_v1_fpn.py
     ```
     如下实例：
     ```python
@@ -415,8 +415,8 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 
     执行以下命令启动训练容器：
    ```shell script
-       cd scripts
-       bash docker_start.sh 
+   cd scripts
+   bash docker_start.sh 
    ```
 
 8. **开始训练**
@@ -593,7 +593,7 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
     "train_data_type": "",
     "val_data_type": "",
     "instances_set": "",
-    # 迁移学习数据集标签：background 之后为真实标签名，需要和 4.4.1 章节中的标注数据中类别及熟悉保持一致。
+    # 迁移学习数据集标签：background 之后为真实标签名，需要和 4.4.1 章节中的标注数据中类别及顺序保持一致。
     "classes": ('background', 'Arduino Nano', 'ESP8266', 'Raspberry Pi 3', 'Heltec ESP32 Lora'), 
     # 迁移学习数据集分类数：真实分数类 + 1
     "num_classes": 5,
@@ -680,31 +680,30 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 4. 模型转换为 OM 模型，执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
 
    ```shell
-   bash convert_om.sh /usr/local/Ascend/ascend-toolkit/ ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl
+   bash convert_om.sh /usr/local/Ascend/ascend-toolkit/ ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl_bgr ./aipp.cfg
    ```
 
    AIR 模型转换为 OM 模型的命令参数说明如下：
 
    - 参数1：ascend-toolkit 安装路径
-
    - 参数2：AIR 模型文件路径
-
    - 参数3：转换生成的的 OM 模型 文件名。
-
+   - 参数4：转换OM模型使用的 AIPP 配置文件
+   
     本例中执行生成以下模型文件：
-    ```
-   [root@centos-11 convert]# ll models/
-   total 111152
-   -r--------. 1 root root 47413459 Mar 13 17:08 ssd_1000-2_on_micro_ctrl.air
-   -rw-------. 1 root root 66403654 Mar 13 17:11 ssd_1000-2_on_micro_ctrl.om
-    ```
-
-6. 修改以下配置文件：
+       ```
+      [root@centos-11 convert]# ll models/
+      total 111152
+      -r--------. 1 root root 47413459 Mar 13 17:08 ssd_1000-2_on_micro_ctrl.air
+      -rw-------. 1 root root 66403654 Mar 13 17:11 ssd_1000-2_on_micro_ctrl_bgr.om
+       ```
+   
+5. 修改以下配置文件：
 
    - 环境变量配置文件：${work_space}/infer/sdk/conf/sdk_infer_env.rc
        ```shell
        export MX_SDK_HOME=/home/sam/mxManufacture # 根据 mxManufacture 安装路径修改
-       export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/arm64-linux
+       export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/arm64-linux # 环境如果是x86，则路径最后分量是 x86_64-linux
        export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${LD_LIBRARY_PATH}
        export PYTHONPATH=${MX_SDK_HOME}/python:${PYTHONPATH}
        export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME}/lib/plugins
@@ -724,33 +723,34 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
    - 后处理配置文件：本文示例为：/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_postprocess.cfg
      ```
      CLASS_NUM=5
-     OBJECT_NUM=51150
      SCORE_THRESH=0.1
      IOU_THRESH=0.6
      CHECK_MODEL=false
      ```
      参数说明：
      - CLASS_NUM：迁移学习数据集分类数+1
-     - OBJECT_NUM：推理输出的目标检测框的个数（后处理前）--TODO：会删除
      - SCORE_THRESH：分类置信度阈值
      - IOU_THRESH： IOU 阈值
-     - CHECK_MODEL：--TODO：待刘雨辰补充。
-
-   - mxManufacture 推理 pipeline配置，本文示例修改:/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
-![](res/md/infer/sdk_infer_pipeline.png)
-    参数说明：
+     - CHECK_MODEL：是否校验模型的输入是否匹配。
      
+   - mxManufacture 推理 pipeline配置，本文示例修改:/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
+   ![](res/md/infer/sdk_infer_pipeline.png)
+
+    参数说明：
+
      - resizeHeight: 图像缩放高度
      - resizeWidth: 图像缩放宽度
      - modelPath: 步骤4中转换生成的 OM 模型绝对路径
      - postProcessConfigPath: 后处理配置文件绝对路径
      - labelPath：迁移学习数据集标注文件绝对路径
      - postProcessLibPath：后处理 so 文件绝对路径，根据 mxManufacture 安装路径修改
-   
-7. 设置环境变量
+
+6. 设置环境变量
    - 修改 mxManufacture 推理需要的环境变量，本例中修改文件：
       ```shell
         export MX_SDK_HOME=/home/sam/mxManufacture # 根据 mxManufacture 安装路径修改。
+        # 以下环境变量 如果是x86架构，则配置为：
+        # export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/x86_64-linux
         export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/arm64-linux
         export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${LD_LIBRARY_PATH}
         export PYTHONPATH=${MX_SDK_HOME}/python:${PYTHONPATH}
@@ -761,16 +761,16 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
         ```shell
         source conf/sdk_infer_env.rc
         ```
-   
+
 7. 准备输入图片：本例中输入图片上传至：/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/test_img目录。
 
-9. 执行推理，并观察结果。
-    执行以下命令启动推理测试：
-   
+8. 执行推理，并观察结果。
+   执行以下命令启动推理测试：
+
    ```shell
     python3 infer_by_sdk.py
    ```
-   
+
     脚本可选参数可以通过：python3 infer_by_sdk.py --help查看如下：
     - pipeline_path 推理pipeline配置文件路径
     - stream_name 推理pipeline中配置的业务流名称
@@ -792,6 +792,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
         -rw-r--r--. 1 root root 1920 Mar 15 16:28 IMG_20181228_102757.json
       ```
       
+
 ### 5.4 mxBase 推理
 1. 准备 mxBase 代码<br/>
    在推理环境上执行以下命令下载 mxBase 代码：
@@ -806,24 +807,55 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
    cp /data/sam/codes/ssd_mobilenet_v1_fpn/infer/mxbase/models/coco.names /data/sam/codes/mindxsdk-mxbase/samples/models
    ```
 
-2. 修改环境变量及代码、模型路径
+2. OM 模型，执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
+
+   ```shell
+   bash convert_om.sh /usr/local/Ascend/ascend-toolkit/ ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl ./aipp_yuv.cfg
+   ```
+
+   AIR 模型转换为 OM 模型的命令参数说明如下：
+
+   - 参数1：ascend-toolkit 安装路径
+
+   - 参数2：AIR 模型文件路径
+
+   - 参数3：转换生成的的 OM 模型 文件名。
+
+   - 参数4：转换OM模型使用的 AIPP 配置文件
+
+     
+
+   **备注：** **SDK 推理和 mxBase 推理使用的是不同的 OM 模型文件。**
+
+   
+
+3. 修改环境变量及代码、模型路径
 
    ```shell
    cd /data/sam/codes/mindxsdk-mxbase/samples/C++/ # 根据1中clone的代码路径进行修改
    vi run.sh
    ```
-   
+
    修改参数如下：
-   
+
    ```shell
+   export ARCH_PATTERN=x86_64-linux # 如果是arm推理环境则修改为： arm_64-linux
+   
    # 以下变量根据代码 clone 路径及 OM 模型文件路径修改
    MXBASE_CODE_DIR=/data/sam/codes/mindxsdk-mxbase
-   OM_FILE=/data/pretrained_models/ms/mobilenet_v1/ckpt_0/mobilenetv1-90_625_2.om
+   OM_FILE=/data/pretrained_models/ms/mobilenet_v1/ckpt_0/mobilenetv1-90_625_2_yuv.om
    ```
+
+4. 修改 CMakeList.txt
+   执行以下命令，修改 mindxsdk-mxbase 根目录下的 CMakeLists.txt 文件，在最后一行添加如下内容：
+
+      ```
+   add_subdirectory(samples/C++)
+      ```
+
    
-   
-   
-3. 启动编译并推理
+
+5. 启动编译并推理
     执行以下命令启动编译和推理：
 
     ```shell script

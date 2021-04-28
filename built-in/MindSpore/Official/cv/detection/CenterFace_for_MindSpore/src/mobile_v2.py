@@ -15,16 +15,12 @@
 """modified mobilenet_v2 backbone"""
 
 import mindspore.nn as nn
-from collections import OrderedDict
 from mindspore.ops import operations as P
-from mindspore.ops.operations import TensorAdd
-from mindspore.common import dtype as mstype
-from mindspore import Parameter
-from mindspore.common.initializer import initializer
+from mindspore.ops.operations import Add
 
 from src.var_init import KaimingNormal
 
-__all__ = ['MobileNetV2', 'mobilenet_v2', 'DepthWiseConv']
+__all__ = ['MobileNetV2', 'mobilenet_v2']
 
 def _make_divisible(v, divisor, min_value=None):
     """
@@ -45,40 +41,20 @@ def _make_divisible(v, divisor, min_value=None):
         new_v += divisor
     return new_v
 
-class DepthWiseConv(nn.Cell):
-    def __init__(self, in_planes, kernel_size, stride, pad_mode, pad, channel_multiplier=1, has_bias=False):
-        super(DepthWiseConv, self).__init__()
-        self.has_bias = has_bias
-        self.depthwise_conv = P.DepthwiseConv2dNative(channel_multiplier=channel_multiplier, kernel_size=kernel_size,
-                                                      stride=stride, pad_mode=pad_mode, pad=pad)
-        self.bias_add = P.BiasAdd()
-
-        weight_shape = [channel_multiplier, in_planes, kernel_size, kernel_size]
-        #self.weight = Parameter(initializer('ones', weight_shape), name='weight')
-        self.weight = Parameter(initializer(KaimingNormal(mode='fan_out'), #KaimingUniform(a=math.sqrt(5)),
-                                                         weight_shape), name='weight')
-
-        if has_bias:
-            bias_shape = [channel_multiplier * in_planes]
-            self.bias = Parameter(initializer('zeros', bias_shape), name='bias')
-        else:
-            self.bias = None
-
-    def construct(self, x):
-        output = self.depthwise_conv(x, self.weight)
-        if self.has_bias:
-            output = self.bias_add(output, self.bias)
-        return output
-
 
 class ConvBNReLU(nn.Cell):
+    """
+    Convolution and batchnorm and relu
+    """
     def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1):
         padding = (kernel_size - 1) // 2
         super(ConvBNReLU, self).__init__()
         if groups == 1:
-            conv = nn.Conv2d(in_planes, out_planes, kernel_size, stride, pad_mode="pad", padding=padding, has_bias=False)
+            conv = nn.Conv2d(in_planes, out_planes, kernel_size, stride, pad_mode="pad", padding=padding,
+                             has_bias=False)
         else:
-            conv = DepthWiseConv(in_planes, kernel_size, stride, pad_mode="pad", pad=padding)
+            conv = nn.Conv2d(in_planes, out_planes, kernel_size, stride, pad_mode="pad", padding=padding,
+                             has_bias=False, group=groups, weight_init=KaimingNormal(mode='fan_out'))
 
         layers = [conv, nn.BatchNorm2d(out_planes).add_flags_recursive(fp32=True), nn.ReLU6()]  #, momentum=0.9
         self.features = nn.SequentialCell(layers)
@@ -91,6 +67,9 @@ class ConvBNReLU(nn.Cell):
 
 
 class InvertedResidual(nn.Cell):
+    """
+    Inverted residual module
+    """
     def __init__(self, inp, oup, stride, expand_ratio):
         super(InvertedResidual, self).__init__()
         self.stride = stride
@@ -112,7 +91,7 @@ class InvertedResidual(nn.Cell):
         ])
 
         self.conv = nn.SequentialCell(layers)
-        self.add = TensorAdd()
+        self.add = Add()
         self.cast = P.Cast()
 
     def construct(self, x):
@@ -120,21 +99,21 @@ class InvertedResidual(nn.Cell):
         x = self.conv(x)
         if self.use_res_connect:
             return self.add(identity, x)
-        else:
-            return x
+
+        return x
 
 
 class MobileNetV2(nn.Cell):
-    def __init__(self, width_mult=1.0, inverted_residual_setting=None, round_nearest=8):
-        """
-        MobileNet V2 main class, backbone
+    """
+    MobileNet V2 main class, backbone
 
-        Args:
-            width_mult (float): Width multiplier - adjusts number of channels in each layer by this amount
-            inverted_residual_setting: Network structure
-            round_nearest (int): Round the number of channels in each layer to be a multiple of this number
-            Set to 1 to turn off rounding
-        """
+    Args:
+        width_mult (float): Width multiplier - adjusts number of channels in each layer by this amount
+        inverted_residual_setting: Network structure
+        round_nearest (int): Round the number of channels in each layer to be a multiple of this number
+        Set to 1 to turn off rounding
+    """
+    def __init__(self, width_mult=1.0, inverted_residual_setting=None, round_nearest=8):
         super(MobileNetV2, self).__init__()
         block = InvertedResidual
         input_channel = 32
@@ -153,7 +132,7 @@ class MobileNetV2(nn.Cell):
         self.feat_channel = []
 
         # only check the first element, assuming user knows t,c,n,s are required
-        if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
+        if inverted_residual_setting is None or len(inverted_residual_setting[0]) != 4:
             raise ValueError("inverted_residual_setting should be non-empty "
                              "or a 4-element list, got {}".format(inverted_residual_setting))
 
@@ -161,26 +140,26 @@ class MobileNetV2(nn.Cell):
         input_channel = _make_divisible(input_channel * width_mult, round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]
 
-        for id, (t, c, n, s) in enumerate(inverted_residual_setting):
+        for index, (t, c, n, s) in enumerate(inverted_residual_setting):
             output_channel = _make_divisible(c * width_mult, round_nearest)
             for i in range(n):
                 stride = s if i == 0 else 1
                 features.append(block(input_channel, output_channel, stride, expand_ratio=t))
                 input_channel = output_channel
 
-            if id == 1:
+            if index == 1:
                 self.need_fp1 = nn.SequentialCell(features)
                 self.feat_channel.append(output_channel)
                 features = []
-            elif id == 2:
+            elif index == 2:
                 self.need_fp2 = nn.SequentialCell(features)
                 self.feat_channel.append(output_channel)
                 features = []
-            elif id == 4:
+            elif index == 4:
                 self.need_fp3 = nn.SequentialCell(features)
                 self.feat_channel.append(output_channel)
                 features = []
-            elif id == 6:
+            elif index == 6:
                 self.need_fp4 = nn.SequentialCell(features)
                 self.feat_channel.append(output_channel)
                 features = []

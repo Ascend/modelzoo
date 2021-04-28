@@ -22,6 +22,7 @@ link_directories(${SDK_INSTALL_DIR}/opensource/lib/)
 
 add_compile_options(-std=c++11 -fPIC -fstack-protector-all -pie -Wno-deprecated-declarations)
 add_compile_options("-DPLUGIN_NAME=${PLUGIN_NAME}")
+add_compile_options(-Dgoogle=mindxsdk_private)
 
 add_definitions(-DENABLE_DVPP_INTERFACE)
 

@@ -14,7 +14,6 @@
 # ============================================================================
 """losses for centerface"""
 
-import mindspore as ms
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 from mindspore.common import dtype as mstype
@@ -29,9 +28,14 @@ class FocalLoss(nn.Cell):
         self.sum = P.ReduceSum()
         self.print = P.Print()
 
-    def construct(self, pred, gt): # 2个map,关于cls
-        pos_inds = P.Select()(P.Equal()(gt, 1.0), P.Fill()(P.DType()(gt), P.Shape()(gt), 1.0), P.Fill()(P.DType()(gt), P.Shape()(gt), 0.0))
-        neg_inds = P.Select()(P.Less()(gt, 1.0), P.Fill()(P.DType()(gt), P.Shape()(gt), 1.0), P.Fill()(P.DType()(gt), P.Shape()(gt), 0.0))
+    def construct(self, pred, gt):
+        """Construct method"""
+        pos_inds = P.Select()(P.Equal()(gt, 1.0), P.Fill()(P.DType()(gt), P.Shape()(gt), 1.0), P.Fill()(P.DType()(gt),
+                                                                                                        P.Shape()(gt),
+                                                                                                        0.0))
+        neg_inds = P.Select()(P.Less()(gt, 1.0), P.Fill()(P.DType()(gt), P.Shape()(gt), 1.0), P.Fill()(P.DType()(gt),
+                                                                                                       P.Shape()(gt),
+                                                                                                       0.0))
 
         neg_weights = self.pow(1 - gt, 4) # beta=4
         # afa=2
@@ -47,12 +51,13 @@ class FocalLoss(nn.Cell):
         return loss
 
 class SmoothL1LossNew(nn.Cell):
+    """Smoothl1loss"""
     def __init__(self):
         super(SmoothL1LossNew, self).__init__()
         self.transpose = P.Transpose()
         self.smooth_l1_loss = nn.SmoothL1Loss()
         self.shape = P.Shape()
-        self.expandDims = P.ExpandDims()
+        self.expand_dims = P.ExpandDims()
         self.sum = P.ReduceSum()
         self.cast = P.Cast()
 
@@ -65,12 +70,14 @@ class SmoothL1LossNew(nn.Cell):
         '''
         output = self.transpose(output, (0, 2, 3, 1))
         # dim = self.shape(output)[3]
-        mask = P.Select()(P.Equal()(ind, 1), P.Fill()(mstype.float32, P.Shape()(ind), 1.0), P.Fill()(mstype.float32, P.Shape()(ind), 0.0))
+        mask = P.Select()(P.Equal()(ind, 1), P.Fill()(mstype.float32, P.Shape()(ind), 1.0), P.Fill()(mstype.float32,
+                                                                                                     P.Shape()(ind),
+                                                                                                     0.0))
         # ind = self.cast(ind, mstype.float32)
         target = self.cast(target, mstype.float32)
         output = self.cast(output, mstype.float32)
         num = self.cast(self.sum(mask, ()), mstype.float32)
-        mask = self.expandDims(mask, -1) # [batch,h,w]--[batch,h,w,c]
+        mask = self.expand_dims(mask, -1) # [batch,h,w]--[batch,h,w,c]
         output = output * mask
         target = target * mask
         loss = self.smooth_l1_loss(output, target)
@@ -84,12 +91,13 @@ class SmoothL1LossNew(nn.Cell):
         return loss
 
 class SmoothL1LossNewCMask(nn.Cell):
+    """Smoothl1loss with mask"""
     def __init__(self):
         super(SmoothL1LossNewCMask, self).__init__()
         self.transpose = P.Transpose()
         self.smooth_l1_loss = nn.L1Loss(reduction='sum') # or use nn.SmoothL1Loss()
         self.shape = P.Shape()
-        self.expandDims = P.ExpandDims()
+        self.expand_dims = P.ExpandDims()
         self.sum = P.ReduceSum()
         self.cast = P.Cast()
 
@@ -107,11 +115,10 @@ class SmoothL1LossNewCMask(nn.Cell):
         target = self.cast(target, mstype.float32)
         cmask = self.cast(cmask, mstype.float32)
         output = self.cast(output, mstype.float32)
-        ind = self.expandDims(ind, -1)
+        ind = self.expand_dims(ind, -1)
         output = output * ind
         target = target * ind
         loss = self.smooth_l1_loss(output*cmask, target*cmask)
         #loss = self.sum(loss, ()) # if use SmoothL1Loss, this is needed
         loss = loss / (num + 1e-4)
         return loss
-

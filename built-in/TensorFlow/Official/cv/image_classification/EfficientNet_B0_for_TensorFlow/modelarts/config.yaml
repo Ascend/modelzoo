@@ -1,0 +1,162 @@
+create_algo:
+  name: EfficientNet-B0-Ascend-ModelZoo
+  description: '基于TensorFlow框架的Ascend910训练'
+  config:
+    training:
+      image:
+        engine_name: Ascend-Powered-Engine
+        engine_version: TF-1.15-python3.7-aarch64
+      code:
+        relative_boot_file: start.py
+      inputs:
+        - name: 数据来源
+          parameter:
+            label: data_url
+            value: data_url/
+          dataset_enable: false
+          annotations:
+            - key: data_source
+              value:
+                - obs
+                - modelarts_dataset
+            - key: dataset_type
+              value:
+                - '0'
+            - key: data_format
+              value:
+                - Default
+            - key: data_segmentation
+              value:
+                - ''
+            - key: isconstrictinput
+            - key: constrictInputTempShow
+            - key: isSelectDatasetAndObs
+      outputs:
+        - name: 模型输出
+          description: ''
+          parameter:
+            label: train_url
+            value: train_url/
+          artifact:
+            - type: ''
+          modelarts_hosted: false
+      flavor:
+        flavor_codes: []
+        annotations:
+          - key: flavor_type
+            value:
+              - Ascend
+          - key: is_multi_devices_supported
+            value:
+              - 'true'
+          - key: is_multi_nodes_supported
+            value:
+              - 'true'
+          - key: flavor_codes
+            value: []
+          - key: isMultiDevHide
+      parameters:
+        regular:
+          - key: train_steps
+            help: null
+            type: Integer
+            default_value: '218750'
+            editable: true
+            required: true
+          - key: base_learning_rate
+            help: null
+            type: Continuous
+            default_value: '0.2'
+            editable: true
+            required: true
+          - key: iterations_per_loop
+            help: null
+            type: Integer
+            default_value: '625'
+            editable: true
+            required: true
+          - key: train_batch_size
+            help: null
+            type: Integer
+            default_value: '256'
+            editable: true
+            required: true
+          - key: mode
+            help: null
+            type: String
+            default_value: 'train'
+            editable: true
+            required: false
+          - key: steps_per_eval
+            help: null
+            type: Integer
+            default_value: '31250'
+            editable: true
+            required: true
+          - key: freeze_pb
+            help: null
+            type: String
+            default_value: 'True'
+            editable: true
+            required: true
+          - key: num_label_classes
+            help: null
+            type: Integer
+            default_value: '1000'
+            editable: true
+            required: true
+          - key: restore_path
+            help: null
+            type: String
+            default_value: ''
+            editable: true
+            required: false
+        customization: true
+
+publish_algo:
+  item_name: 图像分类-EfficientNet-B0-Ascend_ModelZoo
+  short_desc: '基于TensorFlow框架的Ascend910训练'
+
+create_train_job:
+  task_type: image_classification
+  job_desc: null
+  config:
+    flavor:
+      code: modelarts.kat1.xlarge
+    log_url: null
+    parameter:
+      - label: max_epochs
+        value: '150'
+        editable: true
+        required: true
+      - label: lr
+        value: '0.1'
+        editable: true
+        required: true
+      - label: iterations_per_loop
+        value: '10'
+        editable: true
+        required: true
+      - label: batch_size
+        value: '32'
+        editable: true
+        required: true
+    inputs:
+      - data_source:
+          obs:
+            obs_url: null
+    outputs:
+      - value: null
+
+create_model:
+  model_type: TensorFlow
+  description: null
+
+create_service:
+  schedule:
+    - duration: 1
+      time_units: HOURS
+      type: stop
+  description: null
+  config:
+    - specification: modelarts.kat1.xlarge

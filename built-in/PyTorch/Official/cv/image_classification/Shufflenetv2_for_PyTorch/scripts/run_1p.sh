@@ -30,4 +30,5 @@ python3.7 -u ${currentDir}/8p_main_med.py \
     --momentum=0 \
     --wd=3.0517578125e-05 \
     --device-list=${device_id} \
+    --num-classes=1000 \
     --benchmark 0 > ./shufflenetv2_1p.log 2>&1 &

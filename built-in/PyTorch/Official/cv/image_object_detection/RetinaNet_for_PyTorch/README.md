@@ -24,9 +24,9 @@ export MAX_JOBS=8
 source pt_set_env.sh
 
 cd mmcv
-python3.7.5 setup.py build_ext
-python3.7.5 setup.py develop
-pip3.7.5 list | grep mmcv
+python3.7 setup.py build_ext
+python3.7 setup.py develop
+pip3.7 list | grep mmcv
 ```
 
 #### Modified MMCV
@@ -49,9 +49,9 @@ pip3.7.5 list | grep mmcv
 4. 执行以下命令，安装mmdet
 ```
 cd RetinaNet_for_PyTorch
-pip3.7.5 install -r requirements/build.txt
-pip3.7.5 install -v -e .
-pip3.7.5 list | grep mm
+pip3.7 install -r requirements/build.txt
+pip3.7 install -v -e .
+pip3.7 list | grep mm
 ```
 
 

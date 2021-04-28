@@ -46,17 +46,15 @@ import argparse
 
 
 def parse_args():
+    """parse args from command line"""
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    
-
-    parser.add_argument('--rank_size', default=1,type=int,
+    parser.add_argument('--rank_size', default=1, type=int,
                         help="""number of NPUs  to use.""")
-
-    # mode and parameters related 
+    # mode and parameters related
     parser.add_argument('--mode', default='train_and_evaluate',
                         help="""mode to run the program  e.g. train, evaluate, and
                         train_and_evaluate""")
-    parser.add_argument('--max_train_steps', default=100,type=int,
+    parser.add_argument('--max_train_steps', default=100, type=int,
                         help="""train steps for one NPU""")
     parser.add_argument('--iterations_per_loop', default=10, type=int,
                         help="""the number of steps in devices for each iteration""")
@@ -102,6 +100,15 @@ def parse_args():
                         help="""name of log file""")
     parser.add_argument('--log_dir', default='./model_1p',
                         help="""log directory""")
+    # 配置预训练ckpt路径
+    parser.add_argument('--restore_path', default='',
+                        help="""restore path of pretrained model""")
+    # 不加载预训练网络中FC层权重
+    parser.add_argument('--restore_exclude', default=['linear/'],
+                        help="""restore_exclude""")
+    # 数据集中的类别数量
+    parser.add_argument('--num_classes', default=1000, type=int,
+                        help="""number of classes for datasets""")
  
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:

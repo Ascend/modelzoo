@@ -30,4 +30,5 @@ python3.7 -u ${currentDir}/8p_main_med.py \
     --amp \
     --momentum=0 \
     --device-list=${device_id_list} \
+    --num-classes=1000 \
     --benchmark 0 > ./shufflenetv2_8p.log 2>&1 &

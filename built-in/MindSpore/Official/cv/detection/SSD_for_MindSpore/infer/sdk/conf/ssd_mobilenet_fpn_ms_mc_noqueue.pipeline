@@ -10,9 +10,6 @@
 			"factory": "appsrc",
 			"next": "mxpi_imagedecoder0"
 		},
-		"appsink0": {
-			"factory": "appsink"
-		},
         "mxpi_imagedecoder0": {
 		    "props": {
 			    "handleMethod": "opencv"
@@ -33,7 +30,7 @@
 		"mxpi_tensorinfer0": {
 			"props": {
 				"dataSource": "mxpi_imageresize0",
-				"modelPath": "/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/convert/models/ssd-500_458_on_coco.om"
+				"modelPath": "/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/convert/models/ssd-500_458_on_coco_bgr.om"
 			},
 			"factory": "mxpi_tensorinfer",
 			"next": "mxpi_objectpostprocessor0"
@@ -55,5 +52,8 @@
 			"factory": "mxpi_dataserialize",
 			"next": "appsink0"
 		}
+        "appsink0": {
+			"factory": "appsink"
+		},
 	}
 }

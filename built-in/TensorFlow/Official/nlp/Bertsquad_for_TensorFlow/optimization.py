@@ -89,13 +89,13 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
     optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
 
   tvars = tf.trainable_variables()
-  if ran_size == 1:
+  if rank_size == 1:
       grads = tf.gradients(loss, tvars)
   else:
-      optimizer = NPUDistributeOptimizer(optimizer)
+      optimizer = NPUDistributedOptimizer(optimizer)
       grads_and_vars = optimizer.compute_gradients(loss, tvars)
       grads_and_vars = [(g, v) for g, v in grads_and_vars if g is not None]
-      grads, tars = list(zip(*grads_and_vars))
+      grads, tvars = list(zip(*grads_and_vars))
   # This is how the model was pre-trained.
   (grads, _) = tf.clip_by_global_norm(grads, clip_norm=1.0)
 

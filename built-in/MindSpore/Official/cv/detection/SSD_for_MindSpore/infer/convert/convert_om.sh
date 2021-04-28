@@ -8,12 +8,13 @@ then
   echo "Example: "
   echo "         bash convert_om.sh /usr/local/Ascend/ascend-toolkit/ ./models/ssd-500_458_on_coco.air ./models/ssd-500_458_on_coco"
 
-  exit -1
+  exit 255
 fi
 
 ascend_toolkit_install_path=$1
 input_air_path=$2
 output_om_path=$3
+aipp_cfg=$4
 
 export install_path=$ascend_toolkit_install_path
 
@@ -34,6 +35,6 @@ atc --input_format=NCHW \
 --output=${output_om_path} \
 --soc_version=Ascend310 \
 --disable_reuse_memory=0 \
---insert_op_conf=../../src/aipp.cfg \
+--insert_op_conf=${aipp_cfg} \
 --precision_mode=allow_fp32_to_fp16  \
 --op_select_implmode=high_precision

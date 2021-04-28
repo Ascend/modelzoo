@@ -14,8 +14,10 @@
 # ============================================================================
 """centerface unique configs"""
 
-class Config_centerface():
-
+class ConfigCenterface():
+    """
+    Config setup
+    """
     flip_idx = [[0, 1], [3, 4]]
     default_resolution = [512, 512]
     heads = {'hm': 1, 'wh': 2, 'hm_offset': 2, 'landmarks': 5 * 2}
@@ -45,7 +47,7 @@ class Config_centerface():
     # for test
     mean = [0.408, 0.447, 0.470]
     std = [0.289, 0.274, 0.278]
-    test_scales = [0.999, ] #[1, ]
+    test_scales = [0.999,]
     nms = 1
     flip_test = 0
     fix_res = True
@@ -53,8 +55,8 @@ class Config_centerface():
     input_w = 832 #800
     K = 200
     down_ratio = 4
+    test_batch_size = 1
 
-    seed = 317
     master_batch_size = 8
     num_workers = 8
     not_rand_crop = False

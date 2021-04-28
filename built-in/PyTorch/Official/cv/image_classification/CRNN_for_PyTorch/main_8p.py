@@ -145,7 +145,7 @@ def main():
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[npu], broadcast_buffers=False)
 
     converter = utils.strLabelConverter(config.DATASET.ALPHABETS)
-    if distributed and npu == 0:
+    if distributed and config.DISTRIBUTED.RANK % npus_per_node == 0:
         checkpoint_dir, log_dir = utils.create_output_folder(config)
     for epoch in range(last_epoch, config.TRAIN.END_EPOCH):
         train(config, train_loader, train_dataset, converter, model, criterion, optimizer, device, epoch, npus_per_node,
@@ -155,7 +155,7 @@ def main():
         best_acc = max(acc, best_acc)
         print("is best:", is_best)
         print("best acc is:", best_acc)
-        if distributed and npu == 0:
+        if distributed and config.DISTRIBUTED.RANK % npus_per_node == 0:
             if config.TRAIN.AMP:
                 torch.save(
                     {

@@ -1,6 +1,6 @@
 create_algo:
   name: AlexNet-Ascend-ModelZoo
-  description: ""
+  description: "基于TensorFlow框架的Ascend910训练"
   config:
     training:
       image:
@@ -98,12 +98,12 @@ create_algo:
             type: String
             default_value: ''
             editable: true
-            required: true
+            required: false
         customization: true
 
 publish_algo:
-  item_name: 图像分类-AlexNet(Ascend-ModelZoo)
-  short_desc: 基于TensorFlow, Ascend910训练
+  item_name: 图像分类-AlexNet-Ascend_ModelZoo
+  short_desc: '基于TensorFlow框架的Ascend910训练'
 
 create_train_job:
   task_type: image_classification

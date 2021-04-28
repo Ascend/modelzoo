@@ -12,50 +12,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Convert ckpt to air."""
-import os
-import numpy as np
+"""export checkpoint file into air, onnx, mindir models"""
 import argparse
+import numpy as np
 
-from mindspore import context
-from mindspore import Tensor
-from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
+import mindspore
+from mindspore import context, Tensor
+from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 
-from src.centerface import centerface_mobilev2
+from src.centerface import CenterfaceMobilev2, CenterFaceWithNms
+from src.config import ConfigCenterface
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=True)
+parser = argparse.ArgumentParser(description='centerface export')
+parser.add_argument("--device_id", type=int, default=0, help="Device id")
+parser.add_argument("--batch_size", type=int, default=1, help="batch size")
+parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
+parser.add_argument("--file_name", type=str, default="centerface", help="output file name.")
+parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', help='file format')
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
+                    help="device target")
+args = parser.parse_args()
 
-def save_air():
-    print('============= centerface start save air ==================')
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 
-    parser = argparse.ArgumentParser(description='Convert ckpt to air')
-    parser.add_argument('--pretrained', type=str, default='', help='pretrained model to load')
-    parser.add_argument('--batch_size', type=int, default=8, help='batch size')
+if __name__ == '__main__':
+    config = ConfigCenterface()
+    net = CenterfaceMobilev2()
 
-    args = parser.parse_args()
-    network = centerface_mobilev2()
+    param_dict = load_checkpoint(args.ckpt_file)
+    param_dict_new = {}
+    for key, values in param_dict.items():
+        if key.startswith('moments.') or key.startswith('moment1.') or key.startswith('moment2.'):
+            continue
+        elif key.startswith('centerface_network.'):
+            param_dict_new[key[19:]] = values
+        else:
+            param_dict_new[key] = values
 
-    if os.path.isfile(args.pretrained):
-        param_dict = load_checkpoint(args.pretrained)
-        param_dict_new = {}
-        for key, values in param_dict.items():
-            if key.startswith('moments.') or key.startswith('moment1.') or key.startswith('moment2.'):
-                continue
-            elif key.startswith('centerface_network.'):
-                param_dict_new[key[19:]] = values
-            else:
-                param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
-        print('load model {} success'.format(args.pretrained))
+    load_param_into_net(net, param_dict_new)
+    net = CenterFaceWithNms(net)
+    net.set_train(False)
 
-        input_data = np.random.uniform(low=0, high=1.0, size=(args.batch_size, 3, 832, 832)).astype(np.float32)
-
-        tensor_input_data = Tensor(input_data)
-        export(network, tensor_input_data,
-               file_name=args.pretrained.replace('.ckpt', '_' + str(args.batch_size) + 'b.air'), file_format='AIR')
-
-        print("export model success.")
-
-
-if __name__ == "__main__":
-    save_air()
+    input_data = Tensor(np.zeros([args.batch_size, 3, config.input_h, config.input_w]), mindspore.float32)
+    export(net, input_data, file_name=args.file_name, file_format=args.file_format)
