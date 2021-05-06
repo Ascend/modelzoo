@@ -7,7 +7,7 @@ export ASCEND_GLOBAL_EVENT_ENABLE=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 export DYNAMIC_OP="ADD#MUL"
-/usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
+/usr/local/Ascend/driver/tools/msnpureport -g error
 /usr/local/Ascend/driver/tools/msnpureport -e disable
 
 nohup python3.7 tools/train_net.py \

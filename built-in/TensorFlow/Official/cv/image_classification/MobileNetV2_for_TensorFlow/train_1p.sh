@@ -21,7 +21,7 @@ mkdir -p ${currentDir}/result/1p/${device_id}
 cd ${currentDir}/result/1p/${device_id}
 
 python3.7 ${currentDir}/train.py \
-    --dataset_dir=/opt/npu/slimImagenet \
+    --dataset_dir=/data/imagenet_TF \
     --max_train_steps=500 \
     --iterations_per_loop=50 \
     --model_name="mobilenet_v2" \
@@ -34,7 +34,7 @@ python3.7 ${currentDir}/train.py \
     --learning_rate=0.4 \
     --optimizer='momentum' \
     --momentum='0.9' \
-    --warmup_epochs=5 > ${currentDir}/result/1p/train_${device_id}.log 2>&1
+    --warmup_epochs=5 | tee -a ${currentDir}/result/1p/train_${device_id}.log 2>&1
 
 if [ $? -eq 0 ] ;
 then

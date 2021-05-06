@@ -25,6 +25,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 from nets import nets_factory
 from preprocessing import preprocessing_factory
+from config import trans_config as config
 
 flags.DEFINE_string("model_name", None,
                     "The name of the architecture to quantize.")
@@ -46,7 +47,7 @@ flags.DEFINE_integer(
     "num_steps", 1000,
     "Number of post-training quantization calibration steps to run.")
 flags.DEFINE_integer("image_size", 224, "Size of the input image.")
-flags.DEFINE_integer("num_classes", 1001,
+flags.DEFINE_integer("num_classes", config.num_classes,
                      "Number of output classes for the model.")
 
 FLAGS = flags.FLAGS

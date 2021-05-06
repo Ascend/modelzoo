@@ -17,7 +17,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+#
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 """Utility functions for GLUE classification tasks."""
 
 from __future__ import absolute_import
@@ -871,11 +886,11 @@ class COPAProcessor(DataProcessor):
       guid1 = "%s-%s" % (set_type, i)
 #         try:
       if line['question'] == 'cause':
-        text_a = convert_to_unicode(line['premise'] + '原因是什么呢？' + line['choice0'])
-        text_b = convert_to_unicode(line['premise'] + '原因是什么呢？' + line['choice1'])
+        text_a = convert_to_unicode(line['premise'] + '鍘熷洜鏄粈涔堝憿锛' + line['choice0'])
+        text_b = convert_to_unicode(line['premise'] + '鍘熷洜鏄粈涔堝憿锛' + line['choice1'])
       else:
-        text_a = convert_to_unicode(line['premise'] + '造成了什么影响呢？' + line['choice0'])
-        text_b = convert_to_unicode(line['premise'] + '造成了什么影响呢？' + line['choice1'])
+        text_a = convert_to_unicode(line['premise'] + '閫犳垚浜嗕粈涔堝奖鍝嶅憿锛' + line['choice0'])
+        text_b = convert_to_unicode(line['premise'] + '閫犳垚浜嗕粈涔堝奖鍝嶅憿锛' + line['choice1'])
       label = convert_to_unicode(str(1 if line['label'] == 0 else 0)) if set_type != 'test' else '0'
       examples.append(
           InputExample(guid=guid1, text_a=text_a, text_b=text_b, label=label))

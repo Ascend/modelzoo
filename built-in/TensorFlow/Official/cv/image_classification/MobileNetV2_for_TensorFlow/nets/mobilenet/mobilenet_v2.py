@@ -33,6 +33,7 @@ from tensorflow.contrib import slim as contrib_slim
 
 from nets.mobilenet import conv_blocks as ops
 from nets.mobilenet import mobilenet as lib
+from config import trans_config as config
 
 slim = contrib_slim
 op = lib.op
@@ -105,7 +106,7 @@ V2_DEF_GROUP_NORM['defaults'] = {
 
 @slim.add_arg_scope
 def mobilenet(input_tensor,
-              num_classes=1001,
+              num_classes=config.num_classes,
               depth_multiplier=1.0,
               scope='MobilenetV2',
               conv_defs=None,
@@ -150,6 +151,7 @@ def mobilenet(input_tensor,
   Raises:
     ValueError: On invalid arguments
   """
+  print("In mobilenet, num_classes is %d" % config.num_classes)
   if conv_defs is None:
     conv_defs = V2_DEF
   if 'multiplier' in kwargs:

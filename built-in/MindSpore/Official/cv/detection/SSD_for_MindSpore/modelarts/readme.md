@@ -1,8 +1,11 @@
 
-# SSD-ModelZoo (目标检测/MindSpore)
 
----
+# SSD_MobileNet_V1_FPN-Ascend (目标检测/MindSpore)
+
+
+
 ## 1.概述
+
 SSD Mobilenet V1 FPN SSD 将边界框的输出空间离散为一组默认框，每个特征地图位置的纵横比和比例不同。在预测时，网络为每个默认框中每个对象类别 生成分数，并对该框进行调整，以更好地匹配对象形状。此外，该网络结合了来自不同分辨率的多个特征图的预测，从而自然地处理不同尺寸的物体。
 
 ## 2.训练
@@ -25,10 +28,7 @@ save_checkpoint_epochs|10|int|False|保存checkpoint的轮数。
 feature_extractor_base_param|-|string|False|预训练模型路径，模型放在data_url下，填相对于data_url的路径。using_model为ssd_mobilenet_v1_fpn需要改参数。迁移学习时该参数不起作用。
  classes_label_path           |-|string|True|数据集标签文件路径，文件内容为，每行一个类别名，第一行类别名为background。填相对于data_url的路径。
 num_classes|81|string|True|数据集类别数+1。
-coco_root|-|string|False|dataset为coco时，用于指定数据集路径，填相对于data_url的路径。
-voc_root|-|string|False|dataset为voc时，用于指定数据集路径，填相对于data_url的路径。
 voc_json|-|string|False|dataset为voc时，用于指定数据集标注文件，填相对于data_url的路径。
-image_dir|-|string|False|dataset为other时，用于指定数据集路径，填相对于data_url的路径。
 anno_path|-|string|False|dataset为other时，用于指定数据集标注文件，填相对于data_url的路径。
 pre_trained|-|string|False|迁移学习时，预训练模型路径，模型放在data_url下，填相对于data_url的路径。
 loss_scale|1024|int|False|Loss scale.
@@ -54,11 +54,11 @@ freeze_layer|none|string|False|冻结网络的权重，支持冻结backbone的�
 ```
 
 ## 3.迁移学习指导
-### 1. 数据集准备：
+### 3.1. 数据集准备：
 
 参考训练手册：`迁移学习指导`->`数据集准备`
 
-### 2. 上传预训练模型ckpt文件到obs数据目录pretrain_model中，示例如下：
+### 3.2. 上传预训练模型ckpt文件到obs数据目录pretrain_model中，示例如下：
 
 ```
 MicrocontrollerDetection              # obs数据目录 
@@ -83,9 +83,17 @@ Heltec ESP32 Lora
 
 
 
-### 3. 修改配置文件
+### 3.3. 修改调优参数
 
+目前迁移学习支持修改数据集类别，订阅算法创建训练任务，创建训练作业时需要修改如下调优参数：
 
+* dataset改为other。
+* num_classes改为迁移学习数据集的类别数+1。
+* anno_path指定迁移学习数据集的标注文件路径。
+* filter_weight改为True。
+* pre_trained指定预训练模型路径。
 
-### 4. 创建训练作业
+以上参数的说明见`训练参数说明`。
+
+### 3.4. 创建训练作业
 指定数据存储位置、模型输出位置和作业日志路径，创建训练作业进行迁移学习。

@@ -70,7 +70,8 @@ def random_sample_crop(image, boxes):
 
         # dropout some boxes
         drop_mask = overlap > 0
-        if not drop_mask.any():
+        #if not drop_mask.any():
+        if not drop_mask.all():
             continue
 
         if overlap[drop_mask].min() < min_iou and overlap[drop_mask].max() > (min_iou + 0.2):
@@ -400,11 +401,15 @@ def create_ssd_dataset(mindrecord_file, batch_size=32, repeat_num=10, device_num
     change_swap_op = C.HWC2CHW()
     normalize_op = C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
                                std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
+    is_use_color_adjust = config.color_adjust
     color_adjust_op = C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
     compose_map_func = (lambda img_id, image, annotation: preprocess_fn(img_id, image, annotation, is_training))
-    if is_training:
+    if is_training and is_use_color_adjust:
         output_columns = ["image", "box", "label", "num_match"]
         trans = [color_adjust_op, normalize_op, change_swap_op]
+    elif is_training and not is_use_color_adjust:
+        output_columns = ["image", "box", "label", "num_match"]
+        trans = [normalize_op, change_swap_op]
     else:
         output_columns = ["img_id", "image", "image_shape"]
         trans = [normalize_op, change_swap_op]

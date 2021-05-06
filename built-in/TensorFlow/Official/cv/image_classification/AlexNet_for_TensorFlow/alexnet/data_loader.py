@@ -162,7 +162,7 @@ def make_dataset(config, take_count, batch_size,
     shuffle_buffer_size = 10000
 
     rank_size = int(os.getenv('RANK_SIZE'))
-    rank_id = int(os.getenv('DEVICE_INDEX'))
+    rank_id = int(os.getenv('RANK_ID'))
 
     if synthetic:
         height = 224

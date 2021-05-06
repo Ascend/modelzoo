@@ -27,6 +27,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 from tensorflow.contrib import slim as contrib_slim
+from config import trans_config as config
 
 slim = contrib_slim
 
@@ -289,7 +290,9 @@ def inception_resnet_v2_base(inputs,
     raise ValueError('final_endpoint (%s) not recognized', final_endpoint)
 
 
-def inception_resnet_v2(inputs, num_classes=1001, is_training=True,
+def inception_resnet_v2(inputs,
+                        num_classes=config.num_classes,
+                        is_training=True,
                         dropout_keep_prob=0.8,
                         reuse=None,
                         scope='InceptionResnetV2',
@@ -318,6 +321,7 @@ def inception_resnet_v2(inputs, num_classes=1001, is_training=True,
       None).
     end_points: the set of end_points from the inception model.
   """
+  print("In inception_resnet_v2, num_classes is %d" % config.num_classes)
   end_points = {}
 
   with tf.compat.v1.variable_scope(

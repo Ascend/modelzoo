@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     for file_name in file_list:
         file_path = dir_name + file_name
-        if file_name.lower().endswith(".jpg") or file_name.endswith(".jpeg"):
+        if not (file_name.lower().endswith(".jpg") or file_name.lower().endswith(".jpeg")):
             continue
 
         with open(file_path, 'rb') as f:

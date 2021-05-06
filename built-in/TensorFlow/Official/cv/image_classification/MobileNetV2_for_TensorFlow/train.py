@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
-from env import Env
-
-from estimator_impl import EstimatorImpl
-
 import os
+import tensorflow as tf
+
+from config import trans_config as config
+from env import Env
+from estimator_impl import EstimatorImpl
 
 
 def parse_args():
@@ -244,6 +244,13 @@ def parse_args():
         'ignore_missing_vars', False,
         'When restoring a checkpoint would ignore missing variables.')
 
+    tf.app.flags.DEFINE_integer('num_classes', 1001,
+                                'the number of data set categories.')
+    tf.app.flags.DEFINE_string('restore_path', None,
+                               'the directory where the ckpt files are stored.')
+    tf.app.flags.DEFINE_list('restore_exclude', ['MobilenetV2/Logits/'],
+                               'the directory where the fc files are stored.')
+
     FLAGS = tf.app.flags.FLAGS
 
     return FLAGS
@@ -252,8 +259,13 @@ def parse_args():
 FLAGS = parse_args()
 
 
-def main(_):
+def set_config():
+    config.num_classes = FLAGS.num_classes
+    config.restore_path = FLAGS.restore_path
 
+
+def main(_):
+    set_config()
     num_samples = 1281167
 
     if FLAGS.max_train_steps is None and FLAGS.max_epoch is None:

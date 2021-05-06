@@ -22,6 +22,7 @@ import tensorflow as tf
 from tensorflow.contrib import slim as contrib_slim
 
 from nets import inception_utils
+from config import trans_config as config
 
 slim = contrib_slim
 
@@ -471,7 +472,7 @@ def inception_v2_base(inputs,
 
 
 def inception_v2(inputs,
-                 num_classes=1000,
+                 num_classes=config.num_classes,
                  is_training=True,
                  dropout_keep_prob=0.8,
                  min_depth=16,
@@ -524,6 +525,7 @@ def inception_v2(inputs,
     ValueError: if final_endpoint is not set to one of the predefined values,
                 or depth_multiplier <= 0
   """
+  print("In inception_v2, num_classes is %d" % config.num_classes)
   if depth_multiplier <= 0:
     raise ValueError('depth_multiplier is not greater than zero.')
 

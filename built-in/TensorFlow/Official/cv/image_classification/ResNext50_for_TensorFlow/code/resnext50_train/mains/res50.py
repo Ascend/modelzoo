@@ -84,6 +84,16 @@ def main():
                          help='num_classes')
     cmdline.add_argument('--restore_path', type=str, default='',
                          help='restore ckpt path')
+    
+    # modify for npu overflow start
+    # enable overflow
+    cmdline.add_argument("--over_dump", default="False",
+                        help="whether to enable overflow")
+    cmdline.add_argument("--over_dump_path", default="./",
+                        help="path to save overflow dump files")
+    cmdline.add_argument("--data_path", default="/data/imagenet_TF",
+                        help="path of dataset")
+    
     FLAGS, unknown_args = cmdline.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -95,6 +105,17 @@ def main():
     cfg = getattr(__import__(configs, fromlist=[cfg_file]), cfg_file)
     #------------------------------------------------------------------
 
+    if FLAGS.data_path == "/data/imagenet_TF":
+        pass
+    else:
+        f1 = open("../configs/res50_32bs_8p_host.py", "r")
+        lines = f1.readlines()
+        f2 = open("../configs/res50_32bs_8p_host.py", "w")
+        for line in lines:
+            f2.write(line.replace('\'data_url\': \'file:///data/imagenet_TF\',', '\'data_url\': \'file://' + FLAGS.data_path + '\','))
+        f2.close()
+        f1.close()
+
     config = cfg.res50_config()
     config['iterations_per_loop'] = int(FLAGS.iterations_per_loop)
     config['max_train_steps'] = int(FLAGS.max_train_steps)
@@ -103,6 +124,10 @@ def main():
     config['model_dir'] = FLAGS.model_dir
     config['num_classes'] = FLAGS.num_classes
     config['restore_path'] = FLAGS.restore_path
+    
+    config['over_dump'] = FLAGS.over_dump
+    config['over_dump_path'] = FLAGS.over_dump_path
+    
     print("iterations_per_loop:%d" % (config['iterations_per_loop']))
     print("max_train_steps    :%d" % (config['max_train_steps']))
     print("debug              :%s" % (config['debug']))
@@ -110,6 +135,8 @@ def main():
     print("model_dir          :%s" % (config['model_dir']))
     print("num_classes        :%s" % (config['num_classes']))
     print("restore_path       :%s" % (config['restore_path']))
+    print("over_dump          :%s" %(config['over_dump']))
+    print("over_dump_path     :%s" %(config['over_dump_path']))
     Session = cs.CreateSession(config)
     data = dl.DataLoader(config)
     hyper_param = hp.HyperParams(config)

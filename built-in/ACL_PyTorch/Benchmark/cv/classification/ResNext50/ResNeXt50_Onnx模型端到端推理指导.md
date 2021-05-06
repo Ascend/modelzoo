@@ -57,6 +57,7 @@ onnx == 1.7.0
 ```
 numpy == 1.18.5
 Pillow == 7.2.0
+opencv-python3 == 1.0
 ```
 
 **说明：** 
@@ -82,7 +83,7 @@ Pillow == 7.2.0
 
 3.执行pth2onnx脚本，生成onnx模型文件
 ```
-python3 resnext50_pth2onnx.py resnext50_32x4d-7cdf4587.pth resnext50.onnx
+python3.7 resnext50_pth2onnx.py resnext50_32x4d-7cdf4587.pth resnext50.onnx
 ```
 
 ### 3.2 onnx转om模型
@@ -105,21 +106,21 @@ atc --framework=5 --model=./resnext50.onnx --input_format=NCHW --input_shape="im
 -   **[生成数据集信息文件](#43-生成数据集信息文件)**  
 
 ### 4.1 数据集获取
-该模型使用[ImageNet官网](http://www.image-net.org)的5万张验证集进行测试，图片与标签分别存放在datasets/ImageNet/val_union与datasets/ImageNet/val_label.txt。
+该模型使用[ImageNet官网](http://www.image-net.org)的5万张验证集进行测试，图片与标签分别存放在/root/datasets/imagenet/val与/root/datasets/imagenet/val_label.txt。
 
 ### 4.2 数据集预处理
 1.预处理脚本imagenet_torch_preprocess.py
 
 2.执行预处理脚本，生成数据集预处理后的bin文件
 ```
-python3 imagenet_torch_preprocess.py datasets/ImageNet/val_union ./prep_dataset
+python3.7 imagenet_torch_preprocess.py resnet /root/datasets/imagenet/val ./prep_dataset
 ```
 ### 4.3 生成数据集信息文件
 1.生成数据集信息文件脚本get_info.py
 
 2.执行生成数据集信息脚本，生成数据集信息文件
 ```
-python3 get_info.py bin ./prep_dataset ./resnext50_prep_bin.info 224 224
+python3.7 get_info.py bin ./prep_dataset ./resnext50_prep_bin.info 224 224
 ```
 第一个参数为模型输入的类型，第二个参数为生成的bin文件路径，第三个为输出的info文件，后面为宽高信息
 ## 5 离线推理
@@ -138,7 +139,7 @@ source env.sh
 ```
 2.执行离线推理
 ```
-./benchmark -model_type=vision -device_id=0 -batch_size=16 -om_path=resnext50_bs16.om -input_text_path=./resnext50_prep_bin.info -input_width=224 -input_height=224 -output_binary=False -useDvpp=False
+./benchmark.x86_64 -model_type=vision -device_id=0 -batch_size=16 -om_path=resnext50_bs16.om -input_text_path=./resnext50_prep_bin.info -input_width=224 -input_height=224 -output_binary=False -useDvpp=False
 ```
 输出结果默认保存在当前目录result/dumpOutput_devicex，模型只有一个名为class的输出，shape为bs * 1000，数据类型为FP32，对应1000个分类的预测结果，每个输入对应的输出对应一个_x.bin文件。
 
@@ -154,7 +155,7 @@ source env.sh
 
 调用vision_metric_ImageNet.py脚本推理结果与label比对，可以获得Accuracy Top5数据，结果保存在result.json中。
 ```
-python3 vision_metric_ImageNet.py result/dumpOutput_device0/ dataset/ImageNet/val_label.txt ./ result.json
+python3.7 vision_metric_ImageNet.py result/dumpOutput_device0/ /root/datasets/imagenet/val_label.txt ./ result.json
 ```
 第一个为benchmark输出目录，第二个为数据集配套标签，第三个是生成文件的保存目录，第四个是生成的文件名。  
 查看输出结果：
@@ -180,7 +181,7 @@ ResNeXt-50-32x4d    77.618    93.698
 batch1的性能：
  测试npu性能要确保device空闲，使用npu-smi info命令可查看device是否在运行其它推理任务
 ```
-./benchmark -round=50 -om_path=resnext50_bs1.om -device_id=0 -batch_size=1
+./benchmark.x86_64 -round=50 -om_path=resnext50_bs1.om -device_id=0 -batch_size=1
 ```
 执行50次纯推理取均值，统计吞吐率与其倒数时延（benchmark的时延是单个数据的推理时间），npu性能是一个device执行的结果
 ```
@@ -191,7 +192,7 @@ batch1的性能：
 ```
 batch16的性能：
 ```
-./benchmark -round=50 -om_path=resnext50_bs16.om -device_id=0 -batch_size=16
+./benchmark.x86_64 -round=50 -om_path=resnext50_bs16.om -device_id=0 -batch_size=16
 ```
 ```
 [INFO] Dataset number: 49 finished cost 30.514ms

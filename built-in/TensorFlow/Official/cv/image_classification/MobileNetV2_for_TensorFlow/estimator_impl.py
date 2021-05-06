@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+import os
 import tensorflow as tf
+
+from config import trans_config as config
 from dataloader import data_provider
 from datasets import dataset_factory
 from nets import nets_factory
-import os
 
 
 class EstimatorImpl:
@@ -24,7 +26,8 @@ class EstimatorImpl:
         self.env = env
 
     def model_fn(self, features, labels, mode, params):
-        num_classes = 1001
+        print("In EstimatorImpl, num_classes is %d" % config.num_classes)
+        num_classes = config.num_classes
 
         summaries = set(tf.get_collection(tf.GraphKeys.SUMMARIES))
 
@@ -51,6 +54,14 @@ class EstimatorImpl:
 
             estimator_spec = tf.estimator.EstimatorSpec(
                 mode=tf.estimator.ModeKeys.TRAIN, loss=total_loss, train_op=train_op)
+            # restore ckpt for finetune
+            if config.restore_path:
+                print("----------begin finetune--------------")
+                variables_to_restore = tf.contrib.slim.get_variables_to_restore(
+                    exclude=self.env.FLAGS.restore_exclude)
+                tf.train.init_from_checkpoint(
+                    self.env.FLAGS.restore_path,
+                    {v.name.split(':')[0]: v for v in variables_to_restore})
 
         elif mode == tf.estimator.ModeKeys.EVAL:
             network_fn = nets_factory.get_network_fn(

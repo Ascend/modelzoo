@@ -89,10 +89,21 @@ class GPUBaseTrain(object):
            allow_soft_placement=True,)
 
 
-        if self.config['debug'] :
-            run_config = NPURunConfig(hcom_parallel=True, precision_mode="allow_mix_precision", enable_data_pre_proc=True, save_checkpoints_steps=112590, session_config=session_config, model_dir = self.config['model_dir'], iterations_per_loop=self.config['iterations_per_loop'], keep_checkpoint_max=5)
-        else :
-            run_config = NPURunConfig(hcom_parallel=True, precision_mode="allow_mix_precision", save_summary_steps=0, log_step_count_steps=None, enable_data_pre_proc=True,save_checkpoints_secs=1e9, session_config=session_config, model_dir = self.config['model_dir'], iterations_per_loop=self.config['iterations_per_loop'])
+        if self.config['over_dump'] == "True":
+            print("NPU overflow dump is enabled")
+            from npu_bridge.npu_init import DumpConfig
+            dump_config = DumpConfig(
+                enable_dump_debug=True, dump_path=self.config['over_dump_path'], dump_debug_mode="all")
+            if self.config['debug'] :
+                run_config = NPURunConfig(dump_config=dump_config, hcom_parallel=True, precision_mode="allow_mix_precision", enable_data_pre_proc=True, save_checkpoints_steps=112590, session_config=session_config, model_dir = self.config['model_dir'], iterations_per_loop=self.config['iterations_per_loop'], keep_checkpoint_max=5)
+            else :
+                run_config = NPURunConfig(dump_config=dump_config, hcom_parallel=True, precision_mode="allow_mix_precision", save_summary_steps=0, log_step_count_steps=None, enable_data_pre_proc=True,save_checkpoints_secs=1e9, session_config=session_config, model_dir = self.config['model_dir'], iterations_per_loop=self.config['iterations_per_loop'])
+        else:
+            if self.config['debug'] :
+                run_config = NPURunConfig(hcom_parallel=True, precision_mode="allow_mix_precision", enable_data_pre_proc=True, save_checkpoints_steps=112590, session_config=session_config, model_dir = self.config['model_dir'], iterations_per_loop=self.config['iterations_per_loop'], keep_checkpoint_max=5)
+            else :
+                run_config = NPURunConfig(hcom_parallel=True, precision_mode="allow_mix_precision", save_summary_steps=0, log_step_count_steps=None, enable_data_pre_proc=True,save_checkpoints_secs=1e9, session_config=session_config, model_dir = self.config['model_dir'], iterations_per_loop=self.config['iterations_per_loop'])
+
 #        run_config = NPURunConfig(enable_data_pre_proc=True,save_checkpoints_secs=1e9, session_config=session_config, model_dir = self.config['model_dir'])
 
      #   classifier = tf.estimator.Estimator(

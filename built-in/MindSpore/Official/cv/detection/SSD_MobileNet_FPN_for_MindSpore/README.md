@@ -174,6 +174,7 @@ python eval.py --run_platform=CPU --dataset=[DATASET] --checkpoint_path=[PRETRAI
     ├─ src
       ├─ __init__.py                  # init file
       ├─ box_utils.py                 # bbox utils
+      ├─ eval_callback.py             # evaluation callback when training
       ├─ eval_utils.py                # metrics utils
       ├─ config.py                    # total config
       ├─ dataset.py                   # create dataset and process dataset
@@ -202,6 +203,10 @@ python eval.py --run_platform=CPU --dataset=[DATASET] --checkpoint_path=[PRETRAI
     "loss_scale": 1024                               # Loss scale
     "filter_weight": False                           # Load parameters in head layer or not. If the class numbers of train dataset is different from the class numbers in pre_trained checkpoint, please set True.
     "freeze_layer": "none"                           # Freeze the backbone parameters or not, support none and backbone.
+    "run_eval": False                                # Run evaluation when training
+    "save_best_ckpt": True                           # Save best checkpoint when run_eval is True
+    "eval_start_epoch": 40                           # Evaluation start epoch when run_eval is True
+    "eval_interval": 1                               # valuation interval when run_eval is True
 
     "class_num": 81                                  # Dataset class number
     "image_shape": [300, 300]                        # Image height and width used as input to the model
@@ -284,6 +289,9 @@ epoch time: 150753.701, per step time: 329.157
 ...
 
 ```
+#### Evaluation while training
+
+You can add `run_eval` to start shell and set it True, if you want evaluation while training. And you can set argument option: `save_best_ckpt`, `eval_start_epoch`, `eval_interval` when `run_eval` is True.
 
 ### [Evaluation Process](#contents)
 

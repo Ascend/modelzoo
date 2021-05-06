@@ -19,7 +19,7 @@ from .config_ssd300 import config as config_ssd300
 from .config_ssd_mobilenet_v1_fpn import config as config_ssd_mobilenet_v1_fpn
 
 
-using_model = "ssd300"
+using_model = "ssd_mobilenet_v1_fpn"
 
 config_map = {
     "ssd300": config_ssd300,

@@ -12,7 +12,30 @@ cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 ln -s ${currentDir}/.data ${train_log_dir}/.data
 
-python3.7 ${currentDir}/gru_8p.py \
+if [ $(uname -m) = "aarch64" ]
+then
+    for i in $(seq 0 7)
+    do
+    let p_start=0+24*i
+    let p_end=23+24*i
+    taskset -c $p_start-$p_end python3.7 ${currentDir}/gru_8p.py \
+        --addr=$(hostname -I |awk '{print $1}') \
+        --seed 123456 \
+        --workers 160 \
+        --print-freq 1 \
+        --dist-url 'tcp://127.0.0.1:50000' \
+        --dist-backend 'hccl' \
+        --multiprocessing-distributed \
+        --world-size 1 \
+        --batch-size 4096 \
+        --epoch 10 \
+        --rank 0 \
+        --npu $i \
+        --device-list '0,1,2,3,4,5,6,7' \
+        --amp  > ./gru_8p_${i}.log 2>&1 &
+    done
+else
+    python3.7 ${currentDir}/gru_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed 123456 \
         --workers 160 \
@@ -25,7 +48,5 @@ python3.7 ${currentDir}/gru_8p.py \
         --epoch 10 \
         --rank 0 \
         --device-list '0,1,2,3,4,5,6,7' \
-        --amp \
-        --bleu-npu 0 \
-        --ckptpath ./seq2seq-gru-model.pth.tar > ./gru_8p.log 2>&1 &
-
+        --amp  > ./gru_8p.log 2>&1 &
+fi

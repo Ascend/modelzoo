@@ -283,13 +283,11 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 
 ## 4 训练
 
--   **[数据集准备](#数据集准备.md)**  
-
--   **[模型训练](#模型训练.md)**  
-
--   **[高级参考](#高级参考.md)**  
-
--   **[迁移学习指导](#迁移学习指导.md)**  
+-   **数据集准备**  
+-   **模型训练**  
+-   **高级参考**  
+-   **迁移学习指导**
+-   **模型转换**
 
 
 ### 4.1 数据集准备
@@ -462,24 +460,24 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 ### 4.3 高级参考
 #### 4.3.1 脚本参数
 - 训练脚本参数<br/>
-执行以下命令查看训练脚本参数:
+  执行以下命令查看训练脚本参数:
   
     ```shell script
     python train.py --help
     ```
 - 评估脚本参数<br/>
-执行以下命令查看模型评估脚本参数:
+  执行以下命令查看模型评估脚本参数:
   
     ```shell script
     python eval.py --help
     ```
 - 模型导出脚本参数<br/>
-执行以下命令查看模型导出脚本参数:
+  执行以下命令查看模型导出脚本参数:
     ```shell script
     python export.py --help
     ```
 - 后处理脚本参数<br/>
-执行以下命令查看后处理脚本参数:
+  执行以下命令查看后处理脚本参数:
     ```shell script
      python postprocess.py --help
     ```
@@ -582,7 +580,7 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
 - num_classes：用于迁移学习的数据集的类别数（实际类别数加1）
 - image_dir：迁移学习数据集目录
 - anno_path：迁移学习训练集标注文件路径<br/>
-针对本文示例所使用的数据集，src/config_ssd_mobilenet_v1_fpn.py  文件修改内容如下：
+  针对本文示例所使用的数据集，src/config_ssd_mobilenet_v1_fpn.py  文件修改内容如下：
   
     ```python
     "feature_extractor_base_param": "/data/pretrained_models/ms/mobilenet_v1_fpn_on_coco2017/ssd-500_458.ckpt",
@@ -635,35 +633,41 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
     ```
     参数解释如下：
     - 参数1：设备数
+    
     - 参数2：epoch个数
+    
     - 参数3：学习率
+    
     - 参数4：数据集名称（迁移学习设置为other）
+    
     - 参数5：rank_table_file，参考
+    
     - 参数6：预训练模型的 ckpt 文件绝对路径
+    
     - 参数7：已经训练的 epoch 数，迁移学习设置为0
+### 4.5  模型转换
+
+ 若训练的模型要在昇腾 310 上推理，则在训练或者迁移学习结束后，在昇腾 910 环境上将 ckpt 文件导出为 AIR 文件，执行以下命令导出：
+
+ ```shell
+python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+ ```
+
+ 参数说明：
+
+ - ckpt_file： 训练（4.2章节）或者迁移学习（4.4 章节）生成的 ckpt 文件。
+ - file_name: 导出的模型文件名
+ - file_format: 导出的模型格式，当前支持：AIR、MINDIR 两种类型；
 
 ## 5 推理
-
--   **模型转换**
 
 -   **MindX SDK 推理** 
 
 -   **mxBase 推理**
 
--   **应用参考**
 
 
-### 5.1 模型转换
-   若训练的模型要在昇腾 310 上推理，则在训练或者迁移学习结束后，在昇腾 910 环境上将 ckpt 文件导出为 AIR 文件，执行以下命令导出：
-   ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
-   ```
-   参数说明：
-   - ckpt_file： 训练（4.2章节）或者迁移学习（4.4 章节）生成的 ckpt 文件。
-   - file_name: 导出的模型文件名
-   - file_format: 导出的模型格式，当前支持：AIR、MINDIR 两种类型；
-
-### 5.2 MindX SDK推理
+### 5.1 MindX SDK推理
 
 1. 参考3.2章节，下载所需软件包，并安装推理 mxManufacture。本文安装到：/home/sam/mxManufacture 目录。
 
@@ -791,9 +795,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
         -rw-r--r--. 1 root root    2 Mar 15 16:28 IMG_20181228_102749.json
         -rw-r--r--. 1 root root 1920 Mar 15 16:28 IMG_20181228_102757.json
       ```
-      
 
-### 5.4 mxBase 推理
+### 5.2 mxBase 推理
 1. 准备 mxBase 代码<br/>
    在推理环境上执行以下命令下载 mxBase 代码：
    ```shell script
@@ -853,8 +856,6 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
    add_subdirectory(samples/C++)
       ```
 
-   
-
 5. 启动编译并推理
     执行以下命令启动编译和推理：
 
@@ -862,9 +863,118 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
     bash run.sh
     ```
 
-## 6 应用参考
+## 6 在Modelarts上应用
 
-在ModelArts上应用
+### 6.1 创建OBS桶
+
+**步骤1**：登录OBS管理控制台，创建OBS桶。具体请参见[创建桶](https://support.huaweicloud.com/usermanual-obs/obs_03_0306.html)章节。例如创建名称为“4modelarts"的OBS桶。
+
+说明：创建桶的区域需要与ModelArts所在的区域一致。例如：当前ModelArts在华北-北京四区域，在对象存储服务创建桶时，请选择华北-北京四。
+
+**步骤2**：创建用于存放数据的文件夹，具体请参见[新建文件夹](https://support.huaweicloud.com/usermanual-obs/obs_03_0316.html)章节。例如，在已创建的OBS桶中新建文件夹code、dataset、logs、output目录。
+
+目录结构说明：
+
+* code：存放训练脚本目录
+* dataset：存放训练数据集目录
+* logs：存放训练日志目录
+* output：训练生成的模型目录
+
+将SSD训练脚本文件夹上传至“code”目录，数据集coco2017上传至“dataset”目录。
+
+注意：预训练模型也需要上传到数据集所在目录中。
+
+---- 结束
+
+### 6.2 创建训练作业
+
+**步骤1**：使用华为云账号登录[ModelArts管理控制台](https://console.huaweicloud.com/modelarts/?region=cn-north-4)，在左侧导航栏中选择“训练管理 > 训练作业”，默认进入“训练作业”列表。
+
+**步骤2**：在训练作业列表中，单击左上角“创建”，进入“创建训练作业”页面。
+
+**步骤3：**在创建训练作业页面，填写训练作业相关参数，然后单击“下一步”。
+
+本步骤只提供训练任务部分参数配置说明，其他参数配置详情请参见《[ModelArts AI工程师用户指南](https://support.huaweicloud.com/modelarts/index.html)》中“使用自定义镜像训练模型”章节。
+
+1. 填写基本信息。设置训练作业名称。
+
+2. 填写作业参数。
+
+   * ![](res/md/modelarts/create_train_task.png)
+
+   * **表1** 部分作业参数说明
+
+     * | 参数名称       | 子参数       | 说明                                                         |
+       | -------------- | ------------ | ------------------------------------------------------------ |
+       | 一键式参数配置 | -            | 如果您在ModelArts已保存作业参数，可以根据界面提示，选择已有的作业参数，快速完成训练作业的参数配置 |
+       | 算法来源       | 常用框架     | - **AI引擎**：Ascend-Powered-Engine，Mindspore-1.1.1-python3.7-aarch64<br>- **代码目录**：上传训练脚本到OBS的目录，如：/code/SSD_for_MindSpore/<br>- **启动文件**：启动训练的python脚本，选择代码目录modelarts目录下的start.py脚本。 |
+       | 数据来源       | 数据存储位置 | 选择OBS上数据集存放的目录。                                  |
+       | 训练输出位置   | -            | 选择训练结果的存储位置。                                     |
+       | 运行参数       | -            | 代码中的命令行参数设置值，请根据您的算法代码逻辑进行填写，确保参数名称和代码的参数名称保持一致。<br>示例：<br>* 传入给start.py的参数：<br>  * train_url: 训练输出位置（默认生成）<br>  * data_url：训练数据来源（默认生成）<br>  * 其他参数见：表2 训练参数说明 |
+       | 作业日志路径   | -            | 设置训练日志存放的目录。                                     |
+
+   * **表2** 训练参数说明
+
+     * 
+       名称|默认值|类型|是否必填|描述
+       ---|---|---|---|---
+       lr|0.05|float|True|初始学习率
+       dataset|coco|string|True|数据集格式，可选值coco、voc、other
+       epoch_size|5|int|True|训练轮数
+       batch_size|32|int|True|一次训练所抓取的数据样本数量
+       save_checkpoint_epochs|10|int|False|保存checkpoint的轮数。
+       feature_extractor_base_param|-|string|False|预训练模型路径，模型放在data_url下，填相对于data_url的路径。using_model为ssd_mobilenet_v1_fpn需要改参数。迁移学习时该参数不起作用。
+        classes_label_path           |-|string|True|数据集标签文件路径，文件内容为，每行一个类别名，第一行类别名为background。填相对于data_url的路径。
+       num_classes|81|string|True|数据集类别数+1。
+       voc_json|-|string|False|dataset为voc时，用于指定数据集标注文件，填相对于data_url的路径。
+       anno_path|-|string|False|dataset为other时，用于指定数据集标注文件，填相对于data_url的路径。
+       pre_trained|-|string|False|迁移学习时，预训练模型路径，模型放在data_url下，填相对于data_url的路径。
+       loss_scale|1024|int|False|Loss scale.
+       filter_weight|False|Boolean|False|Filter head weight paramaters，迁移学习时需要设置为True。
+       freeze_layer|none|string|False|冻结网络的权重，支持冻结backbone的权重。none、backbone可选。默认不冻结。
+       
+
+3. 选择用于训练作业的资源。选择资源类型为“Ascend”
+
+4. 勾选“保存作业”。
+
+5. 完成参数填写后，单击“下一步”
+
+**步骤4**： 在”规格确认“页面，确认填写信息无误后，单击”提交“， 完成训练作业的创建。训练作业一般需要运行一段时间，根据您选择的数据量和资源不同，训练时间将耗时几十分钟到几个小时不等。
+
+---- 结束
+
+### 6.4 查看训练任务日志
+
+**步骤1** 在Modelarts管理控制台，选择“训练管理 > 训练作业”，进入训练作业列表页面。
+
+**步骤2** 在训练作业列表中，单击作业名称，查看该作业的详情。
+
+**步骤2** 选择“日志”页签，可查看该作业日志信息。
+
+![](res/md/modelarts/train_log.png)
+
+---- 结束
+
+### 6.5 迁移学习
+
+**步骤1** 数据集准备
+
+请参见”训练 > 迁移学习指导“，准备训练所需的数据集，并上传到对应的OBS桶中。
+
+**步骤2** 在数据集目录下，新建pretrain_model文件夹，并上传预训练模型到该文件夹下。
+
+**步骤3** 上传训练代码到OBS桶中。
+
+**步骤4** 创建训练作业，进行迁移学习。请参考“创建训练作业”章节。
+
+![](res/md/modelarts/create_transfer_train_task.png)
+
+**步骤5** 在指定的训练输出位置查看生成的模型。
+
+![](res/md/modelarts/models.png)
+
+---- 结束
 
 
 ## 7 模型性能与精度

@@ -19,7 +19,7 @@ chown -R HwHiAiUser:HwHiAiUser $DUMP_PATH
 export JOB_ID=9999001
 export RANK_SIZE=1
 
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 
 device_group=0
 

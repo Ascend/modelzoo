@@ -64,6 +64,18 @@ class Classifier(object):
         # --------------------------------------------------------------------------------
         config = tf.ConfigProto()
         custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+        
+        if "autotune" in os.environ:
+        
+            print ("autotune value is " + os.environ["autotune"])
+            if os.environ["autotune"] == "True":
+            
+                print ("autotune is set !")
+                custom_op.parameter_map["autotune_tune_mode"].s = tf.compat.as_bytes("RL,GA")
+                print ("autotune set success")
+            else:
+                print ("autotune is not set!")
+                
         custom_op.name = "NpuOptimizer"
         # 1）run on Ascend NPU
         custom_op.parameter_map["use_off_line"].b = True

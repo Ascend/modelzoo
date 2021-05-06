@@ -1,5 +1,5 @@
-ARG FROM_IMAGE_NAME=ascend-tensorflow-arm:20.1.0
+ARG FROM_IMAGE_NAME
 FROM ${FROM_IMAGE_NAME}
 
-COPY requirements.txt .
-RUN pip3.7 install -r requirements.txt
+COPY pip-requirements.txt .
+RUN pip3.7 install -r pip-requirements.txt

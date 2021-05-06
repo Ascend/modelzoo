@@ -24,6 +24,7 @@ import os
 
 import tensorflow as tf
 from tensorflow.contrib import slim as contrib_slim
+from config import trans_config as config
 
 slim = contrib_slim
 
@@ -313,7 +314,7 @@ def _scope_all(scope, default_scope=None):
 
 @slim.add_arg_scope
 def mobilenet(inputs,
-              num_classes=1001,
+              num_classes=config.num_classes,
               prediction_fn=slim.softmax,
               reuse=None,
               scope='Mobilenet',

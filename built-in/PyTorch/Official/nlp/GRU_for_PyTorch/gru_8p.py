@@ -123,68 +123,16 @@ def main():
     if args.multiprocessing_distributed:
         # Since we have ngpus_per_node processes per node, the total world_size
         # needs to be adjusted accordingly
-        args.world_size = ngpus_per_node * args.world_size
+        # args.world_size = ngpus_per_node * args.world_size
         # Use torch.multiprocessing.spawn to launch distributed processes: the
         # main_worker process function
-        print('mp.spawn')
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
-    else:
+        # print('mp.spawn')
+        # mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        # else:
         # Simply call main_worker function
+        args.world_size = ngpus_per_node * args.world_size
+        print("---------------args.npu", args.npu)
         main_worker(args.npu, ngpus_per_node, args)
-
-    bleu_score_start(args)
-
-
-def bleu_score_start(args):
-    CALCULATE_DEVICE = "npu:{}".format(args.bleu_npu)
-    torch.npu.set_device(CALCULATE_DEVICE)
-    # parpare dataset
-    SRC = Field(tokenize=tokenize_de,
-                init_token='<sos>',
-                eos_token='<eos>',
-                lower=True, fix_length=46)
-
-    TRG = Field(tokenize=tokenize_en,
-                init_token='<sos>',
-                eos_token='<eos>',
-                lower=True, fix_length=46)
-
-    train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'),
-                                                        fields=(SRC, TRG))
-    SRC.build_vocab(train_data, min_freq=2)
-    TRG.build_vocab(train_data, min_freq=2)
-    INPUT_DIM = len(SRC.vocab)
-    OUTPUT_DIM = len(TRG.vocab)
-
-    device = CALCULATE_DEVICE
-
-    train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
-        (train_data, valid_data, test_data),
-        batch_size=args.batch_size,
-        device=device)
-
-    seed_init = gen_seeds(32 * 1024 * 12).float().to(CALCULATE_DEVICE)
-
-    enc = Encoder(INPUT_DIM, ENC_EMB_DIM, HID_DIM, ENC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
-    dec = Decoder(OUTPUT_DIM, DEC_EMB_DIM, HID_DIM, DEC_DROPOUT, seed=seed_init).to(CALCULATE_DEVICE)
-
-    model = Seq2Seq(enc, dec, device).to(CALCULATE_DEVICE)
-    model.apply(init_weights)
-
-    print(f'The model has {count_parameters(model):,} trainable parameters')
-    optimizer = optim.Adam(model.parameters())
-    if args.amp:
-        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
-    TRG_PAD_IDX = TRG.vocab.stoi[TRG.pad_token]
-    criterion = nn.CrossEntropyLoss(ignore_index=TRG_PAD_IDX).to(CALCULATE_DEVICE)
-    best_valid_loss = float('inf')
-
-    # load model
-    checkpoint = torch.load(args.ckptpath, map_location='cpu')
-    model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint.items()})
-
-    bleu_score = calculate_bleu(test_data, SRC, TRG, model, device)
-    print(f'BLEU score = {bleu_score * 100:.4f}')
 
 
 def main_worker(npu, ngpus_per_node, args):
@@ -286,6 +234,8 @@ def train(model, train_iterator, optimizer, criterion, epoch, args, ngpus_per_no
 
     end = time.time()
     for i, batch in enumerate(train_iterator):
+        if i == len(train_iterator) - 1:
+            continue
 
         data_time.update(time.time() - end)
         src = batch.src.to(CALCULATE_DEVICE)

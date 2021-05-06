@@ -62,9 +62,14 @@ def run_general_distill():
                         help="dataset type tfrecord/mindrecord, default is tfrecord")
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
+    if args_opt.device_target == "Ascend":
+        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
+    elif args_opt.device_target == "GPU":
+        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
+    else:
+        raise Exception("Target error, GPU or Ascend is supported.")
+
     context.set_context(reserve_class_name_in_scope=False)
-    context.set_context(variable_memory_max_size="30GB")
 
     save_ckpt_dir = os.path.join(args_opt.save_ckpt_path,
                                  datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))

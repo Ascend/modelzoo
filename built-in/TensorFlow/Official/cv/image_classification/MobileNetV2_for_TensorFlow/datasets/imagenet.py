@@ -38,6 +38,7 @@ import tensorflow as tf
 from tensorflow.contrib import slim as contrib_slim
 
 from datasets import dataset_utils
+from config import trans_config as config
 
 slim = contrib_slim
 
@@ -57,7 +58,7 @@ _ITEMS_TO_DESCRIPTIONS = {
     'object/label': 'A list of labels, one per each object.',
 }
 
-_NUM_CLASSES = 1001
+_NUM_CLASSES = config.num_classes
 
 # If set to false, will not try to set label_to_names in dataset
 # by reading them from labels.txt or github.
@@ -190,6 +191,8 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
       labels_to_names = create_readable_names_for_imagenet_labels()
       dataset_utils.write_label_file(labels_to_names, dataset_dir)
 
+  _NUM_CLASSES = config.num_classes
+  print("In datasets, num_classes is %d" % config.num_classes)
   return slim.dataset.Dataset(
       data_sources=file_pattern,
       reader=reader,

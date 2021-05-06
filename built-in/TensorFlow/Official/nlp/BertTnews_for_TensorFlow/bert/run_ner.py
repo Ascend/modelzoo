@@ -17,7 +17,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""BERT finetuning runner."""
+#
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#"""BERT finetuning runner."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -52,7 +67,7 @@ flags = tf.flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
-    "data_dir", None,
+    "data_path", None,
     "The input datadir.",
 )
 
@@ -97,6 +112,13 @@ flags.DEFINE_bool(
 flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
 
 flags.DEFINE_bool("do_eval", False, "Whether to run eval on the dev set.")
+
+# modify for npu overflow start
+# enable overflow
+flags.DEFINE_bool("over_dump", False,
+                  "whether to enable overflow")
+flags.DEFINE_string("over_dump_path", "./",
+                    "path to save overflow dump files")
 
 flags.DEFINE_bool("do_predict", False,
                   "Whether to run the model in inference mode on the test set.")
@@ -162,11 +184,11 @@ class InputFeatures(object):
 class DataProcessor(object):
     """Base class for data converters for sequence classification data sets."""
 
-    def get_train_examples(self, data_dir):
+    def get_train_examples(self, data_path):
         """Gets a collection of `InputExample`s for the train set."""
         raise NotImplementedError()
 
-    def get_dev_examples(self, data_dir):
+    def get_dev_examples(self, data_path):
         """Gets a collection of `InputExample`s for the dev set."""
         raise NotImplementedError()
 
@@ -203,19 +225,19 @@ class DataProcessor(object):
 
 
 class NerProcessor(DataProcessor):
-    def get_train_examples(self, data_dir):
+    def get_train_examples(self, data_path):
         return self._create_example(
-            self._read_data(os.path.join(data_dir, "train.txt")), "train"
+            self._read_data(os.path.join(data_path, "train.txt")), "train"
         )
 
-    def get_dev_examples(self, data_dir):
+    def get_dev_examples(self, data_path):
         return self._create_example(
-            self._read_data(os.path.join(data_dir, "dev.txt")), "dev"
+            self._read_data(os.path.join(data_path, "dev.txt")), "dev"
         )
 
-    def get_test_examples(self, data_dir):
+    def get_test_examples(self, data_path):
         return self._create_example(
-            self._read_data(os.path.join(data_dir, "test.txt")), "test")
+            self._read_data(os.path.join(data_path, "test.txt")), "test")
 
     def get_labels(self):
         # return ["I-MISC", "I-PER",  "I-ORG", "I-LOC", "O", "X", "[CLS]", "[SEP]"]
@@ -235,19 +257,19 @@ class WeiboNERProcessor(DataProcessor):
     def __init_(self):
         self.labels = set()
 
-    def get_train_examples(self, data_dir):
+    def get_train_examples(self, data_path):
         return self._create_example(
-            self._read_raw(os.path.join(data_dir, "weiboNER.conll.train")), "train"
+            self._read_raw(os.path.join(data_path, "weiboNER.conll.train")), "train"
         )
 
-    def get_dev_examples(self, data_dir):
+    def get_dev_examples(self, data_path):
         return self._create_example(
-            self._read_raw(os.path.join(data_dir, "weiboNER.conll.dev")), "dev"
+            self._read_raw(os.path.join(data_path, "weiboNER.conll.dev")), "dev"
         )
 
-    def get_test_examples(self, data_dir):
+    def get_test_examples(self, data_path):
         return self._create_example(
-            self._read_raw(os.path.join(data_dir, "weiboNER.conll.test")), "test")
+            self._read_raw(os.path.join(data_path, "weiboNER.conll.test")), "test")
 
     def get_labels(self):
         return ['I-PER.NOM', 'I-PER.NAM', 'I-GPE.NAM', 'I-ORG.NAM', 'I-ORG.NOM', 'I-LOC.NAM', 'I-LOC.NOM', "O", "X", "[CLS]", "[SEP]"]
@@ -299,19 +321,19 @@ class MsraNERProcessor(DataProcessor):
     def __init_(self):
         self.labels = set()
 
-    def get_train_examples(self, data_dir):
+    def get_train_examples(self, data_path):
         return self._create_example(
-            self._read_raw(os.path.join(data_dir, "train1.txt")), "train"
+            self._read_raw(os.path.join(data_path, "train1.txt")), "train"
         )
 
-    def get_dev_examples(self, data_dir):
+    def get_dev_examples(self, data_path):
         return self._create_example(
-            self._read_raw(os.path.join(data_dir, "testright1.txt")), "dev"
+            self._read_raw(os.path.join(data_path, "testright1.txt")), "dev"
         )
 
-    def get_test_examples(self, data_dir):
+    def get_test_examples(self, data_path):
         return self._create_example(
-            self._read_raw(os.path.join(data_dir, "testright1.txt")), "test")
+            self._read_raw(os.path.join(data_path, "testright1.txt")), "test")
 
     def get_labels(self):
         return ['B-PERSON', 'I-PERSON', 'B-LOCATION', 'I-LOCATION', 'B-ORGANIZATION', 'I-ORGANIZATION', "O", "[CLS]", "[SEP]", "X"]
@@ -739,18 +761,39 @@ def main(_):
     ##################modify for npu######################
     # Creates a `NPURunConfig`
     session_config = tf.ConfigProto(allow_soft_placement=True)
-    run_config = NPURunConfig(
-        session_config=session_config,
-        model_dir=FLAGS.output_dir,
-        keep_checkpoint_max=5,
-        save_summary_steps=0,
-        save_checkpoints_steps=115200,
-        iterations_per_loop=10,
-        #enable_data_pre_proc=True,
-        precision_mode='allow_mix_precision',
-       # precision_mode='allow_fp32_to_fp16',
-        #hcom_parallel=True
-    )
+    
+    if FLAGS.over_dump is True:
+        print("NPU overflow dump is enabled")
+        from npu_bridge.npu_init import DumpConfig
+        dump_config = DumpConfig(
+            enable_dump_debug=True, dump_path=FLAGS.over_dump_path, dump_debug_mode="all")
+        run_config = NPURunConfig(
+            dump_config=dump_config,
+            session_config=session_config,
+            model_dir=FLAGS.output_dir,
+            keep_checkpoint_max=5,
+            save_summary_steps=0,
+            save_checkpoints_steps=115200,
+            iterations_per_loop=10,
+            #enable_data_pre_proc=True,
+            precision_mode='allow_mix_precision',
+           # precision_mode='allow_fp32_to_fp16',
+            #hcom_parallel=True
+        )
+    else:
+        print("NPU overflow dump is disabled")
+        run_config = NPURunConfig(
+            session_config=session_config,
+            model_dir=FLAGS.output_dir,
+            keep_checkpoint_max=5,
+            save_summary_steps=0,
+            save_checkpoints_steps=115200,
+            iterations_per_loop=10,
+            #enable_data_pre_proc=True,
+            precision_mode='allow_mix_precision',
+           # precision_mode='allow_fp32_to_fp16',
+            #hcom_parallel=True
+        )
     ##################npu modify end######################
 
 
@@ -759,7 +802,7 @@ def main(_):
     num_warmup_steps = None
 
     if FLAGS.do_train:
-        train_examples = processor.get_train_examples(FLAGS.data_dir)
+        train_examples = processor.get_train_examples(FLAGS.data_path)
         num_train_steps = int(
             len(train_examples) / FLAGS.train_batch_size * FLAGS.num_train_epochs)
         print(num_train_steps)
@@ -809,7 +852,7 @@ def main(_):
             drop_remainder=True)
         estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
     if FLAGS.do_eval:
-        eval_examples = processor.get_dev_examples(FLAGS.data_dir)
+        eval_examples = processor.get_dev_examples(FLAGS.data_path)
         eval_file = os.path.join(FLAGS.output_dir, "eval.tf_record")
         file_based_convert_examples_to_features(
             eval_examples, label_list, FLAGS.max_seq_length, tokenizer, eval_file, FLAGS.output_dir)
@@ -847,7 +890,7 @@ def main(_):
             id2label = {value: key for key, value in label2id.items()}
         if os.path.exists(token_path):
             os.remove(token_path)
-        predict_examples = processor.get_test_examples(FLAGS.data_dir)
+        predict_examples = processor.get_test_examples(FLAGS.data_path)
         ground_truth_file = os.path.join(FLAGS.output_dir, "ground_truth.txt")
         with open(ground_truth_file, 'w') as writer:
             for ex_index, example in enumerate(predict_examples):
@@ -909,12 +952,12 @@ def main(_):
         cmd = "python %s -d '\t' < %s > %s" % \
             (os.path.join(os.getcwd(), "conlleval.py"),
              os.path.join(FLAGS.output_dir, "tmp"),
-             os.path.join(FLAGS.data_dir, "test_results_bert.txt"))
+             os.path.join(FLAGS.data_path, "test_results_bert.txt"))
         os.system(cmd)
 
 
 if __name__ == "__main__":
-    flags.mark_flag_as_required("data_dir")
+    flags.mark_flag_as_required("data_path")
     flags.mark_flag_as_required("task_name")
     flags.mark_flag_as_required("vocab_file")
     flags.mark_flag_as_required("bert_config_file")

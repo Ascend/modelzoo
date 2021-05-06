@@ -80,6 +80,16 @@ def main():
                          help="""config file used.""")
     cmdline.add_argument('--model_dir', default="./model_dir",
                          help="""config file used.""")
+    
+    # modify for npu overflow start
+    # enable overflow
+    cmdline.add_argument("--over_dump", default="False",
+                        help="whether to enable overflow")
+    cmdline.add_argument("--over_dump_path", default="./",
+                        help="path to save overflow dump files")
+    cmdline.add_argument("--data_path", default="PATH_TO_BE_CONFIGURED",
+                        help="path of dataset")
+    
     FLAGS, unknown_args = cmdline.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -91,17 +101,34 @@ def main():
     cfg = getattr(__import__(configs, fromlist=[cfg_file]), cfg_file)
     #------------------------------------------------------------------
 
+    if FLAGS.data_path == "PATH_TO_BE_CONFIGURED":
+        pass
+    else:
+        f1 = open("../configs/config.py", "r")
+        lines = f1.readlines()
+        f2 = open("../configs/config.py", "w")
+        for line in lines:
+            f2.write(line.replace('\'data_url\': \'file://PATH_TO_BE_CONFIGURED\',', '\'data_url\': \'file://' + FLAGS.data_path + '\','))
+        f2.close()
+        f1.close()
+
     config = cfg.res50_config()
     config['iterations_per_loop'] = int(FLAGS.iterations_per_loop)
     config['max_train_steps'] = int(FLAGS.max_train_steps)
     config['debug'] = FLAGS.debug
     config['eval'] = FLAGS.eval
     config['model_dir'] = FLAGS.model_dir
+    
+    config['over_dump'] = FLAGS.over_dump
+    config['over_dump_path'] = FLAGS.over_dump_path
+    
     print("iterations_per_loop:%d" %(config['iterations_per_loop']))
     print("max_train_steps    :%d" %(config['max_train_steps']))
     print("debug              :%s" %(config['debug']))
     print("eval               :%s" %(config['eval']))
     print("model_dir          :%s" %(config['model_dir']))
+    print("over_dump          :%s" %(config['over_dump']))
+    print("over_dump_path     :%s" %(config['over_dump_path']))
     Session = cs.CreateSession(config)
     data = dl.DataLoader(config)
     hyper_param = hp.HyperParams(config)

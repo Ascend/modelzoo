@@ -25,6 +25,7 @@ config = ed({
     "nms_threshold": 0.6,
     "min_score": 0.1,
     "max_boxes": 100,
+    "color_adjust": True,
 
     # learning rate settings
     #"learning_rate": {

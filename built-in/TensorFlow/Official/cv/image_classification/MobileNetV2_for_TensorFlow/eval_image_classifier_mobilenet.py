@@ -23,6 +23,7 @@ import tensorflow as tf
 from tensorflow.contrib import quantize as contrib_quantize
 from tensorflow.contrib import slim as contrib_slim
 
+from config import trans_config as config
 from datasets import dataset_factory
 from nets import nets_factory
 import os
@@ -87,8 +88,11 @@ tf.app.flags.DEFINE_bool(
 
 tf.app.flags.DEFINE_bool('use_grayscale', False,
                          'Whether to convert input images to grayscale.')
+tf.app.flags.DEFINE_integer('num_classes', 1001,
+                            'the number of data set categories.')
 
 FLAGS = tf.app.flags.FLAGS
+config.num_classes = FLAGS.num_classes
 
 
 def main(_):

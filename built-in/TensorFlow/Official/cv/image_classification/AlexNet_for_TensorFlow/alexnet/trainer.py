@@ -51,8 +51,44 @@ class Trainer(object):
     def get_npu_classifier(self):
         from npu_bridge.estimator.npu.npu_config import NPURunConfig
         from npu_bridge.estimator.npu.npu_estimator import NPUEstimator
-
-        run_config = NPURunConfig(
+        
+ #modify enable autotune       
+        
+        if "autotune" in os.environ:
+        
+        
+            print ("autotune value is " + os.environ["autotune"])
+            
+            if os.environ["autotune"] == "True":
+            
+                print ("autotune is set !")
+                
+                run_config = NPURunConfig(
+            hcom_parallel=True,
+            precision_mode="allow_mix_precision",
+            enable_data_pre_proc=True,
+            save_checkpoints_steps=112590,
+            auto_tune_mode="RL,GA",
+            session_config=self.sess.estimator_config,
+            model_dir=self.config.log_dir,
+            iterations_per_loop=self.config.iterations_per_loop,
+            keep_checkpoint_max=self.config.max_checkpoint_to_save)
+            
+            else:
+                print ("autotune is not set ")
+                run_config = NPURunConfig(
+            hcom_parallel=True,
+            precision_mode="allow_mix_precision",
+            enable_data_pre_proc=True,
+            save_checkpoints_steps=112590,
+            session_config=self.sess.estimator_config,
+            model_dir=self.config.log_dir,
+            iterations_per_loop=self.config.iterations_per_loop,
+            keep_checkpoint_max=self.config.max_checkpoint_to_save)
+        
+#autotune set is end!
+        else:        
+            run_config = NPURunConfig(
             hcom_parallel=True,
             precision_mode="allow_mix_precision",
             enable_data_pre_proc=True,
