@@ -1,7 +1,7 @@
 {
 	"detection": {
         "stream_config": {
-                "deviceId": "1"
+                "deviceId": "0"
         },
 		"appsrc0": {
 			"props": {
@@ -44,7 +44,7 @@
 		"mxpi_tensorinfer0": {
 			"props": {
 				"dataSource": "mxpi_imageresize0",
-				"modelPath": "/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/convert/models/ssd-500_458_on_coco_bgr.om"
+				"modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ssd_1000-2_on_micro_ctrl_bgr.om"
 			},
 			"factory": "mxpi_tensorinfer",
 			"next": "mxpi_objectpostprocessor0"
@@ -52,8 +52,8 @@
 		"mxpi_objectpostprocessor0": {
 			"props": {
 				"dataSource": "mxpi_tensorinfer0",
-				"postProcessConfigPath": "/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/sdk_mobilenet_fpn_coco_postprocess.cfg",
-				"labelPath": "/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/coco1.names",
+				"postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/sdk_mobilenet_fpn_coco_postprocess.cfg",
+				"labelPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names",
 				"postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
 			},
 			"factory": "mxpi_objectpostprocessor",
@@ -65,9 +65,9 @@
 			},
 			"factory": "mxpi_dataserialize",
 			"next": "appsink0"
-		}
+		},
 	    "appsink0": {
 			"factory": "appsink"
-		},
+		}
 	}
 }

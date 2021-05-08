@@ -123,13 +123,13 @@ ids = { 'train_sharp': '1YLksKtMhd2mWyVSkvhDaDLWSc1qYNCz-',
 #    os.makedirs('REDS', exist_ok=True)
 #    root_dir = 'REDS'
 
-if not os.path.exist(args.root_dir):
+if not os.path.exists(args.root_dir):
     os.makedirs(args.root_dir, exist_ok=True)
 
 for subset in ids:
     argdict = args.__dict__
     if args.all or argdict[subset]:
-        filename = '{}/{}.zip'.format(root_dir, subset)
+        filename = '{}/{}.zip'.format(args.root_dir, subset)
         servername = 'Google Drive' if args.server == 'google' else 'SNU CVLab'
         print('Downloading {}.zip from {}'.format(subset, servername))
         download_file_from_server(args.server, subset, filename)    # download the designated subset

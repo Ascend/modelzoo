@@ -7,7 +7,7 @@
 ## 环境需求
 
 - tensorflow==1.15
-- imageio
+- cv2
 - yacs
 - python3.7
 
@@ -72,33 +72,31 @@ edvr
     python3 scripts/download_REDS.py --root_dir ${datadir} --train_sharp --train_sharp_bicubic --val_sharp --val_sharp_bicubic
     ```
 
-    这一步会将这四个部分下载下来，保存到``data/reds``目录中
+    这一步会将这四个部分下载下来，保存到``data/reds``目录中。下载完后进行解压到``data/reds``目录中。
 
 2. 参考论文方法，合并原始训练集和验证集
 
     ```sh
+    if [ ! -d ${datadir}/images ]; then
+        mkdir -p ${datadir}/images
+    fi
+    
     python3 scripts/regroup_reds_dataset.py ${datadir}
     ```
 
-    这一步会将验证集（``val_sharp``和``val_sharp_bicubic``）合并到对应的初始训练集中。验证集部分将被重命名为序列240-269，并附在原训练集之后。因此总共有270个视频序列，每个视频序列有100帧。其中000，011，015，020四个序列将作为真正的验证集。
+    这一步会将验证集（``val_sharp``和``val_sharp_bicubic``）合并到对应的初始训练集中。验证集部分将被重命名为序列240-269，并附在原训练集之后。因此总共有270个视频序列，每个视频序列有100帧。
 
-3. 重组数据集，与训练脚本进行适配
+4. 准备数据meta信息。其中000，011，015，020四个序列将作为真正的验证集。
 
     ```sh
-    mkdir ${datadir}/images
+    if [ ! -d ${datadir}/sets ]; then
+        mkdir -p ${datadir}/sets
+    fi
     
-    mv ${datadir}/train_sharp ${datadir}/images/truth
-    mv ${datadir}/train_sharp_bicubic/X4 ${datadir}/images/blur4
+    python3 scripts/make_reds_dataset.py ${datadir}
     ```
 
-4. 准备数据meta信息
-
-    ```sh
-    mkdir ${datadir}/sets
-    python3 scripts/make_reds_dataset.py ${datadir}/sets
-    ```
-
-我们已将上述4个步骤合并成一个shell脚本。用户可直接运行该脚本（仅适用于REDS4数据集）：
+我们已将上述3个步骤合并成一个shell脚本。用户可直接运行该脚本（仅适用于REDS4数据集）：
 
 ```sh
 bash scripts/prepare_reds_dataset.sh
@@ -221,13 +219,6 @@ data/reds
     > 2021-01-05 14:07:08 Step:460, lr:0.00039999, loss:6676.80909872, time:227.10ms, fps:140.91 <br>
     > 2021-01-05 14:07:12 Step:480, lr:0.00039999, loss:6571.46454924, time:226.12ms, fps:141.52 <br>
     > 2021-01-05 14:07:17 Step:500, lr:0.00039999, loss:6452.07785241, time:223.62ms, fps:143.10 <br>
-
-注意：示例配置文件``edvr.yaml``和训练脚本``run_1p_train.sh``仅作为参考。
-    单卡``batchsize=4``且只训练1000个step，是无法达到本仓库所复现的精度的。需要完整体验复现精度，请执行
-   ``run_1p_train_precision_overwatch.sh``和``run_8p_train_precision_overwatch.sh``脚本。单卡``batchsize=32``
-   或8卡每张卡``batchsize=4``（等效``batchsize=32``）可达到复现精度。
-
-此外，由于读数据过程可能成为训练耗时瓶颈，可以考虑增加读数据的线程数``num_threads``和队列容量``train_data_queue_size``，加快数据读取速度，保证它不会成为耗时瓶颈。
 
 ## 精度验证
 

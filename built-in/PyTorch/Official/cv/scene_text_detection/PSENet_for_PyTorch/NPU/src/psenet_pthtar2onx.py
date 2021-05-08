@@ -48,7 +48,7 @@ def proc_nodes_module(checkpoint,AttrName):
 def convert():
     checkpoint = torch.load("./psenet_Checkpoint.pth.tar", map_location='cpu')
     checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
-    model = onnx_models.resnet50(pretrained=True, num_classed=7, scale=1)
+    model = onnx_models.resnet50(pretrained=True, num_classes=7, scale=1)
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     print(model)

@@ -116,7 +116,8 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 
   <a name="zh-cn_topic_0000001074020224_table1519011227314"></a>
 
-  <table><thead align="left"><tr id="zh-cn_topic_0000001074020224_row0190152218319"><th class="cellrowborder" valign="top" width="55.00000000000001%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074020224_p1419132211315"><a name="zh-cn_topic_0000001074020224_p1419132211315"></a><a name="zh-cn_topic_0000001074020224_p1419132211315"></a>镜像名称</p>
+
+  <table xmlns="http://www.w3.org/1999/html"><thead align="left"><tr id="zh-cn_topic_0000001074020224_row0190152218319"><th class="cellrowborder" valign="top" width="55.00000000000001%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074020224_p1419132211315"><a name="zh-cn_topic_0000001074020224_p1419132211315"></a><a name="zh-cn_topic_0000001074020224_p1419132211315"></a>镜像名称</p>
   </th>
   <th class="cellrowborder" valign="top" width="20%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074020224_p1564813141255"><a name="zh-cn_topic_0000001074020224_p1564813141255"></a><a name="zh-cn_topic_0000001074020224_p1564813141255"></a>镜像版本</p>
   </th>
@@ -138,10 +139,32 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
     -   [MindSpore教程](MindSpore教程https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html )
     -   [MindSpore API参考](MindSpore API参考https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html )
 
-
 ### 3.2 推理环境准备
 
--   本样例配套的CANN版本为20.2，MindX SDK版本为20.2.0。
+- **表 1**  镜像列表
+
+  <a name="zh-cn_topic_0000001074020224_table1519011227314"></a>
+
+  <table><thead align="left"><tr id="zh-cn_topic_0000001074020224_row0190152218319"><th class="cellrowborder" valign="top" width="55.00000000000001%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074020224_p1419132211315"><a name="zh-cn_topic_0000001074020224_p1419132211315"></a><a name="zh-cn_topic_0000001074020224_p1419132211315"></a>镜像名称</p>
+  </th>
+  <th class="cellrowborder" valign="top" width="20%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074020224_p1564813141255"><a name="zh-cn_topic_0000001074020224_p1564813141255"></a><a name="zh-cn_topic_0000001074020224_p1564813141255"></a>镜像版本</p>
+  </th>
+  <th class="cellrowborder" valign="top" width="25%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000001074020224_p1764811141954"><a name="zh-cn_topic_0000001074020224_p1764811141954"></a><a name="zh-cn_topic_0000001074020224_p1764811141954"></a>配套CANN版本</p>
+  </th>
+  </tr>
+  </thead>
+  <tbody><tr id="zh-cn_topic_0000001074020224_row71915221134"><td class="cellrowborder" valign="top" width="55.00000000000001%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074020224_ul129622059162218"></a><a name="zh-cn_topic_0000001074020224_ul129622059162218"></a><ul id="zh-cn_topic_0000001074020224_ul129622059162218"><li>ARM架构：<a href="https://ascendhub.huawei.com/#/detail?name=ascend-infer-arm" target="_blank" rel="noopener noreferrer">ascend-infer-arm</a></li><li>x86架构：<a href="https://ascendhub.huawei.com/#/detail?name=ascend-infer-x86" target="_blank" rel="noopener noreferrer">ascend-infer-x86</a></li></ul>
+  </td>
+  <td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074020224_p14648161414516"><a name="zh-cn_topic_0000001074020224_p14648161414516"></a><a name="zh-cn_topic_0000001074020224_p14648161414516">20.2.0</p>
+  </td>
+  <td class="cellrowborder" valign="top" width="25%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074020224_p1264815147514">CANN V100R020C20</p>
+  </td>
+  </tr>
+  </tbody>
+  </table>
+
+
+-   本样例配套的CANN版本为20.2，MindX SDK版本为2.0.1。
 -   硬件环境和运行环境准备请参见《CANN 软件安装指南](CANN 软件安装指南https://ascend.huawei.com/#/software/cann)》。
 -   安装MindX SDK开发套件请参见《mxManufacture 用户指南](mxManufacture 用户指南https://ascend.huawei.com/#/software/mindx-sdk/sdk-detail)》。
 -   运行推理环境需要安装Python3.7.5并获取以下lib库。
@@ -287,7 +310,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 -   **模型训练**  
 -   **高级参考**  
 -   **迁移学习指导**
--   **模型转换**
+-   **模型导出**
 
 
 ### 4.1 数据集准备
@@ -481,7 +504,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
     ```shell script
      python postprocess.py --help
     ```
-#### 4.3.1 训练过程
+#### 4.3.2 训练过程
 通过“模型训练”中步骤，启动单卡或者多卡训练。
 训练过程中，若需保存 checkpoint 文件，可在 src/config.py 中配置 save\_checkpoint=True，每 save\_checkpoint\_epochs 保存一次
  checkpoint，保存在路径 save\_checkpoint\_path 中，也可设置保存的最大checkpoint数keep\_checkpoint\_max。
@@ -508,7 +531,7 @@ epoch time: 350259.662 ms, per step time: 764.759 ms
 epoch: 3 step: 458, loss is 1.3008881
 epoch time: 345243.121 ms, per step time: 753.806 ms
 ```
-#### 4.3.1 评估/推理过程
+#### 4.3.3 评估/推理过程
 通过“模型训练”中的测试指令启动单卡或者多卡测试。单卡和多卡的配置与训练过程一致。
 当前只能针对该工程训练出的 checkpoint 进行推理测试。
 推理结果将会被保存在 “eval[x]“ 目录下，在日志中可以看到以下输出。
@@ -645,7 +668,7 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
     - 参数6：预训练模型的 ckpt 文件绝对路径
     
     - 参数7：已经训练的 epoch 数，迁移学习设置为0
-### 4.5  模型转换
+### 4.5  模型导出
 
  若训练的模型要在昇腾 310 上推理，则在训练或者迁移学习结束后，在昇腾 910 环境上将 ckpt 文件导出为 AIR 文件，执行以下命令导出：
 
@@ -669,52 +692,60 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
 
 ### 5.1 MindX SDK推理
 
-1. 参考3.2章节，下载所需软件包，并安装推理 mxManufacture。本文安装到：/home/sam/mxManufacture 目录。
-
-   
+1. 参考3.2章节，下载所需软件包 mxManufacture 上传到：/home/sam/pkgs 目录。
 
 2. 上传下载的代码到推理环境，本文上传到：/home/sam/codes/ 目录，并执行以下命令解压：
 
    ```shell
-   unzip SSD_MobileNetV1_FPN_for_MindSpore
+   unzip SSD_for_MindSpore.zip
    ```
 
-3. 上传推理迁移学习后导出的 AIR 模型文件，本文示例上传到：/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/convert/models 目录。
-
-4. 模型转换为 OM 模型，执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
+3. 上传推理迁移学习后导出的 AIR 模型文件，本文示例上传到：/home/sam/codes/SSD_for_MindSpore/infer/convert/models 目录。
+   
+4. 执行如下命令启动推理容器
+   ```shell
+    cd SSD_MobileNetV1_FPN_for_MindSpore/scripts
+    bash docker_start_infer.sh swr.cn-south-1.myhuaweicloud.com/public-ascendhub/ascend-infer-arm:21.0.1 /home/sam
+   ```
+   参数说明：
+   - 参数1： 镜像名称：版本
+   - 参数2：宿主机挂载目录
+4. 模型转换为 OM 模型。在容器中执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
 
    ```shell
-   bash convert_om.sh /usr/local/Ascend/ascend-toolkit/ ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl_bgr ./aipp.cfg
+   cd /home/sam/codes/SSD_for_MindSpore/infer/convert
+   bash convert_om.sh ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl_bgr ./aipp.cfg
    ```
-
    AIR 模型转换为 OM 模型的命令参数说明如下：
-
-   - 参数1：ascend-toolkit 安装路径
-   - 参数2：AIR 模型文件路径
-   - 参数3：转换生成的的 OM 模型 文件名。
-   - 参数4：转换OM模型使用的 AIPP 配置文件
+   - 参数1：AIR 模型文件路径
+   - 参数2：转换生成的的 OM 模型 文件名。
+   - 参数3：转换OM模型使用的 AIPP 配置文件
    
-    本例中执行生成以下模型文件：
-       ```
-      [root@centos-11 convert]# ll models/
-      total 111152
-      -r--------. 1 root root 47413459 Mar 13 17:08 ssd_1000-2_on_micro_ctrl.air
-      -rw-------. 1 root root 66403654 Mar 13 17:11 ssd_1000-2_on_micro_ctrl_bgr.om
-       ```
+    本例中执行生成以下模型文件：<br/>
+   ```
+    root@9a9f1537b68b:/home/sam/codes/SSD_for_MindSpore/infer/convert# ll models/
+    total 111184
+    drwxr-xr-x 2 root root     4096 Apr 30 07:40 ./
+    drwxr-xr-x 4 root root     4096 Apr 30 07:40 ../
+    -rw-r--r-- 1 root root 47413459 Mar 10 06:46 ssd_1000-2_on_micro_ctrl.air
+    -rw------- 1 root root 66428371 Apr 30 07:40 ssd_1000-2_on_micro_ctrl_bgr.om
+   ```
+5. 容器内安装 mxManufacture，本文安装到 /home/sam/mxManufacture
+   执行以下命令安装 mxManufacture：
    
-5. 修改以下配置文件：
-
-   - 环境变量配置文件：${work_space}/infer/sdk/conf/sdk_infer_env.rc
-       ```shell
-       export MX_SDK_HOME=/home/sam/mxManufacture # 根据 mxManufacture 安装路径修改
-       export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/arm64-linux # 环境如果是x86，则路径最后分量是 x86_64-linux
-       export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${LD_LIBRARY_PATH}
-       export PYTHONPATH=${MX_SDK_HOME}/python:${PYTHONPATH}
-       export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME}/lib/plugins
-       ```
-
-   - 迁移数据集分类标签文件，本文示例为：/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names
-
+   ```shell
+   cd /home/sam/pkgs
+   chmod +x Ascend-mindxsdk-mxmanufacture_2.0.1_linux-aarch64.run
+   bash Ascend-mindxsdk-mxmanufacture_2.0.1_linux-aarch64.run --install-path=/home/sam --install
+   ```
+6. 设置环境变量
+   执行以下命令设置 SDK 推理需要的环境变量： 
+   ```shell
+   source ~/.bashrc
+   export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/driver:$LD_LIBRARY_PATH
+   ```
+7. 修改以下配置文件：
+   - 迁移数据集分类标签文件，本文示例为：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names
      ```
      # backgroud 为固定的分类标签；之后的标签顺序需要与 4.4.1 章节中的标签顺序保持一致。
      background
@@ -724,24 +755,40 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
      Heltec ESP32 Lora
      ```
 
-   - 后处理配置文件：本文示例为：/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_postprocess.cfg
+   - 后处理配置文件：本文示例为：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_postprocess.cfg
      ```
      CLASS_NUM=5
      SCORE_THRESH=0.1
      IOU_THRESH=0.6
-     CHECK_MODEL=false
      ```
      参数说明：
      - CLASS_NUM：迁移学习数据集分类数+1
      - SCORE_THRESH：分类置信度阈值
      - IOU_THRESH： IOU 阈值
-     - CHECK_MODEL：是否校验模型的输入是否匹配。
      
-   - mxManufacture 推理 pipeline配置，本文示例修改:/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
-   ![](res/md/infer/sdk_infer_pipeline.png)
+   - mxManufacture 推理 pipeline配置，本文示例修改:/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
+   ```json
+		"mxpi_tensorinfer0": {
+			"props": {
+				"dataSource": "mxpi_imageresize0",
+				"modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ssd_1000-2_on_micro_ctrl_bgr.om"
+			},
+			"factory": "mxpi_tensorinfer",
+			"next": "mxpi_objectpostprocessor0"
+		},
+		"mxpi_objectpostprocessor0": {
+			"props": {
+				"dataSource": "mxpi_tensorinfer0",
+				"postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_postprocess",
+				"labelPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names",
+				"postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
+			},
+			"factory": "mxpi_objectpostprocessor",
+			"next": "mxpi_dataserialize0"
+		},
+   ```
 
     参数说明：
-
      - resizeHeight: 图像缩放高度
      - resizeWidth: 图像缩放宽度
      - modelPath: 步骤4中转换生成的 OM 模型绝对路径
@@ -749,32 +796,15 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
      - labelPath：迁移学习数据集标注文件绝对路径
      - postProcessLibPath：后处理 so 文件绝对路径，根据 mxManufacture 安装路径修改
 
-6. 设置环境变量
-   - 修改 mxManufacture 推理需要的环境变量，本例中修改文件：
-      ```shell
-        export MX_SDK_HOME=/home/sam/mxManufacture # 根据 mxManufacture 安装路径修改。
-        # 以下环境变量 如果是x86架构，则配置为：
-        # export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/x86_64-linux
-        export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/arm64-linux
-        export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${LD_LIBRARY_PATH}
-        export PYTHONPATH=${MX_SDK_HOME}/python:${PYTHONPATH}
-        export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME}/lib/plugins
-        export GST_PLUGIN_SCANNER=${MX_SDK_HOME}/opensource/libexec/gstreamer-1.0/gst-plugin-scanner
-      ```
-   - 设置环境变量。执行以下命令设置推理过程需要的环境变量：
-        ```shell
-        source conf/sdk_infer_env.rc
-        ```
+8. 准备输入图片：本例中输入图片上传至：/home/sam/codes/SSD_for_MindSpore/infer/sdk/test_img 目录。
 
-7. 准备输入图片：本例中输入图片上传至：/home/sam/codes/SSD_MobileNet_FPN_for_MindSpore/infer/sdk/test_img目录。
-
-8. 执行推理，并观察结果。
+9. 执行推理，并观察结果。
    执行以下命令启动推理测试：
-
+   
    ```shell
+    cd /home/sam/codes/SSD_for_MindSpore/infer/sdk
     python3 infer_by_sdk.py
    ```
-
     脚本可选参数可以通过：python3 infer_by_sdk.py --help查看如下：
     - pipeline_path 推理pipeline配置文件路径
     - stream_name 推理pipeline中配置的业务流名称
@@ -785,31 +815,32 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
       查看推理结果目录，生成文件如下：
       
       ```
-        [root@centos-11 sdk]# ll infer_res
-        total 28
-        -rw-r--r--. 1 root root    2 Mar 15 16:28 IMG_20181228_102636.json
-        -rw-r--r--. 1 root root  404 Mar 15 16:28 IMG_20181228_102641.json
-        -rw-r--r--. 1 root root    2 Mar 15 16:28 IMG_20181228_102658.json
-        -rw-r--r--. 1 root root  777 Mar 15 16:28 IMG_20181228_102706.json
-        -rw-r--r--. 1 root root 1935 Mar 15 16:28 IMG_20181228_102745.json
-        -rw-r--r--. 1 root root    2 Mar 15 16:28 IMG_20181228_102749.json
-        -rw-r--r--. 1 root root 1920 Mar 15 16:28 IMG_20181228_102757.json
+      root@f4777ba50c5b:/home/sam/codes/SSD_for_MindSpore/infer/sdk# ll infer_res/
+      total 24
+      drwxr-xr-x 2 root root 4096 May  7 00:53 ./
+      drwxr-xr-x 6 root root 4096 May  7 00:44 ../
+      -rw-r--r-- 1 root root 3854 May  7 00:53 Arduino_Nano.json
+      -rw-r--r-- 1 root root  412 May  7 00:53 ESP8266.json
+      -rw-r--r-- 1 root root 1520 May  7 00:53 Heltec_ESP32_Lora.json
+      -rw-r--r-- 1 root root 3035 May  7 00:53 Raspberry_Pi_3.json
       ```
 
 ### 5.2 mxBase 推理
 1. 准备 mxBase 代码<br/>
    在推理环境上执行以下命令下载 mxBase 代码：
+   
    ```shell script
    cd /data/sam/codes
    git clone https://github.com/Ascend/mindxsdk-mxbase.git
    ```
-   执行以下命令拷贝推理代码到mxbase子目录：
-
+执行以下命令拷贝推理代码到mxbase子目录：
+   
    ```shell
    cp /data/sam/codes/ssd_mobilenet_v1_fpn/infer/mxbase/C++/* /data/sam/codes/mindxsdk-mxbase/samples/C++/
    cp /data/sam/codes/ssd_mobilenet_v1_fpn/infer/mxbase/models/coco.names /data/sam/codes/mindxsdk-mxbase/samples/models
    ```
-
+```
+   
 2. OM 模型，执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
 
    ```shell

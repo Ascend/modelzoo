@@ -4,7 +4,7 @@ This is an EDVR implementation based on tensorflow, which supports running on NP
 
 ## Requirements
 - tensorflow==1.15
-- imageio
+- cv2
 - yacs
 - python3.7
 
@@ -68,29 +68,27 @@ datadir=./data/reds
 mkdir -p ${datadir}
 python3 scripts/download_REDS.py --root_dir ${datadir} --train_sharp --train_sharp_bicubic --val_sharp --val_sharp_bicubic
 ```
-This step will download the above splits and save them to ``data/reds``.
+This step will download the above splits and save them to ``data/reds``. Unzip these files in ``data/reds``.
 
-2. Merge the REDS4 dataset splits as in the paper
+2. Merge and regroup the REDS4 dataset splits as in the paper
 
 ```bash
+if [ ! -d ${datadir}/images ]; then
+    mkdir -p ${datadir}/images
+fi
+
 python3 scripts/regroup_reds_dataset.py ${datadir}
 ```
-This step will merge the val splits into the train splits, and concatenate them together. The val splits will be renamed to index [240 - 269]. Of all the 270 clips, the 000, 011, 015, 020 will be used as the actual validation sets as is conducted by the paper. 
+This step will merge the val splits into the train splits, and concatenate them together. The val splits will be renamed to index [240 - 269]. 
 
-3. Re-organize the dataset
-
-```sh
-mkdir ${datadir}/images
-
-mv ${datadir}/train_sharp ${datadir}/images/truth
-mv ${datadir}/train_sharp_bicubic/X4 ${datadir}/images/blur4
-```
-
-4. Prepare dataset metadata
+3. Prepare dataset metadata. Of all the 270 clips, the 000, 011, 015, 020 will be used as the actual validation sets as is conducted by the paper. 
 
 ```sh
-mkdir ${datadir}/sets
-python3 scripts/make_reds_dataset.py ${datadir}/sets
+if [ ! -d ${datadir}/sets ]; then
+    mkdir -p ${datadir}/sets
+fi
+
+python3 scripts/make_reds_dataset.py ${datadir}
 ```
 
 **We've integrated these steps in a single shell script**. One can run the script directly for the REDS4 dataset：

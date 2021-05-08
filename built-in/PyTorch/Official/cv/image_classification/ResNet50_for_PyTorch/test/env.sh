@@ -26,6 +26,7 @@ export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkaclli
 export ASCEND_OPP_PATH=${install_path}/opp
 
 export SOC_VERSION=Ascend910
+export HCCL_WHITELIST_DISABLE=1
 export HCCL_CONNECT_TIMEOUT=600
 
 #export ASCEND_SLOG_PRINT_TO_STDOUT=1

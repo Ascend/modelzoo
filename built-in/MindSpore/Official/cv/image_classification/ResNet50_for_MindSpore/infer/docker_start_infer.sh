@@ -16,10 +16,9 @@
 
 docker_image=$1
 data_dir=$2
-code_dir=$3
 
 function show_help() {
-    echo "Usage: docker_start.sh docker_image data_dir code_dir"
+    echo "Usage: docker_start.sh docker_image data_dir"
 }
 
 function param_check() {
@@ -34,12 +33,6 @@ function param_check() {
         show_help
         exit 1
     fi
-
-    if [ -z "${code_dir}" ]; then
-        echo "please input code_dir"
-        show_help
-        exit 1
-    fi
 }
 
 param_check
@@ -51,6 +44,5 @@ docker run -it \
   --device=/dev/hisi_hdc \
   -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
   -v ${data_dir}:${data_dir} \
-  -v ${code_dir}:${code_dir} \
   ${docker_image} \
   /bin/bash

@@ -1,10 +1,9 @@
 model_path=$1
-framework=$2
-output_model_name=$3
+output_model_name=$2
 
 /usr/local/Ascend/atc/bin/atc \
 --model=$model_path \
---framework=$framework \
+--framework=1 \
 --output=$output_model_name \
 --input_format=NCHW --input_shape="actual_input_1:1,3,304,304" \
 --enable_small_channel=1 \

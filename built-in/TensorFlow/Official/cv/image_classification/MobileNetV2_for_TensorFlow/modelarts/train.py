@@ -11,7 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ==============================================================================
+#
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+## ==============================================================================
 """Generic training script that trains a model using a given dataset."""
 
 from __future__ import absolute_import
@@ -284,7 +299,7 @@ def model_trans():
     ckpt_path = "/cache/ckpt_first"
     match_rule = "model.ckpt-[!0]*.meta*"
 
-    # 设置模型参数
+    # 璁剧疆妯″瀷鍙傛暟
     placed_match_path = os.path.join(ckpt_path, match_rule)
     placed_ckpt_list = glob.glob(placed_match_path)
     if not placed_ckpt_list:
