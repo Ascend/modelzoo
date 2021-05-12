@@ -100,9 +100,8 @@ class Env:
 
         return optimizer
 
-
     def create_logdir(self):
-        logdir = "results"
+        logdir = self.FLAGS.log_dir
         os.makedirs(logdir, exist_ok=True)
         return logdir
 

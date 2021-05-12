@@ -54,6 +54,9 @@ parser.add_argument('--pre_trained', type=str, default=None, help='Pretrained ch
 parser.add_argument('--parameter_server', type=ast.literal_eval, default=False, help='Run parameter server train')
 parser.add_argument("--filter_weight", type=ast.literal_eval, default=True,
                     help="Filter head weight parameters, default is False.")
+parser.add_argument('--class_num', type=int, default=None, help="class num")
+parser.add_argument('--epoch_size', type=int, default=None, help="epoch size")
+parser.add_argument('--batch_size', type=int, default=None, help="batch size")
 
 parser.add_argument('--data_url',
                     metavar='DIR',
@@ -91,6 +94,20 @@ else:
     from src.dataset import create_dataset4 as create_dataset
 
 
+def config_from_cmd():
+    if args_opt.class_num is not None:
+        print('config from cmd: class_num is {}'.format(args_opt.class_num))
+        config['class_num'] = args_opt.class_num
+
+    if args_opt.epoch_size is not None:
+        print('config from cmd: epoch_size is {}'.format(args_opt.epoch_size))
+        config['epoch_size'] = args_opt.epoch_size
+
+    if args_opt.batch_size is not None:
+        print('config from cmd: batch_size is {}'.format(args_opt.batch_size))
+        config['batch_size'] = args_opt.batch_size
+
+
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
     """remove useless parameters according to filter_list"""
     for key in list(origin_dict.keys()):
@@ -102,6 +119,7 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
 
 
 if __name__ == '__main__':
+    config_from_cmd()
     target = args_opt.device_target
     if target == "CPU":
         args_opt.run_distribute = False
@@ -161,6 +179,8 @@ if __name__ == '__main__':
         print("---------------------------------mdoel file name")
         print(model_file_name)
         cache_model_file_path = os.path.join(real_path, model_file_name)
+        if not os.path.exists(cache_model_file_path):
+            print('cache_model_file_path: {} not exists'.format(cache_model_file_path))
         # mox.file.copy_parallel(args_opt.pre_trained, os.path.join(real_path, model_file_name))
         param_dict = load_checkpoint(cache_model_file_path)
 

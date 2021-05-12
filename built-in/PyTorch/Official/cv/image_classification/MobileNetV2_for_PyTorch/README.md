@@ -6,7 +6,7 @@
 	1. 安装环境
 	2. 修改run_1p.sh字段"data"为当前磁盘的数据集路径
 	3. 修改字段device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
-	4. cd中run1p.sh文件的目录(1p文件夹)，执行bash run1p.sh单卡脚本， 进行单卡训练
+	4. cd中run1p.sh文件的目录(8p文件夹)，执行bash run1p.sh单卡脚本， 进行单卡训练
 ```
 
 	
@@ -16,7 +16,7 @@
 	1. 安装环境
 	2. 修改多P脚本中字段"data"为当前磁盘的数据集路径
 	3. 修改run8p.sh字段"addr"为当前主机ip地址
-	4. cd到run8p.sh文件的目录，执行bash run8p.sh等多卡脚本， 进行多卡训练	
+	4. cd到run8p.sh文件的目录(8p文件夹)，执行bash run8p.sh等多卡脚本， 进行多卡训练	
 ```
 
 

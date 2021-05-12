@@ -23,6 +23,8 @@ def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--ckpt_path', default=1,
                         help="""set checkpoint path""")
+    parser.add_argument('--class_num', default=1000, type=int,
+                        help="the class num")
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
         for bad_arg in unknown_args:
@@ -35,7 +37,7 @@ def main():
     tf.reset_default_graph()
     # set inputs node
     inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="input")
-    top_layer = vgg.vgg_impl(inputs, False)
+    top_layer = vgg.vgg_impl(inputs, False, args.class_num)
     # create inference graph
     with tf.Session() as sess:
         tf.train.write_graph(sess.graph_def, './', 'model.pb')

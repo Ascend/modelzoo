@@ -34,13 +34,13 @@ class Model(object):
 
         inputs = tf.cast(inputs, self.args.dtype)
 
-        top_layer = vgg.vgg_impl(inputs, is_training)
+        top_layer = vgg.vgg_impl(inputs, is_training, self.args.class_num)
 
         logits = top_layer
         predicted_classes = tf.argmax(logits, axis=1, output_type=tf.int32)
         logits = tf.cast(logits, tf.float32)
 
-        labels_one_hot = tf.one_hot(labels, depth=1000)
+        labels_one_hot = tf.one_hot(labels, depth=self.args.class_num)
         loss = tf.losses.softmax_cross_entropy(
             logits=logits, onehot_labels=labels_one_hot, label_smoothing=self.args.label_smoothing)
 
@@ -60,6 +60,14 @@ class Model(object):
                 mode, loss=loss, eval_metric_ops=metrics)
 
         assert (mode == tf.estimator.ModeKeys.TRAIN)
+
+        if self.args.restore_path:
+            # restore ckpt for finetune
+            variables_to_restore = tf.contrib.slim.get_variables_to_restore(
+                exclude=self.args.restore_exclude)
+            tf.train.init_from_checkpoint(self.args.restore_path,
+                                          {v.name.split(':')[0]: v for v in
+                                           variables_to_restore})
 
         batch_size = tf.shape(inputs)[0]
 

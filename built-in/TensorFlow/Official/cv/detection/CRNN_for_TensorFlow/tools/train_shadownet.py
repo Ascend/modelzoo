@@ -1,6 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 17-9-22 下午1:39
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# @Time    : 17-9-22 涓嬪崍1:39
 # @Author  : MaybeShewill-CV
 # @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : train_shadownet.py
@@ -20,7 +48,7 @@ import numpy as np
 #from .. import _init_paths
 import sys 
 
-sys.path.append("/opt/npu/m00536736/OCR/CRNN/CRNN_NPU")
+sys.path.append("./CRNN/CRNN_NPU")
 
 from crnn_model import crnn_net
 from local_utils import evaluation_tools
@@ -271,9 +299,9 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
     config = tf.ConfigProto()
     custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
     custom_op.name =  "NpuOptimizer"
-    custom_op.parameter_map["use_off_line"].b = True #在昇腾AI处理器执行训练
-    custom_op.parameter_map["allow_mix_compile"].b = True #在昇腾AI处理器执行训练
-    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  #关闭remap开关
+    custom_op.parameter_map["use_off_line"].b = True #鍦ㄦ槆鑵続I澶勭悊鍣ㄦ墽琛岃缁
+    custom_op.parameter_map["allow_mix_compile"].b = True #鍦ㄦ槆鑵続I澶勭悊鍣ㄦ墽琛岃缁
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  #鍏抽棴remap寮鍏
     #config.iterations_per_loop = 100
 
     sess = tf.Session(config=config)

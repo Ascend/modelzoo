@@ -3,7 +3,35 @@
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 17-9-22 下午1:39
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# @Time    : 17-9-22 涓嬪崍1:39
 # @Author  : MaybeShewill-CV
 # @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : train_shadownet.py
@@ -82,6 +110,14 @@ def init_args():
                         nargs='?', const=True, help='Use multi gpus to train')
     parser.add_argument( '--warmup_step', type=int,default=10,
                         help='number of warmup step used in lr scheduler ')
+    
+    # modify for npu overflow start
+    # enable overflow
+    parser.add_argument("--over_dump", type=str, default="False",
+                        help="whether to enable overflow")
+    parser.add_argument("--over_dump_path", type=str, default="./",
+                        help="path to save overflow dump files")
+    # modify for npu overflow end
 
  
     return parser.parse_args()
@@ -344,7 +380,16 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
     custom_op.parameter_map["use_off_line"].b = True
     custom_op.parameter_map["enable_data_pre_proc"].b = True
     custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes('allow_mix_precision')
-    custom_op.parameter_map["mix_compile_mode"].b = False  # 混合计算
+    custom_op.parameter_map["mix_compile_mode"].b = False  # 娣峰悎璁＄畻
+    
+    if args.over_dump == "True":
+        print("NPU overflow dump is enabled")
+        custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(args.over_dump_path)
+        custom_op.parameter_map["enable_dump_debug"].b = True
+        custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
+    else:
+        print("NPU overflow dump is disabled")
+    
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF 
  
     sess = tf.Session(config=config)

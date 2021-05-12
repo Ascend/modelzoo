@@ -1,4 +1,4 @@
-SSD for MindSpore
+	SSD for MindSpore
 
 -   [交付件基本信息](#交付件基本信息.md)
 -   [概述](#概述.md)
@@ -222,46 +222,50 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 │   └── src
 │       ├── main.cc
 │       └── utils.cc
-├── Dockerfile                                            # 训练镜像 Dockerfile 文件
-├── eval.py                                               # 模型评估入口脚本
-├── export.py                                             # 模型导出入口脚本
+├── Dockerfile                  # 训练镜像 Dockerfile 文件
+├── eval.py                     # 模型评估入口脚本
+├── export.py                   # 模型导出入口脚本
 ├── infer
-│   ├── convert                                           # 模型转换功能
+│   ├── convert                 # 模型转换功能
 │   │   ├── aipp.cfg
-│   │   ├── aipp_yuv.cfg                                  # 模型转换使用的 AIPP 配置文件
-│   │   └──  convert_om.sh                                # 模型转换入口脚本
-│   ├── __init__.py
-│   ├── mxbase                                            # mxBase 推理 exmaple 目录
-│   │   ├── C++
-│   │   │   ├── CMakeLists.txt
-│   │   │   ├── main_ssd.cpp
-│   │   │   ├── run.sh
-│   │   │   ├── SSDMobileNetV1Fpn.cpp
-│   │   │   └── SSDMobileNetV1Fpn.h
+│   │   ├── aipp_coco_rgb.cfg   # 模型转换使用的 AIPP 配置文件
+│   │   ├── aipp_coco_yuv.cfg
+│   │   ├── aipp_yuv.cfg
+│   │   ├── convert_om.sh       # 模型转换入口脚本
 │   │   └── models
-│   │       └── coco.names
-│   ├── sdk                                               # mxManufacture 推理 exmaple 目录
+│   ├── __init__.py
+│   ├── sdk                                                        # mxManufacture 推理 exmaple 目录
 │   │   ├── conf
-│   │   │   ├── coco.names                                # 数据集标签文件
-│   │   │   ├── sdk_infer_env.rc                          # 推理环境变量配置文件
-│   │   │   ├── sdk_mobilenet_fpn_coco_postprocess.cfg    # 后处理配置文件
-│   │   │   ├── ssd_mobilenet_fpn_mc.names                # 迁移学习 Microcontroller 数据标签文件
-│   │   │   ├── ssd_mobilenet_fpn_ms_mc_noqueue.pipeline  # 迁移学习 Microcontroller 推理 pipeline 配置
-│   │   │   └── ssd_mobilenet_v1_fpn_ms_postprocess.cfg   # 迁移学习 Microcontroller 推理后处理配置文件
-│   │   ├── infer_by_sdk.py                               # mxManufacture 推理入口脚本
+│   │   │   ├── coco.names                                         # 数据集标签文件
+│   │   │   ├── ssd_mobilenet_fpn_mc.names                         # 数据集 Microcontroller 标签文件
+│   │   │   ├── ssd_mobilenet_fpn_ms_coco.pipeline                 # 数据集 coco2017 val 推理 pipeline 配置
+│   │   │   ├── ssd_mobilenet_fpn_ms_mc.pipeline                   # 数据集 Microcontroller 推理 pipeline 配置
+│   │   │   ├── ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg    # 数据集 coco2017 推理后处理配置
+│   │   │   └── ssd_mobilenet_v1_fpn_ms_on_mc_postprocess.cfg      # 数据集 Microcontroller 推理后处理配置
+│   │   ├── infer_by_sdk.py
 │   │   ├── __init__.py
-│   │   └── perf
-│   │       ├── generate_map_report.py                    # mxManufacture 推理精度测试脚本
-│   │       ├── __init__.py
-│   │       ├── om_infer_perf_test.py                     # mxManufacture 推理性能测试脚本
-│   │       ├── run_map_test.sh                           # mxManufacture 精度测试脚本
-│   │       └── run_om_infer_perf_test.sh
+│   │   ├── perf
+│   │   │   ├── generate_map_report.py                    # mxManufacture 推理精度测试脚本
+│   │   │   ├── __init__.py
+│   │   │   ├── om_infer_perf_test.py                     # mxManufacture 推理性能测试脚本
+│   │   │   ├── run_map_test.sh                           # mxManufacture 精度测试脚本
+│   │   │   └── run_om_infer_perf_test.sh
+│   │   └── test_img
 │   └── utils
 │       ├── __init__.py
 │       ├── resize_utils.py
 │       └── restore_coordinates_from_json.py
+├── __init__.py
 ├── LICENSE
 ├── mindspore_hub_conf.py
+├── modelarts
+│   ├── config.yaml
+│   ├── label
+│   │   ├── coco_labels.txt
+│   │   └── microcontroller_labels.txt
+│   ├── modelarts_utils.py
+│   ├── readme.md
+│   └── start.py
 ├── postprocess.py
 ├── README_CN_C.md
 ├── README_CN.md
@@ -269,18 +273,23 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 ├── requirements.txt
 ├── res
 │   └── md
-│       └── infer
-│           ├── sdk_infer_pipeline.png
-│           └── sdk_infer_ret.png
-├── scripts                                                # 训练、评估入口脚本
+│       ├── infer
+│       │   ├── sdk_infer_pipeline.png
+│       │   └── sdk_infer_ret.png
+│       └── modelarts
+│           ├── create_train_task.png
+│           ├── create_transfer_train_task.png
+│           ├── models.png
+│           └── train_log.png
+├── scripts                             # 训练、评估入口脚本
+│   ├── docker_start_infer.sh
 │   ├── docker_start.sh
-│   ├── hccl_8p_01234567_182.138.104.158.json
 │   ├── run_distribute_train_gpu.sh
 │   ├── run_distribute_train.sh
 │   ├── run_eval_gpu.sh
 │   ├── run_eval.sh
 │   └── run_infer_310.sh
-├── src                                                    # 网络结构实现
+├── src                                 # 网络结构实现
 │   ├── anchor_generator.py
 │   ├── box_utils.py
 │   ├── config.py
@@ -301,6 +310,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 │   └── vgg16.py
 ├── train.py
 └── utils
+    ├── __init__.py
     └── trans_xml_annotations_to_txt.py
 ```
 
@@ -343,12 +353,13 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
     -   下载模型：下载模型文件。
 
 2. **将源码上传至训练服务器任意目录并解压。**
+    
     ```
     # 在环境上执行
     unzip SSD_for_MindSpore.zip
     cd SSD_for_MindSpore && dos2unix `find . *.sh`
-    ```
-
+   ```
+    
 3. **修改 backbone 网络配置。**
 
     ```
@@ -378,18 +389,18 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
     执行以下命令构建镜像：
 
     ```shell
-    cd {model/zoo/cv}/ssd
+    cd SSD_for_MindSpore
     docker build -t {docker_image} --build-arg FROM_IMAGE_NAME={base_image} .
     ```
     参数说明：
     - docker_image：将要构建生成镜像名称，请根据实际写入。
     - base_image：为基础镜像，可从AscendHub上下载，参考 3.1 章节。例如：
-
-      ````shell
-      docker build -t ssd_ms:v1.0 --build-arg FROM_IMAGE_NAME=swr.cn-south-1.myhuaweicloud.com/public-ascendhub/ascend-mindspore-x86:20.2.0 .
-      ````
-
-7. **启动容器实例。**
+      ```shell
+      # 注意：根据训练服务器架构选择对应平台镜像
+      docker build -t ssd_ms:v1.0 --build-arg FROM_IMAGE_NAME=swr.cn-south-1.myhuaweicloud.com/public-ascendhub/ascend-mindspore-arm:21.0.1 .
+      ```
+    
+7. **启动容器实例。**<br/>
    修改启动容器脚本：scripts/docker_start.sh，需要修改的关键参数包括：挂载的 NPU 设备、数据集、代码路径，构建的镜像名称。示例如下：
 
    ```sh
@@ -444,7 +455,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
    在scripts下的训练脚本默认数据集是 coco2017 格式的数据集。执行以下命令启动训练
 
    ```shell
-   cd scripts/
+   cd /home/sam/codes/SSD_for_MindSpore/scripts/
    # 分布式训练
    sh run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABLE_FILE]
    # 单卡训练
@@ -469,13 +480,14 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 9. **开始评估**
 
    ```
-   bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH]
+   bash run_eval_ascend.sh [DATA_SET] [CHECKPOINT_PATH] [DEVICE_ID]
    ```
 
    评估参数说明如下：
 
-   -   VALIDATION\_JSON\_FILE：验证数据集标注文件路径。
-   -   CHECKPOINT\_PATH：待验证的ckpt文件路径。
+   -   DATASET: 数据集名称，如 coco 等；
+   -   CHECKPOINT\_PATH：待验证的ckpt文件路径；
+   -   DEVICE_ID： 设备ID，如0、1、2、3；
 
    
 
@@ -486,23 +498,25 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
   执行以下命令查看训练脚本参数:
   
     ```shell script
-    python train.py --help
+  python train.py --help
     ```
 - 评估脚本参数<br/>
   执行以下命令查看模型评估脚本参数:
   
     ```shell script
-    python eval.py --help
+  python eval.py --help
     ```
 - 模型导出脚本参数<br/>
   执行以下命令查看模型导出脚本参数:
+  
     ```shell script
-    python export.py --help
+  python export.py --help
     ```
 - 后处理脚本参数<br/>
   执行以下命令查看后处理脚本参数:
+  
     ```shell script
-     python postprocess.py --help
+  python postprocess.py --help
     ```
 #### 4.3.2 训练过程
 通过“模型训练”中步骤，启动单卡或者多卡训练。
@@ -510,6 +524,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
  checkpoint，保存在路径 save\_checkpoint\_path 中，也可设置保存的最大checkpoint数keep\_checkpoint\_max。
 训练结果将会被保存在 “LOG“ 目录（单卡）或者 “LOG[0-7\]“ 目录（多卡）下，包括 checkpoint 目录和
  log.txt等输出文件。8卡训练过程产生的 log.txt内容如下所示。
+
 ```
 WARNING: 'ControlDepend' is deprecated from version 1.1 and will be removed in a future version, use 'Depend' instead.
 (38400, 4)
@@ -643,7 +658,19 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
    parser.add_argument("--filter_weight", type=ast.literal_eval, default=True,
                        help="Filter head weight parameters, default is False.")
    ```
-2. 执行如下命令启动迁移学习:
+   
+2. **注意事项**：<br/>
+   
+    如果使用的迁移数据集比较小，还需要修改默认的batchsize值，使得：**迁移学习数据集图片总数/训练卡数/batchsize >=1**，本例中修改为2，如下所示：
+    
+    ```python
+    parser.add_argument("--batch_size", type=int, default=2, help="Batch size, default is 32.")
+    ```
+    
+    
+    
+3. 执行如下命令启动迁移学习:
+
     ```shell script
     bash run_distribute_train.sh \
     8 \
@@ -656,24 +683,24 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
     ```
     参数解释如下：
     - 参数1：设备数
-    
+
     - 参数2：epoch个数
-    
+
     - 参数3：学习率
-    
+
     - 参数4：数据集名称（迁移学习设置为other）
-    
+
     - 参数5：rank_table_file，参考
-    
+
     - 参数6：预训练模型的 ckpt 文件绝对路径
-    
+
     - 参数7：已经训练的 epoch 数，迁移学习设置为0
 ### 4.5  模型导出
 
- 若训练的模型要在昇腾 310 上推理，则在训练或者迁移学习结束后，在昇腾 910 环境上将 ckpt 文件导出为 AIR 文件，执行以下命令导出：
+ 若训练或者迁移学习的模型要在昇腾 310 上推理，则在训练或者迁移学习结束后，需要在昇腾 910 环境上将 ckpt 文件导出为 AIR 文件，执行以下命令导出：
 
  ```shell
-python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
  ```
 
  参数说明：
@@ -700,18 +727,29 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
    unzip SSD_for_MindSpore.zip
    ```
 
-3. 上传推理迁移学习后导出的 AIR 模型文件，本文示例上传到：/home/sam/codes/SSD_for_MindSpore/infer/convert/models 目录。
+3. 准备推理图片
+   针对coco公开数据集：/home/sam/dataset/coco2017，该目前在启动推理容器时挂载到容器中；
+   本例中输入图片上传至：/home/sam/codes/SSD_for_MindSpore/infer/sdk/test_img 目录。
    
-4. 执行如下命令启动推理容器
+4. 上传推理迁移学习后导出的 AIR 模型文件，本文示例上传 ssd-60_458.air 到：/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ms_ckpt_1_2 目录。
+
+5. 执行如下命令启动推理容器
    ```shell
-    cd SSD_MobileNetV1_FPN_for_MindSpore/scripts
-    bash docker_start_infer.sh swr.cn-south-1.myhuaweicloud.com/public-ascendhub/ascend-infer-arm:21.0.1 /home/sam
+    cd /home/sam/codes/SSD_for_MindSpore/scripts
+    bash docker_start_infer.sh swr.cn-south-1.myhuaweicloud.com/public-ascendhub/ascend-infer-x86:20.2.0 /home/sam
    ```
    参数说明：
    - 参数1： 镜像名称：版本
    - 参数2：宿主机挂载目录
-4. 模型转换为 OM 模型。在容器中执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
 
+6. 模型转换为 OM 模型。在容器中执行以下命令将 3 中上传的 AIR 模型转换为 OM 模型：
+   若使用 coco 公开数据集，则执行以下命令进行模型转换：
+
+   ```shell
+   cd /home/sam/codes/SSD_for_MindSpore/infer/convert
+   bash convert_om.sh ./models/ms_ckpt_1_2/ssd-60_458.air ./models/ms_ckpt_1_2/ssd-60_458 ./aipp_coco_yuv.cfg
+   ```
+   针对迁移学习数据集，命令参考如下：
    ```shell
    cd /home/sam/codes/SSD_for_MindSpore/infer/convert
    bash convert_om.sh ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl_bgr ./aipp.cfg
@@ -720,7 +758,7 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
    - 参数1：AIR 模型文件路径
    - 参数2：转换生成的的 OM 模型 文件名。
    - 参数3：转换OM模型使用的 AIPP 配置文件
-   
+
     本例中执行生成以下模型文件：<br/>
    ```
     root@9a9f1537b68b:/home/sam/codes/SSD_for_MindSpore/infer/convert# ll models/
@@ -730,22 +768,30 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
     -rw-r--r-- 1 root root 47413459 Mar 10 06:46 ssd_1000-2_on_micro_ctrl.air
     -rw------- 1 root root 66428371 Apr 30 07:40 ssd_1000-2_on_micro_ctrl_bgr.om
    ```
-5. 容器内安装 mxManufacture，本文安装到 /home/sam/mxManufacture
+
+7. 容器内安装 mxManufacture，本文安装到 /home/sam/mxManufacture
    执行以下命令安装 mxManufacture：
-   
+
    ```shell
    cd /home/sam/pkgs
-   chmod +x Ascend-mindxsdk-mxmanufacture_2.0.1_linux-aarch64.run
-   bash Ascend-mindxsdk-mxmanufacture_2.0.1_linux-aarch64.run --install-path=/home/sam --install
+   # 如果是arm，则安装对应arm平台的run包
+   chmod +x Ascend-mindxsdk-mxmanufacture_2.0.1_linux-x86_64.run
+   bash Ascend-mindxsdk-mxmanufacture_2.0.1_linux-x86_64.run --install-path=/home/sam --install
    ```
-6. 设置环境变量
+
+8. 设置环境变量
    执行以下命令设置 SDK 推理需要的环境变量： 
+
    ```shell
    source ~/.bashrc
-   export LD_LIBRARY_PATH=/usr/local/Ascend/driver/lib64/driver:$LD_LIBRARY_PATH
    ```
-7. 修改以下配置文件：
-   - 迁移数据集分类标签文件，本文示例为：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names
+
+9. 修改以下配置文件：
+   - 迁移数据集分类标签文件<br/>
+     若使用 coco 公开数据集，则直接使用：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/coco.names;
+     
+     针对本文示例的迁移学习数据集为：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names
+     
      ```
      # backgroud 为固定的分类标签；之后的标签顺序需要与 4.4.1 章节中的标签顺序保持一致。
      background
@@ -754,8 +800,11 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
      Raspberry Pi 3
      Heltec ESP32 Lora
      ```
-
-   - 后处理配置文件：本文示例为：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_postprocess.cfg
+     
+   - 后处理配置文件<br/>
+     若使用 coco 公开数据集，则直接使用：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg；
+     针对本文示例的迁移学习数据集：本文示例为：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_mc_postprocess.cfg
+     
      ```
      CLASS_NUM=5
      SCORE_THRESH=0.1
@@ -766,64 +815,108 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
      - SCORE_THRESH：分类置信度阈值
      - IOU_THRESH： IOU 阈值
      
-   - mxManufacture 推理 pipeline配置，本文示例修改:/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
-   ```json
-		"mxpi_tensorinfer0": {
-			"props": {
-				"dataSource": "mxpi_imageresize0",
-				"modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ssd_1000-2_on_micro_ctrl_bgr.om"
-			},
-			"factory": "mxpi_tensorinfer",
-			"next": "mxpi_objectpostprocessor0"
-		},
-		"mxpi_objectpostprocessor0": {
-			"props": {
-				"dataSource": "mxpi_tensorinfer0",
-				"postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_postprocess",
-				"labelPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names",
-				"postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
-			},
-			"factory": "mxpi_objectpostprocessor",
-			"next": "mxpi_dataserialize0"
-		},
-   ```
-
+   - mxManufacture 推理 pipeline配置<br/>
+     若使用coco公开数据集训练的模型，则使用：/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_coco.pipeline。
+     其关键配置参数如下：
+     
+     ```json
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "mxpi_imageresize0",
+                "modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ms_ckpt_1_2/ssd-60_458_yuv.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_objectpostprocessor0"
+        },
+        "mxpi_objectpostprocessor0": {
+            "props": {
+                "dataSource": "mxpi_tensorinfer0",
+                "postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
+                "labelPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/coco.names",
+                "postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
+            },
+            "factory": "mxpi_objectpostprocessor",
+            "next": "mxpi_dataserialize0"
+        },
+     ```
+     针对迁移学习，本文示例修改:/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
+     
+        ```json
+        "mxpi_tensorinfer0": {
+                    "props": {
+                        "dataSource": "mxpi_imageresize0",
+                        "modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ssd-500_458_bgr.om"
+                    },
+                    "factory": "mxpi_tensorinfer",
+                    "next": "mxpi_objectpostprocessor0"
+                },
+                "mxpi_objectpostprocessor0": {
+                    "props": {
+                        "dataSource": "mxpi_tensorinfer0",
+                        "postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
+                        "labelPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/coco.names",
+                        "postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
+                    },
+                    "factory": "mxpi_objectpostprocessor",
+                    "next": "mxpi_dataserialize0"
+                },
+        ```
+   
     参数说明：
      - resizeHeight: 图像缩放高度
      - resizeWidth: 图像缩放宽度
      - modelPath: 步骤4中转换生成的 OM 模型绝对路径
      - postProcessConfigPath: 后处理配置文件绝对路径
      - labelPath：迁移学习数据集标注文件绝对路径
-     - postProcessLibPath：后处理 so 文件绝对路径，根据 mxManufacture 安装路径修改
+  - postProcessLibPath：后处理 so 文件绝对路径，根据 mxManufacture 安装路径修改
 
-8. 准备输入图片：本例中输入图片上传至：/home/sam/codes/SSD_for_MindSpore/infer/sdk/test_img 目录。
+10. 执行推理
 
-9. 执行推理，并观察结果。
-   执行以下命令启动推理测试：
-   
+    针对coco2017数据集，启动以下命令进行推理测试：
+
    ```shell
-    cd /home/sam/codes/SSD_for_MindSpore/infer/sdk
-    python3 infer_by_sdk.py
+cd /home/sam/codes/SSD_for_MindSpore/infer/sdk/perf
+bash run_om_infer_perf_test.sh
    ```
-    脚本可选参数可以通过：python3 infer_by_sdk.py --help查看如下：
-    - pipeline_path 推理pipeline配置文件路径
-    - stream_name 推理pipeline中配置的业务流名称
-    - img_path 推理图片或者图片所在目录路径
-    - res_path 推理结果文件路径（json格式）<br/>
-       推理过程输出如下所示：<br/>
-      ![](res/md/infer/sdk_infer_ret.png)
-      查看推理结果目录，生成文件如下：
-      
-      ```
-      root@f4777ba50c5b:/home/sam/codes/SSD_for_MindSpore/infer/sdk# ll infer_res/
-      total 24
-      drwxr-xr-x 2 root root 4096 May  7 00:53 ./
-      drwxr-xr-x 6 root root 4096 May  7 00:44 ../
-      -rw-r--r-- 1 root root 3854 May  7 00:53 Arduino_Nano.json
-      -rw-r--r-- 1 root root  412 May  7 00:53 ESP8266.json
-      -rw-r--r-- 1 root root 1520 May  7 00:53 Heltec_ESP32_Lora.json
-      -rw-r--r-- 1 root root 3035 May  7 00:53 Raspberry_Pi_3.json
-      ```
+
+   推理完成后，会生成以下文件：
+    ![](res/md/infer/infer_ret_of_coco_val2017.png)
+
+   执行以下命令生成推理精度报告：
+   ```shell
+cd /home/sam/codes/SSD_for_MindSpore/infer/sdk/perf
+python3 generate_map_report.py \
+--annotations_json=/home/sam/dataset/coco2017/annotations/instances_val2017.json \
+--det_result_json=./om_infer_output_on_coco_val2017/om_det_result.json \
+--output_path_name=./om_infer_output_on_coco_val2017/npu_map.txt
+   ```
+    命令执行完成会，会在om_infer_output_on_coco_val2017目录中生成精度报告：npu_map.txt。
+
+   针对迁移数据集，执行以下命令启动推理测试：
+   ```shell
+cd /home/sam/codes/SSD_for_MindSpore/infer/sdk
+python3 infer_by_sdk.py
+   ```
+
+脚本可选参数可以通过：python3 infer_by_sdk.py --help查看如下：
+- pipeline_path 推理pipeline配置文件路径
+- stream_name 推理pipeline中配置的业务流名称
+- img_path 推理图片或者图片所在目录路径
+- res_path 推理结果文件路径（json格式）<br/>
+   推理过程输出如下所示：<br/>
+  ![](res/md/infer/sdk_infer_ret.png)
+  查看推理结果目录，生成文件如下：    
+  
+  ```
+  root@f4777ba50c5b:/home/sam/codes/SSD_for_MindSpore/infer/sdk# ll infer_res/
+  total 24
+  drwxr-xr-x 2 root root 4096 May  7 00:53 ./
+  drwxr-xr-x 6 root root 4096 May  7 00:44 ../
+  -rw-r--r-- 1 root root 3854 May  7 00:53 Arduino_Nano.json
+  -rw-r--r-- 1 root root  412 May  7 00:53 ESP8266.json
+  -rw-r--r-- 1 root root 1520 May  7 00:53 Heltec_ESP32_Lora.json
+  -rw-r--r-- 1 root root 3035 May  7 00:53 Raspberry_Pi_3.json
+  ```
 
 ### 5.2 mxBase 推理
 1. 准备 mxBase 代码<br/>
@@ -833,7 +926,7 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
    cd /data/sam/codes
    git clone https://github.com/Ascend/mindxsdk-mxbase.git
    ```
-执行以下命令拷贝推理代码到mxbase子目录：
+   执行以下命令拷贝推理代码到mxbase子目录：
    
    ```shell
    cp /data/sam/codes/ssd_mobilenet_v1_fpn/infer/mxbase/C++/* /data/sam/codes/mindxsdk-mxbase/samples/C++/
@@ -845,7 +938,7 @@ python export.py --ckpt_file [] --file_name [FILE_NAME] --file_format [FILE_FORM
 
    ```shell
    bash convert_om.sh /usr/local/Ascend/ascend-toolkit/ ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl ./aipp_yuv.cfg
-   ```
+```
 
    AIR 模型转换为 OM 模型的命令参数说明如下：
 

@@ -1,1 +1,0 @@
-# MobileNetV2 NPU 1P训练

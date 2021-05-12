@@ -19,7 +19,7 @@ import tensorflow as tf
 from npu_bridge.estimator import npu_ops
 
 # vgg with initialization method in gluoncv
-def vgg_impl(inputs, is_training=True):
+def vgg_impl(inputs, is_training=True, class_num=1000):
     x = inputs
 
     # conv1
@@ -73,7 +73,7 @@ def vgg_impl(inputs, is_training=True):
     if is_training:
         x = npu_ops.dropout(x, 0.5)
     # fc8
-    x = tf.layers.dense(x, 1000, activation=None, use_bias=True, kernel_initializer=tf.keras.initializers.RandomNormal(stddev=0.01))
+    x = tf.layers.dense(x, class_num, activation=None, use_bias=True, kernel_initializer=tf.keras.initializers.RandomNormal(stddev=0.01))
 
     return x
 

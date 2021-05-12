@@ -1,6 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 17-9-18 下午3:59
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# @Time    : 17-9-18 涓嬪崍3:59
 # @Author  : MaybeShewill-CV
 # @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : cnn_basenet.py
@@ -466,13 +494,13 @@ class CNNBaseModel(object):
             mean, var = tf.nn.moments(inputdata, [2, 3, 4], keep_dims=True)
             inputdata = (inputdata - mean) / tf.sqrt(var + esp)
 
-            # 每个通道的gamma和beta
+            # 姣忎釜閫氶亾鐨刧amma鍜宐eta
             gamma = tf.Variable(tf.constant(1.0, shape=[c]), dtype=tf.float32, name='gamma')
             beta = tf.Variable(tf.constant(0.0, shape=[c]), dtype=tf.float32, name='beta')
             gamma = tf.reshape(gamma, [1, c, 1, 1])
             beta = tf.reshape(beta, [1, c, 1, 1])
 
-            # 根据论文进行转换 [n, c, h, w, c] 到 [n, h, w, c]
+            # 鏍规嵁璁烘枃杩涜杞崲 [n, c, h, w, c] 鍒 [n, h, w, c]
             output = tf.reshape(inputdata, [-1, c, h, w])
             output = output * gamma + beta
             output = tf.transpose(output, [0, 2, 3, 1])
@@ -588,7 +616,7 @@ class CNNBaseModel(object):
     @staticmethod
     def spatial_dropout(input_tensor, keep_prob, is_training, name, seed=1234):
         """
-        空间dropout实现
+        绌洪棿dropout瀹炵幇
         :param input_tensor:
         :param keep_prob:
         :param is_training:

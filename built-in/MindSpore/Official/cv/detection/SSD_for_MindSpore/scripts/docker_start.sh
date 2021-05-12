@@ -2,8 +2,8 @@
 
 docker_image=ssd_ms:v1.0
 data_dir=/data/dataset/coco2017
-ssd_code_dir=/data/sam/codes/ssd_mobilenet_v1_fpn
-pretrained_models_dir=/data/pretrained_models/ms/mobilenet_v1
+ssd_code_dir=/home/sam/codes/
+pretrained_models_dir=/home/sam/pretrained_models/
 
 docker run -it --ipc=host \
 --device=/dev/davinci0 \
@@ -17,6 +17,7 @@ docker run -it --ipc=host \
 --device=/dev/davinci_manager \
 --device=/dev/devmm_svm \
 --device=/dev/hisi_hdc \
+--privileged \
 -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
 -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
 -v ${ssd_code_dir}:${ssd_code_dir} \

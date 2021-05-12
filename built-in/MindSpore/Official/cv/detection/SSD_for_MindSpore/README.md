@@ -201,7 +201,6 @@ Then you can run everything just like on ascend.
     ├─ src
       ├─ __init__.py                  # init file
       ├─ box_utils.py                 # bbox utils
-      ├─ eval_callback.py             # evaluation callback when training
       ├─ eval_utils.py                # metrics utils
       ├─ config.py                    # total config
       ├─ dataset.py                   # create dataset and process dataset
@@ -230,10 +229,6 @@ Then you can run everything just like on ascend.
     "loss_scale": 1024                               # Loss scale
     "filter_weight": False                           # Load parameters in head layer or not. If the class numbers of train dataset is different from the class numbers in pre_trained checkpoint, please set True.
     "freeze_layer": "none"                           # Freeze the backbone parameters or not, support none and backbone.
-    "run_eval": False                                # Run evaluation when training
-    "save_best_ckpt": True                           # Save best checkpoint when run_eval is True
-    "eval_start_epoch": 40                           # Evaluation start epoch when run_eval is True
-    "eval_interval": 1                               # valuation interval when run_eval is True
 
     "class_num": 81                                  # Dataset class number
     "image_shape": [300, 300]                        # Image height and width used as input to the model
@@ -315,10 +310,6 @@ epoch: 1 step: 458, loss is 3.1283689
 epoch time: 150753.701, per step time: 329.157
 ...
 ```
-
-#### Evaluation while training
-
-You can add `run_eval` to start shell and set it True, if you want evaluation while training. And you can set argument option: `save_best_ckpt`, `eval_start_epoch`, `eval_interval` when `run_eval` is True.
 
 #### Transfer Training
 
@@ -454,7 +445,7 @@ mAP: 0.33880018942412393
 | Parameters          | Ascend                                                                        | GPU                                                                           | Ascend                                                                        |
 | ------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Model Version       | SSD V1                                                                        | SSD V1                                                                        | SSD-Mobilenet-V1-Fpn                                                          |
-| Resource            | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8                               | NV SMX2 V100-16G                                                              | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8            |
+| Resource            | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G                              | NV SMX2 V100-16G                                                              | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G                              |
 | uploaded Date       | 09/15/2020 (month/day/year)                                                   | 09/24/2020 (month/day/year)                                                   | 01/13/2021 (month/day/year)                                                   |
 | MindSpore Version   | 1.0.0                                                                         | 1.0.0                                                                         | 1.1.0                                                                         |
 | Dataset             | COCO2017                                                                      | COCO2017                                                                      | COCO2017                                                                      |
@@ -471,7 +462,7 @@ mAP: 0.33880018942412393
 | Parameters          | Ascend                      | GPU                         | Ascend                      |
 | ------------------- | --------------------------- | --------------------------- | --------------------------- |
 | Model Version       | SSD V1                      | SSD V1                      | SSD-Mobilenet-V1-Fpn        |
-| Resource            | Ascend 910; OS Euler2.8                  | GPU                         |Ascend 910; OS Euler2.8                  |
+| Resource            | Ascend 910                  | GPU                         | Ascend 910                  |
 | Uploaded Date       | 09/15/2020 (month/day/year) | 09/24/2020 (month/day/year) | 09/24/2020 (month/day/year) |
 | MindSpore Version   | 1.0.0                       | 1.0.0                       | 1.1.0                       |
 | Dataset             | COCO2017                    | COCO2017                    | COCO2017                    |

@@ -1,3 +1,31 @@
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 ###############################################
 #  convert annotation ofg test data to a text 
 #  file
@@ -63,22 +91,6 @@ def convert():
 if __name__ == "__main__":
     convert()
 
-
-
-#path = "/data/m00536736/modelzoo/OCR/datasets/IIIT5K/testdata.mat"
-#testfile = io.loadmat(path)
-#testdata = testfile['testdata'][0]
-#
-#for i in range(100):
-#    tmp = testdata[i]
-#    print("image name :", tmp[0])
-#    print("image label : ", tmp[1])
-#    print("first 5 word from 50  lexicon : ",tmp[2][:5])
-#    print("first 5 word from 1k  lexicon : ",tmp[3][:5])
-#
-#
-#np.save('/data/m00536736/modelzoo/OCR/crnn_smoke/data/test/iiit5k/testdata.npy',testdata)
-#
 
 
 

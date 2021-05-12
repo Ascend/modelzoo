@@ -5,6 +5,7 @@ cur_path=`pwd`
 #集合通信参数,不需要修改
 export RANK_SIZE=1
 export JOB_ID=10087
+export DEVICE_INDEX=0
 
 # 数据集路径,保持为空,不需要修改
 data_path=""
@@ -17,7 +18,7 @@ Network="BertMRPC_for_TensorFlow"
 #训练batch_size
 train_batch_size=32
 #训练ephch
-num_train_epochs=1.0
+num_train_epochs=3.0
 #学习率
 learning_rate=2e-5
 
@@ -32,6 +33,7 @@ profiling=False
 #其他参数
 task_name=MRPC
 output_dir=ckpt
+type=official
 
 if [[ $1 == --help || $1 == -h ]];then 
 	echo "usage: ./train_full_1p.sh <args>"
@@ -56,6 +58,8 @@ for para in $*
 do
     if [[ $para == --task_name* ]];then
 		task_name=`echo ${para#*=}`
+	elif [[ $para == --type* ]];then
+		type=`echo ${para#*=}`
 	elif [[ $para == --data_path* ]];then
 		data_path=`echo ${para#*=}`
 	elif [[ $para == --model_path* ]];then
@@ -102,7 +106,7 @@ fi
 if [[ $ckpt_path == "" ]];then
 	config_path=$model_path
 else
-	config_path=$ckpt_path/$model_path
+	config_path=$ckpt_path/$type/$model_path
 fi
 
 if [[ $config_path == */ ]];then
@@ -118,6 +122,10 @@ if [   -d $cur_path/output ];then
   mkdir -p $cur_path/output/$ASCEND_DEVICE_ID
 else
   mkdir -p $cur_path/output/$ASCEND_DEVICE_ID
+fi
+
+if [ -d ${cur_path}/${output_dir} ];then
+  rm -rf ${cur_path}/${output_dir}
 fi
 
 cd $cur_path/../
@@ -154,13 +162,13 @@ echo "E2E Training Duration sec : $e2etime"
 ##冒烟看护字段
 BatchSize=${train_batch_size}
 DeviceType=`uname -m`
-if [[ $model_path=~base ]]||[[ $model_path=~Base ]]||[[ $model_path=~BASE ]]
+if [[ $model_path =~ base ]]||[[ $model_path =~ Base ]]||[[ $model_path =~ BASE ]]
 then
   model=bertbase
-  else
+else
   model=bertlarge
 fi
-CaseName=${Network}_${model}_bs${BatchSize}_${RankSize}'p'_'perf'
+CaseName=${Network}_${model}_${type}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 
 ##获取性能数据
 #吞吐量
@@ -176,6 +184,7 @@ ActualLoss=`awk 'END {print $1}' $cur_path/output/$ASCEND_DEVICE_ID/train_${Case
 #关键性息打印到CaseName.log中
 echo "Network = ${Network}">>$cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}">>$cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "BatchSize = ${BatchSize}">>$cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "DeviceType = ${DeviceType}">>$cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "CaseName = ${CaseName}">>$cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}">>$cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

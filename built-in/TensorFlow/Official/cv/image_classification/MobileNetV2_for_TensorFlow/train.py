@@ -285,6 +285,7 @@ FLAGS = parse_args()
 def set_config():
     config.num_classes = FLAGS.num_classes
     config.restore_path = FLAGS.restore_path
+    FLAGS.log_dir = 'results'
 
 
 def main(_):

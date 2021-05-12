@@ -52,7 +52,7 @@
 		"mxpi_objectpostprocessor0": {
 			"props": {
 				"dataSource": "mxpi_tensorinfer0",
-				"postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/sdk_mobilenet_fpn_coco_postprocess.cfg",
+				"postProcessConfigPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_mc_postprocess.cfg",
 				"labelPath": "/home/sam/codes/SSD_for_MindSpore/infer/sdk/conf/ssd_mobilenet_fpn_mc.names",
 				"postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
 			},

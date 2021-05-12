@@ -306,3 +306,11 @@ flags.DEFINE_string(
 flags.DEFINE_bool(
     "clear_efs", False, 
         "whether to clear efs")
+
+# modify for npu overflow start
+# enable overflow
+flags.DEFINE_string("over_dump", "False",
+                    "whether to enable overflow")
+flags.DEFINE_string("over_dump_path", "./",
+                    "path to save overflow dump files")
+# modify for npu overflow end

@@ -11,8 +11,8 @@ export DYNAMIC_OP="ADD#MUL"
 /usr/local/Ascend/driver/tools/msnpureport -e disable
 
 nohup python3 main.py \
-    --video_path /data/hj/resnet3d/hmdb51_jpg \
-    --annotation_path /data/hj/resnet3d/hmdb51_json/hmdb51_1.json \
+    --video_path /data/resnet3d/hmdb51_jpg \
+    --annotation_path /data/resnet3d/hmdb51_json/hmdb51_1.json \
     --result_path outputs \
     --dataset hmdb51 \
     --n_classes 51 \

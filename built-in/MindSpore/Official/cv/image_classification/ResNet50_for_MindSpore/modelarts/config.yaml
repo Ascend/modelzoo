@@ -1,0 +1,122 @@
+create_algo:
+  name: ResNet50-Ascend-ModelZoo
+  description: "基于MindSpore框架的Ascend910训练"
+  config:
+    training:
+      image:
+        engine_name: Ascend-Powered-Engine
+        engine_version: Mindspore-1.1.1-python3.7-aarch64
+      code:
+        relative_boot_file: train_start.py
+      inputs:
+        - name: 数据来源
+          parameter:
+            label: data_url
+            value: data_url/
+          dataset_enable: false
+          annotations:
+            - key: data_source
+              value:
+                - obs
+                - modelarts_dataset
+            - key: dataset_type
+              value:
+                - '0'
+            - key: data_format
+              value:
+                - Default
+            - key: data_segmentation
+              value:
+                - ''
+            - key: isconstrictinput
+            - key: constrictInputTempShow
+            - key: isSelectDatasetAndObs
+      outputs:
+        - name: 模型输出
+          description: ''
+          parameter:
+            label: train_url
+            value: train_url/
+          artifact:
+            - type: ''
+          modelarts_hosted: false
+      flavor:
+        flavor_codes: []
+        annotations:
+          - key: flavor_type
+            value:
+              - Ascend
+          - key: is_multi_devices_supported
+            value:
+              - 'true'
+          - key: is_multi_nodes_supported
+            value:
+              - 'true'
+          - key: flavor_codes
+            value: []
+          - key: isMultiDevHide
+      parameters:
+        regular:
+          - key: epoch_size
+            help: null
+            type: Integer
+            default_value: '90'
+            editable: true
+            required: false
+          - key: batch_size
+            help: null
+            type: Integer
+            default_value: '256'
+            editable: true
+            required: false
+          - key: class_num
+            help: null
+            type: Integer
+            default_value: '1001'
+            editable: true
+            required: false
+        customization: true
+
+publish_algo:
+  item_name: 图像分类-ResNet50-Ascend_ModelZoo
+  short_desc: '基于MindSpore框架的Ascend910训练'
+
+create_train_job:
+  task_type: image_classification
+  job_desc: null
+  config:
+    flavor:
+      code: modelarts.kat1.xlarge
+    log_url: null
+    parameter:
+      - label: epoch_size
+        value: '90'
+        editable: true
+        required: false
+      - label: batch_size
+        value: '256'
+        editable: true
+        required: false
+      - label: class_num
+        value: '1001'
+        editable: true
+        required: false
+    inputs:
+      - data_source:
+          obs:
+            obs_url: null
+    outputs:
+      - value: null
+
+create_model:
+  model_type: TensorFlow
+  description: null
+
+create_service:
+  schedule:
+    - duration: 1
+      time_units: HOURS
+      type: stop
+  description: null
+  config:
+    - specification: modelarts.kat1.xlarge

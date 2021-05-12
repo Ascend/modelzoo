@@ -38,7 +38,7 @@ def main():
     args = parse_args()
     tf.reset_default_graph()
     # set inputs node
-    inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="input")
+    inputs = tf.placeholder(tf.float32, shape=[None, 304, 304, 3], name="input")
     # create inference graph
     network_fn = nets_factory.get_network_fn('mobilenet_v2',
                                              num_classes=int(args.num_classes),

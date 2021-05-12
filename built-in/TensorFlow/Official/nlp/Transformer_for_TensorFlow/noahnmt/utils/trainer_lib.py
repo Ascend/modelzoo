@@ -100,12 +100,12 @@ def create_session_config(log_device_placement=False,
   custom_op.parameter_map["enable_data_pre_proc"].b = True
   custom_op.parameter_map["enable_auto_mix_precision"].b=False
   # Autotune
-  custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes(os.getenv("FLAG_AUTOTUNE"))
+  # custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes(os.getenv("FLAG_AUTOTUNE"))
   # DataDump
-  custom_op.parameter_map["enable_dump"].b = "True" == os.getenv("FLAG_ENABLE_DUMP")
-  custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(os.getenv("DUMP_PATH"))
-  custom_op.parameter_map["dump_step"].s = tf.compat.as_bytes(os.getenv("DUMP_STEP"))
-  custom_op.parameter_map["sump_mode"].s = tf.compat.as_bytes(os.getenv("DUMP_MODE"))
+  #custom_op.parameter_map["enable_dump"].b = "True" == os.getenv("FLAG_ENABLE_DUMP")
+  #custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(os.getenv("DUMP_PATH"))
+  #custom_op.parameter_map["dump_step"].s = tf.compat.as_bytes(os.getenv("DUMP_STEP"))
+  #custom_op.parameter_map["sump_mode"].s = tf.compat.as_bytes(os.getenv("DUMP_MODE"))
 
   if RANK_SIZE > 1:
     custom_op.parameter_map["hcom_parallel"].b = True
@@ -156,7 +156,9 @@ def create_run_config(master="",
                       sync=False,
                       inter_op_parallelism_threads=0,
                       log_step_count_steps=100,
-                      intra_op_parallelism_threads=0):
+                      intra_op_parallelism_threads=0,
+                      over_dump="False",
+                      over_dump_path="./"):
   """Create RunConfig, and Parallelism object."""
   
   """session_config = create_session_config(
@@ -177,6 +179,14 @@ def create_run_config(master="",
   custom_op.parameter_map["use_off_line"].b = True
   custom_op.parameter_map["min_group_size"].b = 1
   custom_op.parameter_map["enable_auto_mix_precision"].b=False
+  
+  if over_dump == "True":
+      print("NPU overflow dump is enabled")
+      custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(over_dump_path)
+      custom_op.parameter_map["enable_dump_debug"].b = True
+      custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
+  else:
+      print("NPU overflow dump is disabled")
   
   if RANK_SIZE > 1:
     custom_op.parameter_map["hcom_parallel"].b = True

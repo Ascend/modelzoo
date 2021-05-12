@@ -1,5 +1,5 @@
 ARG FROM_IMAGE_NAME
 FROM ${FROM_IMAGE_NAME}
 
-COPY pip-requirements.txt .
-RUN pip3.7 install -r pip-requirements.txt
+COPY requirements.txt .
+RUN pip3.7 install -r requirements.txt

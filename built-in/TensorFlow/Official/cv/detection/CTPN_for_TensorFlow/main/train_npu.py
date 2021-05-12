@@ -1,3 +1,33 @@
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 import datetime
 import os
 import sys
@@ -30,6 +60,14 @@ tf.app.flags.DEFINE_integer('num_bbox', 256, '')
 tf.app.flags.DEFINE_integer('loss_scale', 4096, '')
 tf.app.flags.DEFINE_integer('inputs_height', 600, '')
 tf.app.flags.DEFINE_integer('inputs_width', 900, '')
+
+# modify for npu overflow start
+# enable overflow
+tf.app.flags.DEFINE_string("over_dump", "False",
+                           "whether to enable overflow")
+tf.app.flags.DEFINE_string("over_dump_path", "./",
+                    "path to save overflow dump files")
+# modify for npu overflow end
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -131,6 +169,15 @@ def main(argv=None):
     custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
     custom_op.name =  "NpuOptimizer"
     custom_op.parameter_map["use_off_line"].b = True
+    
+    if FLAGS.over_dump == "True":
+        print("NPU overflow dump is enabled")
+        custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(FLAGS.over_dump_path)
+        custom_op.parameter_map["enable_dump_debug"].b = True
+        custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
+    else:
+        print("NPU overflow dump is disabled")
+    
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
     with tf.Session(config=config) as sess:

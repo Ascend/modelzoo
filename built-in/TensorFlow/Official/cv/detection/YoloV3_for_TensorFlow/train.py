@@ -12,6 +12,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import division, print_function
 
@@ -50,6 +65,15 @@ parser.add_argument("--data_url", default='/cache/data_url',
                     help="setting dir of training data.")
 parser.add_argument("--train_url", default='/cache/training',
                     help="setting dir of training output.")
+
+# modify for npu overflow start
+# enable overflow
+parser.add_argument("--over_dump", type=str, default="False",
+                    help="whether to enable overflow")
+parser.add_argument("--over_dump_path", type=str, default="./",
+                    help="path to save overflow dump files")
+# modify for npu overflow end
+
 args_input = parser.parse_args()
 
 if args_input.mode == 'single':
@@ -226,13 +250,22 @@ custom_op.name = "NpuOptimizer"
 custom_op.parameter_map["use_off_line"].b = True  # training on Ascend chips
 custom_op.parameter_map["enable_data_pre_proc"].b = True
 custom_op.parameter_map["iterations_per_loop"].i = args.iterations_per_loop
+
+if args_input.over_dump == "True":
+    print("NPU overflow dump is enabled")
+    custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(args_input.over_dump_path)
+    custom_op.parameter_map["enable_dump_debug"].b = True
+    custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
+else:
+    print("NPU overflow dump is disabled")
+
 config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
 with tf.Session(config=config) as sess:
-    # yolov3 finetuning训练开启（darknet53.ckpt）
+    # yolov3 finetuning璁粌寮鍚紙darknet53.ckpt锛
     sess.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
 
-    # 断点续训开启
+    # 鏂偣缁寮鍚
     if args_input.resume:
         saver_to_restore = tf.train.Saver()
         saver_to_restore.restore(sess, tf.train.latest_checkpoint(args.save_dir))

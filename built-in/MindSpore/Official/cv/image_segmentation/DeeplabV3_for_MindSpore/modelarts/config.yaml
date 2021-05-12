@@ -1,0 +1,244 @@
+create_algo:
+  name: deeplabv3
+  description: null
+  config:
+    training:
+      image:
+        engine_name: Ascend-Powered-Engine
+        engine_version: Mindspore-1.1.1-python3.7-aarch64
+      code:
+        relative_boot_file: train_start.py
+      inputs:
+        - name: 数据来源
+          parameter:
+            label: data_url
+            value: data_url/
+          dataset_enable: false
+          annotations:
+            - key: data_source
+              value:
+                  - obs
+                  - modelarts_dataset
+            - key: dataset_type
+              value:
+                - '3'
+            - key: data_segmentation
+              value:
+                - ''
+            - key: isconstrictinput
+            - key: constrictInputTempShow
+            - key: isSelectDatasetAndObs
+      outputs:
+        - name: 模型输出
+          description: ''
+          parameter:
+            label: train_url
+            value: train_url/
+          artifact:
+            - type: ''
+          modelarts_hosted: false
+      flavor:
+        flavor_codes: []
+        annotations:
+          - key: flavor_type
+            value:
+              - Ascend
+          - key: is_multi_devices_supported
+            value:
+              - 'true'
+          - key: flavor_codes
+            value: []
+          - key: isMultiDevHide
+      parameters:
+        regular:
+          - key: "batch_size"
+            help: null
+            type: Integer
+            default_value: "32"
+            editable: true
+            required: false
+          - key: "crop_size"
+            help: null
+            type: Integer
+            default_value: "513"
+            editable: true
+            required: false
+          - key: "min_scale"
+            help: null
+            type: Continuous
+            default_value: "0.5"
+            editable: true
+            required: false
+          - key: "max_scale"
+            help: null
+            type: Continuous
+            default_value: "2.0"
+            editable: true
+            required: false
+          - key: "ignore_label"
+            help: null
+            type: Integer
+            default_value: "255"
+            editable: true
+            required: false
+          - key: "num_classes"
+            help: null
+            type: Integer
+            default_value: "21"
+            editable: true
+            required: false
+          - key: "train_epochs"
+            help: null
+            type: Integer
+            default_value: "200"
+            editable: true
+            required: false
+          - key: "lr_type"
+            help: null
+            type: String
+            default_value: "cos"
+            editable: true
+            required: false
+          - key: "base_lr"
+            help: null
+            type: Continuous
+            default_value: "0.015"
+            editable: true
+            required: false
+          - key: "lr_decay_step"
+            help: null
+            type: Integer
+            default_value: "40000"
+            editable: true
+            required: false
+          - key: "lr_decay_rate"
+            help: null
+            type: Continuous
+            default_value: "0.1"
+            editable: true
+            required: false
+          - key: "loss_scale"
+            help: null
+            type: Continuous
+            default_value: "3072.0"
+            editable: true
+            required: false
+          - key: "model"
+            help: null
+            type: String
+            default_value: "deeplab_v3_s16"
+            editable: true
+            required: false
+          - key: "ckpt_pre_trained"
+            help: null
+            type: String
+            default_value: ""
+            editable: true
+            required: false
+          - key: "save_steps"
+            help: null
+            type: Integer
+            default_value: "1500"
+            editable: true
+            required: false
+          - key: "keep_checkpoint_max"
+            help: null
+            type: Integer
+            default_value: "200"
+            editable: true
+            required: false
+        customization: true
+
+publish_algo:
+  item_name: 语义分割-DeeplabV3-Ascend_ModelZoo
+  short_desc: 基于MindSpore框架的Ascend 910训练
+  add_version_desc:
+
+create_train_job:
+  job_desc: null
+  config:
+    pool_id: "poola4e86449"
+    parameter:
+      - label: "batch_size"
+        value: "32"
+        editable: true
+        required: false
+      - label: "crop_size"
+        value: "513"
+        editable: true
+        required: false
+      - label: "min_scale"
+        value: "0.5"
+        editable: true
+        required: false
+      - label: "max_scale"
+        value: "2.0"
+        editable: true
+        required: false
+      - label: "ignore_label"
+        value: "255"
+        editable: true
+        required: false
+      - label: "num_classes"
+        value: "21"
+        editable: true
+        required: false
+      - label: "train_epochs"
+        value: "200"
+        editable: true
+        required: false
+      - label: "lr_type"
+        value: "cos"
+        editable: true
+        required: false
+      - label: "base_lr"
+        value: "0.015"
+        editable: true
+        required: false
+      - label: "lr_decay_step"
+        value: "40000"
+        editable: true
+        required: false
+      - label: "lr_decay_rate"
+        value: "0.1"
+        editable: true
+        required: false
+      - label: "loss_scale"
+        value: "3072.0"
+        editable: true
+        required: false
+      - label: "model"
+        value: "deeplab_v3_s16"
+        editable: true
+        required: false
+      - label: "ckpt_pre_trained"
+        value: ""
+        editable: true
+        required: false
+      - label: "save_steps"
+        value: "1500"
+        editable: true
+        required: false
+      - label: "keep_checkpoint_max"
+        value: "200"
+        editable: true
+        required: false
+    inputs:
+      - data_source:
+          obs:
+            obs_url: '/cnnorth4-job-test/e2e-input/deeplabv3'
+    outputs:
+      - value:
+
+create_model:
+  model_type: TensorFlow
+  description: null
+
+create_service:
+  schedule:
+    - duration: 1
+      time_units: HOURS
+      type: stop
+  description: null
+  config:
+    - specification: modelarts.kat1.xlarge

@@ -88,6 +88,12 @@ def parse_args():
                         help="""name of log file""")
     parser.add_argument('--log_dir', default='./model_1p',
                         help="""log directory""")
+    parser.add_argument('--restore_path', default='',
+                        help="""restore path""")
+    parser.add_argument('--restore_exclude', default=['dense_2'],
+                        type=ast.literal_eval, help="""restore_exclude""")
+    parser.add_argument('--class_num', default=1000, type=int,
+                        help="the class num")
  
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:

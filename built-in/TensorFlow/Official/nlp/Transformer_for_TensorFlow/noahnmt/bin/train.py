@@ -170,7 +170,9 @@ def create_run_config(hparams):
       random_seed=FLAGS.random_seed,
       inter_op_parallelism_threads=FLAGS.inter_op_threads,
       log_step_count_steps=FLAGS.log_step_count_steps,
-      intra_op_parallelism_threads=FLAGS.intra_op_threads)
+      intra_op_parallelism_threads=FLAGS.intra_op_threads,
+      over_dump=FLAGS.over_dump,
+      over_dump_path=FLAGS.over_dump_path)
 
 
 @contextlib.contextmanager

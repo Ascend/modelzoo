@@ -25,6 +25,7 @@ export ASCEND_SLOG_PRINT_TO_STDOUT=1
 
 echo "Input AIR file path: ${input_air_path}"
 echo "Output OM file path: ${output_om_path}"
+echo "AIPP cfg file path: ${aipp_cfg}"
 
 atc --input_format=NCHW \
 --framework=1 \

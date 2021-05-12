@@ -18,6 +18,7 @@ import os
 import threading
 import time
 from datetime import datetime
+from threading import Lock
 
 import cv2
 from StreamManagerApi import MxDataInput
@@ -32,6 +33,7 @@ DET_RESULT_RESIZED_JSON = None
 DET_RESULT_JSON = None
 
 FLAGS = flags.FLAGS
+infer_ret_list_lock = Lock()
 
 flags.DEFINE_string(
     name="img_dir", default=None, help="Directory of images to infer"
@@ -67,6 +69,18 @@ flags.DEFINE_string(
     default=None,
     help="Where to out put the inferred image with bounding box, if the "
     "draw_box is set, this parameter must be set.",
+)
+
+flags.DEFINE_integer(
+    name="how_many_images_to_infer",
+    default=-1,
+    help="Infer how many images in img_dir, -1 means all."
+)
+
+flags.DEFINE_integer(
+    name="infer_timeout_secs",
+    default=3,
+    help="Time out(in seconds) to get the infer result. "
 )
 
 flags.DEFINE_integer(
@@ -195,7 +209,7 @@ def parse_result(img_id, json_content):
 
 
 def send_many_images(stream_manager_api):
-    data_input = MxDataInput()
+
     input_dir = FLAGS.img_dir
 
     imgs = os.listdir(input_dir)
@@ -205,9 +219,12 @@ def send_many_images(stream_manager_api):
         for img_name in imgs
         if "boxed" not in img_name
     ]
+    infer_cnt = len(img_file_names) if FLAGS.how_many_images_to_infer == -1 \
+        else FLAGS.how_many_images_to_infer
     start = time.time()
     uuid_list = []
-    for img_file_name in img_file_names:
+    for img_file_name in img_file_names[:infer_cnt]:
+        data_input = MxDataInput()
         with open(img_file_name, "rb") as f:
             data_input.data = f.read()
 
@@ -225,7 +242,7 @@ def send_many_images(stream_manager_api):
     time_str = (
         f"\nSend all images data took: {round((end-start)*1000, 2)} ms\n"
     )
-
+    print(time_str)
     with open(PERF_REPORT_TXT, "a+") as fw:
         fw.write(time_str)
 
@@ -245,7 +262,8 @@ def get_all_images_result(uuid_img_id_zip, stream_manager_api):
     )
     for index, (uuid, img_id) in enumerate(uuid_img_id_zip):
         infer_result = stream_manager_api.GetResultWithUniqueId(
-            FLAGS.infer_stream_name.encode("utf8"), uuid, 3000
+            FLAGS.infer_stream_name.encode("utf8"), uuid,
+            FLAGS.infer_timeout_secs * 1000
         )
         if (index + 1) % FLAGS.display_step == 0:
             cur_secs = time.time()
@@ -256,6 +274,7 @@ def get_all_images_result(uuid_img_id_zip, stream_manager_api):
                 f"took: {acc_secs} seconds; "
                 f"average inference speed at: {real_speed} ms/image\n"
             )
+            print(perf_detail)
             threading.Thread(
                 target=write_speed_detail, args=(perf_detail, report_file)
             ).start()
@@ -291,7 +310,9 @@ def parse_infer_result(all_infer_dict_list, img_id, infer_result):
         exit()
 
     info_json_str = infer_result.data.decode()
-    all_infer_dict_list.extend(parse_result(img_id, info_json_str))
+    img_infer_ret = parse_result(img_id, info_json_str)
+    with infer_ret_list_lock:
+        all_infer_dict_list.extend(img_infer_ret)
 
 
 def infer_img(stream_manager_api, input_image, infer_stream_name):

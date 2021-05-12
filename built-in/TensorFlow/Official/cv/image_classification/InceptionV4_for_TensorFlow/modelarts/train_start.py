@@ -108,6 +108,9 @@ def parse_args():
                         help = "T_max for cosing_annealing learning rate")
     parser.add_argument("--momentum", default = 0.9, type = float,
                         help = "momentum used in optimizer.")
+    # enable overflow
+    parser.add_argument("--over_dump", default="False", type = str,
+                        help="""whether to enable overflow""")
     # display frequency
     parser.add_argument("--display_every", default = 100, type = int,
                         help = "the frequency to display info")

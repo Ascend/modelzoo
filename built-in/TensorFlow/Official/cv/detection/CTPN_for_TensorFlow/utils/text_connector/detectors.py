@@ -1,4 +1,34 @@
 # coding:utf-8
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 import numpy as np
 from utils.bbox.nms import nms
 
@@ -16,19 +46,19 @@ class TextDetector:
             self.text_proposal_connector = TextProposalConnectorOriented()
 
     def detect(self, text_proposals, scores, size):
-        # 删除得分较低的proposal
+        # 鍒犻櫎寰楀垎杈冧綆鐨刾roposal
         keep_inds = np.where(scores > TextLineCfg.TEXT_PROPOSALS_MIN_SCORE)[0]
         text_proposals, scores = text_proposals[keep_inds], scores[keep_inds]
 
-        # 按得分排序
+        # 鎸夊緱鍒嗘帓搴
         sorted_indices = np.argsort(scores.ravel())[::-1]
         text_proposals, scores = text_proposals[sorted_indices], scores[sorted_indices]
 
-        # 对proposal做nms
+        # 瀵筽roposal鍋歯ms
         keep_inds = nms(np.hstack((text_proposals, scores)), TextLineCfg.TEXT_PROPOSALS_NMS_THRESH)
         text_proposals, scores = text_proposals[keep_inds], scores[keep_inds]
 
-        # 获取检测结果
+        # 鑾峰彇妫娴嬬粨鏋
         text_recs = self.text_proposal_connector.get_text_lines(text_proposals, scores, size)
         keep_inds = self.filter_boxes(text_recs)
         return text_recs[keep_inds]

@@ -444,7 +444,7 @@ if __name__ == '__main__':
                         help='remark. ')
     parser.add_argument('--combine_grad', default=True, action='store_true',
                         help='whether to combine grad in apex')
-    parser.add_argument('--combine_sgd', default=True, action='store_true',
+    parser.add_argument('--combine_sgd', default=False, action='store_true',
                         help='whether to use combined sgd instead of sgd')
     # modelarts
     parser.add_argument('--train_url',

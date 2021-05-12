@@ -1,6 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 17-9-25 下午3:56
+#
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# @Time    : 17-9-25 涓嬪崍3:56
 # @Author  : MaybeShewill-CV
 # @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : evaluate_shadownet.py
@@ -152,7 +180,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
     custom_op.parameter_map["use_off_line"].b = True
     custom_op.parameter_map["enable_data_pre_proc"].b = True
     custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes('allow_mix_precision')
-    custom_op.parameter_map["mix_compile_mode"].b = False  # 混合计算
+    custom_op.parameter_map["mix_compile_mode"].b = False  # 娣峰悎璁＄畻
     config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
     # Set sess configuration

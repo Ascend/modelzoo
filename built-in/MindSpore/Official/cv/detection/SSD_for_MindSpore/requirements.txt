@@ -1,3 +1,4 @@
+Cython
 pycocotools
 opencv-python
 xml-python
