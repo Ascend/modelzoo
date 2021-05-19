@@ -41,7 +41,6 @@ Thank You!
     - [FasterRcnn_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/FasterRcnn_for_TensorFlow)
     - [EDVR_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/Video_enhancement/EDVR_for_TensorFlow)
     - [GNMT_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/GNMT_for_TensorFlow)
-    - [MaskRcnn_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/MaskRcnn_for_TensorFlow)
     - [CTPN_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CTPN_for_TensorFlow)
     - [CRNN_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/CRNN_for_TensorFlow)
             

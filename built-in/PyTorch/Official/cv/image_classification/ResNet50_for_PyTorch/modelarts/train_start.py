@@ -14,8 +14,10 @@
 
 import argparse
 import os
+import glob
 import random
 import shutil
+import sys
 import time
 import warnings
 import math
@@ -34,10 +36,12 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 import torch.npu
+
+sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../'))
+from pthtar2onx import convert
 import DistributedResnet50.image_classification.resnet as nvmodels
 from apex import amp
 import moxing as mox
-import os
 
 BATCH_SIZE = 512
 EPOCHS_SIZE = 100
@@ -182,7 +186,10 @@ parser.add_argument('--train_url',
                     help="setting dir of training output")
 parser.add_argument('--pretrained_weight', default='', type=str, metavar='PATH',
                     help='path to pretrained weight')
+parser.add_argument('--onnx', default=True, action='store_true',
+                    help="convert pth model to onnx")
 
+CACHE_TRAINING_URL = "/cache/training"
 best_acc1 = 0
 
 def main():
@@ -413,6 +420,24 @@ def main_worker(gpu, ngpus_per_node, args):
         }, is_best, file_name)
         modeltmp.to(CALCULATE_DEVICE)
 
+    if args.onnx:
+        convert_pth_to_onnx(args)
+
+    # --------------modelarts modification----------
+    mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
+    # --------------modelarts modification end----------
+
+def convert_pth_to_onnx(args):
+    pth_pattern = os.path.join(CACHE_TRAINING_URL, f"checkpoint_npu{args.npu}.pth.tar")
+    pth_file_list = glob.glob(pth_pattern)
+    if not pth_file_list:
+        print(f"can't find pth {pth_pattern}")
+        return
+    pth_file = pth_file_list[0]
+    onnx_path = pth_file.split(".")[0] + '.onnx'
+    convert(pth_file, onnx_path)
+
+
 def train(train_loader, model, criterion, optimizer, epoch, args):
     if args.optimizer_batch_size < 0:
         batch_size_multiplier = 1
@@ -535,16 +560,13 @@ def validate(val_loader, model, criterion, args):
     return top1.avg
 
 def save_checkpoint(state, is_best, filename='checkpoint'):
-    args = parser.parse_args()
+    if not os.path.exists(CACHE_TRAINING_URL):
+        os.makedirs(CACHE_TRAINING_URL)
 
-    if not os.path.exists("/cache/training"):
-        os.makedirs("/cache/training")
-
-    filename2 = os.path.join('/cache/training', filename + ".pth.tar")
+    filename2 = os.path.join(CACHE_TRAINING_URL, filename + ".pth.tar")
     torch.save(state, filename2)
     if is_best:
-        shutil.copyfile(filename2, '/cache/training/' + filename+'model_best.pth.tar')
-    mox.file.copy_parallel('/cache/training/', args.train_url)
+        shutil.copyfile(filename2, os.path.join(CACHE_TRAINING_URL, filename + 'model_best.pth.tar'))
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""

@@ -16,8 +16,12 @@ limitations under the License.
 """
 
 import argparse
+import ast
+import functools
+import glob
 import logging
 import os
+import re
 from unittest import mock
 
 import yaml
@@ -25,6 +29,7 @@ from easydict import EasyDict
 
 import modelarts_utils
 import main as train_main
+from pthtar2onx import convert
 
 
 _CACHE_TRAIN_DATA_URL = "/cache/train_data_url"
@@ -42,6 +47,8 @@ def parse_args():
                         help='the training data')
     parser.add_argument('--test_data_url', type=str, default='',
                         help='the test data')
+    parser.add_argument('--onnx', default=True, type=ast.literal_eval,
+                        help="convert pth model to onnx")
     args = parser.parse_args()
 
     return args
@@ -73,6 +80,38 @@ def train():
     train_main.main()
 
 
+def cmp_acc(x, y):
+    """sort by acc and epoch."""
+    pattern = r'checkpoint_(?P<epoch>\d+)_acc_(?P<acc>[.0-9]).pth'
+    m_x = re.search(pattern, x)
+    m_y = re.search(pattern, y)
+    if m_x is None or m_y is None:
+        print(f"paste x {x} or y {y} failed.")
+        return (x > y) - (x < y)
+
+    delta = float(m_x['acc']) - float(m_y['acc'])
+    if delta > 0:
+        val = 1
+    elif delta < 0:
+        val = -1
+    else:
+        val = 0
+    return val if val != 0 else int(m_x['epoch']) - int(m_y['epoch'])
+
+
+def convert_pth_to_onnx():
+    pth_pattern = os.path.join(_CACHE_TRAIN_OUT_URL,
+                               'output', '*', 'checkpoints', 'checkpoint*.pth')
+    pth_list = glob.glob(pth_pattern)
+    if not pth_list:
+        print (f"can't find pth {pth_pattern}")
+        return
+    pth_list.sort(key=functools.cmp_to_key(cmp_acc))
+    pth = pth_list[-1]
+    onnx_path = pth + '.onnx'
+    convert(pth, onnx_path)
+
+
 def main():
     logging.basicConfig(level=logging.INFO,
                         format='%(levelname)s: %(message)s')
@@ -94,6 +133,9 @@ def main():
         os.chdir(_CACHE_TRAIN_OUT_URL)
 
         train()
+        if args.onnx:
+            print("convert pth to onnx")
+            convert_pth_to_onnx()
 
         mox.file.copy_parallel(_CACHE_TRAIN_OUT_URL, args.train_url)
     except ModuleNotFoundError:

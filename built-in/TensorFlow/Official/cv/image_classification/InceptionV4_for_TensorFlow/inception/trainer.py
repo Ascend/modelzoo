@@ -53,13 +53,19 @@ class Trainer(object):
         from npu_bridge.estimator.npu.npu_config import NPURunConfig
         from npu_bridge.estimator.npu.npu_estimator import NPUEstimator
 
-        if self.args.over_dump == "True":
+        #  init autotune module start
+        autotune = False
+        autotune = os.environ.get('autotune')
+
+        if self.args.over_dump == "True" and autotune:
             print("NPU overflow dump is enabled")
+            print("Autotune module is enabled")
             from npu_bridge.npu_init import DumpConfig
             dump_config = DumpConfig(
                 enable_dump_debug=True, dump_path=self.args.over_dump_path, dump_debug_mode="all")
             run_config = NPURunConfig(
                 dump_config=dump_config,
+                auto_tune_mode="RL,GA",
                 hcom_parallel=True,
                 precision_mode="allow_mix_precision",
                 enable_data_pre_proc=True,
@@ -68,8 +74,39 @@ class Trainer(object):
                 model_dir=self.args.log_dir,
                 iterations_per_loop=self.args.iterations_per_loop,
                 keep_checkpoint_max=5)
-        else:
+        elif self.args.over_dump == "True" and not autotune:
+            print("NPU overflow dump is enabled")
+            print("Autotune module is disabled")
+            from npu_bridge.npu_init import DumpConfig
+            dump_config = DumpConfig(
+                enable_dump_debug=True, dump_path=self.args.over_dump_path, dump_debug_mode="all")
+            run_config = NPURunConfig(
+                dump_config=dump_config,
+                auto_tune_mode="RL,GA",
+                hcom_parallel=True,
+                precision_mode="allow_mix_precision",
+                enable_data_pre_proc=True,
+                save_checkpoints_steps=self.args.nsteps_per_epoch,
+                session_config=self.sess.estimator_config,
+                model_dir=self.args.log_dir,
+                iterations_per_loop=self.args.iterations_per_loop,
+                keep_checkpoint_max=5)
+        elif not (self.args.over_dump == "True") and autotune:
             print("NPU overflow dump is disabled")
+            print("Autotune module is enabled")
+            run_config = NPURunConfig(
+                auto_tune_mode="RL,GA",
+                hcom_parallel=True,
+                precision_mode="allow_mix_precision",
+                enable_data_pre_proc=True,
+                save_checkpoints_steps=self.args.nsteps_per_epoch * self.args.epochs_between_evals,
+                session_config=self.sess.estimator_config,
+                model_dir=self.args.log_dir,
+                iterations_per_loop=self.args.iterations_per_loop,
+                keep_checkpoint_max=5)
+        elif not (self.args.over_dump == "True") and not autotune:
+            print("NPU overflow dump is disabled")
+            print("Autotune module is disabled")
             run_config = NPURunConfig(
                 hcom_parallel=True,
                 precision_mode="allow_mix_precision",

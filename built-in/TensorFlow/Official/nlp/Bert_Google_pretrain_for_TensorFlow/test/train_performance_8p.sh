@@ -38,11 +38,7 @@ max_seq_length=256
 max_predictions_per_seq=40
 output_dir=ckpt
 
-if [[ type == bertbase ]];then
-    bert_config_file=$cur_path/../configs/bert_base_12layer_config.json
-else
-    bert_config_file=$cur_path/../configs/bert_large_24layer_config.json
-fi
+
 
 # 帮助信息，不需要修改
 if [[ $1 == --help || $1 == -h ]];then
@@ -125,6 +121,11 @@ if [[ $data_path != */ ]];then
     data_path=${data_path}/
 fi
 
+if [[ $type == bertbase ]];then
+    bert_config_file=$cur_path/../configs/bert_base_12layer_config.json
+else
+    bert_config_file=$cur_path/../configs/bert_large_24layer_config.json
+fi
 
 #训练开始时间，不需要修改
 start_time=$(date +%s)

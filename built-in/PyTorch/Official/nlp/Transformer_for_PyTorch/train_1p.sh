@@ -33,6 +33,7 @@ python3 -u train_1p.py \
   --label-smoothing 0.1 \
   --max-sentences 128\
   --max-tokens 102400\
+  --max-epoch 40\
   --seed 1 \
   --save-dir $MODELDIR \
   --save-interval 1\

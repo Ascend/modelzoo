@@ -16,6 +16,8 @@
 
 import argparse
 import apex
+from collections import OrderedDict
+import glob
 import os
 import random
 import sys
@@ -39,8 +41,11 @@ from data_loader import IC15Loader
 from metrics import runningScore
 from multi_epochs_dataloader import MultiEpochsDataLoader
 from util import AverageMeter
+from psenet_pthtar2onx import convert
+
 import moxing as mox
 
+CACHE_TRAINING_URL = "/cache/training/"
 
 def ohem_single(score, gt_text, training_mask):
     pos_num = (int)(np.sum(gt_text > 0.5)) - (int)(np.sum((gt_text > 0.5) & (training_mask <= 0.5)))
@@ -227,15 +232,12 @@ def adjust_learning_rate(args, optimizer, epoch):
             param_group['lr'] = args.lr
 
 
-def save_checkpoint(args, state, checkpoint='checkpoint', filename='checkpoint.pth.tar'):
-    checkpoint = os.path.join('/cache/training/', checkpoint)
+def save_checkpoint(state, checkpoint='checkpoint', filename='checkpoint.pth.tar'):
+    checkpoint = os.path.join(CACHE_TRAINING_URL, checkpoint)
     if not os.path.isdir(checkpoint):
         os.makedirs(checkpoint, mode=0o755)
     filepath = os.path.join(checkpoint, filename)
     torch.save(state, filepath)
-    #--------------modelarts modification----------
-    mox.file.copy_parallel('/cache/training/', args.train_url)
-    # --------------modelarts modification end----------
 
 
 def main(npu, npu_per_node, args):
@@ -363,7 +365,7 @@ def main(npu, npu_per_node, args):
                                                     and args.rank % npu_per_node == 0):
             if epoch > args.n_epoch - 6:
                 best_path = f'{args.remark}_{train_loss:.4f}_{train_te_acc:.4f}_{train_ke_iou:.4f}_{train_te_iou:.4f}_{epoch}.pth.tar'
-                save_checkpoint(args, {
+                save_checkpoint({
                     'epoch': epoch + 1,
                     'state_dict': model.state_dict(),
                     'lr': args.lr,
@@ -372,6 +374,27 @@ def main(npu, npu_per_node, args):
                 }, checkpoint='best', filename=best_path)
                 best_model['acc'] = train_te_acc
                 best_model['iou'] = train_te_iou
+
+    if args.onnx:
+        convert_pth_to_onnx()
+
+    # --------------modelarts modification----------
+    mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
+    # --------------modelarts modification end----------
+
+
+def convert_pth_to_onnx():
+    pth_pattern = os.path.join(CACHE_TRAINING_URL, 'best', "test_*.pth.tar")
+    pth_file_list = glob.glob(pth_pattern)
+    if not pth_file_list:
+        print("pth file not generated.")
+        return
+
+    pth_file_list.sort(key=os.path.getmtime)
+
+    pth_file = pth_file_list[0]
+    onnx_path = pth_file.split(".")[0] + '.onnx'
+    convert(pth_file, onnx_path)
 
 
 def device_id_to_process_device_map(device_list):
@@ -451,6 +474,8 @@ if __name__ == '__main__':
                         default="/cache/training",
                         type=str,
                         help="setting dir of training output")
+    parser.add_argument('--onnx', default=True, action='store_true',
+                        help="convert pth model to onnx")
 
     args = parser.parse_args()
 

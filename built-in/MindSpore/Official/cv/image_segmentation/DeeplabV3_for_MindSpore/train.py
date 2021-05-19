@@ -16,8 +16,10 @@
 
 import os
 import argparse
+import ast
 from mindspore import context
-from mindspore.train.model import ParallelMode, Model
+from mindspore.train.model import Model
+from mindspore.context import ParallelMode
 import mindspore.nn as nn
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -29,10 +31,9 @@ from src.data import dataset as data_generator
 from src.loss import loss
 from src.nets import net_factory
 from src.utils import learning_rates
-
+from src.utils.eval_utils import BuildEvalNetwork
+from src.utils.eval_callback import EvalCallBack, apply_eval
 set_seed(1)
-context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, save_graphs=False,
-                    device_target="Ascend", device_id=int(os.getenv('DEVICE_ID')))
 
 
 class BuildTrainNetwork(nn.Cell):
@@ -72,22 +73,47 @@ def parse_args():
 
     # model
     parser.add_argument('--model', type=str, default='deeplab_v3_s16', help='select model')
-    parser.add_argument('--freeze_bn', action='store_true', help='freeze bn')
     parser.add_argument('--ckpt_pre_trained', type=str, default='', help='pretrained model')
+    parser.add_argument("--filter_weight", type=ast.literal_eval, default=False,
+                        help="Filter the last weight parameters, default is False.")
 
     # train
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'CPU'],
+                        help='device where the code will be implemented. (Default: Ascend)')
     parser.add_argument('--is_distributed', action='store_true', help='distributed training')
     parser.add_argument('--rank', type=int, default=0, help='local rank of distributed')
     parser.add_argument('--group_size', type=int, default=1, help='world size of distributed')
     parser.add_argument('--save_steps', type=int, default=3000, help='steps interval for saving')
     parser.add_argument('--keep_checkpoint_max', type=int, default=int, help='max checkpoint for saving')
 
+    # validate
+    parser.add_argument("--run_eval", type=ast.literal_eval, default=False,
+                        help="Run evaluation when training, default is False.")
+    parser.add_argument("--save_best_ckpt", type=ast.literal_eval, default=True,
+                        help="Save best checkpoint when run_eval is True, default is True.")
+    parser.add_argument("--eval_start_epoch", type=int, default=200,
+                        help="Evaluation start epoch when run_eval is True, default is 200.")
+    parser.add_argument("--eval_interval", type=int, default=1,
+                        help="Evaluation interval when run_eval is True, default is 1.")
+    parser.add_argument('--ann_file', type=str, default='', help='path to annotation')
+    parser.add_argument('--data_root', type=str, default='', help='root path of val data')
+    parser.add_argument('--val_data', type=str, default='', help='list of val data')
+    parser.add_argument('--scales', type=float, action='append', help='scales of evaluation')
+    parser.add_argument('--flip', action='store_true', help='perform left-right flip')
+    parser.add_argument("--input_format", type=str, choices=["NCHW", "NHWC"], default="NCHW",
+                        help="NCHW or NHWC")
     args, _ = parser.parse_known_args()
     return args
 
 
 def train():
     args = parse_args()
+
+    if args.device_target == "CPU":
+        context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target="CPU")
+    else:
+        context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, save_graphs=False,
+                            device_target="Ascend", device_id=int(os.getenv('DEVICE_ID')))
 
     # init multicards training
     if args.is_distributed:
@@ -116,9 +142,9 @@ def train():
 
     # network
     if args.model == 'deeplab_v3_s16':
-        network = net_factory.nets_map[args.model]('train', args.num_classes, 16, args.freeze_bn)
+        network = net_factory.nets_map[args.model](args.num_classes, 16)
     elif args.model == 'deeplab_v3_s8':
-        network = net_factory.nets_map[args.model]('train', args.num_classes, 8, args.freeze_bn)
+        network = net_factory.nets_map[args.model](args.num_classes, 8)
     else:
         raise NotImplementedError('model [{:s}] not recognized'.format(args.model))
 
@@ -130,7 +156,16 @@ def train():
     # load pretrained model
     if args.ckpt_pre_trained:
         param_dict = load_checkpoint(args.ckpt_pre_trained)
+        if args.filter_weight:
+            filter_list = ["network.aspp.conv2.weight", "network.aspp.conv2.bias"]
+            for key in list(param_dict.keys()):
+                for filter_key in filter_list:
+                    if filter_key not in key:
+                        continue
+                    print('filter {}'.format(key))
+                    del param_dict[key]
         load_param_into_net(train_net, param_dict)
+        print('load_model {} success'.format(args.ckpt_pre_trained))
 
     # optimizer
     iters_per_epoch = dataset.get_dataset_size()
@@ -149,7 +184,9 @@ def train():
 
     # loss scale
     manager_loss_scale = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
-    model = Model(train_net, optimizer=opt, amp_level="O3", loss_scale_manager=manager_loss_scale)
+    amp_level = "O0" if args.device_target == "CPU" else "O3"
+    train_net.set_train(True)
+    model = Model(train_net, optimizer=opt, amp_level=amp_level, loss_scale_manager=manager_loss_scale)
 
     # callback for saving ckpts
     time_cb = TimeMonitor(data_size=iters_per_epoch)
@@ -162,7 +199,17 @@ def train():
         ckpoint_cb = ModelCheckpoint(prefix=args.model, directory=args.train_dir, config=config_ck)
         cbs.append(ckpoint_cb)
 
-    model.train(args.train_epochs, dataset, callbacks=cbs)
+    if args.run_eval and args.rank == 0:
+        network_eval = BuildEvalNetwork(network, args.input_format)
+        eval_dataset = args.val_data
+        save_ckpt_path = args.train_dir
+        eval_param_dict = {"net": network_eval, "dataset": eval_dataset, "args": args}
+        eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=args.eval_interval,
+                               eval_start_epoch=args.eval_start_epoch, save_best_ckpt=True,
+                               ckpt_directory=save_ckpt_path, besk_ckpt_name="best_map.ckpt",
+                               metrics_name="mIou")
+        cbs.append(eval_cb)
+    model.train(args.train_epochs, dataset, callbacks=cbs, dataset_sink_mode=(args.device_target != "CPU"))
 
 
 if __name__ == '__main__':

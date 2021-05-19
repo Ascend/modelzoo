@@ -18,7 +18,7 @@ import sys
 
 def gen_set_meta(meta):
     return dict(
-        prefix=True,
+        prefix=False,
         gt_folder='truth',
         x4_folder='blur4',
         videos=meta)

@@ -78,13 +78,20 @@ do
         mkdir -p ${profiling_dump_path}
     elif [[ $para == --autotune* ]];then
         autotune=`echo ${para#*=}`
+
+#开autotune特有环境变量
+		autotune=True
+		export autotune=True
+		export REPEAT_TUNE=True
+		export ASCEND_DEVICE_ID=0
+		export ENABLE_TUNE_BANK=True
+		export TE_PARALLEL_COMPILER=32
         mv $install_path/fwkacllib/data/rl/Ascend910/custom $install_path/fwkacllib/data/rl/Ascend910/custom_bak
         mv $install_path/fwkacllib/data/tiling/Ascend910/custom $install_path/fwkacllib/data/tiling/Ascend910/custom_bak
         autotune_dump_path=${cur_path}/output/autotune_dump
         mkdir -p ${autotune_dump_path}/GA
         mkdir -p ${autotune_dump_path}/rl
-        cp -rf $install_path/fwkacllib/data/tiling/Ascend910/custom ${autotune_dump_path}/GA/
-        cp -rf $install_path/fwkacllib/data/rl/Ascend910/custom ${autotune_dump_path}/RL/
+  
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
     fi

@@ -7,25 +7,25 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# less required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
 
-echo "=============================================================================================================="
-echo "Please run the script as: "
-echo "bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]"
-echo "for example: bash run_distribute_train.sh /absolute/path/to/RANK_TABLE_FILE /absolute/path/to/data"
-echo "=============================================================================================================="
-
 if [ $# != 2 ]
 then
+    echo "=============================================================================================================="
     echo "Usage: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]"
+    echo "Please run the script as: "
+    echo "bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]"
+    echo "for example: bash run_distribute_train.sh /absolute/path/to/RANK_TABLE_FILE /absolute/path/to/data"
+    echo "=============================================================================================================="
     exit 1
 fi
 
+export HCCL_CONNECT_TIMEOUT=600
 export RANK_SIZE=8
 
 for((i=0;i<RANK_SIZE;i++))

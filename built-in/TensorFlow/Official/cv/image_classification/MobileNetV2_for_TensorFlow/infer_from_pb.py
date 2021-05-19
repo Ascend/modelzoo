@@ -74,6 +74,22 @@ class Classifier(object):
         # 2）recommended use fp16 datatype to obtain better performance
         custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("force_fp16")
 
+        #  init autotune module start
+        autotune = False
+        autotune = os.environ.get('autotune')
+        if autotune:
+            autotune = autotune.lower()
+            if autotune == 'true':
+                print("Autotune module is :" + autotune)
+                print("Autotune module has been initiated!")
+                custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes("RL,GA")
+            else:
+                print("Autotune module is :" + autotune)
+                print("Autotune module is enabled or with error setting.")
+        else:
+            print("Autotune module de_initiate!Pass")
+        #  init autotune module end
+
         # 3）disable remapping
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 

@@ -381,7 +381,23 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
     custom_op.parameter_map["enable_data_pre_proc"].b = True
     custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes('allow_mix_precision')
     custom_op.parameter_map["mix_compile_mode"].b = False  # 娣峰悎璁＄畻
-    
+
+    #  init autotune module start
+    autotune = False
+    autotune = os.environ.get('autotune')
+    if autotune:
+        autotune = autotune.lower()
+        if autotune == 'true':
+            print("Autotune module is :" + autotune)
+            print("Autotune module has been initiated!")
+            custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes("RL,GA")
+        else:
+            print("Autotune module is :" + autotune)
+            print("Autotune module is enabled or with error setting.")
+    else:
+        print("Autotune module de_initiate!Pass")
+    #  init autotune module end
+
     if args.over_dump == "True":
         print("NPU overflow dump is enabled")
         custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(args.over_dump_path)

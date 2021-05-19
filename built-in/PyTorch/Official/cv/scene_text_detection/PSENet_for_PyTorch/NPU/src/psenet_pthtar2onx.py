@@ -45,8 +45,8 @@ def proc_nodes_module(checkpoint,AttrName):
         new_state_dict[name] = v
     return new_state_dict
 
-def convert():
-    checkpoint = torch.load("./psenet_Checkpoint.pth.tar", map_location='cpu')
+def convert(pth_file_path, onnx_file_path):
+    checkpoint = torch.load(pth_file_path, map_location='cpu')
     checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
     model = onnx_models.resnet50(pretrained=True, num_classes=7, scale=1)
     model.load_state_dict(checkpoint['state_dict'])
@@ -56,7 +56,11 @@ def convert():
     input_names = ["actual_input_1"]
     output_names = ["output1"]
     dummy_input = torch.randn(16, 3, 640, 640)
-    torch.onnx.export(model, dummy_input, "psenet_bs16.onnx", input_names = input_names, output_names = output_names,
+    torch.onnx.export(model, dummy_input, onnx_file_path, input_names = input_names, output_names = output_names,
                       opset_version=11)
+
+
 if __name__ == "__main__":
-    convert()
+    src_file_path = "./psenet_Checkpoint.pth.tar"
+    dst_file_path = "psenet_bs16.onnx"
+    convert(src_file_path, dst_file_path)

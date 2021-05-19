@@ -20,9 +20,13 @@ import time
 from datetime import datetime
 from threading import Lock
 
+import MxpiDataType_pb2 as MxpiDataType
 import cv2
+from StreamManagerApi import InProtobufVector
 from StreamManagerApi import MxDataInput
+from StreamManagerApi import MxProtobufIn
 from StreamManagerApi import StreamManagerApi
+from StreamManagerApi import StringVector
 from absl import app
 from absl import flags
 
@@ -34,6 +38,7 @@ DET_RESULT_JSON = None
 
 FLAGS = flags.FLAGS
 infer_ret_list_lock = Lock()
+det_restore_ratio = dict()
 
 flags.DEFINE_string(
     name="img_dir", default=None, help="Directory of images to infer"
@@ -58,6 +63,19 @@ flags.DEFINE_boolean(
     help="Whether out put the inferred image with bounding box",
 )
 
+flags.DEFINE_enum(
+    name="preprocess",
+    default="OPENCV",
+    enum_values=["DVPP", "OPENCV"],
+    help="Preprocess method to use, default OpenCV.",
+)
+
+flags.DEFINE_boolean(
+    name="coco",
+    default=True,
+    help="Whether use coco dataset to test performance.",
+)
+
 flags.DEFINE_float(
     name="score_thresh_for_draw",
     default=0.5,
@@ -74,13 +92,23 @@ flags.DEFINE_string(
 flags.DEFINE_integer(
     name="how_many_images_to_infer",
     default=-1,
-    help="Infer how many images in img_dir, -1 means all."
+    help="Infer how many images in img_dir, -1 means all.",
 )
 
 flags.DEFINE_integer(
     name="infer_timeout_secs",
     default=3,
-    help="Time out(in seconds) to get the infer result. "
+    help="Time out(in seconds) to get the infer result. ",
+)
+
+flags.DEFINE_integer(
+    name="model_input_height",
+    default=640,
+    help="Image height input to " "model.",
+)
+
+flags.DEFINE_integer(
+    name="model_input_width", default=640, help="Image width input to model."
 )
 
 flags.DEFINE_integer(
@@ -133,6 +161,7 @@ def draw_img_fun(img_id, bboxes):
     boxed_img = os.path.join(BOXED_IMG_DIR, img_name)
     draw_image(input_img, bboxes, boxed_img)
 
+
 def trans_class_id(k):
     if k >= 1 and k <= 11:
         return k
@@ -153,11 +182,13 @@ def trans_class_id(k):
     elif k >= 74 and k <= 80:
         return k + 10
 
+
 def parse_result(img_id, json_content):
     obj_list = json.loads(json_content).get("MxpiObject", [])
     pic_infer_dict_list = []
     bboxes_for_drawing = []
     txt_lines_list = []
+    hratio, wratio = det_restore_ratio.get(img_id, (1, 1))
     for o in obj_list:
         x0, y0, x1, y1 = (
             round(o.get("x0"), 4),
@@ -166,7 +197,12 @@ def parse_result(img_id, json_content):
             round(o.get("y1"), 4),
         )
         # For MAP
-        bbox_for_map = [x0, y0, round(x1 - x0, 4), round(y1 - y0, 4)]
+        bbox_for_map = [
+            int(x0 * wratio),
+            int(y0 * hratio),
+            int((x1 - x0) * wratio),
+            int((y1 - y0) * hratio),
+        ]
         # For drawing bounding box.
         bbox_for_drawing = [int(x0), int(y0), int(x1), int(y1)]
         # calculation
@@ -180,7 +216,7 @@ def parse_result(img_id, json_content):
         ]
         tmp_list = map(str, tmp_list)
         txt_lines_list.append(" ".join(tmp_list))
-        category_id = o.get("classVec")[0].get("classId") # 1-80, GT:1-90
+        category_id = o.get("classVec")[0].get("classId")  # 1-80, GT:1-90
         category_id = trans_class_id(category_id)
         score = o.get("classVec")[0].get("confidence")
 
@@ -208,6 +244,162 @@ def parse_result(img_id, json_content):
     return pic_infer_dict_list
 
 
+def send_img_with_opencv_handled(stream_manager_api, img_file_name):
+    img = cv2.imread(img_file_name)
+    height = img.shape[0]
+    width = img.shape[1]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (FLAGS.model_input_width, FLAGS.model_input_height))
+
+    img_id = (
+        int(os.path.basename(img_file_name).split(".")[0])
+        if FLAGS.coco
+        else img_file_name
+    )
+    """
+    height/FLAGS.model_input_height = hx/ DH =>hx = DH * (
+    height/FLAGS.model_input_height)
+    """
+    det_restore_ratio[img_id] = (
+        round(height * 1.0 / FLAGS.model_input_height, 4),
+        round(width * 1.0 / FLAGS.model_input_width, 4),
+    )
+    array_bytes = img.tobytes()
+    data_input = MxDataInput()
+    data_input.data = array_bytes
+    key = b"appsrc0"
+    protobuf_vec = InProtobufVector()
+
+    vision_list = MxpiDataType.MxpiVisionList()
+    vision_vec = vision_list.visionVec.add()
+    vision_vec.visionInfo.format = 1
+    vision_vec.visionInfo.width = FLAGS.model_input_width
+    vision_vec.visionInfo.height = FLAGS.model_input_height
+    vision_vec.visionInfo.widthAligned = FLAGS.model_input_width
+    vision_vec.visionInfo.heightAligned = FLAGS.model_input_height
+    vision_vec.visionData.deviceId = 0
+    vision_vec.visionData.memType = 0
+    vision_vec.visionData.dataStr = data_input.data
+
+    protobuf = MxProtobufIn()
+    protobuf.key = key
+    protobuf.type = b"MxTools.MxpiVisionList"
+    protobuf.protobuf = vision_list.SerializeToString()
+
+    protobuf_vec.push_back(protobuf)
+
+    unique_id = stream_manager_api.SendProtobuf(
+        FLAGS.infer_stream_name.encode("utf8"), 0, protobuf_vec
+    )
+
+    if unique_id < 0:
+        print("Failed to send data to stream.")
+        exit()
+
+    key_vec = StringVector()
+    key_vec.push_back(b"mxpi_modelinfer0")
+    return unique_id
+
+
+def display_infer_progress(img_num, index, report_file, start_secs):
+    cur_secs = time.time()
+    acc_secs = round(cur_secs - start_secs, 4)
+    real_speed = round((cur_secs - start_secs) * 1000 / (index + 1), 4)
+    perf_detail = (
+        f"Inferred: {index + 1}/{img_num} images; "
+        f"took: {acc_secs} seconds; "
+        f"average inference speed at: {real_speed} ms/image\n"
+    )
+    print(perf_detail)
+    threading.Thread(
+        target=write_speed_detail, args=(perf_detail, report_file)
+    ).start()
+
+
+def write_speed_detail(perf_detail, report_file):
+    report_file.write(perf_detail)
+    report_file.flush()
+
+
+def handle_infer_result(
+    all_infer_dict_list, img_id, infer_result, img_ext="jpg"
+):
+    if infer_result.errorCode != 0:
+        print(
+            "GetResultWithUniqueId error. errorCode=%d, errorMsg=%s"
+            % (infer_result.errorCode, infer_result.data.decode())
+        )
+        exit()
+
+    info_json_str = infer_result.data.decode()
+    with infer_ret_list_lock:
+        all_infer_dict_list.extend(parse_result(img_id, info_json_str))
+
+
+def infer_imgs_in_dir_with_open_cv():
+    input_dir = FLAGS.img_dir
+    report_file = open(PERF_REPORT_TXT, "a+")
+    imgs = [
+        img_name
+        for img_name in os.listdir(input_dir)
+        if "boxed" not in img_name
+        and img_name.lower().endswith((".jpg", ".jpeg"))
+    ]
+
+    img_file_names = [
+        os.path.join(input_dir, img_name)
+        for img_name in imgs
+        if "boxed" not in img_name
+    ]
+    all_infer_dict_list = []
+    stream_manager_api = prepare_infer_stream()
+    start_secs = time.time()
+    img_num = len(img_file_names)
+    parse_det_threads = []
+    for index, img_file_name in enumerate(img_file_names):
+        inferred_cnt = index + 1
+        send_img_with_opencv_handled(stream_manager_api, img_file_name)
+        infer_result = stream_manager_api.GetResult(
+            FLAGS.infer_stream_name.encode("utf8"), 0
+        )
+
+        if inferred_cnt % FLAGS.display_step == 0:
+            display_infer_progress(img_num, index, report_file, start_secs)
+
+        name, ext = os.path.splitext(os.path.basename(img_file_name))
+        img_id = int(name) if FLAGS.coco else name
+
+        t = threading.Thread(
+            target=handle_infer_result,
+            args=(all_infer_dict_list, img_id, infer_result, ext),
+        )
+        t.start()
+        parse_det_threads.append(t)
+
+        if inferred_cnt >= FLAGS.how_many_images_to_infer > 0:
+            img_num = inferred_cnt
+            print(f"Inferred all {inferred_cnt} images to SDK success.")
+            break
+
+    for t in parse_det_threads:
+        t.join()
+
+    finish_secs = time.time()
+    avg_infer_speed = round((finish_secs - start_secs) * 1000 / img_num, 4)
+    final_perf = (
+        f"Infer with OPENCV finished, average speed:{avg_infer_speed} "
+        f"ms/image for {img_num} images.\n\n"
+    )
+    print(final_perf)
+    report_file.write(final_perf)
+    report_file.close()
+
+    with open(DET_RESULT_JSON, "w") as fw:
+        fw.write(json.dumps(all_infer_dict_list))
+
+    stream_manager_api.DestroyAllStreams()
+
+
 def send_many_images(stream_manager_api):
 
     input_dir = FLAGS.img_dir
@@ -219,8 +411,11 @@ def send_many_images(stream_manager_api):
         for img_name in imgs
         if "boxed" not in img_name
     ]
-    infer_cnt = len(img_file_names) if FLAGS.how_many_images_to_infer == -1 \
+    infer_cnt = (
+        len(img_file_names)
+        if FLAGS.how_many_images_to_infer == -1
         else FLAGS.how_many_images_to_infer
+    )
     start = time.time()
     uuid_list = []
     for img_file_name in img_file_names[:infer_cnt]:
@@ -262,8 +457,9 @@ def get_all_images_result(uuid_img_id_zip, stream_manager_api):
     )
     for index, (uuid, img_id) in enumerate(uuid_img_id_zip):
         infer_result = stream_manager_api.GetResultWithUniqueId(
-            FLAGS.infer_stream_name.encode("utf8"), uuid,
-            FLAGS.infer_timeout_secs * 1000
+            FLAGS.infer_stream_name.encode("utf8"),
+            uuid,
+            FLAGS.infer_timeout_secs * 1000,
         )
         if (index + 1) % FLAGS.display_step == 0:
             cur_secs = time.time()
@@ -417,7 +613,12 @@ def main(unused_arg):
     with open(PERF_REPORT_TXT, "a+") as fw:
         fw.write(head_info)
 
-    infer_imgs()
+    if FLAGS.preprocess == "DVPP":
+        print("Start DVPP infer pert testing...")
+        infer_imgs()
+    else:
+        print("Start OpenCV infer pert testing...")
+        infer_imgs_in_dir_with_open_cv()
 
     end_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     tail_info = f"{'-'*50}Perf Test On NPU ends @ {end_time_str}{'-'*50}\n"

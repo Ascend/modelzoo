@@ -6,7 +6,7 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# less required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -36,3 +36,15 @@ class CrossEntropyWithLogits(_Loss):
         loss = self.reduce_mean(
             self.softmax_cross_entropy_loss(self.reshape_fn(logits, (-1, 2)), self.reshape_fn(label, (-1, 2))))
         return self.get_loss(loss)
+
+class MultiCrossEntropyWithLogits(nn.Cell):
+    def __init__(self):
+        super(MultiCrossEntropyWithLogits, self).__init__()
+        self.loss = CrossEntropyWithLogits()
+        self.squeeze = F.Squeeze(axis=0)
+
+    def construct(self, logits, label):
+        total_loss = 0
+        for i in range(len(logits)):
+            total_loss += self.loss(self.squeeze(logits[i:i+1]), label)
+        return total_loss

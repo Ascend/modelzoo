@@ -14,7 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+import ast
+import glob
 import importlib
 import logging
 import os
@@ -31,6 +32,7 @@ import torch.utils.data.distributed
 import yaml
 
 import modelarts_utils
+from pthtar2onnx import convert
 
 
 _MODULE_8P_MAIN_MED = importlib.import_module("8p_main_med")
@@ -77,6 +79,8 @@ def parse_args():
     # 数据集目录
     parser.add_argument('--data_url', type=str, default='',
                         help='the training data')
+    parser.add_argument('--onnx', default=True, type=ast.literal_eval,
+                        help="convert pth model to onnx")
 
     # 参数优先级：命令行 > 配置文件 > 默认参数
     default_args = parser.parse_args([])
@@ -146,6 +150,17 @@ def train(args):
         main_worker(args.gpu, ngpus_per_node, args)
 
 
+def convert_pth_to_onnx(args):
+    pth_pattern = os.path.join(_CACHE_TRAIN_URL, 'checkpoint.pth.tar')
+    pth_list = glob.glob(pth_pattern)
+    if not pth_list:
+        print (f"can't find pth {pth_pattern}")
+        return
+    pth = pth_list[0]
+    onnx_path = pth + '.onnx'
+    convert(pth, onnx_path, args.num_classes)
+
+
 def main():
     logging.basicConfig(level=logging.INFO,
                         format='%(levelname)s: %(message)s')
@@ -164,6 +179,10 @@ def main():
         os.chdir(_CACHE_TRAIN_URL)
 
         train(args)
+
+        if args.onnx:
+            print("convert pth to onnx")
+            convert_pth_to_onnx(args)
 
         mox.file.copy_parallel(_CACHE_TRAIN_URL, args.train_url)
     except ModuleNotFoundError:

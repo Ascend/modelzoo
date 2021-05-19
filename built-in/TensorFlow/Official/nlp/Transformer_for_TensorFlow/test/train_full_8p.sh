@@ -73,6 +73,7 @@ do
         mkdir -p ${profiling_dump_path}
     elif [[ $para == --autotune* ]];then
         autotune=`echo ${para#*=}`
+		export autotune=$autotune
         mv $install_path/fwkacllib/data/rl/Ascend910/custom $install_path/fwkacllib/data/rl/Ascend910/custom_bak
         mv $install_path/fwkacllib/data/tiling/Ascend910/custom $install_path/fwkacllib/data/tiling/Ascend910/custom_bak
         autotune_dump_path=${cur_path}/output/autotune_dump
@@ -96,6 +97,7 @@ if [[ $autotune == True ]]; then
     train_full_1p.sh --autotune=$autotune --data_path=$data_path
     wait
     autotune=False
+	export autotune=$autotune
 fi
 
 #内部其余路径

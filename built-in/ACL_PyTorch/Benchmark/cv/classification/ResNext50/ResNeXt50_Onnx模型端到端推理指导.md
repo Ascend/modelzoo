@@ -86,6 +86,9 @@ opencv-python3 == 1.0
 python3.7 resnext50_pth2onnx.py resnext50_32x4d-7cdf4587.pth resnext50.onnx
 ```
 
+ **模型转换要点：**  
+>此模型转换为onnx不需要修改开源代码仓代码，故不需要特殊说明
+
 ### 3.2 onnx转om模型
 
 1.设置环境变量
@@ -116,11 +119,11 @@ atc --framework=5 --model=./resnext50.onnx --input_format=NCHW --input_shape="im
 python3.7 imagenet_torch_preprocess.py resnet /root/datasets/imagenet/val ./prep_dataset
 ```
 ### 4.3 生成数据集信息文件
-1.生成数据集信息文件脚本get_info.py
+1.生成数据集信息文件脚本gen_dataset_info.py
 
 2.执行生成数据集信息脚本，生成数据集信息文件
 ```
-python3.7 get_info.py bin ./prep_dataset ./resnext50_prep_bin.info 224 224
+python3.7 gen_dataset_info.py bin ./prep_dataset ./resnext50_prep_bin.info 224 224
 ```
 第一个参数为模型输入的类型，第二个参数为生成的bin文件路径，第三个为输出的info文件，后面为宽高信息
 ## 5 离线推理
@@ -150,18 +153,21 @@ source env.sh
 -   **[精度对比](#63-精度对比)**  
 
 ### 6.1 离线推理TopN精度统计
+需要统计batch1，batch4，batch8，batch16，batch32的精度，这里用batch16做示例  
 
 后处理统计TopN精度
 
-调用vision_metric_ImageNet.py脚本推理结果与label比对，可以获得Accuracy Top5数据，结果保存在result.json中。
+调用imagenet_acc_eval.py脚本推理结果与label比对，可以获得Accuracy Top5数据，结果保存在result.json中。
 ```
-python3.7 vision_metric_ImageNet.py result/dumpOutput_device0/ /root/datasets/imagenet/val_label.txt ./ result.json
+python3.7 imagenet_acc_eval.py result/dumpOutput_device0/ /root/datasets/imagenet/val_label.txt ./ result.json
 ```
 第一个为benchmark输出目录，第二个为数据集配套标签，第三个是生成文件的保存目录，第四个是生成的文件名。  
 查看输出结果：
 ```
 {"title": "Overall statistical evaluation", "value": [{"key": "Number of images", "value": "50000"}, {"key": "Number of classes", "value": "1000"}, {"key": "Top1 accuracy", "value": "77.62%"}, {"key": "Top2 accuracy", "value": "87.42%"}, {"key": "Top3 accuracy", "value": "90.79%"}, {"key": "Top4 accuracy", "value": "92.56%"}, {"key": "Top5 accuracy", "value": "93.69%"}]
 ```
+batch1,4,8,32的精度...
+
 ### 6.2 开源TopN精度
 [torchvision官网精度](https://pytorch.org/vision/stable/models.html)
 ```
@@ -169,7 +175,9 @@ Model               Acc@1     Acc@5
 ResNeXt-50-32x4d    77.618    93.698
 ```
 ### 6.3 精度对比
-将得到的om离线模型推理TopN精度与该模型github代码仓上公布的精度对比，精度下降在1%范围之内，故精度达标。
+将得到的om离线模型推理TopN精度与该模型github代码仓上公布的精度对比，精度下降在1%范围之内，故精度达标。  
+ **精度调试：**  
+>没有遇到精度不达标的问题，故不需要进行精度调试
 
 ## 7 性能对比
 
@@ -178,29 +186,44 @@ ResNeXt-50-32x4d    77.618    93.698
 -   **[性能对比](#73-性能对比)**  
 
 ### 7.1 npu性能数据
+需要测试batch1，batch4，batch8，batch16，batch32的性能，这里用batch1与batch16做示例  
+benchmark工具在整个数据集上推理时也会统计性能数据，但是推理整个数据集较慢，如果这么测性能那么整个推理期间需要确保独占device。为快速获取性能数据，也可以使用benchmark纯推理功能测得性能数据，但是由于随机数不能模拟数据分布，纯推理功能测的有些模型性能数据可能不太准。这里给出两种方式，模型的测试脚本使用benchmark工具在整个数据集上推理得到bs1与bs16的性能数据为准。  
+1.benchmark工具在整个数据集上推理获得性能数据  
+以batch1为例，benchmark工具在整个数据集上推理后生成result/perf_vision_batchsize_1_device_0.txt：  
+```
+[e2e] throughputRate: 243.034, latency: 205733
+[data read] throughputRate: 258.963, moduleLatency: 3.86155
+[preprocess] throughputRate: 258.404, moduleLatency: 3.86991
+[infer] throughputRate: 244.435, Interface throughputRate: 382.328, moduleLatency: 3.35758
+[post] throughputRate: 244.435, moduleLatency: 4.09107
+```
+Interface throughputRate: 382.328，382.328乘以4既是310单卡吞吐率  
+2.benchmark纯推理功能测得性能数据  
 batch1的性能：
  测试npu性能要确保device空闲，使用npu-smi info命令可查看device是否在运行其它推理任务
 ```
-./benchmark.x86_64 -round=50 -om_path=resnext50_bs1.om -device_id=0 -batch_size=1
+./benchmark.x86_64 -round=20 -om_path=resnext50_bs1.om -device_id=0 -batch_size=1
 ```
-执行50次纯推理取均值，统计吞吐率与其倒数时延（benchmark的时延是单个数据的推理时间），npu性能是一个device执行的结果
+执行20次纯推理取均值，统计吞吐率与其倒数时延（benchmark的时延是单个数据的推理时间），npu性能是一个device执行的结果
 ```
-[INFO] Dataset number: 49 finished cost 2.635ms
+[INFO] Dataset number: 19 finished cost 2.635ms
 [INFO] PureInfer result saved in ./result/PureInfer_perf_of_resnext50_bs1_in_device_0.txt
 -----------------PureInfer Performance Summary------------------
 [INFO] ave_throughputRate: 374.313samples/s, ave_latency: 2.67914ms
 ```
 batch16的性能：
 ```
-./benchmark.x86_64 -round=50 -om_path=resnext50_bs16.om -device_id=0 -batch_size=16
+./benchmark.x86_64 -round=20 -om_path=resnext50_bs16.om -device_id=0 -batch_size=16
 ```
 ```
-[INFO] Dataset number: 49 finished cost 30.514ms
+[INFO] Dataset number: 19 finished cost 30.514ms
 [INFO] PureInfer result saved in ./result/PureInfer_perf_of_resnext50_bs16_in_device_0.txt
 -----------------PureInfer Performance Summary------------------
 [INFO] ave_throughputRate: 524.094samples/s, ave_latency: 1.9101ms
 ```
+batch4,8,32的性能...
 ### 7.2 T4性能数据
+需要测试batch1，batch4，batch8，batch16，batch32的性能，这里用batch1与batch16做示例  
 batch1性能：
 在T4机器上安装开源TensorRT
 ```
@@ -230,10 +253,12 @@ batch16性能：
 [03/24/2021-03:57:22] [I] percentile: 14.8377 ms at 99%
 [03/24/2021-03:57:22] [I] total compute time: 3.03173 s
 ```
+batch4,8,32的性能...
 ### 7.3 性能对比
-batch1：2.67914/4 < 1.31054/1  
-batch16：1.9101/4 < 12.9561/16  
-npu的吞吐率乘4比T4的吞吐率大，即npu的时延除4比T4的时延除以batch小，故npu性能高于T4性能，性能达标。  
+batch1：374.313*4 > 1/(1.31054/1)*1000  
+batch16：524.094*4 > 1/(12.9561/16)*1000  
+npu的吞吐率乘4比T4的吞吐率大，也等同于npu的时延除4比T4的时延除以batch小，故npu性能高于T4性能，性能达标。  
 对于batch1与batch16，npu性能均高于T4性能1.2倍，该模型放在benchmark/cv/classification目录下。  
-
+ **性能优化：**  
+>没有遇到性能不达标的问题，故不需要进行性能优化
 

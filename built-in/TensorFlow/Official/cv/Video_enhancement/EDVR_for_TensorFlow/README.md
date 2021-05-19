@@ -143,6 +143,9 @@ We suggest users to follow our dataset folder structure and protocal, especially
 1. Training EDVR with device 0: 
 
     ```sh
+   # Set ascend environment
+   source scripts/env.sh
+   
     bash scripts/run_1p_train.sh 0 1
     ```
 
@@ -183,6 +186,9 @@ We suggest users to follow our dataset folder structure and protocal, especially
 2. Training EDVR with 8 devices:
 
     ```sh
+   # Set ascend environment
+   source scripts/env.sh
+   
     bash scripts/prepare_8p.sh
     bash scripts/run_8p_train.sh
     ```
@@ -214,6 +220,13 @@ We suggest users to follow our dataset folder structure and protocal, especially
     > 2021-01-05 14:07:08 Step:460, lr:0.00039999, loss:6676.80909872, time:227.10ms, fps:140.91 <br>
     > 2021-01-05 14:07:12 Step:480, lr:0.00039999, loss:6571.46454924, time:226.12ms, fps:141.52 <br>
     > 2021-01-05 14:07:17 Step:500, lr:0.00039999, loss:6452.07785241, time:223.62ms, fps:143.10 <br>
+
+**Note**: The given scripts ``edvr.yaml``, ``run_1p_train.sh`` are only for reference.
+    In ``run_1p_train.sh``, the training proceeds with ``batchsize=4`` and runs for only 1000 steps, 
+which cannot reach the reproduced precision (PSNR 31.24dB on REDS4). If one wants to fully 
+reproduce the given PSNR, please run ``run_1p_train_precision_overwatch.sh`` (for 1 device) or 
+``run_8p_train_precision_overwatch.sh`` (for 8 devices). The former requires several days to complete 
+the training, while the latter also takes one day at least.
 
 ## Evaluation
 

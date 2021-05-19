@@ -94,11 +94,13 @@ if __name__ == '__main__':
     elif args_opt.dataset == "voc":
         json_path = os.path.join(config.voc_root, config.voc_json)
     else:
-        raise ValueError('SSD eval only support dataset mode is coco and voc!')
+        json_path = config.instances_set
 
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=args_opt.device_id)
 
-    mindrecord_file = create_mindrecord(args_opt.dataset, "ssd_eval.mindrecord", False)
+    mindrecord_file = create_mindrecord(args_opt.dataset,
+                                        "ssd_eval.mindrecord", False,
+                                        file_num=1)
 
     print("Start Eval!")
     ssd_eval(mindrecord_file, args_opt.checkpoint_path, json_path)

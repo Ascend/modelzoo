@@ -179,7 +179,23 @@ def create_run_config(master="",
   custom_op.parameter_map["use_off_line"].b = True
   custom_op.parameter_map["min_group_size"].b = 1
   custom_op.parameter_map["enable_auto_mix_precision"].b=False
-  
+
+  #  init autotune module start
+  autotune = False
+  autotune = os.environ.get('autotune')
+  if autotune:
+      autotune = autotune.lower()
+      if autotune == 'true':
+          print("Autotune module is :" + autotune)
+          print("Autotune module has been initiated!")
+          custom_op.parameter_map["auto_tune_mode"].s = tf.compat.as_bytes("RL,GA")
+      else:
+          print("Autotune module is :" + autotune)
+          print("Autotune module is enabled or with error setting.")
+  else:
+      print("Autotune module de_initiate!Pass")
+  #  init autotune module end
+
   if over_dump == "True":
       print("NPU overflow dump is enabled")
       custom_op.parameter_map["dump_path"].s = tf.compat.as_bytes(over_dump_path)

@@ -17,8 +17,11 @@
 import os
 import argparse
 import ast
+import glob
+import numpy as np
 
 from mindspore import context
+from mindspore import export
 from mindspore import Tensor
 from mindspore.nn.optim.momentum import Momentum
 from mindspore.train.model import Model
@@ -100,6 +103,12 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
                 del origin_dict[key]
                 break
 
+def frozen_to_air(net, args):
+    param_dict = load_checkpoint(args.get("ckpt_file"))
+    load_param_into_net(net, param_dict)
+
+    input_arr = Tensor(np.zeros([args.get("batch_size"), 3, args.get("height"), args.get("width")], np.float32))
+    export(net, input_arr, file_name=args.get("file_name"), file_format=args.get("file_format"))
 
 if __name__ == '__main__':
     target = args_opt.device_target
@@ -254,5 +263,24 @@ if __name__ == '__main__':
     dataset_sink_mode = (not args_opt.parameter_server) and target != "CPU"
     model.train(config.epoch_size - config.pretrain_epoch_size, dataset, callbacks=cb,
                 sink_size=dataset.get_dataset_size(), dataset_sink_mode=dataset_sink_mode)
+
+    ckpt_list = glob.glob("/cache/training/resnet*.ckpt")
+    if not ckpt_list:
+        print("ckpt file not generated.")
+
+    ckpt_list.sort(key=os.path.getmtime)
+    ckpt_model = ckpt_list[-1]
+    print("checkpoint path", ckpt_model)
+
+    net = resnet(config.class_num)
+
+    frozen_to_air_args = {'ckpt_file': ckpt_model,
+                          'batch_size': 16,
+                          'height': 304,
+                          'width': 304,
+                          'file_name': '/cache/training/resnet',
+                          'file_format': 'AIR'}
+    frozen_to_air(net, frozen_to_air_args)
+
     mox.file.copy_parallel(CACHE_TRAINING_URL, args_opt.train_url)
 

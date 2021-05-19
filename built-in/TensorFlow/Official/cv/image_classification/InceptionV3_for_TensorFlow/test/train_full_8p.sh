@@ -83,8 +83,7 @@ do
         autotune_dump_path=${cur_path}/output/autotune_dump
         mkdir -p ${autotune_dump_path}/GA
         mkdir -p ${autotune_dump_path}/rl
-        cp -rf $install_path/fwkacllib/data/tiling/Ascend910/custom ${autotune_dump_path}/GA/
-        cp -rf $install_path/fwkacllib/data/rl/Ascend910/custom ${autotune_dump_path}/RL/
+    
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
     fi
@@ -98,9 +97,20 @@ fi
 
 #autotune时，先开启autotune执行单P训练，不需要修改
 if [[ $autotune == True ]]; then
-    train_full_1p.sh --autotune=$autotune --data_path=$data_path
+    sh -x train_full_1p.sh --autotune=$autotune --data_path=$data_path
+	wait
+	cp -rf $install_path/fwkacllib/data/tiling/Ascend910/custom ${autotune_dump_path}/GA/
+    cp -rf $install_path/fwkacllib/data/rl/Ascend910/custom ${autotune_dump_path}/RL/
     wait
     autotune=False
+	 export autotune=False
+	 
+	export RANK_SIZE=8
+    export RANK_TABLE_FILE=${cur_path}/../configs/8p.json
+    export JOB_ID=10087
+    RANK_ID_START=0
+	unset TE_PARALLEL_COMPILER
+	 
 fi
 
 #训练开始时间，不需要修改

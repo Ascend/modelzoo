@@ -102,9 +102,6 @@ class CRNN(torch.nn.Module):
         return output
 
 
-pth_file_path = "checkpoint_6_acc_0.7887.pth"
-
-
 def proc_node_module(checkpoint, AttrName):
     new_state_dict = OrderedDict()
     for k, v in checkpoint[AttrName].items():
@@ -127,7 +124,7 @@ def lstm_op_adapter(state_dict):
     return ret
 
 
-def convert(pth_file_path):
+def convert(pth_file_path, onnx_path):
     checkpoint = torch.load(pth_file_path, map_location='cpu')
     checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
     model = CRNN(32, 1, 37, 256)
@@ -139,10 +136,12 @@ def convert(pth_file_path):
     output_names = ["output1"]
     dummy_input = torch.randn(1, 1, 32, 100)
     dynamic_axes = {"actual_imput_1": {0: "-1"}, "output1": {1: "-1"}}
-    torch.onnx.export(model, dummy_input, "crnn_npu_dy.onnx",
+    torch.onnx.export(model, dummy_input, onnx_path,
                       input_names=input_names, dynamic_axes=dynamic_axes,
                       output_names=output_names, opset_version=11)
 
 
 if __name__ == "__main__":
-    convert(pth_file_path)
+    pth_file_path = "checkpoint_6_acc_0.7887.pth"
+    onnx_path = "crnn_npu_dy.onnx"
+    convert(pth_file_path, onnx_path)

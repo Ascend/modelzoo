@@ -29,11 +29,10 @@ def proc_node_module(checkpoint, AttrName):
     return new_state_dict
 
 
-def convert():
-    model = shufflenet_v2_x1_0()
+def convert(path, onnx_path, num_classes=1000):
+    model = shufflenet_v2_x1_0(num_classes=num_classes)
     model.eval()
 
-    path = "checkpoints.pth"
     checkpoint = torch.load(path, map_location='cpu')
     try:
         model.load_state_dict(checkpoint)
@@ -44,11 +43,14 @@ def convert():
     input_names = ["actual_input_1"]
     output_names = ["output1"]
     dummy_input = torch.randn(16, 3, 224, 224)
-    torch.onnx.export(model, dummy_input, "shufflenetv2_x1_npu_16.onnx", input_names=input_names,
+    torch.onnx.export(model, dummy_input, onnx_path, input_names=input_names,
                       output_names=output_names,
                       opset_version=11)
     print('onnx export done.')
 
 
 if __name__ == "__main__":
-    convert()
+    path = "checkpoints.pth"
+    onnx_path = "shufflenetv2_x1_npu_16.onnx"
+    num_classes = 1000
+    convert(path, onnx_path, num_classes)

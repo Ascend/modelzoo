@@ -31,8 +31,8 @@ def proc_nodes_module(checkpoint, AttrName):
     return new_state_dict
 
 
-def convert():
-    checkpoint = torch.load("./Densenet121_Checkpoint.pth.tar", map_location='cpu')
+def convert(pth_file_path, onnx_file_path):
+    checkpoint = torch.load(pth_file_path, map_location='cpu')
     checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
     model = densenet121(pretrained=False)
     model.load_state_dict(checkpoint['state_dict'])
@@ -42,9 +42,11 @@ def convert():
     input_names = ["actual_input_1"]
     output_names = ["output1"]
     dummy_input = torch.randn(16, 3, 224, 224)
-    torch.onnx.export(model, dummy_input, "densenet121_bs16.onnx", input_names=input_names, output_names=output_names,
+    torch.onnx.export(model, dummy_input, onnx_file_path, input_names=input_names, output_names=output_names,
                       opset_version=11)
 
 
 if __name__ == "__main__":
-    convert()
+    src_file_path = "checkpoint.pth.tar"
+    dst_file_path = "densenet.onnx"
+    convert(src_file_path, dst_file_path)

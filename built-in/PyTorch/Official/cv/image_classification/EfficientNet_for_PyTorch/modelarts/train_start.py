@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import argparse
+import glob
 import os
 import re
 import sys
@@ -37,6 +38,8 @@ from apex import amp
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../'))
 from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch import rand_augment_transform, augment_and_mix_transform, auto_augment_transform
+from pthtar2onnx import convert
+
 import moxing as mox
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
@@ -119,6 +122,8 @@ parser.add_argument('--data_url',
                     metavar='DIR',
                     default='/cache/data_url',
                     help='path to dataset')
+parser.add_argument('--onnx', default=True, action='store_true',
+                    help="convert pth model to onnx")
 
 cur_step = 0
 CACHE_TRAINING_URL = "/cache/training/"
@@ -344,6 +349,24 @@ def main_worker(npu, nnpus_per_node, args):
         if args.stop_step_num is not None and cur_step >= args.stop_step_num:
             break
 
+    if args.onnx:
+        convert_pth_to_onnx()
+
+    # --------------modelarts modification----------
+    mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
+    # --------------modelarts modification end----------
+
+
+def convert_pth_to_onnx():
+    pth_pattern = os.path.join(CACHE_TRAINING_URL, 'checkpoint.pth')
+    pth_file_list = glob.glob(pth_pattern)
+    if not pth_file_list:
+        print(f"can't find pth {pth_pattern}")
+        return
+    pth_file = pth_file_list[0]
+    onnx_path = pth_file.split(".")[0] + '.onnx'
+    convert(pth_file, onnx_path)
+
 
 def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node):
     global cur_step
@@ -466,11 +489,8 @@ def save_checkpoint(state, filename='checkpoint.pth'):
     if not os.path.exists(CACHE_TRAINING_URL):
         os.makedirs(CACHE_TRAINING_URL, 0o755)
 
-    torch.save(state, CACHE_TRAINING_URL + filename)
-
-    # --------------modelarts modification----------
-    mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
-    # --------------modelarts modification end----------
+    checkpoint_file_path = os.path.join(CACHE_TRAINING_URL, filename)
+    torch.save(state, checkpoint_file_path)
 
 
 class AverageMeter(object):

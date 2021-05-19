@@ -44,7 +44,7 @@
 		"mxpi_tensorinfer0": {
 			"props": {
 				"dataSource": "mxpi_imageresize0",
-				"modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/ssd_1000-2_on_micro_ctrl_bgr.om"
+				"modelPath": "/home/sam/codes/SSD_for_MindSpore/infer/convert/models/finetune_mc/ssd-300_9_mc_bgr.om"
 			},
 			"factory": "mxpi_tensorinfer",
 			"next": "mxpi_objectpostprocessor0"

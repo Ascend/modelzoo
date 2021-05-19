@@ -104,6 +104,15 @@ flags.DEFINE_integer("save_checkpoints_steps", 10000,
 flags.DEFINE_integer("display_loss_steps", 10,
                      "How often to print loss")
 
+# modify for npu overflow start
+# enable overflow
+flags.DEFINE_string("over_dump", "False",
+                    "whether to enable overflow")
+flags.DEFINE_string("over_dump_path", "./",
+                    "path to save overflow dump files")
+# modify for npu overflow end
+
+
 flags.DEFINE_integer("iterations_per_loop", 1000,
                      "How many steps to make in each estimator call.")
 
@@ -620,20 +629,42 @@ def main(_):
       config.graph_options.rewrite_options.memory_optimization = rewriter_config_pb2.RewriterConfig.NO_MEM_OPT
 
   #run_config = tf.estimator.RunConfig(
-  run_config = NPURunConfig(
-      model_dir=FLAGS.output_dir,
-      save_summary_steps=0,
-      session_config=config,
-      save_checkpoints_steps=FLAGS.save_checkpoints_steps if not FLAGS.horovod or hvd.rank() == 0 else None,
-      # This variable controls how often estimator reports examples/sec.
-      # Default value is every 100 steps.
-      # When --report_loss is True, we set to very large value to prevent
-      # default info reporting from estimator.
-      # Ideally we should set it to None, but that does not work.
-      log_step_count_steps=1 if FLAGS.report_loss else 100,
-      enable_data_pre_proc=FLAGS.npu_bert_use_tdt,
-      iterations_per_loop=FLAGS.iterations_per_loop,
-      hcom_parallel=FLAGS.hcom_parallel)
+  if FLAGS.over_dump == "True":
+      print("NPU overflow dump is enabled")
+      from npu_bridge.npu_init import DumpConfig
+      dump_config = DumpConfig(
+          enable_dump_debug=True, dump_path=FLAGS.over_dump_path, dump_debug_mode="all")
+      run_config = NPURunConfig(
+          dump_config=dump_config,
+          model_dir=FLAGS.output_dir,
+          save_summary_steps=0,
+          session_config=config,
+          save_checkpoints_steps=FLAGS.save_checkpoints_steps if not FLAGS.horovod or hvd.rank() == 0 else None,
+          # This variable controls how often estimator reports examples/sec.
+          # Default value is every 100 steps.
+          # When --report_loss is True, we set to very large value to prevent
+          # default info reporting from estimator.
+          # Ideally we should set it to None, but that does not work.
+          log_step_count_steps=1 if FLAGS.report_loss else 100,
+          enable_data_pre_proc=FLAGS.npu_bert_use_tdt,
+          iterations_per_loop=FLAGS.iterations_per_loop,
+          hcom_parallel=FLAGS.hcom_parallel)
+  else:
+      print("NPU overflow dump is disabled")
+      run_config = NPURunConfig(
+          model_dir=FLAGS.output_dir,
+          save_summary_steps=0,
+          session_config=config,
+          save_checkpoints_steps=FLAGS.save_checkpoints_steps if not FLAGS.horovod or hvd.rank() == 0 else None,
+          # This variable controls how often estimator reports examples/sec.
+          # Default value is every 100 steps.
+          # When --report_loss is True, we set to very large value to prevent
+          # default info reporting from estimator.
+          # Ideally we should set it to None, but that does not work.
+          log_step_count_steps=1 if FLAGS.report_loss else 100,
+          enable_data_pre_proc=FLAGS.npu_bert_use_tdt,
+          iterations_per_loop=FLAGS.iterations_per_loop,
+          hcom_parallel=FLAGS.hcom_parallel)
 
   if FLAGS.distributed:
     rank_size = int(os.getenv('RANK_SIZE'))

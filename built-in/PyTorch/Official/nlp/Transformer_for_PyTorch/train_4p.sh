@@ -18,7 +18,7 @@ python3 train_np.py $DATA_DIR \
   --optimizer adam \
   --adam-beta1 0.9 \
   --adam-beta2 0.997 \
-  --addr 'XX.XXX.XXX.XXX' \
+  --addr=$(hostname -I |awk '{print $1}') \
   --adam-eps "1e-9" \
   --clip-norm 0.0 \
   --lr-scheduler inverse_sqrt \
@@ -32,6 +32,7 @@ python3 train_np.py $DATA_DIR \
   --label-smoothing 0.1 \
   --max-sentences 128\
   --max-tokens 102400 \
+  --max-epoch 40\
   --seed 1 \
   --save-dir $MODELDIR \
   --stat-file $STAT_FILE\

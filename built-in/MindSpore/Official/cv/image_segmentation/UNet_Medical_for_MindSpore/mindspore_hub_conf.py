@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """hub config."""
-from src.unet import UNet
+from src.unet_medical import UNet
 
 def create_network(name, *args, **kwargs):
     if name == "unet2d":

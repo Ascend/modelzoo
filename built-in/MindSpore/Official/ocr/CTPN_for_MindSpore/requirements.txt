@@ -1,0 +1,5 @@
+python-Levenshtein
+Pillow
+xml-python
+matplotlib
+mmcv==0.2.14

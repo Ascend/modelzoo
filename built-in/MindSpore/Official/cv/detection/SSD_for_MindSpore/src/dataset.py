@@ -313,7 +313,7 @@ def anno_parser(annos_str):
     return annos
 
 
-def filter_valid_data(image_dir, anno_path):
+def filter_valid_data(image_dir, anno_path, dataset='coco'):
     """Filter valid image file, which both in image_dir and anno_path."""
     images = []
     image_path_dict = {}
@@ -325,15 +325,27 @@ def filter_valid_data(image_dir, anno_path):
 
     with open(anno_path, "rb") as f:
         lines = f.readlines()
-    for img_id, line in enumerate(lines):
-        line_str = line.decode("utf-8").strip()
-        line_split = str(line_str).split(' ')
-        file_name = line_split[0]
-        image_path = os.path.join(image_dir, file_name)
-        if os.path.isfile(image_path):
-            images.append(img_id)
-            image_path_dict[img_id] = image_path
-            image_anno_dict[img_id] = anno_parser(line_split[1:])
+    if dataset == 'coco':
+        for img_id, line in enumerate(lines):
+            line_str = line.decode("utf-8").strip()
+            line_split = str(line_str).split(' ')
+            file_name = line_split[0]
+            image_path = os.path.join(image_dir, file_name)
+            if os.path.isfile(image_path):
+                images.append(img_id)
+                image_path_dict[img_id] = image_path
+                image_anno_dict[img_id] = anno_parser(line_split[1:])
+    else:
+        for line in lines:
+            line_str = line.decode("utf-8").strip()
+            line_split = str(line_str).split(' ')
+            file_name = line_split[0]
+            image_path = os.path.join(image_dir, file_name)
+            if os.path.isfile(image_path):
+                img_id = int(os.path.basename(file_name).split('.')[0])
+                images.append(img_id)
+                image_path_dict[img_id] = image_path
+                image_anno_dict[img_id] = anno_parser(line_split[1:])
 
     return images, image_path_dict, image_anno_dict
 
@@ -370,10 +382,11 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
     if dataset == "coco":
         images, image_path_dict, image_anno_dict = create_coco_label(is_training)
     else:
-        images, image_path_dict, image_anno_dict = filter_valid_data(config.image_dir, config.anno_path)
+        images, image_path_dict, image_anno_dict = filter_valid_data(
+            config.image_dir, config.anno_path, dataset=dataset)
 
     ssd_json = {
-        "img_id": {"type": "int32", "shape": [1]},
+        "img_id": {"type": "int64", "shape": [1]},
         "image": {"type": "bytes"},
         "annotation": {"type": "int32", "shape": [-1, 5]},
     }
@@ -384,7 +397,7 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
         with open(image_path, 'rb') as f:
             img = f.read()
         annos = np.array(image_anno_dict[img_id], dtype=np.int32)
-        img_id = np.array([img_id], dtype=np.int32)
+        img_id = np.array([img_id], dtype=np.int64)
         row = {"img_id": img_id, "image": img, "annotation": annos}
         writer.write_raw_data([row])
     writer.commit()
@@ -419,14 +432,16 @@ def create_ssd_dataset(mindrecord_file, batch_size=32, repeat_num=10, device_num
     return ds
 
 
-def create_mindrecord(dataset="coco", prefix="ssd.mindrecord", is_training=True):
+def create_mindrecord(dataset="coco", prefix="ssd.mindrecord",
+                      is_training=True, file_num=8):
     print("Start create dataset!")
 
     # It will generate mindrecord file in config.mindrecord_dir,
     # and the file name is ssd.mindrecord0, 1, ... file_num.
 
     mindrecord_dir = config.mindrecord_dir
-    mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
+    num_suffix = "0" if file_num > 1 else ""
+    mindrecord_file = os.path.join(mindrecord_dir, prefix + num_suffix)
     if not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
@@ -447,7 +462,8 @@ def create_mindrecord(dataset="coco", prefix="ssd.mindrecord", is_training=True)
         else:
             if os.path.isdir(config.image_dir) and os.path.exists(config.anno_path):
                 print("Create Mindrecord.")
-                data_to_mindrecord_byte_image("other", is_training, prefix)
+                data_to_mindrecord_byte_image("other", is_training, prefix,
+                                              file_num=file_num)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("image_dir or anno_path not exits.")

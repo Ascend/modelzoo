@@ -230,6 +230,15 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 
+3、用户根据网络状态必须配置modelzoo_level.txt文件，且文件内容包含三个关键字段：FuncStatus(值可填写OK-流程通过/NOK-流程失败)；PerfStatus(值可填OK-持平GPU/NOK-低于GPU/PERFECT-超过GPU)；PrecisionStatus(OK-精度达标,NOK-Loss拟合，精度未实施)；若网络功能、性能、精度均通过，内容格式如下所示（注：“:”两侧无需空格，英文格式；）： 
+            
+```
+            FuncStatus:OK
+            PerfStatus:OK
+            PrecisionStatus:OK
+```
+
+
  **六、编程规范**
 
 - 规范标准

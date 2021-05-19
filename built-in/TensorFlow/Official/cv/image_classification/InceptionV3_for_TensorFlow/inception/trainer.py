@@ -58,7 +58,28 @@ class Trainer(object):
             from npu_bridge.npu_init import DumpConfig
             dump_config = DumpConfig(
                 enable_dump_debug=True, dump_path=self.args.over_dump_path, dump_debug_mode="all")
-            run_config = NPURunConfig(
+            if "autotune" in os.environ:
+        
+        
+                print ("autotune value is " + os.environ["autotune"])
+            
+                if os.environ["autotune"] == "True":
+            
+                    print ("autotune is set !") 
+                    run_config = NPURunConfig(
+                dump_config=dump_config,
+                hcom_parallel=True,
+                precision_mode="allow_mix_precision",
+                enable_data_pre_proc=True,
+                save_checkpoints_steps=self.args.nsteps_per_epoch * 10,
+                auto_tune_mode="RL,GA",
+                session_config=self.sess.estimator_config,
+                model_dir=self.args.log_dir,
+                iterations_per_loop=self.args.iterations_per_loop,
+                keep_checkpoint_max=5)
+                else:
+                    print ("autotune is not set ")
+                    run_config = NPURunConfig(
                 dump_config=dump_config,
                 hcom_parallel=True,
                 precision_mode="allow_mix_precision",
@@ -68,9 +89,10 @@ class Trainer(object):
                 model_dir=self.args.log_dir,
                 iterations_per_loop=self.args.iterations_per_loop,
                 keep_checkpoint_max=5)
-        else:
-            print("NPU overflow dump is disabled")
-            run_config = NPURunConfig(
+                
+            else:
+                run_config = NPURunConfig(
+                dump_config=dump_config,
                 hcom_parallel=True,
                 precision_mode="allow_mix_precision",
                 enable_data_pre_proc=True,
@@ -79,6 +101,52 @@ class Trainer(object):
                 model_dir=self.args.log_dir,
                 iterations_per_loop=self.args.iterations_per_loop,
                 keep_checkpoint_max=5)
+                
+        else:
+        
+            if "autotune" in os.environ:
+        
+        
+                print ("autotune value is " + os.environ["autotune"])
+            
+                if os.environ["autotune"] == "True":
+            
+                    print ("autotune is set !")
+                                        
+                    print("NPU overflow dump is disabled")
+                    run_config = NPURunConfig(
+                hcom_parallel=True,
+                precision_mode="allow_mix_precision",
+                enable_data_pre_proc=True,
+                save_checkpoints_steps=self.args.nsteps_per_epoch * 10,
+                auto_tune_mode="RL,GA",
+                session_config=self.sess.estimator_config,
+                model_dir=self.args.log_dir,
+                iterations_per_loop=self.args.iterations_per_loop,
+                keep_checkpoint_max=5)
+                
+                else:
+                    run_config = NPURunConfig(
+                hcom_parallel=True,
+                precision_mode="allow_mix_precision",
+                enable_data_pre_proc=True,
+                save_checkpoints_steps=self.args.nsteps_per_epoch * 10,
+                session_config=self.sess.estimator_config,
+                model_dir=self.args.log_dir,
+                iterations_per_loop=self.args.iterations_per_loop,
+                keep_checkpoint_max=5)
+                
+            else:
+                run_config = NPURunConfig(
+                hcom_parallel=True,
+                precision_mode="allow_mix_precision",
+                enable_data_pre_proc=True,
+                save_checkpoints_steps=self.args.nsteps_per_epoch * 10,
+                session_config=self.sess.estimator_config,
+                model_dir=self.args.log_dir,
+                iterations_per_loop=self.args.iterations_per_loop,
+                keep_checkpoint_max=5)           
+                
         # modify for npu overflow end
 
         classifier =NPUEstimator(
