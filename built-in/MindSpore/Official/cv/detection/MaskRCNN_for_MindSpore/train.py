@@ -6,7 +6,7 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# less required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -23,7 +23,7 @@ import ast
 import mindspore.common.dtype as mstype
 from mindspore import context, Tensor
 from mindspore.communication.management import init
-from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor, LossMonitor
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -124,10 +124,10 @@ if __name__ == '__main__':
 
         net_with_loss = WithLossCell(net, loss)
         if args_opt.run_distribute:
-            net = TrainOneStepCell(net_with_loss, net, opt, sens=config.loss_scale, reduce_flag=True,
+            net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale, reduce_flag=True,
                                    mean=True, degree=device_num)
         else:
-            net = TrainOneStepCell(net_with_loss, net, opt, sens=config.loss_scale)
+            net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale)
 
         time_cb = TimeMonitor(data_size=dataset_size)
         loss_cb = LossCallBack(rank_id=rank)
@@ -138,9 +138,6 @@ if __name__ == '__main__':
             save_checkpoint_path = os.path.join(config.save_checkpoint_path, 'ckpt_' + str(rank) + '/')
             ckpoint_cb = ModelCheckpoint(prefix='mask_rcnn', directory=save_checkpoint_path, config=ckptconfig)
             cb += [ckpoint_cb]
+
         model = Model(net)
-        if config.dataset_sink_mode:
-            model.train(config.epoch_size, dataset, callbacks=cb)
-        else:
-            cb.append(LossMonitor(config.steps_of_echo_loss))
-            model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=False)
+        model.train(config.epoch_size, dataset, callbacks=cb)

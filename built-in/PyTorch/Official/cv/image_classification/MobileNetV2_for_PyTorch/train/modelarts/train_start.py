@@ -218,8 +218,8 @@ def main_worker(args):
 
         print("loading checkpoint '{}'".format(args.pretrain))
         pretrained_dict = torch.load(args.pretrain, map_location="cpu")['state_dict']
-        pretrained_dict.pop('classifier.1.weight')
-        pretrained_dict.pop('classifier.1.bias')
+        pretrained_dict.pop('module.classifier.1.weight')
+        pretrained_dict.pop('module.classifier.1.bias')
         model.load_state_dict(pretrained_dict, strict=False)
         print("loaded checkpoint '{}'".format(args.pretrain))
 

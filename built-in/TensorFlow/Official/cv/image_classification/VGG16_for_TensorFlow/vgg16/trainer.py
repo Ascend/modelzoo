@@ -44,7 +44,7 @@ class Trainer(object):
             hcom_parallel=True,
             precision_mode="allow_mix_precision",
             enable_data_pre_proc=True,
-            save_checkpoints_steps=self.args.nsteps_per_epoch,
+            save_checkpoints_steps=self.args.nsteps_per_epoch * self.args.epochs_between_evals,
             session_config=self.sess.estimator_config,
             model_dir=self.args.log_dir,
             iterations_per_loop=self.args.iterations_per_loop,

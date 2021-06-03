@@ -67,7 +67,7 @@ if [ "$precision" = "fp16" ] ; then
   use_fp16=" --fp16 "
 fi
 
-if [ $(uname -m) = "aarch64" ]
+if [ $(uname -m) = "aarch64" ]; then
 	CMD="taskset -c 0-47 python3.7 run_squad.py "
 else
     CMD="python3.7 run_squad.py "

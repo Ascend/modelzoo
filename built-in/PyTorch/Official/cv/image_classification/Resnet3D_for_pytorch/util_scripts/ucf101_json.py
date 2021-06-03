@@ -22,7 +22,7 @@ from .utils import get_n_frames
 
 
 def convert_csv_to_dict(csv_path, subset):
-    data = pd.read_csv(csv_path, delimiter=' ', header=None)
+    data = pd.read_csv(csv_path, delimiter=' ', header=None, error_bad_lines=False)
     keys = []
     key_labels = []
     for i in range(data.shape[0]):
@@ -46,7 +46,7 @@ def convert_csv_to_dict(csv_path, subset):
 
 
 def load_labels(label_csv_path):
-    data = pd.read_csv(label_csv_path, delimiter=' ', header=None)
+    data = pd.read_csv(label_csv_path, delimiter=' ', header=None, error_bad_lines=False)
     labels = []
     for i in range(data.shape[0]):
         labels.append(data.iloc[i, 1])

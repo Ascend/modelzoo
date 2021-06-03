@@ -40,7 +40,7 @@ base_path = os.path.split(os.path.realpath(__file__))[0]
 sys.path.append(base_path + "/..")
 sys.path.append(base_path + "/../models")
 sys.path.append(base_path + "/../../")
-sys.path.append(base_path + "/../../models")
+sys.path.append(base_path + "/../../src")
 
 from utils import create_session as cs
 from utils import logger as lg

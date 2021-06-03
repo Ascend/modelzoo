@@ -44,6 +44,8 @@ def parse_args():
     # model
     parser.add_argument('--model', type=str, default='deeplab_v3_s16', help='select model')
     parser.add_argument('--ckpt_path', type=str, default='', help='model to evaluate')
+    parser.add_argument("--input_format", type=str, choices=["NCHW", "NHWC"], default="NCHW",
+                        help="NCHW or NHWC")
     args_space, _ = parser.parse_known_args()
     return args_space
 

@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ from mindspore.common.tensor import Tensor
 
 class BboxAssignSampleForRcnn(nn.Cell):
     """
-    Bbox assigner and sampler defination.
+    Bbox assigner and sampler definition.
 
     Args:
         config (dict): Config.
@@ -45,6 +45,8 @@ class BboxAssignSampleForRcnn(nn.Cell):
     def __init__(self, config, batch_size, num_bboxes, add_gt_as_proposals):
         super(BboxAssignSampleForRcnn, self).__init__()
         cfg = config
+        self.dtype = np.float32
+        self.ms_type = mstype.float32
         self.batch_size = batch_size
         self.neg_iou_thr = cfg.neg_iou_thr_stage2
         self.pos_iou_thr = cfg.pos_iou_thr_stage2
@@ -57,8 +59,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
 
         self.add_gt_as_proposals = add_gt_as_proposals
         self.label_inds = Tensor(np.arange(1, self.num_gts + 1).astype(np.int32))
-        self.add_gt_as_proposals_valid = Tensor(np.array(self.add_gt_as_proposals * np.ones(self.num_gts),
-                                                         dtype=np.int32))
+        self.add_gt_as_proposals_valid = Tensor(np.full(self.num_gts, self.add_gt_as_proposals, dtype=np.int32))
 
         self.concat = P.Concat(axis=0)
         self.max_gt = P.ArgMaxWithValue(axis=0)
@@ -83,29 +84,29 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.tile = P.Tile()
 
         # Check
-        self.check_gt_one = Tensor(np.array(-1 * np.ones((self.num_gts, 4)), dtype=np.float32))
-        self.check_anchor_two = Tensor(np.array(-2 * np.ones((self.num_bboxes, 4)), dtype=np.float32))
+        self.check_gt_one = Tensor(np.full((self.num_gts, 4), -1, dtype=self.dtype))
+        self.check_anchor_two = Tensor(np.full((self.num_bboxes, 4), -2, dtype=self.dtype))
 
         # Init tensor
-        self.assigned_gt_inds = Tensor(np.array(-1 * np.ones(num_bboxes), dtype=np.int32))
+        self.assigned_gt_inds = Tensor(np.full(num_bboxes, -1, dtype=np.int32))
         self.assigned_gt_zeros = Tensor(np.array(np.zeros(num_bboxes), dtype=np.int32))
         self.assigned_gt_ones = Tensor(np.array(np.ones(num_bboxes), dtype=np.int32))
-        self.assigned_gt_ignores = Tensor(np.array(-1 * np.ones(num_bboxes), dtype=np.int32))
+        self.assigned_gt_ignores = Tensor(np.full(num_bboxes, -1, dtype=np.int32))
         self.assigned_pos_ones = Tensor(np.array(np.ones(self.num_expected_pos), dtype=np.int32))
 
-        self.gt_ignores = Tensor(np.array(-1 * np.ones(self.num_gts), dtype=np.int32))
-        self.range_pos_size = Tensor(np.arange(self.num_expected_pos).astype(np.float32))
+        self.gt_ignores = Tensor(np.full(self.num_gts, -1, dtype=np.int32))
+        self.range_pos_size = Tensor(np.arange(self.num_expected_pos).astype(self.dtype))
         self.check_neg_mask = Tensor(np.array(np.ones(self.num_expected_neg - self.num_expected_pos), dtype=np.bool))
-        self.bboxs_neg_mask = Tensor(np.zeros((self.num_expected_neg, 4), dtype=np.float32))
+        self.bboxs_neg_mask = Tensor(np.zeros((self.num_expected_neg, 4), dtype=self.dtype))
         self.labels_neg_mask = Tensor(np.array(np.zeros(self.num_expected_neg), dtype=np.uint8))
 
         self.reshape_shape_pos = (self.num_expected_pos, 1)
         self.reshape_shape_neg = (self.num_expected_neg, 1)
 
-        self.scalar_zero = Tensor(0.0, dtype=mstype.float32)
-        self.scalar_neg_iou_thr = Tensor(self.neg_iou_thr, dtype=mstype.float32)
-        self.scalar_pos_iou_thr = Tensor(self.pos_iou_thr, dtype=mstype.float32)
-        self.scalar_min_pos_iou = Tensor(self.min_pos_iou, dtype=mstype.float32)
+        self.scalar_zero = Tensor(0.0, dtype=self.ms_type)
+        self.scalar_neg_iou_thr = Tensor(self.neg_iou_thr, dtype=self.ms_type)
+        self.scalar_pos_iou_thr = Tensor(self.pos_iou_thr, dtype=self.ms_type)
+        self.scalar_min_pos_iou = Tensor(self.min_pos_iou, dtype=self.ms_type)
 
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids):
         gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
@@ -149,12 +150,12 @@ class BboxAssignSampleForRcnn(nn.Cell):
         # Get pos index
         pos_index, valid_pos_index = self.random_choice_with_mask_pos(self.greater(assigned_gt_inds5, 0))
 
-        pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), mstype.float32)
+        pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), self.ms_type)
         pos_check_valid = self.sum_inds(pos_check_valid, -1)
         valid_pos_index = self.less(self.range_pos_size, pos_check_valid)
         pos_index = pos_index * self.reshape(self.cast(valid_pos_index, mstype.int32), (self.num_expected_pos, 1))
 
-        num_pos = self.sum_inds(self.cast(self.logicalnot(valid_pos_index), mstype.float32), -1)
+        num_pos = self.sum_inds(self.cast(self.logicalnot(valid_pos_index), self.ms_type), -1)
         valid_pos_index = self.cast(valid_pos_index, mstype.int32)
         pos_index = self.reshape(pos_index, self.reshape_shape_pos)
         valid_pos_index = self.reshape(valid_pos_index, self.reshape_shape_pos)

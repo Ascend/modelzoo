@@ -22,22 +22,23 @@ echo "running....... please see details by log.txt"
 echo "=============================================================================================================="
 
 
-mkdir -p ms_log
+# mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
-export GLOG_log_dir=${CUR_DIR}/ms_log
-export GLOG_logtostderr=0
+# export GLOG_log_dir=${CUR_DIR}/ms_log
+# export GLOG_logtostderr=0
 python ${PROJECT_DIR}/../run_general_distill.py  \
     --distribute="false" \
     --device_target="Ascend" \
-    --epoch_size=3 \
+    --epoch_size=20 \
     --device_id=0 \
     --enable_data_sink="true" \
     --data_sink_steps=100 \
     --save_ckpt_step=100 \
     --max_ckpt_num=1 \
-    --save_ckpt_path="" \
-    --load_teacher_ckpt_path="" \
-    --data_dir="" \
+    --save_ckpt_path="./ckpt" \
+    --load_teacher_ckpt_path="/home/admin/code/tinybert/bert_base_uncased.ckpt" \
+    --resume_ckpt="" \
+    --data_dir="/home/admin/dataset/enwiki/uncased/" \
     --schema_dir="" \
-    --dataset_type="tfrecord" > log.txt 2>&1 &
+    --dataset_type="tfrecord" &

@@ -17,6 +17,7 @@ import argparse
 import numpy as np
 
 import mindspore as ms
+import mindspore.common.dtype as mstype
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 
 from src.FasterRcnn.faster_rcnn_r50 import FasterRcnn_Infer
@@ -31,7 +32,9 @@ parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"
 parser.add_argument('--ckpt_file', type=str, default='', help='fasterrcnn ckpt file.')
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
+if args.device_target == "Ascend":
+    context.set_context(device_id=args.device_id)
 
 if __name__ == '__main__':
     net = FasterRcnn_Infer(config=config)
@@ -44,6 +47,11 @@ if __name__ == '__main__':
 
     load_param_into_net(net, param_dict_new)
 
-    img = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), ms.float32)
+    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    if device_type == "Ascend":
+        net.to_float(mstype.float16)
 
-    export(net, img, file_name=args.file_name, file_format=args.file_format)
+    img = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), ms.float32)
+    img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[config.test_batch_size, 4]), ms.float32)
+
+    export(net, img, img_metas, file_name=args.file_name, file_format=args.file_format)

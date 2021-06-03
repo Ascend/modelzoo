@@ -45,7 +45,7 @@ python3 wikiextractor/WikiExtractor.py wiki/enwiki-20200101-pages-articles-multi
 ./process_wiki.sh '<text/*/wiki_??'  
 python3 extract_test_set_articles.py  
 ```
-  
+
 MD5sums:
 7f59165e21b7d566db610ff6756c926b - bert_config.json  
 00d47075e0f583fb7c0791fac1c57cb3 - enwiki-20200101-pages-articles-multistream.xml.bz2   
@@ -80,51 +80,4 @@ The training should occur over a minimum of 3,000,000 samples. A valid submissio
 The evaluation will be on the first 10,000 consecutive samples of the training set. The evalution frequency is every 500,000 samples, starting from 3,000,000 samples. The evaluation can be either offline or online for v0.7. More details please refer to the training policy.
 
 The generation of the evaluation set shard should follow the exact command shown above, using create_pretraining_data.py. In particular the seed (12345) must be set to ensure everyone evaluates on the same data.
-
-# Running the model
-
-To run this model, use the following command.
-
-```shell
-
-TF_GPU_THREAD_MODE=gpu_private python3 run_pretraining.py \
-  --all_reduce_alg=nccl \
-  --bert_config_file=<path to bert_config.json> \
-  --beta_1=0.91063 \
-  --beta_2=0.96497 \
-  --device_warmup \
-  --do_eval \
-  --dtype=fp32 \
-  --eval_batch_size=48 \
-  --init_checkpoint=<path to model.ckpt-28252> \
-  '--train_files=<tf_record dir>/part-*' \
-  '--eval_files=<tf_record dir>/part-*' \
-  --learning_rate=0.00035221 \
-  --loss_scale=dynamic \
-  --max_predictions_per_seq=76 \
-  --max_seq_length=512 \
-  --model_dir=<output model dir> \
-  --num_accumulation_steps=24 \
-  --num_gpus=8 \
-  --num_steps_per_epoch=8000 \
-  --num_train_epochs=1 \
-  --optimizer_type=lamb \
-  --scale_loss \
-  --steps_before_eval_start=3948 \
-  --steps_between_eval=658 \
-  --steps_per_loop=658 \
-  --stop_steps=8000 \
-  --train_batch_size=768 \
-  --verbosity=0 \
-  --warmup_steps=420
-
-```
-
-The above parameters are for a machine with 8 V100 GPUs with 16GB memory each; the hyper parameters (learning rate, warm up steps, etc.) are from Google's [TF2 BERT submission](https://github.com/mlperf/training_results_v0.7/tree/master/Google/benchmarks/bert/gpu-v100-8-TF2.0) to v0.7, and should converge after about 3.5 to 4.0 million samples.
-
-The model has been tested using the following stack:
-- Debian GNU/Linux 10 GNU/Linux 4.19.0-12-amd64 x86_64
-- NVIDIA Driver 450.51.06
-- NVIDIA Docker 2.5.0-1 + Docker 19.03.13
-- docker image tensorflow/tensorflow:2.4.0-gpu
 

@@ -761,13 +761,42 @@ def main(_):
     ##################modify for npu######################
     # Creates a `NPURunConfig`
     session_config = tf.ConfigProto(allow_soft_placement=True)
-    
+#modify enable autotune start    
     if FLAGS.over_dump is True:
         print("NPU overflow dump is enabled")
-        from npu_bridge.npu_init import DumpConfig
-        dump_config = DumpConfig(
-            enable_dump_debug=True, dump_path=FLAGS.over_dump_path, dump_debug_mode="all")
-        run_config = NPURunConfig(
+        
+        if "autotune" in os.environ:
+        
+        
+            print ("autotune value is " + os.environ["autotune"])
+            
+            if os.environ["autotune"] == "True":
+            
+                print ("autotune is set !")
+                from npu_bridge.npu_init import DumpConfig
+                dump_config = DumpConfig(
+                enable_dump_debug=True, dump_path=FLAGS.over_dump_path, dump_debug_mode="all")
+                run_config = NPURunConfig(
+            dump_config=dump_config,
+            auto_tune_mode="RL,GA",
+            session_config=session_config,
+            model_dir=FLAGS.output_dir,
+            keep_checkpoint_max=5,
+            save_summary_steps=0,
+            save_checkpoints_steps=115200,
+            iterations_per_loop=10,
+            #enable_data_pre_proc=True,
+            precision_mode='allow_mix_precision',
+           # precision_mode='allow_fp32_to_fp16',
+            #hcom_parallel=True
+        )
+        
+            else:
+                print ("autotune is not set !")
+                from npu_bridge.npu_init import DumpConfig
+                dump_config = DumpConfig(
+                enable_dump_debug=True, dump_path=FLAGS.over_dump_path, dump_debug_mode="all")
+                run_config = NPURunConfig(
             dump_config=dump_config,
             session_config=session_config,
             model_dir=FLAGS.output_dir,
@@ -779,10 +808,53 @@ def main(_):
             precision_mode='allow_mix_precision',
            # precision_mode='allow_fp32_to_fp16',
             #hcom_parallel=True
-        )
+            )
+        else:
+            print ("autotune is not set !")
+            from npu_bridge.npu_init import DumpConfig
+            dump_config = DumpConfig(
+            enable_dump_debug=True, dump_path=FLAGS.over_dump_path, dump_debug_mode="all")
+            run_config = NPURunConfig(
+            dump_config=dump_config,
+            session_config=session_config,
+            model_dir=FLAGS.output_dir,
+            keep_checkpoint_max=5,
+            save_summary_steps=0,
+            save_checkpoints_steps=115200,
+            iterations_per_loop=10,
+            #enable_data_pre_proc=True,
+            precision_mode='allow_mix_precision',
+           # precision_mode='allow_fp32_to_fp16',
+            #hcom_parallel=True
+            )
+        
     else:
         print("NPU overflow dump is disabled")
-        run_config = NPURunConfig(
+        if "autotune" in os.environ:
+        
+        
+            print ("autotune value is " + os.environ["autotune"])
+            
+            if os.environ["autotune"] == "True":
+            
+                print ("autotune is set !")
+                run_config = NPURunConfig(
+            session_config=session_config,
+            auto_tune_mode="RL,GA",
+            model_dir=FLAGS.output_dir,
+            keep_checkpoint_max=5,
+            save_summary_steps=0,
+            save_checkpoints_steps=115200,
+            iterations_per_loop=10,
+            #enable_data_pre_proc=True,
+            precision_mode='allow_mix_precision',
+           # precision_mode='allow_fp32_to_fp16',
+            #hcom_parallel=True
+        )
+        
+            else:
+                print ("autotune is not set !")
+                run_config = NPURunConfig(
             session_config=session_config,
             model_dir=FLAGS.output_dir,
             keep_checkpoint_max=5,
@@ -794,6 +866,23 @@ def main(_):
            # precision_mode='allow_fp32_to_fp16',
             #hcom_parallel=True
         )
+            
+        else:
+            print ("autotune is not set !")
+            run_config = NPURunConfig(
+            session_config=session_config,
+            model_dir=FLAGS.output_dir,
+            keep_checkpoint_max=5,
+            save_summary_steps=0,
+            save_checkpoints_steps=115200,
+            iterations_per_loop=10,
+            #enable_data_pre_proc=True,
+            precision_mode='allow_mix_precision',
+           # precision_mode='allow_fp32_to_fp16',
+            #hcom_parallel=True
+        )        
+        
+         
     ##################npu modify end######################
 
 

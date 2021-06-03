@@ -16,7 +16,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-python3.7 ${currentDir}/DistributedResnet50/main-apex-d76-npu.py \
+python3.7 ${currentDir}/DistributedResnet50/main_apex_d76_npu.py \
         --data /data/imagenet \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed=49 \

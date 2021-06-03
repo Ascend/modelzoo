@@ -69,7 +69,7 @@ def create_pretraining_dataset(input_file, max_pred_length, shared_list, args, w
     train_data = pretraining_dataset(input_file=input_file, max_pred_length=max_pred_length)
     train_sampler = RandomSampler(train_data)
     train_dataloader = DataLoader(train_data, sampler=train_sampler,
-                                  batch_size=args.train_batch_size * args.n_gpu, 
+                                  batch_size=args.train_batch_size * args.n_npu,
                                   num_workers=8, worker_init_fn=worker_init,
                                   drop_last=True)
     return train_dataloader, input_file
@@ -286,12 +286,10 @@ def parse_arguments():
 
 def setup_training(args):
 
-    assert (torch.cuda.is_available())
-
     if args.local_rank == -1:
         torch.npu.set_device("npu:%d" % args.npu_id)
         device = torch.device("npu:%d" % args.npu_id)
-        n_npu = 1 # this is the device number of one training process, usually one
+        args.n_npu = 1 # this is the device number of one training process, usually one
         args.allreduce_post_accumulation = False
         args.allreduce_post_accumulation_fp16 = False
     else:
@@ -300,7 +298,7 @@ def setup_training(args):
         torch.npu.set_device("npu:%d" % args.local_rank)
         device = torch.device("npu:%d" % args.local_rank)
         torch.distributed.init_process_group(backend='hccl', world_size=8, rank=args.local_rank)
-        n_npu = 1
+        args.n_npu = 1
         
     if args.gradient_accumulation_steps == 1:
         args.allreduce_post_accumulation = False
@@ -313,8 +311,8 @@ def setup_training(args):
     else:
         dllogger.init(backends=[])
 
-    print("device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}".format(
-        device, args.n_gpu, bool(args.local_rank != -1), args.fp16))
+    print("device: {} n_npu: {}, distributed training: {}, 16-bits training: {}".format(
+        device, args.n_npu, bool(args.local_rank != -1), args.fp16))
 
     if args.gradient_accumulation_steps < 1:
         raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
@@ -420,7 +418,7 @@ def prepare_model_and_optimizer(args, device):
             model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank], broadcast_buffers=False, find_unused_parameters=True)
         else:
             flat_dist_call([param.data for param in model.parameters()], torch.distributed.broadcast, (0,) )
-    elif args.n_gpu > 1:
+    elif args.n_npu > 1:
         model = torch.nn.DataParallel(model)
 
     criterion = BertPretrainingCriterion(config.vocab_size)
@@ -464,7 +462,7 @@ def main():
     if args.do_train:
         if is_main_process():
             dllogger.log(step="PARAMETER", data={"train_start": True})
-            dllogger.log(step="PARAMETER", data={"batch_size_per_gpu": args.train_batch_size})
+            dllogger.log(step="PARAMETER", data={"batch_size_per_npu": args.train_batch_size})
             dllogger.log(step="PARAMETER", data={"learning_rate": args.learning_rate})
 
         model.train()
@@ -509,7 +507,7 @@ def main():
                 train_data = pretraining_dataset(data_file, args.max_predictions_per_seq)
                 train_sampler = RandomSampler(train_data)
                 train_dataloader = DataLoader(train_data, sampler=train_sampler,
-                                            batch_size=args.train_batch_size * args.n_gpu, 
+                                            batch_size=args.train_batch_size * args.n_npu,
                                             num_workers=8, worker_init_fn=worker_init,
                                             drop_last=True)
                 # shared_file_list["0"] = (train_dataloader, data_file)
@@ -531,14 +529,12 @@ def main():
 
                 dataset_future = pool.submit(create_pretraining_dataset, data_file, args.max_predictions_per_seq, shared_file_list, args, worker_init)
 
-                train_iter = tqdm(train_dataloader, desc="Iteration", disable=args.disable_progress_bar) if is_main_process() else train_dataloader
-
                 if raw_train_start is None:
                     raw_train_start = time.time()
                 step_start_time = time.time()
                 data_start_time = time.time()
 
-                for step, batch in enumerate(train_iter):
+                for step, batch in enumerate(train_dataloader):
 
                     training_steps += 1
                     batch = [t.to(torch.int32).to(device) for t in batch]
@@ -546,7 +542,7 @@ def main():
                     data_time = time.time() - data_start_time
                     prediction_scores, seq_relationship_score = model(input_ids=input_ids, token_type_ids=segment_ids, attention_mask=input_mask)
                     loss = criterion(prediction_scores, seq_relationship_score, masked_lm_labels, next_sentence_labels)
-                    if args.n_gpu > 1:
+                    if args.n_npu > 1:
                         loss = loss.mean()  # mean() to average on multi-gpu.
 
                     divisor = args.gradient_accumulation_steps
@@ -576,14 +572,13 @@ def main():
                         if is_main_process():
                             dllogger.log(step=(epoch, global_step, ), data={"final_loss": final_loss})
                     elif training_steps % (args.log_freq * args.gradient_accumulation_steps) == 0:
+                        step_time = time.time() - step_start_time
                         if is_main_process():
                             dllogger.log(step=(epoch, global_step, ), data={"step_time": round(step_time, 4),
-                                                                            "data_time": round(data_time, 4),
-                                                                            "average_loss": round(average_loss / (args.log_freq * divisor), 8),
-                                                                            "step_loss": round(loss.item() * args.gradient_accumulation_steps / divisor, 8), 
-                                                                            "learning_rate": optimizer.param_groups[0]['lr']})
+                                                                            "average_loss": round(average_loss / (args.log_freq * divisor), 4),
+                                                                            "step_loss": round(loss.item() * args.gradient_accumulation_steps / divisor, 4),
+                                                                            "learning_rate": round(optimizer.param_groups[0]['lr'], 6)})
                         average_loss = 0
-                        dllogger.flush()
                         step_start_time = time.time()
 
 
@@ -617,7 +612,7 @@ def main():
                             del train_dataloader
                             # thread.join()
                             return args, final_loss, train_time_raw, global_step
-                        data_start_time = time.time()
+                    data_start_time = time.time()
 
                 del train_dataloader
                 # thread.join()
@@ -632,15 +627,15 @@ if __name__ == "__main__":
 
     now = time.time()
     args, final_loss, train_time_raw, global_step = main()
-    gpu_count = args.n_gpu
+    npu_count = args.n_npu
     global_step += args.phase1_end_step if (args.phase2 and args.resume_step > 0) else 0
     if args.resume_step == -1:
         args.resume_step = 0
     if torch.distributed.is_initialized():
-        gpu_count = get_world_size()
+        npu_count = get_world_size()
     if is_main_process():
         e2e_time = time.time() - now
-        training_perf = args.train_batch_size * args.gradient_accumulation_steps * gpu_count\
+        training_perf = args.train_batch_size * args.gradient_accumulation_steps * npu_count\
                         * (global_step - args.resume_step + skipped_steps) / train_time_raw
         dllogger.log(step=tuple(), data={"e2e_train_time": e2e_time, "training_sequences_per_second": training_perf,
                                          "final_loss": final_loss, "raw_train_time": train_time_raw })

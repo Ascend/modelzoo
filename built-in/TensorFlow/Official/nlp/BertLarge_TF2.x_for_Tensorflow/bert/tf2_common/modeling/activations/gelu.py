@@ -38,6 +38,9 @@ import tensorflow as tf
 import common_flags
 from tensorflow.python.framework import ops
 from npu_device.npu_device import gen_npu_ops as npu_aicore_ops
+from absl import flags
+
+FLAGS=flags.FLAGS
 
 
 @ops.RegisterGradient("FastGelu")
@@ -66,7 +69,9 @@ def gelu(x):
   Returns:
     `x` with the GELU activation applied.
   """
-  cdf = 0.5 * (1.0 + tf.tanh(
-      (math.sqrt(2 / math.pi) * (x + 0.044715 * tf.pow(x, 3)))))
-  return x * cdf
-  #return npu_aicore_ops.fast_gelu(x)
+  if FLAGS.use_fastgelu:
+    return npu_aicore_ops.fast_gelu(x)
+  else:
+    cdf = 0.5 * (1.0 + tf.tanh(
+        (math.sqrt(2 / math.pi) * (x + 0.044715 * tf.pow(x, 3)))))
+    return x * cdf

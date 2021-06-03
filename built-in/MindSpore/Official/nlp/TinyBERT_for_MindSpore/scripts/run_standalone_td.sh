@@ -20,29 +20,29 @@ echo "bash scipts/run_standalone_td.sh"
 echo "for example: bash scipts/run_standalone_td.sh"
 echo "=============================================================================================================="
 
-mkdir -p ms_log
+# mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
-export GLOG_log_dir=${CUR_DIR}/ms_log
-export GLOG_logtostderr=0
+# export GLOG_log_dir=${CUR_DIR}/ms_log
+# export GLOG_logtostderr=0
 python ${PROJECT_DIR}/../run_task_distill.py \
     --device_target="Ascend" \
     --device_id=0 \
     --do_train="true" \
     --do_eval="true" \
-    --td_phase1_epoch_size=10 \
+    --td_phase1_epoch_size=5 \
     --td_phase2_epoch_size=3 \
-    --task_name="" \
+    --task_name="SST-2" \
     --do_shuffle="true" \
     --enable_data_sink="true" \
     --data_sink_steps=100 \
     --save_ckpt_step=100 \
     --max_ckpt_num=1 \
-    --load_teacher_ckpt_path="" \
-    --load_gd_ckpt_path="" \
-    --load_td1_ckpt_path="" \
-    --train_data_dir="" \
-    --eval_data_dir="" \
+    --load_teacher_ckpt_path="/home/admin/code/tinybert/bert_base_finetune_ascend_1.1.1_sst2.ckpt" \
+    --load_gd_ckpt_path="/home/admin/code/tinybert/scripts/tiny_bert_83_10000.ckpt" \
+    --load_td1_ckpt_path="/home/admin/code/tinybert/scripts/eval_model_0.9039.ckpt" \
+    --train_data_dir="/home/admin/dataset/SST-2/uncased/train/" \
+    --eval_data_dir="/home/admin/dataset/SST-2/uncased/eval/" \
     --schema_dir="" \
     --dataset_type="tfrecord" > log.txt 2>&1 &
 

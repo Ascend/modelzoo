@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+
 """export checkpoint file into air models"""
 
 import re
@@ -26,27 +27,56 @@ from src.tinybert_model import BertModelCLS
 
 parser = argparse.ArgumentParser(description='tinybert task distill')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--ckpt_file", type=str, required=True, help="tinybert ckpt file.")
-parser.add_argument("--file_name", type=str, default="tinybert", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument(
+    "--ckpt_file",
+    type=str,
+    required=True,
+    help="tinybert ckpt file.")
+parser.add_argument(
+    "--file_name",
+    type=str,
+    default="tinybert",
+    help="output file name.")
+parser.add_argument(
+    "--file_format",
+    type=str,
+    choices=[
+        "AIR",
+        "ONNX",
+        "MINDIR"],
+    default="AIR",
+    help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
                     choices=["Ascend", "GPU", "CPU"], help="device target (default: Ascend)")
-parser.add_argument('--task_name', type=str, default='SST-2', choices=['SST-2', 'QNLI', 'MNLI'], help='task name')
+parser.add_argument(
+    '--task_name',
+    type=str,
+    default='SST-2',
+    choices=[
+        'SST-2',
+        'QNLI',
+        'MNLI'],
+    help='task name')
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+context.set_context(
+    mode=context.GRAPH_MODE,
+    device_target=args.device_target,
+    device_id=args.device_id)
 
 DEFAULT_NUM_LABELS = 2
 DEFAULT_SEQ_LENGTH = 128
-DEFAULT_BS = 32
-task_params = {"SST-2": {"num_labels": 2, "seq_length": 64},
+DEFAULT_BS = 1
+task_params = {"SST-2": {"num_labels": 2, "seq_length": 128},
                "QNLI": {"num_labels": 2, "seq_length": 128},
                "MNLI": {"num_labels": 3, "seq_length": 128}}
+
 
 class Task:
     """
     Encapsulation class of get the task parameter.
     """
+
     def __init__(self, task_name):
         self.task_name = task_name
 
@@ -62,12 +92,18 @@ class Task:
             return task_params[self.task_name]["seq_length"]
         return DEFAULT_SEQ_LENGTH
 
+
 if __name__ == '__main__':
     task = Task(args.task_name)
     td_student_net_cfg.seq_length = task.seq_length
     td_student_net_cfg.batch_size = DEFAULT_BS
 
-    eval_model = BertModelCLS(td_student_net_cfg, False, task.num_labels, 0.0, phase_type="student")
+    eval_model = BertModelCLS(
+        td_student_net_cfg,
+        False,
+        task.num_labels,
+        0.0,
+        phase_type="student")
     param_dict = load_checkpoint(args.ckpt_file)
     new_param_dict = {}
     for key, value in param_dict.items():
@@ -78,9 +114,26 @@ if __name__ == '__main__':
     load_param_into_net(eval_model, new_param_dict)
     eval_model.set_train(False)
 
-    input_ids = Tensor(np.zeros((td_student_net_cfg.batch_size, task.seq_length), np.int32))
-    token_type_id = Tensor(np.zeros((td_student_net_cfg.batch_size, task.seq_length), np.int32))
-    input_mask = Tensor(np.zeros((td_student_net_cfg.batch_size, task.seq_length), np.int32))
+    input_ids = Tensor(
+        np.zeros(
+            (td_student_net_cfg.batch_size,
+             task.seq_length),
+            np.int32))
+    token_type_id = Tensor(
+        np.zeros(
+            (td_student_net_cfg.batch_size,
+             task.seq_length),
+            np.int32))
+    input_mask = Tensor(
+        np.zeros(
+            (td_student_net_cfg.batch_size,
+             task.seq_length),
+            np.int32))
 
     input_data = [input_ids, token_type_id, input_mask]
-    export(eval_model, *input_data, file_name=args.file_name, file_format=args.file_format)
+    export(
+        eval_model,
+        *input_data,
+        file_name=args.file_name,
+        file_format=args.file_format)
+    print("export complete!!!!")

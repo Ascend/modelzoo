@@ -10,7 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+source ./npu_set_env.sh
+source ./env_new.sh
 
 DATASET_DIR=/data/wmt14_en_de_joined_dict
 TEXT=examples/translation/wmt14_en_de
@@ -22,7 +23,7 @@ TEXT=examples/translation/wmt14_en_de
 )
 
 
-python preprocess.py \
+python3 preprocess.py \
   --source-lang en \
   --target-lang de \
   --trainpref $TEXT/train \
@@ -36,4 +37,8 @@ python preprocess.py \
 
 cp $TEXT/code $DATASET_DIR/code
 cp $TEXT/tmp/valid.raw.de $DATASET_DIR/valid.raw.de
+pip install sacrebleu
 sacrebleu -t wmt14/full -l en-de --echo ref > $DATASET_DIR/test.raw.de
+
+mkdir ./data/dataset
+mv /data/wmt14_en_de_joined_dict ./data/dataset/wmt14_en_de_joined_dict

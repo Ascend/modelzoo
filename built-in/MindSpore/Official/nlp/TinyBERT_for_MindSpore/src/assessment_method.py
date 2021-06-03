@@ -17,8 +17,10 @@
 
 import numpy as np
 
+
 class Accuracy():
     """Accuracy"""
+
     def __init__(self):
         self.acc_num = 0
         self.total_num = 0
@@ -31,8 +33,10 @@ class Accuracy():
         self.acc_num += np.sum(labels == logit_id)
         self.total_num += len(labels)
 
+
 class F1():
     """F1"""
+
     def __init__(self):
         self.TP = 0
         self.FP = 0

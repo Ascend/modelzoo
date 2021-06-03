@@ -87,20 +87,23 @@ def get_eval_args():
                         help="run platform, support Ascend ,GPU and CPU.")
     return parser.parse_args()
 
+
 if __name__ == '__main__':
     args_opt = get_eval_args()
+    file_num = 8
     if args_opt.dataset == "coco":
         json_path = os.path.join(config.coco_root, config.instances_set.format(config.val_data_type))
     elif args_opt.dataset == "voc":
         json_path = os.path.join(config.voc_root, config.voc_json)
     else:
+        file_num = 1
         json_path = config.instances_set
 
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=args_opt.device_id)
 
     mindrecord_file = create_mindrecord(args_opt.dataset,
                                         "ssd_eval.mindrecord", False,
-                                        file_num=1)
+                                        file_num=file_num)
 
     print("Start Eval!")
     ssd_eval(mindrecord_file, args_opt.checkpoint_path, json_path)

@@ -5,7 +5,8 @@ mkdir -p "$MODELDIR"
 LOGFILE="$MODELDIR/log"
 STAT_FILE="log.txt"
 
-source env_new.sh
+source ./npu_set_env.sh
+source ./env_new.sh
 export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export PTCOPY_ENABLE=1

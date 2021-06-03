@@ -22,12 +22,14 @@ from mindspore.common.tensor import Tensor
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 
+
 class DenseNoTranpose(nn.Cell):
     """Dense method"""
+
     def __init__(self, input_channels, output_channels, weight_init):
         super(DenseNoTranpose, self).__init__()
-        self.weight = Parameter(initializer(weight_init, [input_channels, output_channels], mstype.float16))
-        self.bias = Parameter(initializer("zeros", [output_channels], mstype.float16).to_tensor())
+        self.weight = Parameter(initializer(weight_init, [input_channels, output_channels], mstype.float32))
+        self.bias = Parameter(initializer("zeros", [output_channels], mstype.float32))
         self.matmul = P.MatMul(transpose_b=False)
         self.bias_add = P.BiasAdd()
 
@@ -35,24 +37,26 @@ class DenseNoTranpose(nn.Cell):
         output = self.bias_add(self.matmul(x, self.weight), self.bias)
         return output
 
+
 class FpnCls(nn.Cell):
     """dense layer of classification and box head"""
+
     def __init__(self, input_channels, output_channels, num_classes, pool_size):
         super(FpnCls, self).__init__()
         representation_size = input_channels * pool_size * pool_size
         shape_0 = (output_channels, representation_size)
-        weights_0 = initializer("XavierUniform", shape=shape_0[::-1], dtype=mstype.float16).to_tensor()
+        weights_0 = initializer("XavierUniform", shape=shape_0[::-1], dtype=mstype.float32)
         shape_1 = (output_channels, output_channels)
-        weights_1 = initializer("XavierUniform", shape=shape_1[::-1], dtype=mstype.float16).to_tensor()
-        self.shared_fc_0 = DenseNoTranpose(representation_size, output_channels, weights_0)
-        self.shared_fc_1 = DenseNoTranpose(output_channels, output_channels, weights_1)
+        weights_1 = initializer("XavierUniform", shape=shape_1[::-1], dtype=mstype.float32)
+        self.shared_fc_0 = DenseNoTranpose(representation_size, output_channels, weights_0).to_float(mstype.float16)
+        self.shared_fc_1 = DenseNoTranpose(output_channels, output_channels, weights_1).to_float(mstype.float16)
 
         cls_weight = initializer('Normal', shape=[num_classes, output_channels][::-1],
-                                 dtype=mstype.float16).to_tensor()
+                                 dtype=mstype.float32)
         reg_weight = initializer('Normal', shape=[num_classes * 4, output_channels][::-1],
-                                 dtype=mstype.float16).to_tensor()
-        self.cls_scores = DenseNoTranpose(output_channels, num_classes, cls_weight)
-        self.reg_scores = DenseNoTranpose(output_channels, num_classes * 4, reg_weight)
+                                 dtype=mstype.float32)
+        self.cls_scores = DenseNoTranpose(output_channels, num_classes, cls_weight).to_float(mstype.float16)
+        self.reg_scores = DenseNoTranpose(output_channels, num_classes * 4, reg_weight).to_float(mstype.float16)
 
         self.relu = P.ReLU()
         self.flatten = P.Flatten()
@@ -70,6 +74,7 @@ class FpnCls(nn.Cell):
         reg_scores = self.reg_scores(x)
 
         return cls_scores, reg_scores
+
 
 class RcnnCls(nn.Cell):
     """
@@ -89,6 +94,7 @@ class RcnnCls(nn.Cell):
         RcnnCls(config=config, representation_size = 1024, batch_size=2, num_classes = 81, \
              target_means=(0., 0., 0., 0.), target_stds=(0.1, 0.1, 0.2, 0.2))
     """
+
     def __init__(self,
                  config,
                  batch_size,
@@ -161,17 +167,17 @@ class RcnnCls(nn.Cell):
         loss_cls, _ = self.loss_cls(cls_score, labels)
         weights = self.cast(weights, mstype.float16)
         loss_cls = loss_cls * weights
-        loss_cls = self.sum_loss(loss_cls, (0,)) / self.sum_loss(weights, (0,))
+        loss_cls = self.sum_loss(loss_cls, (0,)) / (self.sum_loss(weights, (0,)) + 1e-5)
 
         # loss_reg
         bbox_weights = self.cast(self.onehot(bbox_weights, self.num_classes, self.on_value, self.off_value),
                                  mstype.float16)
-        bbox_weights = bbox_weights * self.rmv_first_tensor   #  * self.rmv_first_tensor  exclude background
+        bbox_weights = bbox_weights * self.rmv_first_tensor  # * self.rmv_first_tensor  exclude background
         pos_bbox_pred = self.reshape(bbox_pred, (self.num_bboxes, -1, 4))
         loss_reg = self.loss_bbox(pos_bbox_pred, bbox_targets)
         loss_reg = self.sum_loss(loss_reg, (2,))
         loss_reg = loss_reg * bbox_weights
-        loss_reg = loss_reg / self.sum_loss(weights, (0,))
+        loss_reg = loss_reg / (self.sum_loss(weights, (0,)) + 1e-5)
         loss_reg = self.sum_loss(loss_reg, (0, 1))
 
         return loss_cls, loss_reg

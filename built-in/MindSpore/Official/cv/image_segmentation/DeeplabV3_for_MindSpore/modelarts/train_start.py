@@ -122,6 +122,39 @@ def _train(args, train_url, data_url, ckpt_pre_trained):
     return process.wait()
 
 
+def _get_last_ckpt(ckpt_dir):
+    ckpt_files = [ckpt_file for ckpt_file in os.listdir(ckpt_dir)
+                  if ckpt_file.endswith('.ckpt')]
+    if not ckpt_files:
+        print("No ckpt file found.")
+        return None
+
+    return os.path.join(ckpt_dir, sorted(ckpt_files)[-1])
+
+
+def _export_air(args, ckpt_dir):
+    ckpt_file = _get_last_ckpt(ckpt_dir)
+    if not ckpt_file:
+        return
+
+    export_file = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "export.py")
+
+    for input_format in ("NCHW", "NHWC"):
+        file_name = os.path.join(ckpt_dir, f"{args.model}_{input_format}")
+        cmd = ["python", export_file,
+               f"--device_id={args.rank}",
+               f"--input_size={args.crop_size}",
+               f"--ckpt_file={ckpt_file}",
+               f"--model={args.model}",
+               f"--num_classes={args.num_classes}",
+               f"--input_format={input_format}",
+               f"--file_name={file_name}"]
+        print(f"Start exporting AIR, cmd = {' '.join(cmd)}.")
+        process = subprocess.Popen(cmd, shell=False)
+        process.wait()
+
+
 def main():
     args = _parse_args()
     try:
@@ -135,6 +168,7 @@ def main():
                                         args.ckpt_pre_trained) \
             if args.ckpt_pre_trained else ""
         ret = _train(args, train_url, data_url, ckpt_pre_trained)
+        _export_air(args, train_url)
         mox.file.copy_parallel(_CACHE_TRAIN_URL, args.train_url)
     except ModuleNotFoundError:
         train_url = args.train_url

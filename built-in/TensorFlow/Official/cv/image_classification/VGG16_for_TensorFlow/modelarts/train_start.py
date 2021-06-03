@@ -21,7 +21,6 @@ import os
 
 import moxing as mox
 import tensorflow as tf
-
 import vgg16.create_session as cs
 import vgg16.data_loader as dl
 import vgg16.hyper_param as hp
@@ -29,6 +28,8 @@ import vgg16.layers as ly
 import vgg16.logger as lg
 import vgg16.model as ml
 import vgg16.trainer as tr
+from vgg16 import vgg
+from tensorflow.python.tools import freeze_graph
 
 _CACHE_DATA_URL = "/cache/data_url"
 _CACHE_TRAIN_URL = "/cache/train_url"
@@ -94,7 +95,7 @@ def _parse_args():
     # log file
     parser.add_argument('--log_name', default='vgg16.log',
                         help='name of log file')
-    parser.add_argument('--log_dir', default='./model_1p',
+    parser.add_argument('--log_dir', default=_CACHE_TRAIN_URL,
                         help='log directory')
     parser.add_argument('--restore_path', default='',
                         help="""restore path""")
@@ -110,6 +111,45 @@ def _parse_args():
         raise ValueError("Invalid command line arg(s)")
 
     return args
+
+
+def _get_last_ckpt(ckpt_dir):
+    ckpt_files = [ckpt_file for ckpt_file in os.listdir(ckpt_dir)
+                  if ckpt_file.startswith('model.ckpt-')
+                  and ckpt_file.endswith('.index')]
+    ckpt_files = [ckpt_file.split('.index')[0] for ckpt_file in ckpt_files]
+    if not ckpt_files:
+        print("No ckpt file found.")
+        return None
+
+    return os.path.join(ckpt_dir, sorted(ckpt_files)[-1])
+
+
+def _frozen_graph(args):
+    ckpt_file = _get_last_ckpt(args.log_dir)
+    if not ckpt_file:
+        return
+
+    tf.reset_default_graph()
+    # set inputs node
+    inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3],
+                            name="input")
+    top_layer = vgg.vgg_impl(inputs, False, args.class_num)
+    # create inference graph
+    with tf.Session() as sess:
+        tf.train.write_graph(sess.graph_def, './', 'model.pb')
+        freeze_graph.freeze_graph(
+            input_graph='./model.pb',
+            input_saver='',
+            input_binary=False,
+            input_checkpoint=ckpt_file,
+            output_node_names='dense_2/BiasAdd',  # graph outputs node
+            restore_op_name='save/restore_all',
+            filename_tensor_name='save/Const:0',
+            output_graph=os.path.join(args.log_dir, 'vgg16_tf_910.pb'),
+            clear_devices=False,
+            initializer_nodes='')
+    print("frozen graph done")
 
 
 def _main():
@@ -143,6 +183,7 @@ def _main():
         trainer.train_and_evaluate()
     else:
         raise ValueError("Invalid mode.")
+    _frozen_graph(args)
     mox.file.copy_parallel(args.log_dir, args.train_url)
 
 

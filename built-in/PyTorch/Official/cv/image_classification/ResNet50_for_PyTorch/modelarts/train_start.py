@@ -123,7 +123,6 @@ parser.add_argument('-e', '--evaluate',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained',
                     dest='pretrained',
-                    default=True,
                     action='store_true',
                     help='use pre-trained model')
 parser.add_argument('--world-size',
@@ -178,7 +177,7 @@ parser.add_argument('--static-loss-scale',
                     help=
                     'Static loss scale, positive power of 2 values can improve fp16 convergence.')
 
-parser.add_argument('-t', '--fine-tuning', default=True, action='store_true',
+parser.add_argument('-t', '--fine-tuning', default=False, action='store_true',
                     help='transfer learning + fine tuning - train only the last FC layer')
 parser.add_argument('--train_url',
                     default="/cache/training",
@@ -257,8 +256,8 @@ def main_worker(gpu, ngpus_per_node, args):
         mox.file.copy_parallel(args.pretrained_weight, os.path.join(CACHE_MODEL_URL, "checkpoint.pth.tar"))
         pretrained_weight = os.path.join(CACHE_MODEL_URL, "checkpoint.pth.tar")
         pretrained_dict = torch.load(pretrained_weight)["state_dict"]
-        pretrained_dict.pop('fc.weight')
-        pretrained_dict.pop('fc.bias')
+        pretrained_dict.pop('module.fc.weight')
+        pretrained_dict.pop('module.fc.bias')
         model.load_state_dict(pretrained_dict, strict=False)
     else:
         print("=> creating model '{}'".format(args.arch))

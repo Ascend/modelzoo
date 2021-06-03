@@ -10,7 +10,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-python3.7 ${currentDir}/densenet121_1p_main.py \
+taskset -c 0-24 python3.7 ${currentDir}/densenet121_1p_main.py \
         --workers 40 \
         --arch densenet121 \
         --npu 0 \

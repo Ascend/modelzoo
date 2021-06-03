@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@ import os
 import numpy as np
 from numpy import random
 
+import cv2
 import mmcv
 import mindspore.dataset as de
 import mindspore.dataset.vision.c_transforms as C
 from mindspore.mindrecord import FileWriter
 from src.config import config
-import cv2
+
 
 def bbox_overlaps(bboxes1, bboxes2, mode='iou'):
     """Calculate the ious between each bbox of bboxes1 and bboxes2.
@@ -71,6 +72,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou'):
     if exchange:
         ious = ious.T
     return ious
+
 
 class PhotoMetricDistortion:
     """Photo Metric Distortion"""
@@ -132,6 +134,7 @@ class PhotoMetricDistortion:
 
         return img, boxes, labels
 
+
 class Expand:
     """expand image"""
     def __init__(self, mean=(0, 0, 0), to_rgb=True, ratio_range=(1, 4)):
@@ -156,6 +159,7 @@ class Expand:
         boxes += np.tile((left, top), 2)
         return img, boxes, labels
 
+
 def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """rescale operation for image"""
     img_data, scale_factor = mmcv.imrescale(img, (config.img_width, config.img_height), return_scale=True)
@@ -164,7 +168,6 @@ def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num):
         scale_factor = scale_factor*scale_factor2
 
     gt_bboxes = gt_bboxes * scale_factor
-
     gt_bboxes[:, 0::2] = np.clip(gt_bboxes[:, 0::2], 0, img_data.shape[1] - 1)
     gt_bboxes[:, 1::2] = np.clip(gt_bboxes[:, 1::2], 0, img_data.shape[0] - 1)
 
@@ -179,7 +182,6 @@ def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     img_shape = np.asarray(img_shape, dtype=np.float32)
 
     return  (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
-
 
 def rescale_column_test(img, img_shape, gt_bboxes, gt_label, gt_num):
     """rescale operation for image of eval"""
@@ -218,6 +220,7 @@ def resize_column(img, img_shape, gt_bboxes, gt_label, gt_num):
 
     return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
 
+
 def resize_column_test(img, img_shape, gt_bboxes, gt_label, gt_num):
     """resize operation for image of eval"""
     img_data = img
@@ -235,17 +238,20 @@ def resize_column_test(img, img_shape, gt_bboxes, gt_label, gt_num):
 
     return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
 
+
 def impad_to_multiple_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """impad operation for image"""
     img_data = mmcv.impad(img, (config.img_height, config.img_width))
     img_data = img_data.astype(np.float32)
     return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
 
+
 def imnormalize_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """imnormalize operation for image"""
     img_data = mmcv.imnormalize(img, np.array([123.675, 116.28, 103.53]), np.array([58.395, 57.12, 57.375]), True)
     img_data = img_data.astype(np.float32)
     return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+
 
 def flip_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """flip operation for image"""
@@ -259,6 +265,7 @@ def flip_column(img, img_shape, gt_bboxes, gt_label, gt_num):
 
     return (img_data, img_shape, flipped, gt_label, gt_num)
 
+
 def transpose_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """transpose operation for image"""
     img_data = img.transpose(2, 0, 1).copy()
@@ -270,6 +277,7 @@ def transpose_column(img, img_shape, gt_bboxes, gt_label, gt_num):
 
     return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
 
+
 def photo_crop_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """photo crop operation for image"""
     random_photo = PhotoMetricDistortion()
@@ -277,12 +285,14 @@ def photo_crop_column(img, img_shape, gt_bboxes, gt_label, gt_num):
 
     return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
 
+
 def expand_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """expand operation for image"""
     expand = Expand()
     img, gt_bboxes, gt_label = expand(img, gt_bboxes, gt_label)
 
     return (img, img_shape, gt_bboxes, gt_label, gt_num)
+
 
 def preprocess_fn(image, box, is_training):
     """Preprocess function for dataset."""
@@ -338,6 +348,7 @@ def preprocess_fn(image, box, is_training):
 
     return _data_aug(image, box, is_training)
 
+
 def create_coco_label(is_training):
     """Get image path and annotation from COCO."""
     from pycocotools.coco import COCO
@@ -388,6 +399,7 @@ def create_coco_label(is_training):
 
     return image_files, image_anno_dict
 
+
 def anno_parser(annos_str):
     """Parse annotation from string to list."""
     annos = []
@@ -395,6 +407,7 @@ def anno_parser(annos_str):
         anno = list(map(int, anno_str.strip().split(',')))
         annos.append(anno)
     return annos
+
 
 def filter_valid_data(image_dir, anno_path):
     """Filter valid image file, which both in image_dir and anno_path."""
@@ -417,6 +430,7 @@ def filter_valid_data(image_dir, anno_path):
             image_files.append(image_path)
     return image_files, image_anno_dict
 
+
 def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="fasterrcnn.mindrecord", file_num=8):
     """Create MindRecord file."""
     mindrecord_dir = config.mindrecord_dir
@@ -433,19 +447,17 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="fast
     }
     writer.add_schema(fasterrcnn_json, "fasterrcnn_json")
 
-    image_files_num = len(image_files)
-    for ind, image_name in enumerate(image_files):
+    for image_name in image_files:
         with open(image_name, 'rb') as f:
             img = f.read()
         annos = np.array(image_anno_dict[image_name], dtype=np.int32)
         row = {"image": img, "annotation": annos}
-        if (ind + 1) % 10 == 0:
-            print("writing {}/{} into mindrecord.".format(ind + 1, image_files_num))
         writer.write_raw_data([row])
     writer.commit()
 
+
 def create_fasterrcnn_dataset(mindrecord_file, batch_size=2, device_num=1, rank_id=0, is_training=True,
-                              num_parallel_workers=8):
+                              num_parallel_workers=8, python_multiprocessing=False):
     """Create FasterRcnn dataset with MindDataset."""
     cv2.setNumThreads(0)
     de.config.set_prefetch_size(8)
@@ -459,7 +471,7 @@ def create_fasterrcnn_dataset(mindrecord_file, batch_size=2, device_num=1, rank_
         ds = ds.map(input_columns=["image", "annotation"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num"],
                     column_order=["image", "image_shape", "box", "label", "valid_num"],
-                    operations=compose_map_func, python_multiprocessing=False,
+                    operations=compose_map_func, python_multiprocessing=python_multiprocessing,
                     num_parallel_workers=num_parallel_workers)
         ds = ds.batch(batch_size, drop_remainder=True)
     else:

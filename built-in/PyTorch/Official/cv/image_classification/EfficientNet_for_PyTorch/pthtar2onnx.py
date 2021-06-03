@@ -37,13 +37,13 @@ def proc_node_module(checkpoint, attr_name):
     return new_state_dict
 
 
-def convert(pth_file_path, onnx_file_path):
+def convert(pth_file_path, onnx_file_path, class_nums):
     """
     convert pth file to onnx file and output onnx file
     """
     checkpoint = torch.load(pth_file_path, map_location='cpu')
     checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
-    model = EfficientNet.from_name("efficientnet-b0")
+    model = EfficientNet.from_name("efficientnet-b0", num_classes=class_nums)
     model.set_swish(memory_efficient=False)
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
@@ -59,4 +59,5 @@ def convert(pth_file_path, onnx_file_path):
 if __name__ == "__main__":
     src_file_path = "./checkpoint.pth"
     dst_file_path = "efficientnet_npu_16.onnx"
-    convert(src_file_path, dst_file_path)
+    class_num = 1000
+    convert(src_file_path, dst_file_path, class_num)

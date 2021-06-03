@@ -186,7 +186,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
-参考：[Readme](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README_NEW.md)
+参考：[Readme](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README.md)
 
  **四、自测试用例**
 
@@ -230,12 +230,40 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 2、PR标题：线上活动，请在标题注明[线上贡献]；高校活动，请注明[xxx学校][高校贡献]；
 
-3、用户根据网络状态必须配置modelzoo_level.txt文件，且文件内容包含三个关键字段：FuncStatus(值可填写OK-流程通过/NOK-流程失败)；PerfStatus(值可填OK-持平GPU/NOK-低于GPU/PERFECT-超过GPU)；PrecisionStatus(OK-精度达标,NOK-Loss拟合，精度未实施)；若网络功能、性能、精度均通过，内容格式如下所示（注：“:”两侧无需空格，英文格式；）： 
+3、built-in用户根据网络状态必须配置modelzoo_level.txt文件，且文件内容包含三个关键字段：FuncStatus(OK-流程通过/ **NOK-流程失败，不允许模型代码提交主仓** )；PerfStatus(OK-持平GPU/POK-0.5倍GPU/NOK-小于0.5倍GPU/PERFECT-1.2倍GPU)；PrecisionStatus(OK-精度达标,POK-Loss拟合但精度未实施， **NOK-Loss不拟合，不允许模型代码提交主仓** )；内容格式如下所示（注：“:”两侧无需空格，英文格式；）： 
             
 ```
-            FuncStatus:OK
-            PerfStatus:OK
-            PrecisionStatus:OK
+            FuncStatus:OK/NOK
+            PerfStatus:PERFECT/OK/POK/NOK
+            PrecisionStatus:OK/POK/NOK
+```
+4、contrib用户根据网络状态必须配置modelzoo_level.txt文件，且文件内容包含关键字段：GPUStatus(OK-GPU复现/NOK-GPU未复现)； NPUMigrationStatus(OK-自动迁移成功/POK-自动迁移失败, 手写规避成功/NOK-均失败)； FuncStatus(OK-基础功能打通/NOK-基础功能失败，不允许模型代码提交到master)； PrecisionStatus(OK-精度达标/POK-Loss拟合但精度未完全达标/NOK-精度不达标, 不允许模型代码提交到master)； AutoTune(OK-性能持平或高于GPU/POK-性能有提升但低于GPU/NOK-性能无提升或者功能失败)； PerfStatus(训练：PERFECT-性能1.2倍GPU/OK-性能持平GPU/POK-性能0.5倍GPU/NOK-性能小于0.5倍GPU；推理：OK-4*310单卡>GPU/NOK-其它)； ModelConvert:OK/NOK(仅推理, OK-om转换成功/NOK-om转换失败)； QuantStatus:OK/NOK(仅推理, OK-精度损失1%以内，性能有提升/POK-性能有提升但未达标/NOK-量化失败)；
+
+样例：modelzoo_level.txt文件 
+
+-----仅限训练----- 
+
+
+```
+GPUStatus:OK/NOK
+NPUMigrationStatus:OK/POK/NOK
+```
+
+
+-----仅限推理----- 
+
+```
+ModelConvert:OK/POK/NOK 
+QuantStatus:OK/POK/NOK 
+```
+
+-----通用部分----- 
+
+```
+FuncStatus:OK/NOK 
+PrecisionStatus:OK/POK/NOK 
+AutoTune:OK/POK/NOK 
+PerfStatus:PERFECT/OK/POK/NOK
 ```
 
 

@@ -350,14 +350,14 @@ def main_worker(npu, nnpus_per_node, args):
             break
 
     if args.onnx:
-        convert_pth_to_onnx()
+        convert_pth_to_onnx(args)
 
     # --------------modelarts modification----------
     mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
     # --------------modelarts modification end----------
 
 
-def convert_pth_to_onnx():
+def convert_pth_to_onnx(config_args):
     pth_pattern = os.path.join(CACHE_TRAINING_URL, 'checkpoint.pth')
     pth_file_list = glob.glob(pth_pattern)
     if not pth_file_list:
@@ -365,7 +365,7 @@ def convert_pth_to_onnx():
         return
     pth_file = pth_file_list[0]
     onnx_path = pth_file.split(".")[0] + '.onnx'
-    convert(pth_file, onnx_path)
+    convert(pth_file, onnx_path, config_args.num_classes)
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node):

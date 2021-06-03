@@ -32,7 +32,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import numpy as np
 import json
 import os
 import time
@@ -461,9 +461,10 @@ def run_customized_training_loop(
         next_sentence_accuracy = (_float_metric_value(eval_ns_num)/
                                   _float_metric_value(eval_ns_denom))
         next_sentence_loss = _float_metric_value(eval_ns_loss)
+        masked_lm_accuracy_ave = npu.distribute.all_reduce(masked_lm_accuracy.astype(np.float32),"mean")
         logging.info('Step: [%d] Validation %s = %f, %s = %f, %s = %f, %s = %f',
                      current_training_step,
-                     'masked_lm_accuracy', masked_lm_accuracy,
+                     'masked_lm_accuracy', masked_lm_accuracy_ave,
                      'masked_lm_loss', masked_lm_loss,
                      'next_sentence_accuracy', next_sentence_accuracy,
                      'next_sentence_loss', next_sentence_loss)
@@ -595,6 +596,7 @@ def run_customized_training_loop(
       train_steps(train_iterator,
                   tf.convert_to_tensor(steps, dtype=tf.int32))
       train_loss = _float_metric_value(train_loss_metric)
+      train_loss_ave = npu.distribute.all_reduce(train_loss.astype(np.float32),"mean")
 
       end_time=time.time()
       timeHistory=(steps / (end_time - start_time))
@@ -607,8 +609,8 @@ def run_customized_training_loop(
       # Updates training logging.
       if isinstance(optimizer, npu.train.optimizer.NpuLossScaleOptimizer):
         training_status='Train Step: %d/%d / loss = %s / loss_scale = %s / dynamic_counter = %s / learning_rate = %s / not_overflow_status = %s' % (
-          current_step,total_training_steps,train_loss,optimizer.loss_scale.numpy(),optimizer.dynamic_counter,
-          optimizer.inner_optimizer.learning_rate(current_step).numpy(),optimizer.last_step_infinite.numpy()
+          current_step,total_training_steps,train_loss_ave,optimizer.loss_scale.numpy(),optimizer.dynamic_counter,
+          optimizer.inner_optimizer.learning_rate(current_step).numpy(),optimizer.last_step_finite.numpy()
         )
       else:
         training_status = 'Train Step: %d/%d  / loss = %s' % (

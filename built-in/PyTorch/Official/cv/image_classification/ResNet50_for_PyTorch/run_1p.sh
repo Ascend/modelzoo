@@ -15,7 +15,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-python3.7 ${currentDir}/pytorch-resnet50-apex.py \
+python3.7 ${currentDir}/pytorch_resnet50_apex.py \
         --data /data/imagenet \
         --npu ${device_id} \
         -j64 \

@@ -12,6 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
 
 """Ops for collective operations implemented using hccl."""
 from __future__ import absolute_import
@@ -191,3 +206,17 @@ def dynamic_rnn_grad(op, dy, dh, dc, di, dj, df, do, dtanhc):
     (dw, db, dx, dh_prev, dc_prev) = gen_npu_ops.dynamic_rnn_grad(x, w, b, y, init_h[-1], init_c[-1], output_h, output_c, dy, dh[-1], dc[-1], i, j, f, o, tanhc, cell_type=op.get_attr("cell_type"), direction=op.get_attr("direction"), cell_depth=op.get_attr("cell_depth"), use_peephole=op.get_attr("use_peephole"), keep_prob=op.get_attr("keep_prob"), cell_clip=op.get_attr("cell_clip"), num_proj=op.get_attr("num_proj"), time_major=op.get_attr("time_major"), forget_bias=op.get_attr("forget_bias"))
 
     return (dx, dw, db, seq_length, dh_prev, dc_prev)
+
+def lamb_apply_optimizer_assign(input0,input1,input2,input3,mul0_x,mul1_x,mul2_x,
+                                mul3_x,add2_y,steps,do_use_weight,weight_decay_rate,name=None):
+    if context.executing_eagerly():
+      raise RuntimeError("tf.lamb_apply_optimizer_assign() is not compatible with eager execution")
+    update,nextv,nextm=gen_npu_ops.lamb_apply_optimizer_assign(input0,input1,input2,input3,mul0_x,mul1_x,mul2_x,
+                                mul3_x,add2_y,steps,do_use_weight,weight_decay_rate,name)
+    return update,nextv,nextm
+
+def lamb_apply_weight_assign(input0,input1,input2,input3,input4,name=None):
+    if context.executing_eagerly():
+      raise RuntimeError("tf.lamb_apply_weight_assign() is not compatible with eager execution")
+    result = gen_npu_ops.lamb_apply_weight_assign(input0,input1,input2,input3,input4,name)
+    return result

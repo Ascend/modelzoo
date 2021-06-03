@@ -21,7 +21,7 @@ from ._amp_state import maybe_print
 import torch
 from apex.optimizers import FusedSGD, NpuFusedAdam, NpuFusedSGD, NpuFusedAdadelta
 from change_data_ptr import change_data_ptr
-from tensor_fused_plugin import combine_npu
+from apex.contrib.combine_tensors import combine_npu
 
 
 def get_grad_combined_tensor_from_param(list_of_params):

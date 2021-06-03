@@ -35,6 +35,8 @@ then
         --amp  > ./gru_8p_${i}.log 2>&1 &
     done
 else
+    for i in $(seq 0 7)
+    do
     python3.7 ${currentDir}/gru_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed 123456 \
@@ -49,4 +51,5 @@ else
         --rank 0 \
         --device-list '0,1,2,3,4,5,6,7' \
         --amp  > ./gru_8p.log 2>&1 &
+    done
 fi

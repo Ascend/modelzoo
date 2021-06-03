@@ -1,14 +1,5 @@
-source ./env_b031.sh
-source ./env_new.sh
+source ./env.sh
 export PYTHONPATH=./:$PYTHONPATH
-export ASCEND_SLOG_PRINT_TO_STDOUT=0
-export ASCEND_GLOBAL_LOG_LEVEL=3
-export ASCEND_GLOBAL_EVENT_ENABLE=0
-export TASK_QUEUE_ENABLE=1
-export PTCOPY_ENABLE=1
-export DYNAMIC_OP="ADD#MUL"
-/usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
-/usr/local/Ascend/driver/tools/msnpureport -e disable
 
 nohup python3.7 tools/train_net.py \
         --config-file configs/COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml \

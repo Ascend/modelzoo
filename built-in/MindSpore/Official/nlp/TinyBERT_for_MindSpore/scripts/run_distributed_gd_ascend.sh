@@ -22,17 +22,18 @@ echo "It is better to use absolute path."
 echo "running....... please see details by LOG{}/log.txt"
 echo "=============================================================================================================="
 
-EPOCH_SIZE=$2
+EPOCH_SIZE=20
 
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
-export RANK_TABLE_FILE=$3
-export RANK_SIZE=$1
+export RANK_TABLE_FILE=/home/admin/code/tinybert/scripts/hccl_8p.json
+export RANK_SIZE=8
 cores=`cat /proc/cpuinfo|grep "processor" |wc -l`
 echo "the number of logical core" $cores
 avg_core_per_rank=`expr $cores \/ $RANK_SIZE`
 core_gap=`expr $avg_core_per_rank \- 1`
 echo "avg_core_per_rank" $avg_core_per_rank
 echo "core_gap" $core_gap
+
 for((i=0;i<RANK_SIZE;i++))
 do
     start=`expr $i \* $avg_core_per_rank`
@@ -45,14 +46,10 @@ do
 
     rm -rf LOG$i
     mkdir ./LOG$i
-    cp  *.py ./LOG$i
+    #cp  *.py ./LOG$i
     cd ./LOG$i || exit
     echo "start training for rank $i, device $DEVICE_ID"
-    mkdir -p ms_log
     CUR_DIR=`pwd`
-    export GLOG_log_dir=${CUR_DIR}/ms_log
-    export GLOG_logtostderr=0
-    env > env.log
     taskset -c $cmdopt python ${PROJECT_DIR}/../run_general_distill.py  \
     --distribute="true" \
     --device_target="Ascend" \
@@ -63,9 +60,10 @@ do
     --data_sink_steps=100 \
     --save_ckpt_step=10000 \
     --max_ckpt_num=1 \
-    --load_teacher_ckpt_path="" \
-    --data_dir="" \
+    --load_teacher_ckpt_path="/home/admin/code/tinybert/bert_base_ascend_1.1.1_en-wiki.ckpt" \
+    --resume_ckpt="" \
+    --data_dir="/home/admin/dataset/enwiki/uncased/" \
     --schema_dir="" \
-    --dataset_type="tfrecord" > log.txt 2>&1 &
+    --dataset_type="tfrecord" &
     cd ../
 done

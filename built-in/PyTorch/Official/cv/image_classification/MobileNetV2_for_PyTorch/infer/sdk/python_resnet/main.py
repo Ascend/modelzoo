@@ -64,8 +64,8 @@ if __name__ == '__main__':
         
         empty_data = []
         stream_name = b'im_resnet50'
-        inPluginId = 0
-        unique_id = stream_manager_api.SendData(stream_name, 1, data_input)
+        in_plugin_id = 0
+        unique_id = stream_manager_api.SendData(stream_name, in_plugin_id, data_input)
         if unique_id < 0:
             print("Failed to send data to stream.")
             exit()

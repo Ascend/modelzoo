@@ -1,7 +1,17 @@
 #!/bin/bash
 
+datasets_path="/root/datasets/"
+
+for para in $*
+do
+    if [[ $para == --datasets_path* ]]; then
+        datasets_path=`echo ${para#*=}`
+    fi
+done
+
+arch=`uname -m`
 rm -rf ./prep_dataset
-python3.7 imagenet_torch_preprocess.py resnet /root/datasets/imagenet/val ./prep_dataset
+python3.7 imagenet_torch_preprocess.py resnet ${datasets_path}/imagenet/val ./prep_dataset
 if [ $? != 0 ]; then
     echo "fail!"
     exit -1
@@ -13,23 +23,23 @@ if [ $? != 0 ]; then
 fi
 source env.sh
 rm -rf result/dumpOutput_device0
-./benchmark.x86_64 -model_type=vision -device_id=0 -batch_size=1 -om_path=resnext50_bs1.om -input_text_path=./resnext50_prep_bin.info -input_width=224 -input_height=224 -output_binary=False -useDvpp=False
+./benchmark.${arch} -model_type=vision -device_id=0 -batch_size=1 -om_path=resnext50_bs1.om -input_text_path=./resnext50_prep_bin.info -input_width=224 -input_height=224 -output_binary=False -useDvpp=False
 if [ $? != 0 ]; then
     echo "fail!"
     exit -1
 fi
 rm -rf result/dumpOutput_device1
-./benchmark.x86_64 -model_type=vision -device_id=1 -batch_size=16 -om_path=resnext50_bs16.om -input_text_path=./resnext50_prep_bin.info -input_width=224 -input_height=224 -output_binary=False -useDvpp=False
+./benchmark.${arch} -model_type=vision -device_id=1 -batch_size=16 -om_path=resnext50_bs16.om -input_text_path=./resnext50_prep_bin.info -input_width=224 -input_height=224 -output_binary=False -useDvpp=False
 if [ $? != 0 ]; then
     echo "fail!"
     exit -1
 fi
-python3.7 imagenet_acc_eval.py result/dumpOutput_device0/ /root/datasets/imagenet/val_label.txt ./ result_bs1.json
+python3.7 imagenet_acc_eval.py result/dumpOutput_device0/ ${datasets_path}/imagenet/val_label.txt ./ result_bs1.json
 if [ $? != 0 ]; then
     echo "fail!"
     exit -1
 fi
-python3.7 imagenet_acc_eval.py result/dumpOutput_device1/ /root/datasets/imagenet/val_label.txt ./ result_bs16.json
+python3.7 imagenet_acc_eval.py result/dumpOutput_device1/ ${datasets_path}/imagenet/val_label.txt ./ result_bs16.json
 if [ $? != 0 ]; then
     echo "fail!"
     exit -1
@@ -46,7 +56,9 @@ if [ $? != 0 ]; then
     echo "fail!"
     exit -1
 fi
-echo "====310 performance data===="
+echo "====performance data===="
+echo "t4 bs1  fps:763.044"
+echo "t4 bs16 fps:1234.940"
 python3.7 test/parse.py result/perf_vision_batchsize_1_device_0.txt
 if [ $? != 0 ]; then
     echo "fail!"

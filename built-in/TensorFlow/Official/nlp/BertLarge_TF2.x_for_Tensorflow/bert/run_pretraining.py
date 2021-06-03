@@ -49,6 +49,7 @@ from tf2_common.modeling import performance
 from tf2_common.utils.misc import distribution_utils
 from tf2_common.utils.mlp_log import mlp_log
 import npu_device
+from hccl.split.api import set_split_strategy_by_size
 
 flags.DEFINE_string(name='precision_mode', default= 'allow_fp32_to_fp16',
                     help='allow_fp32_to_fp16/force_fp16/ ' 
@@ -69,6 +70,10 @@ flags.DEFINE_string(name='data_dump_path', default="/home/data",
                     help='the path to save dump data')     
 flags.DEFINE_boolean(name='autotune', default=False,
                     help='whether to enable autotune, default is False')
+flags.DEFINE_boolean(name='use_npu_lamb', default=True,
+                    help='whether to enable npu lamb optimizer, default is True')
+flags.DEFINE_boolean(name='use_fastgelu', default=True,
+                    help='whether to enable fastgelu, default is True')
 
 flags.DEFINE_string('train_files', None,
                     'File path to retrieve training data for pre-training.')
@@ -331,7 +336,7 @@ def run_bert_pretrain(strategy, custom_callbacks=None):
                'strategy.')
 
   performance.set_mixed_precision_policy(common_flags.dtype())
-
+  set_split_strategy_by_size([40,30,10,20])
   _, masked_lm_accuracy, run_steps = run_customized_training(
       strategy=strategy,
       optimizer_type=FLAGS.optimizer_type,

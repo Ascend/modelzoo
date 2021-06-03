@@ -1,10 +1,31 @@
 # coding: utf-8
+"""
+Copyright 2021 Huawei Technologies Co., Ltd
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
+
 import argparse
 import ast
 import os
 from functools import partial
 
+import numpy as np
+from mindspore import Tensor, export, load_checkpoint, load_param_into_net
 from src.config import cfg_unet as cfg
+from src.unet_medical.unet_model import UNetMedical
+from src.unet_nested import NestedUNet, UNet
+from src.utils import UnetEval
 
 
 def parse_args():
@@ -91,6 +112,47 @@ def set_config(args):
     })
 
 
+def _get_last_ckpt(ckpt_dir):
+    ckpt_files = [ckpt_file for ckpt_file in os.listdir(ckpt_dir)
+                  if ckpt_file.endswith('.ckpt')]
+    if not ckpt_files:
+        print("No ckpt file found.")
+        return None
+
+    return os.path.join(ckpt_dir, sorted(ckpt_files)[-1])
+
+
+def _export_air(args, ckpt_dir):
+    ckpt_file = _get_last_ckpt(ckpt_dir)
+    if not ckpt_file:
+        return
+
+    if cfg['model'] == 'unet_medical':
+        net = UNetMedical(n_channels=cfg['num_channels'],
+                          n_classes=cfg['num_classes'])
+    elif cfg['model'] == 'unet_nested':
+        net = NestedUNet(in_channel=cfg['num_channels'],
+                         n_class=cfg['num_classes'],
+                         use_deconv=cfg['use_deconv'],
+                         use_bn=cfg['use_bn'], use_ds=False)
+    elif cfg['model'] == 'unet_simple':
+        net = UNet(in_channel=cfg['num_channels'], n_class=cfg['num_classes'])
+    else:
+        raise ValueError("Unsupported model: {}".format(cfg['model']))
+    # return a parameter dict for model
+    param_dict = load_checkpoint(ckpt_file)
+    # load the parameter into net
+    load_param_into_net(net, param_dict)
+    net = UnetEval(net)
+    input_data = Tensor(np.ones(
+        [1, cfg["num_channels"], args.img_size[0],
+         args.img_size[1]]).astype(np.float32))
+    air_file_name = os.path.join(os.path.dirname(ckpt_file), cfg['model'])
+    print(f"Start exporting AIR, ckpt_file = {ckpt_file}, input_tensor_shape ="
+          f" {input_data.shape}, air_file_path = {air_file_name}.air.")
+    export(net, input_data, file_name=air_file_name, file_format='AIR')
+
+
 def main():
     args = parse_args()
     print("Training setting:", args)
@@ -110,7 +172,9 @@ def main():
         mox.file.copy_parallel(args.data_url, cache_data_url)
         args.data_url = cache_data_url
         train_func()
-        mox.file.copy_parallel(f"./ckpt_{args.device_id}", args.train_url)
+        ckpt_dir = f"./ckpt_{args.device_id}"
+        _export_air(args, ckpt_dir)
+        mox.file.copy_parallel(ckpt_dir, args.train_url)
     except ModuleNotFoundError:
         train_func()
 

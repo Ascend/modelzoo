@@ -37,6 +37,7 @@ tinybert_student_net_cfg = BertConfig(
     compute_type=mstype.float16
 )
 
+
 def create_network(name, *args, **kwargs):
     '''
     Create tinybert network.

@@ -6,7 +6,7 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# less required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -14,10 +14,7 @@
 # ============================================================================
 """post process for 310 inference"""
 import argparse
-import os
-
 import numpy as np
-from PIL import Image
 from pycocotools.coco import COCO
 
 from src.config import config
@@ -31,19 +28,8 @@ parser.add_argument("--ann_file", type=str, required=True, help="ann file.")
 parser.add_argument("--img_path", type=str, required=True, help="image file path.")
 args = parser.parse_args()
 
-
-def get_img_size(file_name):
-    img = Image.open(file_name)
-    return img.size
-
-
-def scale_bbox(all_bbox, img_meta):
-    all_img_meta = np.array([img_meta[3], img_meta[2], img_meta[3], img_meta[2]])
-    all_bbox[:, 0:4] = all_bbox[:, 0:4] / all_img_meta
-    return all_bbox
-
-
-def get_eval_result(ann_file, img_path):
+def get_eval_result(ann_file):
+    """ get evaluation result of faster rcnn"""
     max_num = 128
     result_path = "./result_Files/"
 
@@ -54,16 +40,12 @@ def get_eval_result(ann_file, img_path):
 
     for img_id in img_ids:
         file_id = str(img_id).zfill(12)
-        file = os.path.join(img_path, f'{file_id}.jpg')
-        img_size = get_img_size(file)
-
-        img_metas = np.array([img_size[1], img_size[0], dst_height / img_size[1], dst_width / img_size[0]])
 
         bbox_result_file = result_path + file_id + "_0.bin"
         label_result_file = result_path + file_id + "_1.bin"
         mask_result_file = result_path + file_id + "_2.bin"
 
-        all_bbox = np.fromfile(bbox_result_file, dtype=np.float32).reshape(80000, 5)
+        all_bbox = np.fromfile(bbox_result_file, dtype=np.float16).reshape(80000, 5)
         all_label = np.fromfile(label_result_file, dtype=np.int32).reshape(80000, 1)
         all_mask = np.fromfile(mask_result_file, dtype=np.bool_).reshape(80000, 1)
 
@@ -73,8 +55,6 @@ def get_eval_result(ann_file, img_path):
 
         all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
         all_labels_tmp_mask = all_label_squee[all_mask_squee]
-
-        scale_bbox(all_bboxes_tmp_mask, img_metas)
 
         if all_bboxes_tmp_mask.shape[0] > max_num:
             inds = np.argsort(-all_bboxes_tmp_mask[:, -1])
@@ -90,4 +70,4 @@ def get_eval_result(ann_file, img_path):
     coco_eval(result_files, eval_types, dataset_coco, single_result=False)
 
 if __name__ == '__main__':
-    get_eval_result(args.ann_file, args.img_path)
+    get_eval_result(args.ann_file)

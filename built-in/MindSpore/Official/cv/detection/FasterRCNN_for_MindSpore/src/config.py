@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -113,8 +113,6 @@ config = ed({
 
     # LR
     "base_lr": 0.04,
-    "base_step": 58633,
-    "total_epoch": 13,
     "warmup_step": 500,
     "warmup_ratio": 1/16.0,
     "sgd_step": [8, 11],
@@ -130,9 +128,11 @@ config = ed({
     "save_checkpoint_epochs": 1,
     "keep_checkpoint_max": 10,
     "save_checkpoint_path": "./",
-    "dataset_sink_mode": True,
-    "steps_of_echo_loss": 100,       # Takes effect when dataset_sink_mode == False
 
+    # Number of threads used to process the dataset in parallel
+    "num_parallel_workers": 8,
+    # Parallelize Python operations with multiple worker processes
+    "python_multiprocessing": True,
     "mindrecord_dir": "../MindRecord_COCO_TRAIN",
     "coco_root": "./cocodataset/",
     "train_data_type": "train2017",

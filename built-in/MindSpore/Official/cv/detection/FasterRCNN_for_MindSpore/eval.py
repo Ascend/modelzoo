@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -6,7 +6,7 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# less required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -19,9 +19,10 @@ import argparse
 import time
 import numpy as np
 from pycocotools.coco import COCO
+import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
+from mindspore.common import set_seed, Parameter
 
 from src.FasterRcnn.faster_rcnn_r50 import Faster_Rcnn_Resnet50
 from src.config import config
@@ -34,25 +35,28 @@ parser = argparse.ArgumentParser(description="FasterRcnn evaluation")
 parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
 parser.add_argument("--ann_file", type=str, default="val.json", help="Ann file, default is val.json.")
 parser.add_argument("--checkpoint_path", type=str, required=True, help="Checkpoint file path.")
+parser.add_argument("--device_target", type=str, default="Ascend",
+                    help="device where the code will be implemented, default is Ascend")
 parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
 args_opt = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args_opt.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
 
-
-def scale_bbox(all_bbox, img_meta):
-    all_img_meta = np.array([img_meta[3], img_meta[2], img_meta[3], img_meta[2]])
-    all_bbox[:, 0:4] = all_bbox[:, 0:4] / all_img_meta
-    return all_bbox
-
-
-def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
+def fasterrcnn_eval(dataset_path, ckpt_path, ann_file):
     """FasterRcnn evaluation."""
     ds = create_fasterrcnn_dataset(dataset_path, batch_size=config.test_batch_size, is_training=False)
     net = Faster_Rcnn_Resnet50(config)
     param_dict = load_checkpoint(ckpt_path)
+    if args_opt.device_target == "GPU":
+        for key, value in param_dict.items():
+            tensor = value.asnumpy().astype(np.float32)
+            param_dict[key] = Parameter(tensor, key)
     load_param_into_net(net, param_dict)
+
     net.set_train(False)
+    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    if device_type == "Ascend":
+        net.to_float(mstype.float16)
 
     eval_iter = 0
     total = ds.get_dataset_size()
@@ -90,8 +94,6 @@ def FasterRcnn_eval(dataset_path, ckpt_path, ann_file):
 
             all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
             all_labels_tmp_mask = all_label_squee[all_mask_squee]
-
-            scale_bbox(all_bboxes_tmp_mask, img_metas.asnumpy()[j])
 
             if all_bboxes_tmp_mask.shape[0] > max_num:
                 inds = np.argsort(-all_bboxes_tmp_mask[:, -1])
@@ -135,4 +137,4 @@ if __name__ == '__main__':
 
     print("CHECKING MINDRECORD FILES DONE!")
     print("Start Eval!")
-    FasterRcnn_eval(mindrecord_file, args_opt.checkpoint_path, args_opt.ann_file)
+    fasterrcnn_eval(mindrecord_file, args_opt.checkpoint_path, args_opt.ann_file)

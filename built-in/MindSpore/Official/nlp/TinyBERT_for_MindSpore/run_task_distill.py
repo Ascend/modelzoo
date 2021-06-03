@@ -18,6 +18,7 @@
 import os
 import re
 import argparse
+import numpy as np
 import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore.train.model import Model
@@ -34,12 +35,15 @@ from src.tinybert_for_gd_td import BertEvaluationWithLossScaleCell, BertNetworkW
 from src.tinybert_model import BertModelCLS
 
 _cur_dir = os.getcwd()
-td_phase1_save_ckpt_dir = os.path.join(_cur_dir, 'tinybert_td_phase1_save_ckpt')
-td_phase2_save_ckpt_dir = os.path.join(_cur_dir, 'tinybert_td_phase2_save_ckpt')
+td_phase1_save_ckpt_dir = os.path.join(
+    _cur_dir, 'tinybert_td_phase1_save_ckpt')
+td_phase2_save_ckpt_dir = os.path.join(
+    _cur_dir, 'tinybert_td_phase2_save_ckpt')
 if not os.path.exists(td_phase1_save_ckpt_dir):
     os.makedirs(td_phase1_save_ckpt_dir)
 if not os.path.exists(td_phase2_save_ckpt_dir):
     os.makedirs(td_phase2_save_ckpt_dir)
+
 
 def parse_args():
     """
@@ -54,21 +58,65 @@ def parse_args():
                         help="Do eval task, default is true.")
     parser.add_argument("--td_phase1_epoch_size", type=int, default=10,
                         help="Epoch size for td phase 1, default is 10.")
-    parser.add_argument("--td_phase2_epoch_size", type=int, default=3, help="Epoch size for td phase 2, default is 3.")
-    parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
+    parser.add_argument(
+        "--td_phase2_epoch_size",
+        type=int,
+        default=3,
+        help="Epoch size for td phase 2, default is 3.")
+    parser.add_argument(
+        "--device_id",
+        type=int,
+        default=0,
+        help="Device id, default is 0.")
     parser.add_argument("--do_shuffle", type=str, default="true", choices=["true", "false"],
                         help="Enable shuffle for dataset, default is true.")
     parser.add_argument("--enable_data_sink", type=str, default="true", choices=["true", "false"],
                         help="Enable data sink, default is true.")
-    parser.add_argument("--save_ckpt_step", type=int, default=100, help="Enable data sink, default is true.")
-    parser.add_argument("--max_ckpt_num", type=int, default=1, help="Enable data sink, default is true.")
-    parser.add_argument("--data_sink_steps", type=int, default=1, help="Sink steps for each epoch, default is 1.")
-    parser.add_argument("--load_teacher_ckpt_path", type=str, default="", help="Load checkpoint file path")
-    parser.add_argument("--load_gd_ckpt_path", type=str, default="", help="Load checkpoint file path")
-    parser.add_argument("--load_td1_ckpt_path", type=str, default="", help="Load checkpoint file path")
-    parser.add_argument("--train_data_dir", type=str, default="", help="Data path, it is better to use absolute path")
-    parser.add_argument("--eval_data_dir", type=str, default="", help="Data path, it is better to use absolute path")
-    parser.add_argument("--schema_dir", type=str, default="", help="Schema path, it is better to use absolute path")
+    parser.add_argument(
+        "--save_ckpt_step",
+        type=int,
+        default=100,
+        help="Enable data sink, default is true.")
+    parser.add_argument(
+        "--max_ckpt_num",
+        type=int,
+        default=1,
+        help="Enable data sink, default is true.")
+    parser.add_argument(
+        "--data_sink_steps",
+        type=int,
+        default=1,
+        help="Sink steps for each epoch, default is 1.")
+    parser.add_argument(
+        "--load_teacher_ckpt_path",
+        type=str,
+        default="",
+        help="Load checkpoint file path")
+    parser.add_argument(
+        "--load_gd_ckpt_path",
+        type=str,
+        default="",
+        help="Load checkpoint file path")
+    parser.add_argument(
+        "--load_td1_ckpt_path",
+        type=str,
+        default="",
+        help="Load checkpoint file path")
+    parser.add_argument(
+        "--train_data_dir",
+        type=str,
+        default="",
+        help="Data path, it is better to use absolute path")
+    parser.add_argument(
+        "--eval_data_dir",
+        type=str,
+        default="",
+        help="Data path, it is better to use absolute path")
+    parser.add_argument(
+        "--schema_dir",
+        type=str,
+        default="",
+        help="Schema path, it is better to use absolute path")
     parser.add_argument("--task_name", type=str, default="", choices=["SST-2", "QNLI", "MNLI"],
                         help="The name of the task to train.")
     parser.add_argument("--dataset_type", type=str, default="tfrecord",
@@ -81,7 +129,7 @@ args_opt = parse_args()
 
 DEFAULT_NUM_LABELS = 2
 DEFAULT_SEQ_LENGTH = 128
-task_params = {"SST-2": {"num_labels": 2, "seq_length": 64},
+task_params = {"SST-2": {"num_labels": 2, "seq_length": 128},
                "QNLI": {"num_labels": 2, "seq_length": 128},
                "MNLI": {"num_labels": 3, "seq_length": 128}}
 
@@ -90,6 +138,7 @@ class Task:
     """
     Encapsulation class of get the task parameter.
     """
+
     def __init__(self, task_name):
         self.task_name = task_name
 
@@ -104,6 +153,8 @@ class Task:
         if self.task_name in task_params and "seq_length" in task_params[self.task_name]:
             return task_params[self.task_name]["seq_length"]
         return DEFAULT_SEQ_LENGTH
+
+
 task = Task(args_opt.task_name)
 
 
@@ -112,12 +163,10 @@ def run_predistill():
     run predistill
     """
     cfg = phase1_cfg
-    if args_opt.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
-    elif args_opt.device_target == "GPU":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    else:
-        raise Exception("Target error, GPU or Ascend is supported.")
+    context.set_context(
+        mode=context.GRAPH_MODE,
+        device_target=args_opt.device_target,
+        device_id=args_opt.device_id)
     context.set_context(reserve_class_name_in_scope=False)
     load_teacher_checkpoint_path = args_opt.load_teacher_ckpt_path
     load_student_checkpoint_path = args_opt.load_gd_ckpt_path
@@ -142,29 +191,41 @@ def run_predistill():
 
     dataset_size = dataset.get_dataset_size()
     print('td1 dataset size: ', dataset_size)
-    print('td1 dataset repeatcount: ', dataset.get_repeat_count())
+
     if args_opt.enable_data_sink == 'true':
-        repeat_count = args_opt.td_phase1_epoch_size * dataset_size // args_opt.data_sink_steps
+        repeat_count = args_opt.td_phase1_epoch_size * \
+            dataset_size // args_opt.data_sink_steps
         time_monitor_steps = args_opt.data_sink_steps
     else:
         repeat_count = args_opt.td_phase1_epoch_size
         time_monitor_steps = dataset_size
+    print('td1 dataset repeatcount: ', repeat_count)
 
     optimizer_cfg = cfg.optimizer_cfg
 
     lr_schedule = BertLearningRate(learning_rate=optimizer_cfg.AdamWeightDecay.learning_rate,
                                    end_learning_rate=optimizer_cfg.AdamWeightDecay.end_learning_rate,
                                    warmup_steps=int(dataset_size / 10),
-                                   decay_steps=int(dataset_size * args_opt.td_phase1_epoch_size),
+                                   decay_steps=int(
+                                       dataset_size * args_opt.td_phase1_epoch_size),
                                    power=optimizer_cfg.AdamWeightDecay.power)
     params = netwithloss.trainable_params()
-    decay_params = list(filter(optimizer_cfg.AdamWeightDecay.decay_filter, params))
-    other_params = list(filter(lambda x: not optimizer_cfg.AdamWeightDecay.decay_filter(x), params))
+    decay_params = list(
+        filter(
+            optimizer_cfg.AdamWeightDecay.decay_filter,
+            params))
+    other_params = list(
+        filter(
+            lambda x: not optimizer_cfg.AdamWeightDecay.decay_filter(x),
+            params))
     group_params = [{'params': decay_params, 'weight_decay': optimizer_cfg.AdamWeightDecay.weight_decay},
                     {'params': other_params, 'weight_decay': 0.0},
                     {'order_params': params}]
 
-    optimizer = AdamWeightDecay(group_params, learning_rate=lr_schedule, eps=optimizer_cfg.AdamWeightDecay.eps)
+    optimizer = AdamWeightDecay(
+        group_params,
+        learning_rate=lr_schedule,
+        eps=optimizer_cfg.AdamWeightDecay.eps)
     callback = [TimeMonitor(time_monitor_steps), LossCallBack(), ModelSaveCkpt(netwithloss.bert,
                                                                                args_opt.save_ckpt_step,
                                                                                args_opt.max_ckpt_num,
@@ -173,7 +234,8 @@ def run_predistill():
         update_cell = DynamicLossScaleUpdateCell(loss_scale_value=cfg.loss_scale_value,
                                                  scale_factor=cfg.scale_factor,
                                                  scale_window=cfg.scale_window)
-        netwithgrads = BertEvaluationWithLossScaleCell(netwithloss, optimizer=optimizer, scale_update_cell=update_cell)
+        netwithgrads = BertEvaluationWithLossScaleCell(
+            netwithloss, optimizer=optimizer, scale_update_cell=update_cell)
     else:
         netwithgrads = BertEvaluationCell(netwithloss, optimizer=optimizer)
 
@@ -182,6 +244,7 @@ def run_predistill():
                 dataset_sink_mode=(args_opt.enable_data_sink == 'true'),
                 sink_size=args_opt.data_sink_steps)
 
+
 def run_task_distill(ckpt_file):
     """
     run task distill
@@ -189,14 +252,10 @@ def run_task_distill(ckpt_file):
     if ckpt_file == '':
         raise ValueError("Student ckpt file should not be None")
     cfg = phase2_cfg
-
-    if args_opt.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
-    elif args_opt.device_target == "GPU":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    else:
-        raise Exception("Target error, GPU or Ascend is supported.")
-
+    context.set_context(
+        mode=context.GRAPH_MODE,
+        device_target=args_opt.device_target,
+        device_id=args_opt.device_id)
     load_teacher_checkpoint_path = args_opt.load_teacher_ckpt_path
     load_student_checkpoint_path = ckpt_file
     netwithloss = BertNetworkWithLoss_td(teacher_config=td_teacher_net_cfg, teacher_ckpt=load_teacher_checkpoint_path,
@@ -212,29 +271,42 @@ def run_task_distill(ckpt_file):
 
     dataset_size = train_dataset.get_dataset_size()
     print('td2 train dataset size: ', dataset_size)
-    print('td2 train dataset repeatcount: ', train_dataset.get_repeat_count())
+
     if args_opt.enable_data_sink == 'true':
-        repeat_count = args_opt.td_phase2_epoch_size * train_dataset.get_dataset_size() // args_opt.data_sink_steps
+        repeat_count = args_opt.td_phase2_epoch_size * \
+            train_dataset.get_dataset_size() // args_opt.data_sink_steps
         time_monitor_steps = args_opt.data_sink_steps
     else:
         repeat_count = args_opt.td_phase2_epoch_size
         time_monitor_steps = dataset_size
+    print('td2 train dataset repeatcount: ', repeat_count)
 
     optimizer_cfg = cfg.optimizer_cfg
 
     lr_schedule = BertLearningRate(learning_rate=optimizer_cfg.AdamWeightDecay.learning_rate,
                                    end_learning_rate=optimizer_cfg.AdamWeightDecay.end_learning_rate,
-                                   warmup_steps=int(dataset_size * args_opt.td_phase2_epoch_size / 10),
-                                   decay_steps=int(dataset_size * args_opt.td_phase2_epoch_size),
+                                   warmup_steps=int(
+                                       dataset_size * args_opt.td_phase2_epoch_size / 10),
+                                   decay_steps=int(
+                                       dataset_size * args_opt.td_phase2_epoch_size),
                                    power=optimizer_cfg.AdamWeightDecay.power)
     params = netwithloss.trainable_params()
-    decay_params = list(filter(optimizer_cfg.AdamWeightDecay.decay_filter, params))
-    other_params = list(filter(lambda x: not optimizer_cfg.AdamWeightDecay.decay_filter(x), params))
+    decay_params = list(
+        filter(
+            optimizer_cfg.AdamWeightDecay.decay_filter,
+            params))
+    other_params = list(
+        filter(
+            lambda x: not optimizer_cfg.AdamWeightDecay.decay_filter(x),
+            params))
     group_params = [{'params': decay_params, 'weight_decay': optimizer_cfg.AdamWeightDecay.weight_decay},
                     {'params': other_params, 'weight_decay': 0.0},
                     {'order_params': params}]
 
-    optimizer = AdamWeightDecay(group_params, learning_rate=lr_schedule, eps=optimizer_cfg.AdamWeightDecay.eps)
+    optimizer = AdamWeightDecay(
+        group_params,
+        learning_rate=lr_schedule,
+        eps=optimizer_cfg.AdamWeightDecay.eps)
 
     eval_dataset = create_tinybert_dataset('td', eval_cfg.batch_size,
                                            device_num, rank, args_opt.do_shuffle,
@@ -255,13 +327,15 @@ def run_task_distill(ckpt_file):
                                                  scale_factor=cfg.scale_factor,
                                                  scale_window=cfg.scale_window)
 
-        netwithgrads = BertEvaluationWithLossScaleCell(netwithloss, optimizer=optimizer, scale_update_cell=update_cell)
+        netwithgrads = BertEvaluationWithLossScaleCell(
+            netwithloss, optimizer=optimizer, scale_update_cell=update_cell)
     else:
         netwithgrads = BertEvaluationCell(netwithloss, optimizer=optimizer)
     model = Model(netwithgrads)
     model.train(repeat_count, train_dataset, callbacks=callback,
                 dataset_sink_mode=(args_opt.enable_data_sink == 'true'),
                 sink_size=args_opt.data_sink_steps)
+
 
 def do_eval_standalone():
     """
@@ -270,13 +344,16 @@ def do_eval_standalone():
     ckpt_file = args_opt.load_td1_ckpt_path
     if ckpt_file == '':
         raise ValueError("Student ckpt file should not be None")
-    if args_opt.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
-    elif args_opt.device_target == "GPU":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    else:
-        raise Exception("Target error, GPU or Ascend is supported.")
-    eval_model = BertModelCLS(td_student_net_cfg, False, task.num_labels, 0.0, phase_type="student")
+    context.set_context(
+        mode=context.GRAPH_MODE,
+        device_target=args_opt.device_target,
+        device_id=args_opt.device_id)
+    eval_model = BertModelCLS(
+        td_student_net_cfg,
+        False,
+        task.num_labels,
+        0.0,
+        phase_type="student")
     param_dict = load_checkpoint(ckpt_file)
     new_param_dict = {}
     for key, value in param_dict.items():
@@ -301,7 +378,7 @@ def do_eval_standalone():
             input_data.append(data[i])
         input_ids, input_mask, token_type_id, label_ids = input_data
         logits = eval_model(input_ids, token_type_id, input_mask)
-        callback.update(logits, label_ids)
+        callback.update(logits[3], label_ids)
     acc = callback.acc_num / callback.total_num
     print("======================================")
     print("============== acc is {}".format(acc))
@@ -310,12 +387,14 @@ def do_eval_standalone():
 
 if __name__ == '__main__':
     if args_opt.do_train.lower() != "true" and args_opt.do_eval.lower() != "true":
-        raise ValueError("do_train or do eval must have one be true, please confirm your config")
+        raise ValueError(
+            "do_train or do eval must have one be true, please confirm your config")
 
     enable_loss_scale = True
     if args_opt.device_target == "GPU":
         if td_student_net_cfg.compute_type != mstype.float32:
-            logger.warning('Compute about the student only support float32 temporarily, run with float32.')
+            logger.warning(
+                'Compute about the student only support float32 temporarily, run with float32.')
             td_student_net_cfg.compute_type = mstype.float32
         # Backward of the network are calculated using fp32,
         # and the loss scale is not necessary
@@ -329,14 +408,18 @@ if __name__ == '__main__':
         run_predistill()
         lists = os.listdir(td_phase1_save_ckpt_dir)
         if lists:
-            lists.sort(key=lambda fn: os.path.getmtime(td_phase1_save_ckpt_dir+'/'+fn))
+            lists.sort(
+                key=lambda fn: os.path.getmtime(
+                    td_phase1_save_ckpt_dir + '/' + fn))
             name_ext = os.path.splitext(lists[-1])
             if name_ext[-1] != ".ckpt":
-                raise ValueError("Invalid file, checkpoint file should be .ckpt file")
+                raise ValueError(
+                    "Invalid file, checkpoint file should be .ckpt file")
             newest_ckpt_file = os.path.join(td_phase1_save_ckpt_dir, lists[-1])
             # run task distill
             run_task_distill(newest_ckpt_file)
         else:
-            raise ValueError("Checkpoint file not exists, please make sure ckpt file has been saved")
+            raise ValueError(
+                "Checkpoint file not exists, please make sure ckpt file has been saved")
     else:
         do_eval_standalone()

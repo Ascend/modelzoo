@@ -357,8 +357,8 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
    
     ```
     # 在环境上执行
-    unzip SSD_MobilenetV1_FPN_1.1_code.zip
-    cd SSD_MobilenetV1_FPN_1.1_code && dos2unix `find . *.sh`
+    unzip SSD_MobilenetV1_FPN_for_MindSpore_1.1_code.zip
+    cd SSD_MobilenetV1_FPN_for_MindSpore_1.1_code && dos2unix `find . *.sh`
    ```
    
 3. **修改 backbone 网络配置。**
@@ -390,7 +390,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
     执行以下命令构建镜像：
 
     ```shell
-    cd SSD_MobilenetV1_FPN_1.1_code
+    cd SSD_MobilenetV1_FPN_for_MindSpore_1.1_code
     docker build -t {docker_image} --build-arg FROM_IMAGE_NAME={base_image} .
     ```
     参数说明：
@@ -454,7 +454,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
    
     执行以下命令启动训练容器：
    ```shell script
-   cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+   cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
    bash docker_start.sh 
    ```
    
@@ -462,7 +462,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
    在scripts下的训练脚本默认数据集是 coco2017 格式的数据集。执行以下命令启动训练
 
    ```shell
-   cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts/
+   cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts/
    # 分布式训练
    bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABLE_FILE]
    # 单卡训练
@@ -481,14 +481,14 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
    训练命令实例如下：
 
    ```shell
-   cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+   cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
    bash run_distribute_train.sh 8 50 0.02 coco /data/sam/codes/ssd_mobilenet_v1_fpn/scripts/hccl_8p_01234567_182.138.104.158.json
    ```
 
 9. **开始评估**
 
    ```shell
-    cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+    cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
     bash run_eval_ascend.sh [DATA_SET] [CHECKPOINT_PATH] [DEVICE_ID]
    ```
 
@@ -509,7 +509,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
   执行以下命令查看训练脚本参数:
   
     ```shell script
-  cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code
+  cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code
   python train.py --help
     ```
 
@@ -517,21 +517,21 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
   执行以下命令查看模型评估脚本参数:
   
     ```shell script
-  cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+  cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
   python eval.py --help
     ```
 - 模型导出脚本参数<br/>
   执行以下命令查看模型导出脚本参数:
   
     ```shell script
-  cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+  cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
   python export.py --help
     ```
 - 后处理脚本参数<br/>
   执行以下命令查看后处理脚本参数:
   
     ```shell script
-  cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+  cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
   python postprocess.py --help
     ```
 #### 4.3.2 训练过程
@@ -616,7 +616,7 @@ epoch time: 345243.121 ms, per step time: 753.806 ms
     本文示例的迁移学习数据集标注文件转换执行以下命令即可生成迁移学习训练集、测试集的标注txt文件：
     
     ```python
-    cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/utils
+    cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/utils
     python trans_xml_annotations_to_txt.py
     ```
     
@@ -673,7 +673,7 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
 1. 执行以下命令，修改迁移学习 filter_weight 参数为 True：
 
    ```shell
-   cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code
+   cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code
    vi train.py
    ```
 
@@ -697,7 +697,7 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
 3. 执行如下命令启动迁移学习:
 
     ```shell script
-    cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+    cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
     bash run_distribute_train.sh \
     8 \
     100 \
@@ -724,7 +724,7 @@ src/config_ssd_mobilenet_v1_fpn.py 中和迁移学习相关的参数解释如下
 #### 4.4.5 迁移学习评估
 1、执行以下命令修改配置：
 ```shel
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code
 vi src/config_ssd_mobilenet_v1_fpn.py
 ```
 修改如下:
@@ -752,7 +752,7 @@ vi src/config_ssd_mobilenet_v1_fpn.py
 ```
 2、执行以下命令启动评估过程：
 ```shell
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
 bash run_eval.sh other /home/sam/pretrained_models/finetune_on_mc/ssd-190_9.ckpt 0
 ```
 参数说明：
@@ -764,7 +764,7 @@ bash run_eval.sh other /home/sam/pretrained_models/finetune_on_mc/ssd-190_9.ckpt
  若训练或者迁移学习的模型要在昇腾 310 上推理，则在训练或者迁移学习结束后，需要在昇腾 910 环境上将 ckpt 文件导出为 AIR 文件，执行以下命令导出：
 
  ```shell
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code
 python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
  ```
 
@@ -788,18 +788,18 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
 2. 上传下载的代码到推理环境，本文上传到：/home/sam/codes/ 目录，并执行以下命令解压：
 
    ```shell
-   unzip SSD_MobilenetV1_FPN_1.1_code.zip
+   unzip SSD_MobilenetV1_FPN_for_MindSpore_1.1_code.zip
    ```
 
 3. 准备推理图片
    针对coco公开数据集：/home/sam/dataset/coco2017，该目前在启动推理容器时挂载到容器中；
-   针对迁移学习数据集，本例中输入图片上传至：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/test_img 目录。
+   针对迁移学习数据集，本例中输入图片上传至：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/test_img 目录。
    
-4. 上传4.5导出的基于coco训练或者迁移学习后导出的 AIR 模型文件。本文示例上传基于coco2017数据集训练的 ssd-60_458.air 到：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/convert/models/ms_ckpt_1_2 目录。
+4. 上传4.5导出的基于coco训练或者迁移学习后导出的 AIR 模型文件。本文示例上传基于coco2017数据集训练的 ssd-60_458.air 到：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/convert/models/ms_ckpt_1_2 目录。
 
 5. 执行如下命令启动推理容器
    ```shell
-    cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/scripts
+    cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/scripts
     bash docker_start_infer.sh swr.cn-south-1.myhuaweicloud.com/public-ascendhub/ascend-infer-x86:20.2.0 /home/sam
    ```
    参数说明：
@@ -810,13 +810,13 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
    若使用 coco 公开数据集，则执行以下命令进行模型转换：
 
    ```shell
-   cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/convert
+   cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/convert
    dos2unix *.sh
    bash convert_om.sh ./models/ms_ckpt_1_2/ssd-60_458.air ./models/ms_ckpt_1_2/ssd-60_458_rgb ./aipp_coco_rgb.cfg
    ```
    针对迁移学习数据集，命令参考如下：
    ```shell
-   cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/convert
+   cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/convert
    dos2unix *.sh
    bash convert_om.sh ./models/ssd_1000-2_on_micro_ctrl.air ./models/ssd_1000-2_on_micro_ctrl_bgr ./aipp.cfg
    ```
@@ -846,9 +846,9 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
 
 9. 修改以下配置文件：
    - 分类标签文件<br/>
-     若使用 coco 公开数据集，则直接使用：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/coco.names;
+     若使用 coco 公开数据集，则直接使用：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/coco.names;
      
-     针对本文示例的迁移学习数据集为：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_mc.names
+     针对本文示例的迁移学习数据集为：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_mc.names
      
      ```
      # backgroud 为固定的分类标签；之后的标签顺序需要与 4.4.1 章节中的标签顺序保持一致。
@@ -860,8 +860,8 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
      ```
      
    - 后处理配置文件<br/>
-     若使用 coco 公开数据集，则直接使用：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg；
-     针对本文示例的迁移学习数据集：本文示例为：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_mc_postprocess.cfg
+     若使用 coco 公开数据集，则直接使用：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg；
+     针对本文示例的迁移学习数据集：本文示例为：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_mc_postprocess.cfg
      
      ```
      CLASS_NUM=5
@@ -874,14 +874,14 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
      - IOU_THRESH： IOU 阈值
      
    - mxManufacture 推理 pipeline配置<br/>
-     若使用coco公开数据集训练的模型，则使用：/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_ms_coco_opencv.pipeline。
+     若使用coco公开数据集训练的模型，则使用：/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_ms_coco_opencv.pipeline。
      其关键配置参数如下：
      
      ```json
         "mxpi_tensorinfer0": {
             "props": {
                 "dataSource": "mxpi_imageresize0",
-                "modelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/convert/models/ms_ckpt_1_2/ssd-60_458_yuv.om"
+                "modelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/convert/models/ms_ckpt_1_2/ssd-60_458_yuv.om"
             },
             "factory": "mxpi_tensorinfer",
             "next": "mxpi_objectpostprocessor0"
@@ -889,21 +889,21 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
         "mxpi_objectpostprocessor0": {
             "props": {
                 "dataSource": "mxpi_tensorinfer0",
-                "postProcessConfigPath": "/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
-                "labelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/coco.names",
+                "postProcessConfigPath": "/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
+                "labelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/coco.names",
                 "postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
             },
             "factory": "mxpi_objectpostprocessor",
             "next": "mxpi_dataserialize0"
         },
      ```
-     针对迁移学习，本文示例修改:/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
+     针对迁移学习，本文示例修改:/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_ms_mc.pipeline 如下：
      
         ```json
         "mxpi_tensorinfer0": {
                     "props": {
                         "dataSource": "mxpi_imageresize0",
-                        "modelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/convert/models/ssd-500_458_bgr.om"
+                        "modelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/convert/models/ssd-500_458_bgr.om"
                     },
                     "factory": "mxpi_tensorinfer",
                     "next": "mxpi_objectpostprocessor0"
@@ -911,8 +911,8 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
                 "mxpi_objectpostprocessor0": {
                     "props": {
                         "dataSource": "mxpi_tensorinfer0",
-                        "postProcessConfigPath": "/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
-                        "labelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/coco.names",
+                        "postProcessConfigPath": "/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
+                        "labelPath": "/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/coco.names",
                         "postProcessLibPath": "/home/sam/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
                     },
                     "factory": "mxpi_objectpostprocessor",
@@ -945,7 +945,7 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
     ${PY_PATH} om_infer_perf_test.py \
     --img_dir=/home/sam/dataset/coco2017/val2017 \
     --how_many_images_to_infer=-1 \
-    --pipeline_config=/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_ms_coco_opencv.pipeline \
+    --pipeline_config=/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/conf/ssd_mobilenet_fpn_ms_coco_opencv.pipeline \
     --infer_stream_name=detection \
     --output_dir=./om_infer_output_on_coco_val2017_opencv_2 \
     --infer_timeout_secs=5 \
@@ -957,7 +957,7 @@ python export.py --ckpt_file [CKPT_FILE_NAME] --file_name [FILE_NAME] --file_for
 启动以下命令进行推理测试：
 
    ```shell
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/perf
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/perf
 dos2unix run_om_infer_perf_test.sh
 pip install Cython
 pip install absl-py
@@ -968,7 +968,7 @@ bash run_om_infer_perf_test.sh
 
    执行以下命令生成推理精度报告：
    ```shell
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/perf
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/perf
 python3 generate_map_report.py \
 --annotations_json=/home/sam/dataset/coco2017/annotations/instances_val2017.json \
 --det_result_json=./om_infer_output_on_coco_val2017_opencv/om_det_result.json \
@@ -987,7 +987,7 @@ python3 generate_map_report.py \
  针对迁移数据集，执行以下命令启动推理测试：
 
    ```shell
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk
 python3 infer_by_sdk.py ./test_img/test/JPEGImgs/
    ```
 
@@ -1000,7 +1000,7 @@ python3 infer_by_sdk.py ./test_img/test/JPEGImgs/
   查看推理结果目录，生成文件如下：    
   
   ```
-  root@d1201bdfb944:/home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk# ll infer_res/
+  root@d1201bdfb944:/home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk# ll infer_res/
   total 40
   drwxr-xr-x 2 root root  4096 May 17 13:18 ./
   drwxr-xr-x 6 root root  4096 May 17 13:15 ../
@@ -1014,7 +1014,7 @@ pip install Cython
 pip install pycocotools
 pip install absl-py
 # 根据实际情况进行修改
-cd /home/sam/codes/SSD_MobilenetV1_FPN_1.1_code/infer/sdk/perf
+cd /home/sam/codes/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/infer/sdk/perf
 # 根据推理结果路径及标注文件路径修改
 python3 generate_map_report.py --annotations_json=../test_img/mc_test.json --det_result_json=../infer_res/det_result.json --output_path_name=../infer_res/map.txt
 ```
@@ -1065,7 +1065,7 @@ python3 generate_map_report.py --annotations_json=../test_img/mc_test.json --det
      * | 参数名称       | 子参数       | 说明                                                         |
        | -------------- | ------------ | ------------------------------------------------------------ |
        | 一键式参数配置 | -            | 如果您在ModelArts已保存作业参数，可以根据界面提示，选择已有的作业参数，快速完成训练作业的参数配置 |
-       | 算法来源       | 常用框架     | - **AI引擎**：Ascend-Powered-Engine，Mindspore-1.1.1-python3.7-aarch64<br>- **代码目录**：上传训练脚本到OBS的目录，如：/code/SSD_MobilenetV1_FPN_1.1_code/<br>- **启动文件**：启动训练的python脚本，选择代码目录modelarts目录下的start.py脚本。 |
+       | 算法来源       | 常用框架     | - **AI引擎**：Ascend-Powered-Engine，Mindspore-1.1.1-python3.7-aarch64<br>- **代码目录**：上传训练脚本到OBS的目录，如：/code/SSD_MobilenetV1_FPN_for_MindSpore_1.1_code/<br>- **启动文件**：启动训练的python脚本，选择代码目录modelarts目录下的start.py脚本。 |
        | 数据来源       | 数据存储位置 | 选择OBS上数据集存放的目录。                                  |
        | 训练输出位置   | -            | 选择训练结果的存储位置。                                     |
        | 运行参数       | -            | 代码中的命令行参数设置值，请根据您的算法代码逻辑进行填写，确保参数名称和代码的参数名称保持一致。<br>示例：<br>* 传入给start.py的参数：<br>  * train_url: 训练输出位置（默认生成）<br>  * data_url：训练数据来源（默认生成）<br>  * 其他参数见：表2 训练参数说明 |

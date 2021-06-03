@@ -134,7 +134,7 @@ class DenseNet(nn.Module):
         return out
 
 
-def densenet121(pretrained=False, **kwargs):
+def densenet121(pretrained=False, pretrained_weight_path="checkpoint.pth.tar", **kwargs):
     r"""Densenet-121 model from
     `"Densely Connected Convolutional Networks" <https://arxiv.org/pdf/1608.06993.pdf>`_
     Args:
@@ -147,8 +147,11 @@ def densenet121(pretrained=False, **kwargs):
         # has keys 'norm.1', 'relu.1', 'conv.1', 'norm.2', 'relu.2', 'conv.2'.
         # They are also in the checkpoints in model_urls. This pattern is used
         # to find such keys.
-        checkpoint = torch.load('checkpoint.pth.tar', map_location='cpu')
-        model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()})
+        checkpoint = torch.load(pretrained_weight_path, map_location='cpu')
+        checkpoint['state_dict'].pop('module.classifier.weight')
+        checkpoint['state_dict'].pop('module.classifier.bias')
+        model.load_state_dict({k.replace('module.', ''): v for k, v in checkpoint['state_dict'].items()}, strict=False)
+
     return model
 
 

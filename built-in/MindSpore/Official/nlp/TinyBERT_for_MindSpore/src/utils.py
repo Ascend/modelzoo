@@ -25,6 +25,7 @@ from mindspore.ops import operations as P
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule, PolynomialDecayLR, WarmUpLR
 from .assessment_method import Accuracy
 
+
 class ModelSaveCkpt(Callback):
     """
     Saves checkpoint.
@@ -34,6 +35,7 @@ class ModelSaveCkpt(Callback):
         save_ckpt_num (int): The number to save checkpoint, default is 1000.
         max_ckpt_num (int): The max checkpoint number, default is 3.
     """
+
     def __init__(self, network, save_ckpt_step, max_ckpt_num, output_dir):
         super(ModelSaveCkpt, self).__init__()
         self.count = 0
@@ -57,6 +59,7 @@ class ModelSaveCkpt(Callback):
                                                        "tiny_bert_{}_{}.ckpt".format(int(saved_ckpt_num),
                                                                                      self.save_ckpt_step)))
 
+
 class LossCallBack(Callback):
     """
     Monitor the loss in training.
@@ -66,6 +69,7 @@ class LossCallBack(Callback):
     Args:
         per_print_times (int): Print loss every times. Default: 1.
     """
+
     def __init__(self, per_print_times=1):
         super(LossCallBack, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
@@ -79,8 +83,10 @@ class LossCallBack(Callback):
                                                            cb_params.cur_step_num,
                                                            str(cb_params.net_outputs)))
 
+
 class EvalCallBack(Callback):
     """Evaluation callback"""
+
     def __init__(self, network, dataset):
         super(EvalCallBack, self).__init__()
         self.network = network
@@ -92,7 +98,11 @@ class EvalCallBack(Callback):
         cb_params = run_context.original_args()
         if cb_params.cur_step_num % 100 == 0:
             callback = Accuracy()
-            columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
+            columns_list = [
+                "input_ids",
+                "input_mask",
+                "segment_ids",
+                "label_ids"]
             for data in self.dataset.create_dict_iterator(num_epochs=1):
                 input_data = []
                 for i in columns_list:
@@ -100,7 +110,7 @@ class EvalCallBack(Callback):
                 input_ids, input_mask, token_type_id, label_ids = input_data
                 self.network.set_train(False)
                 logits = self.network(input_ids, token_type_id, input_mask)
-                callback.update(logits, label_ids)
+                callback.update(logits[3], label_ids)
             acc = callback.acc_num / callback.total_num
             with open("./eval.log", "a+") as f:
                 f.write("acc_num {}, total_num{}, accuracy{:.6f}".format(callback.acc_num, callback.total_num,
@@ -115,17 +125,21 @@ class EvalCallBack(Callback):
                     os.remove(eval_model_ckpt_file)
                 save_checkpoint(self.network, eval_model_ckpt_file)
 
+
 class BertLearningRate(LearningRateSchedule):
     """
     Warmup-decay learning rate for Bert network.
     """
-    def __init__(self, learning_rate, end_learning_rate, warmup_steps, decay_steps, power):
+
+    def __init__(self, learning_rate, end_learning_rate,
+                 warmup_steps, decay_steps, power):
         super(BertLearningRate, self).__init__()
         self.warmup_flag = False
         if warmup_steps > 0:
             self.warmup_flag = True
             self.warmup_lr = WarmUpLR(learning_rate, warmup_steps)
-        self.decay_lr = PolynomialDecayLR(learning_rate, end_learning_rate, decay_steps, power)
+        self.decay_lr = PolynomialDecayLR(
+            learning_rate, end_learning_rate, decay_steps, power)
         self.warmup_steps = Tensor(np.array([warmup_steps]).astype(np.float32))
 
         self.greater = P.Greater()
@@ -135,7 +149,11 @@ class BertLearningRate(LearningRateSchedule):
     def construct(self, global_step):
         decay_lr = self.decay_lr(global_step)
         if self.warmup_flag:
-            is_warmup = self.cast(self.greater(self.warmup_steps, global_step), mstype.float32)
+            is_warmup = self.cast(
+                self.greater(
+                    self.warmup_steps,
+                    global_step),
+                mstype.float32)
             warmup_lr = self.warmup_lr(global_step)
             lr = (self.one - is_warmup) * decay_lr + is_warmup * warmup_lr
         else:

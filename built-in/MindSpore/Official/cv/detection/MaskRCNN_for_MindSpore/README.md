@@ -53,7 +53,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor. If you want to try Ascend, please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources.
+    - Prepare hardware environment with Ascend processor.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - Docker base image
@@ -109,7 +109,7 @@ pip install mmcv=0.2.14
     Note:
     1. To speed up data preprocessing, MindSpore provide a data format named MindRecord, hence the first step is to generate MindRecord files based on COCO2017 dataset before training. The process of converting raw COCO2017 dataset to MindRecord format may take about 4 hours.
     2. For distributed training, a [hccl configuration file](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools) with JSON format needs to be created in advance.
-    3. PRETRAINED_CKPT is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/mindspore/tree/r1.1/model_zoo/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain checkpoint file.
+    3. PRETRAINED_CKPT is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/qujianwei/mindspore/tree/master/model_zoo/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain checkpoint file.
     4. For large models like MaskRCNN, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 
 4. Execute eval script.
@@ -431,7 +431,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 
 ### [Training Result](#content)
 
-Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". You can find checkpoint file together with result like the followings in loss_rankid.log.
+Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". You can find checkpoint file together with result like the following in loss_rankid.log.
 
 ```bash
 # distribute training result(8p)
@@ -457,10 +457,12 @@ bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH]
 
 > As for the COCO2017 dataset, VALIDATION_ANN_FILE_JSON is refer to the annotations/instances_val2017.json in the dataset directory.  
 > checkpoint can be produced and saved in training process, whose folder name begins with "train/checkpoint" or "train_parallel*/checkpoint".
+>
+> Images size in dataset should be equal to the annotation size in VALIDATION_ANN_FILE_JSON, otherwise the evaluation result cannot be displayed properly.
 
 ### [Evaluation result](#content)
 
-Inference result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the followings in log.
+Inference result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the following in log.
 
 ```bash
 Evaluate annotation type *bbox*

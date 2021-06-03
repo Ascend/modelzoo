@@ -23,7 +23,7 @@
  * @attention context is passed in as a parameter after being created in ResourceManager::InitResource
  */
 AclProcess::AclProcess(int deviceId, const std::string &om_path, uint32_t width, uint32_t height)
-    : deviceId_(deviceId), stream_(nullptr), modelProcess_(nullptr), dvppCommon_(nullptr), keepRatio_(false) {
+    : deviceId_(deviceId), stream_(nullptr), modelProcess_(nullptr), dvppCommon_(nullptr), keepRatio_(true) {
     modelInfo_.modelPath = om_path;
     modelInfo_.modelWidth = width;
     modelInfo_.modelHeight = height;
@@ -142,8 +142,7 @@ int AclProcess::WriteResult(const std::string& imageFile) {
     void *resHostBuf = nullptr;
     for (size_t i = 0; i < outputBuffers_.size(); ++i) {
         size_t output_size;
-        void * netOutput;
-        netOutput = outputBuffers_[i];
+        void *netOutput = outputBuffers_[i];
         output_size =  outputSizes_[i];
         int ret = aclrtMallocHost(&resHostBuf, output_size);
         if (ret != OK) {
@@ -163,11 +162,28 @@ int AclProcess::WriteResult(const std::string& imageFile) {
         fileName.replace(fileName.find('.'), fileName.size() - fileName.find('.'), "_" + std::to_string(i) + ".bin");
 
         std::string outFileName = homePath + "/" + fileName;
-        FILE * outputFile = fopen(outFileName.c_str(), "wb");
-        fwrite(resHostBuf, output_size, sizeof(char), outputFile);
+        try {
+            FILE *outputFile = fopen(outFileName.c_str(), "wb");
+            if (outputFile == nullptr) {
+                std::cout << "open result file " << outFileName << " failed" << std::endl;
+                return INVALID_POINTER;
+            }
+            size_t size = fwrite(resHostBuf, sizeof(char), output_size, outputFile);
+            if (size != output_size) {
+                fclose(outputFile);
+                outputFile = nullptr;
+                std::cout << "write result file " << outFileName << " failed, write size[" << size <<
+                    "] is smaller than output size[" << output_size << "], maybe the disk is full." << std::endl;
+                return ERROR;
+            }
 
-        fclose(outputFile);
-        outputFile = nullptr;
+            fclose(outputFile);
+            outputFile = nullptr;
+        } catch (std::exception &e) {
+            std::cout << "write result file " << outFileName << " failed, error info: " << e.what() << std::endl;
+            std::exit(1);
+        }
+
         ret = aclrtFreeHost(resHostBuf);
         if (ret != OK) {
             std::cout << "aclrtFree host output memory failed" << std::endl;
@@ -236,7 +252,7 @@ int AclProcess::Preprocess(const std::string& imageFile) {
     resizeOutData.height = modelInfo_.modelHeight;
     resizeOutData.width = modelInfo_.modelWidth;
     resizeOutData.format = PIXEL_FORMAT_YUV_SEMIPLANAR_420;
-    ret = dvppCommon_->CombineResizeProcess(decodeOutData, resizeOutData, true, VPC_PT_DEFAULT);
+    ret = dvppCommon_->CombineResizeProcess(decodeOutData, resizeOutData, true, VPC_PT_PADDING);
     if (ret != OK) {
         std::cout << "Failed to execute image resized of preprocess module, ret = " << ret << "." << std::endl;
         return ret;
@@ -267,24 +283,19 @@ int AclProcess::ModelInfer(std::map<double, double> *costTime_map) {
         heightScale = static_cast<float>(resizeOutData->height) / inputImg->height;
     }
 
-    aclFloat16 inputWidth = aclFloatToFloat16(static_cast<float>(inputImg->width));
-    aclFloat16 inputHeight = aclFloatToFloat16(static_cast<float>(inputImg->height));
-    aclFloat16 resizeWidthRatioFp16 = aclFloatToFloat16(widthScale);
-    aclFloat16 resizeHeightRatioFp16 = aclFloatToFloat16(heightScale);
-
-    aclFloat16 *im_info = reinterpret_cast<aclFloat16 *>(malloc(sizeof(aclFloat16) * 4));
-    im_info[0] = inputHeight;
-    im_info[1] = inputWidth;
-    im_info[2] = resizeHeightRatioFp16;
-    im_info[3] = resizeWidthRatioFp16;
+    float im_info[4];
+    im_info[0] = static_cast<float>(inputImg->height);
+    im_info[1] = static_cast<float>(inputImg->width);
+    im_info[2] = heightScale;
+    im_info[3] = widthScale;
     void *imInfo_dst = nullptr;
-    int ret = aclrtMalloc(&imInfo_dst, 8, ACL_MEM_MALLOC_NORMAL_ONLY);
+    int ret = aclrtMalloc(&imInfo_dst, 16, ACL_MEM_MALLOC_NORMAL_ONLY);
     if (ret != ACL_ERROR_NONE) {
         std::cout << "aclrtMalloc failed, ret = " << ret << std::endl;
         aclrtFree(imInfo_dst);
         return ret;
     }
-    ret = aclrtMemcpy(reinterpret_cast<uint8_t *>(imInfo_dst), 8, im_info, 8, ACL_MEMCPY_HOST_TO_DEVICE);
+    ret = aclrtMemcpy(reinterpret_cast<uint8_t *>(imInfo_dst), 16, im_info, 16, ACL_MEMCPY_HOST_TO_DEVICE);
     if (ret != ACL_ERROR_NONE) {
         std::cout << "aclrtMemcpy failed, ret = " << ret << std::endl;
         aclrtFree(imInfo_dst);
@@ -292,7 +303,7 @@ int AclProcess::ModelInfer(std::map<double, double> *costTime_map) {
     }
 
     std::vector<void *> inputBuffers({resizeOutData->data, imInfo_dst});
-    std::vector<size_t> inputSizes({resizeOutData->dataSize, 4*2});
+    std::vector<size_t> inputSizes({resizeOutData->dataSize, 4 * 4});
 
     for (size_t i = 0; i < modelInfo_.outputNum; i++) {
         aclrtMemset(outputBuffers_[i], outputSizes_[i], 0, outputSizes_[i]);

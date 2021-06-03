@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
+
 """Functions and classes related to optimization (weight updates)."""
 
 from __future__ import absolute_import
@@ -31,6 +32,7 @@ from tensorflow.python.ops import linalg_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import state_ops
 from tf2_common.training import optimizer_v2modified
+from modeling.layers import npu_ops
 
 FLAGS = flags.FLAGS
 
@@ -302,6 +304,7 @@ class LAMBOptimizer(optimizer_v2modified.OptimizerV2Modified):
     apply_state[(var_device, var_dtype)].update(
         dict(
             weight_decay_rate=weight_decay_rate,
+            local_step=local_step,
             epsilon=ops.convert_to_tensor(self.epsilon, var_dtype),
             beta_1_t=beta_1_t,
             beta_1_power=beta_1_power,
@@ -323,43 +326,56 @@ class LAMBOptimizer(optimizer_v2modified.OptimizerV2Modified):
     var_device, var_dtype = var.device, var.dtype.base_dtype
     coefficients = ((apply_state or {}).get((var_device, var_dtype)) or
                     self._fallback_apply_state(var_device, var_dtype))
-
-    # m_t = beta1 * m + (1 - beta1) * g_t
+    
     m = self.get_slot(var, 'm')
-    m_scaled_g_values = grad * coefficients['one_minus_beta_1_t']
-    m_t = m * coefficients['beta_1_t'] + m_scaled_g_values
-    m_t = state_ops.assign(m, m_t, use_locking=self._use_locking)
-    # v_t = beta2 * v + (1 - beta2) * (g_t * g_t)
     v = self.get_slot(var, 'v')
-    v_scaled_g_values = (grad * grad) * coefficients['one_minus_beta_2_t']
-    v_t = v * coefficients['beta_2_t'] + v_scaled_g_values
-    v_t = state_ops.assign(v, v_t, use_locking=self._use_locking)
+    if FLAGS.use_npu_lamb==False:
+      # m_t = beta1 * m + (1 - beta1) * g_t
+      m_scaled_g_values = grad * coefficients['one_minus_beta_1_t']
+      m_t = m * coefficients['beta_1_t'] + m_scaled_g_values
+      m_t = state_ops.assign(m, m_t, use_locking=self._use_locking)
+      # v_t = beta2 * v + (1 - beta2) * (g_t * g_t)
+      v_scaled_g_values = (grad * grad) * coefficients['one_minus_beta_2_t']
+      v_t = v * coefficients['beta_2_t'] + v_scaled_g_values
+      v_t = state_ops.assign(v, v_t, use_locking=self._use_locking)
 
-    # ==== The following is with m_t_hat and v_t_hat
-    m_t_hat = m_t / (1. - coefficients['beta_1_power'])
-    v_t_hat = v_t / (1. - coefficients['beta_2_power'])
+      # ==== The following is with m_t_hat and v_t_hat
+      m_t_hat = m_t / (1. - coefficients['beta_1_power'])
+      v_t_hat = v_t / (1. - coefficients['beta_2_power'])
 
-    v_sqrt = math_ops.sqrt(v_t_hat)
-    update = m_t_hat / (v_sqrt + coefficients['epsilon'])
+      v_sqrt = math_ops.sqrt(v_t_hat)
+      update = m_t_hat / (v_sqrt + coefficients['epsilon'])
 
-    # ==== The following is the original LAMBOptimizer implementation
-    # v_sqrt = math_ops.sqrt(v_t)
-    # update = m_t / (v_sqrt + coefficients['epsilon'])
+      # ==== The following is the original LAMBOptimizer implementation
+      # v_sqrt = math_ops.sqrt(v_t)
+      # update = m_t / (v_sqrt + coefficients['epsilon'])
 
-    var_name = self._get_variable_name(var.name)
-    if self._do_use_weight_decay(var_name):
-      update += coefficients['weight_decay_rate'] * var
+      var_name = self._get_variable_name(var.name)
+      if self._do_use_weight_decay(var_name):
+        update += coefficients['weight_decay_rate'] * var
 
-    ratio = 1.0
-    if self._do_layer_adaptation(var_name):
-      w_norm = linalg_ops.norm(var, ord=2)
-      g_norm = linalg_ops.norm(update, ord=2)
-      ratio = array_ops.where(
-          math_ops.greater(w_norm, 0),
-          array_ops.where(math_ops.greater(g_norm, 0), (w_norm / g_norm), 1.0),
-          1.0)
+      ratio = 1.0
+      if self._do_layer_adaptation(var_name):
+        w_norm = linalg_ops.norm(var, ord=2)
+        g_norm = linalg_ops.norm(update, ord=2)
+        ratio = array_ops.where(
+            math_ops.greater(w_norm, 0),
+            array_ops.where(math_ops.greater(g_norm, 0), (w_norm / g_norm), 1.0),
+            1.0)
 
-    var_update = var - ratio * coefficients['lr_t'] * update
+      var_update = var - ratio * coefficients['lr_t'] * update
+    else:
+      var_name=self._get_variable_name(var.name)
+      do_use_weight = self._do_use_weight_decay(var_name)
+      do_use_weight = tf.cast(do_use_weight,tf.float32)
+      update, next_v, next_m = npu_ops.lamb_apply_optimizer_assign(grad,v,m,var,coefficients['beta_1_t'],coefficients['one_minus_beta_1_t'],coefficients['beta_2_t'],
+                                                              coefficients['one_minus_beta_2_t'],coefficients['epsilon'],coefficients['local_step'],do_use_weight,coefficients['weight_decay_rate'])
+      
+      w_norm = linalg_ops.norm(var,ord=2)
+      g_norm = linalg_ops.norm(update,ord=2)
+
+      var_update = npu_ops.lamb_apply_weight_assign(w_norm, g_norm, coefficients['lr_t'],update,var)
+
     return state_ops.assign(var, var_update, use_locking=self._use_locking).op
 
   def _resource_apply_sparse(self, grad, var, indices, apply_state=None):

@@ -31,7 +31,9 @@ parser.add_argument('--device_target', type=str, default="Ascend",
                     choices=['Ascend', 'GPU', 'CPU'], help='device target (default: Ascend)')
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
+if args.device_target == "Ascend":
+    context.set_context(device_id=args.device_id)
 
 if __name__ == '__main__':
     net = MaskRcnn_Infer(config=config)
@@ -47,5 +49,7 @@ if __name__ == '__main__':
     bs = config.test_batch_size
 
     img = Tensor(np.zeros([args.batch_size, 3, config.img_height, config.img_width], np.float16))
+    img_metas = Tensor(np.zeros([args.batch_size, 4], np.float16))
 
-    export(net, img, file_name=args.file_name, file_format=args.file_format)
+    input_data = [img, img_metas]
+    export(net, *input_data, file_name=args.file_name, file_format=args.file_format)

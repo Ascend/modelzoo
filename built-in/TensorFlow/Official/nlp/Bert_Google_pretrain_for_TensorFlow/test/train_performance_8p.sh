@@ -145,7 +145,7 @@ do
 
     nohup python3 run_pretraining.py \
         --input_file=${data_path}* \
-        --output_dir=${cur_path}/${output_dir} \
+        --output_dir=${cur_path}/output/$ASCEND_DEVICE_ID/${output_dir} \
         --do_train=True \
         --do_eval=True \
         --bert_config_file=${bert_config_file} \
@@ -175,8 +175,8 @@ FPS=`awk 'BEGIN{printf "%d\n", '$step_sec' * '$train_batch_size' * '$RANK_SIZE'}
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-masked_lm_accuracy=`grep -a 'masked_lm_accuracy' $cur_path/$output_dir/eval_results.txt|awk '{print $3}'`
-next_sentence_accuracy=`grep -a 'next_sentence_accuracy' $cur_path/$output_dir/eval_results.txt|awk '{print $3}'`
+masked_lm_accuracy=`grep -a 'masked_lm_accuracy' $cur_path/output/$ASCEND_DEVICE_ID/$output_dir/eval_results.txt|awk '{print $3}'`
+next_sentence_accuracy=`grep -a 'next_sentence_accuracy' $cur_path/output/$ASCEND_DEVICE_ID/$output_dir/eval_results.txt|awk '{print $3}'`
 
 #打印，不需要修改
 echo "Final Train masked_lm_accuracy : ${masked_lm_accuracy}"

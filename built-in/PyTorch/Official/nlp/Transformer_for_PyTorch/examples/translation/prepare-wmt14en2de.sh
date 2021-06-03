@@ -30,13 +30,7 @@ REM_NON_PRINT_CHAR=$SCRIPTS/tokenizer/remove-non-printing-char.perl
 BPEROOT=subword-nmt
 BPE_TOKENS=40000
 
-URLS=(
-    "http://statmt.org/wmt13/training-parallel-europarl-v7.tgz"
-    "http://statmt.org/wmt13/training-parallel-commoncrawl.tgz"
-    "http://data.statmt.org/wmt17/translation-task/training-parallel-nc-v12.tgz"
-    "http://data.statmt.org/wmt17/translation-task/dev.tgz"
-    "http://statmt.org/wmt14/test-full.tgz"
-)
+
 FILES=(
     "training-parallel-europarl-v7.tgz"
     "training-parallel-commoncrawl.tgz"
@@ -50,13 +44,6 @@ CORPORA=(
     "training/news-commentary-v12.de-en"
 )
 
-# This will make the dataset compatible to the one used in "Convolutional Sequence to Sequence Learning"
-# https://arxiv.org/abs/1705.03122
-if [ "$1" == "--icml17" ]; then
-    URLS[2]="http://statmt.org/wmt14/training-parallel-nc-v9.tgz"
-    FILES[2]="training-parallel-nc-v9.tgz"
-    CORPORA[2]="training/news-commentary-v9.de-en"
-fi
 
 # This will make the dataset comparable to the one used in "Scaling Neural Machine Translation"
 # https://arxiv.org/abs/1806.00187
@@ -81,7 +68,7 @@ mkdir -p $orig $tmp $prep
 
 cd $orig
 
-for ((i=0;i<${#URLS[@]};++i)); do
+for ((i=0;i<${#FILES[@]};++i)); do
     file=${FILES[i]}
     if [ -f $file ]; then
         echo "$file already exists, skipping download"
@@ -91,19 +78,7 @@ for ((i=0;i<${#URLS[@]};++i)); do
             tar xvf $file
         fi
     else
-        url=${URLS[i]}
-        wget "$url"
-        if [ -f $file ]; then
-            echo "$url successfully downloaded."
-        else
-            echo "$url not successfully downloaded."
-            exit -1
-        fi
-        if [ ${file: -4} == ".tgz" ]; then
-            tar zxvf $file
-        elif [ ${file: -4} == ".tar" ]; then
-            tar xvf $file
-        fi
+        echo "$file not exists, ERROR"
     fi
 done
 cd ..

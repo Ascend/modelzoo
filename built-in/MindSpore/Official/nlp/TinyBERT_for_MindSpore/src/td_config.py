@@ -46,7 +46,7 @@ phase2_cfg = edict({
             'learning_rate': 2e-5,
             'end_learning_rate': 1e-14,
             'power': 1.0,
-            'weight_decay': 1e-4,
+            'weight_decay': 4e-4,
             'eps': 1e-6,
             'decay_filter': lambda x: 'layernorm' not in x.name.lower() and 'bias' not in x.name.lower(),
         }),

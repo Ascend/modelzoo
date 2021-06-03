@@ -122,6 +122,10 @@ parser.add_argument('--loss-scale', default=1024., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
+parser.add_argument('--class_num', default=1000, type=int,
+                    help='number of class')
+parser.add_argument('--pretrained_weight', default='', type=str, metavar='PATH',
+                    help='path to pretrained weight')
 
 warnings.filterwarnings('ignore')
 best_acc1 = 0
@@ -181,9 +185,6 @@ def main():
         # main_worker process function
         # The child process uses the environment variables of the parent process,
         # we have to set KERNEL_NAME_ID for every proc
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
-
-    else:
         # Simply call main_worker function
         main_worker(args.gpu, ngpus_per_node, args)
 
@@ -191,9 +192,7 @@ def main():
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = args.process_device_map[gpu]
-
-    if args.gpu is not None:
-        print("[npu id:", args.gpu, "]", "Use GPU: {} for training".format(args.gpu))
+    print("npu id:", args.gpu)
 
     if args.distributed:
         if args.dist_url == "env://" and args.rank == -1:

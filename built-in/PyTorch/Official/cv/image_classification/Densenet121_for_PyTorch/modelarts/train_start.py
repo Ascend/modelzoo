@@ -132,6 +132,8 @@ parser.add_argument('--train_url',
                     help="setting dir of training output")
 parser.add_argument('--onnx', default=True, action='store_true',
                     help="convert pth model to onnx")
+parser.add_argument('--class_num', default=1000, type=int,
+                    help='number of class')
 
 cur_step = 0
 CACHE_TRAINING_URL = "/cache/training"
@@ -208,11 +210,11 @@ def main_worker(gpu, ngpus_per_node, args):
         os.makedirs(CACHE_MODEL_URL, exist_ok=True)
         mox.file.copy_parallel(args.pretrained_weight, os.path.join(CACHE_MODEL_URL, "checkpoint.pth.tar"))
         # ------------------modelarts modification---------------------
-        args.pretrained_weight = os.path.join(CACHE_MODEL_URL, "checkpoint.pth")
-        model = densenet121(pretrained=True)
+        args.pretrained_weight = os.path.join(CACHE_MODEL_URL, "checkpoint.pth.tar")
+        model = densenet121(pretrained=True, pretrained_weight_path=args.pretrained_weight, num_classes=args.class_num)
     else:
         print("=> creating model '{}'".format(args.arch))
-        model = densenet121()
+        model = densenet121(num_classes=args.class_num)
 
     parameters = model.parameters()
     if args.fine_tuning:
@@ -220,11 +222,11 @@ def main_worker(gpu, ngpus_per_node, args):
         for param in model.parameters():
             param.requires_grad = False
         if args.arch == 'densenet121':
-            model.classifier = nn.Linear(1024, 10)
+            model.classifier = nn.Linear(1024, args.class_num)
             parameters = model.classifier.parameters()
         elif args.arch == 'densenet201':
-            model.classifier = nn.Linear(1920, 10)
-            parameters = model.classifier.parameters()
+            model.classifier = nn.Linear(1920, args.class_num)
+            parameters = model.classifier.parameters(args.class_num)
         else:
             print("Error:Fine-tuning is not supported on this architecture")
             exit(-1)
@@ -374,14 +376,14 @@ def main_worker(gpu, ngpus_per_node, args):
             break
 
     if args.onnx:
-        convert_pth_to_onnx()
+        convert_pth_to_onnx(args)
 
     # --------------modelarts modification----------
     mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
     # --------------modelarts modification end----------
 
 
-def convert_pth_to_onnx():
+def convert_pth_to_onnx(config_args):
     pth_pattern = os.path.join(CACHE_TRAINING_URL, 'checkpoint.pth.tar')
     pth_file_list = glob.glob(pth_pattern)
     if not pth_file_list:
@@ -389,7 +391,7 @@ def convert_pth_to_onnx():
         return
     pth_file = pth_file_list[0]
     onnx_path = pth_file.split(".")[0] + '.onnx'
-    convert(pth_file, onnx_path)
+    convert(pth_file, onnx_path, config_args.class_num)
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):

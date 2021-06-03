@@ -17,7 +17,7 @@ import argparse
 import numpy as np
 
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
-from eval import BuildEvalNetwork
+from src.utils.eval_utils import BuildEvalNetwork
 from src.nets import net_factory
 
 parser = argparse.ArgumentParser(description='checkpoint export')
@@ -32,6 +32,8 @@ parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"
 parser.add_argument('--model', type=str.lower, default='deeplab_v3_s8', choices=['deeplab_v3_s16', 'deeplab_v3_s8'],
                     help='Select model structure (Default: deeplab_v3_s8)')
 parser.add_argument('--num_classes', type=int, default=21, help='the number of classes (Default: 21)')
+parser.add_argument("--input_format", type=str, choices=["NCHW", "NHWC"], default="NCHW",
+                    help="NCHW or NHWC")
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
@@ -43,11 +45,14 @@ if __name__ == '__main__':
         network = net_factory.nets_map['deeplab_v3_s16'](args.num_classes, 16)
     else:
         network = net_factory.nets_map['deeplab_v3_s8'](args.num_classes, 8)
-    network = BuildEvalNetwork(network)
-    network.set_trace(False)
+    network = BuildEvalNetwork(network, args.input_format)
+    network.set_train(False)
     param_dict = load_checkpoint(args.ckpt_file)
 
     # load the parameter into net
     load_param_into_net(network, param_dict)
-    input_data = Tensor(np.ones([args.batch_size, 3, args.input_size, args.input_size]).astype(np.float32))
+    if args.input_format == "NHWC":
+        input_data = Tensor(np.ones([args.batch_size, args.input_size, args.input_size, 3]).astype(np.float32))
+    else:
+        input_data = Tensor(np.ones([args.batch_size, 3, args.input_size, args.input_size]).astype(np.float32))
     export(network, input_data, file_name=args.file_name, file_format=args.file_format)
