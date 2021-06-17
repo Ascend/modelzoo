@@ -16,8 +16,8 @@
 	-   [5.1 benchmark工具概述](#51-benchmark工具概述)
 	-   [5.2 离线推理](#52-离线推理)
 -   [6 精度对比](#6-精度对比)
-	-   [6.1 离线推理TopN精度统计](#61-离线推理TopN精度统计)
-	-   [6.2 开源TopN精度](#62-开源TopN精度)
+	-   [6.1 离线推理精度统计](#61-离线推理精度统计)
+	-   [6.2 开源精度](#62-开源精度)
 	-   [6.3 精度对比](#63-精度对比)
 -   [7 性能对比](#7-性能对比)
 	-   [7.1 npu性能数据](#71-npu性能数据)
@@ -38,8 +38,10 @@
 ### 1.2 代码地址
 [ResNeXt50代码](https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py)  
 branch:master  
-commit_id:01dfa8ea81972bb74b52dc01e6a1b43b26b62020  
-备注：commit_id是指基于该次提交时的模型代码做推理，通常选择稳定版本的最后一次提交，或代码仓最新的一次提交  
+commit id:b68adcf9a9280aef02fc08daed170d74d0892361  
+$\color{red}{说明：删除线用于说明READ.md必要的包含项，以下带有删除线的说明在README.md中需要删除}$  
+~~优先使用本任务提供的开源代码仓，填写分支与commit id，需要从github的commits中找到commit id，commit id是指基于该次提交时的模型代码做推理，通常选择稳定版本的最后一次提交，或代码仓最新的一次提交~~  
+
 
 ## 2 环境说明
 
@@ -55,14 +57,16 @@ pytorch >= 1.5.0
 torchvision >= 0.6.0
 onnx >= 1.7.0
 ```
+~~目前推理310服务器安装的是蓝区商用版本CANN 5.0.1，库若无特殊版本要求以上三个库固定这么写~~
 
 ### 2.2 python第三方库
 
 ```
-numpy == 1.18.5
-Pillow == 7.2.0
-opencv-python == 4.5.1.48
+numpy == 1.20.3
+Pillow == 8.2.0
+opencv-python == 4.5.2.54
 ```
+~~requirements.txt中需要写明本模型离线推理所有必要依赖库的具体版本，版本号即是推理310服务器上推理时使用库的版本号~~  
 
 **说明：** 
 >   X86架构：pytorch，torchvision和onnx可以通过官方下载whl包安装，其它可以通过pip3.7 install 包名 安装
@@ -83,13 +87,16 @@ opencv-python == 4.5.1.48
 ```
 wget https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth
 ```
+~~优先使用训练提供的权重文件，如果训练的权重文件网上能获则需给出网址，否则需要给出从哪获取权重文件。如果训练没有提供权重则使用开源代码仓的权重文件。需要给出权重文件名与通过md5sum命令计算的权重文件md5sum值~~  
 2.resnext50模型代码在torchvision里，安装torchvision，arm下需源码安装，参考torchvision官网，若安装过程报错请百度解决
 ```
 git clone https://github.com/pytorch/vision
 cd vision
+git reset b68adcf9a9280aef02fc08daed170d74d0892361 --hard
 python3.7 setup.py install
 cd ..
 ```
+~~如果需要对模型的开源代码做修改，以打patch的形式修改后再安装：patch -p1 < ../{patch_name}.diff~~  
 3.编写pth2onnx脚本resnext50_pth2onnx.py
 
  **说明：**  
@@ -101,7 +108,8 @@ python3.7 resnext50_pth2onnx.py resnext50_32x4d-7cdf4587.pth resnext50.onnx
 ```
 
  **模型转换要点：**  
->此模型转换为onnx不需要修改开源代码仓代码，故不需要特殊说明
+~~对于CANN包算子有问题导致模型转换失败或需要规避才能转换成功，则需要在模型转换要点里写明定位主要过程，原因与措施~~  
+>此模型转换为onnx不需要修改开源代码仓代码，故不需要特殊说明  
 
 ### 3.2 onnx转om模型
 
@@ -109,7 +117,7 @@ python3.7 resnext50_pth2onnx.py resnext50_32x4d-7cdf4587.pth resnext50.onnx
 ```
 source env.sh
 ```
-2.使用atc将onnx模型转换为om模型文件，工具使用方法可以参考[CANN V100R020C10 开发辅助工具指南 (推理) 01](https://support.huawei.com/enterprise/zh/doc/EDOC1100164868?idPath=23710424%7C251366513%7C22892968%7C251168373)
+2.使用atc将onnx模型转换为om模型文件，工具使用方法可以参考CANN 5.0.1 开发辅助工具指南 (推理) 01
 ```
 atc --framework=5 --model=./resnext50.onnx --input_format=NCHW --input_shape="image:16,3,224,224" --output=resnext50_bs16 --log=debug --soc_version=Ascend310
 ```
@@ -148,7 +156,7 @@ python3.7 gen_dataset_info.py bin ./prep_dataset ./resnext50_prep_bin.info 224 2
 
 ### 5.1 benchmark工具概述
 
-benchmark工具为华为自研的模型推理工具，支持多种模型的离线推理，能够迅速统计出模型在Ascend310上的性能，支持真实数据和纯推理两种模式，配合后处理脚本，可以实现诸多模型的端到端过程，获取工具及使用方法可以参考[CANN V100R020C10 推理benchmark工具用户指南 01](https://support.huawei.com/enterprise/zh/doc/EDOC1100164874?idPath=23710424%7C251366513%7C22892968%7C251168373)
+benchmark工具为华为自研的模型推理工具，支持多种模型的离线推理，能够迅速统计出模型在Ascend310上的性能，支持真实数据和纯推理两种模式，配合后处理脚本，可以实现诸多模型的端到端过程，获取工具及使用方法可以参考CANN 5.0.1 推理benchmark工具用户指南 01
 ### 5.2 离线推理
 1.设置环境变量
 ```
@@ -162,11 +170,11 @@ source env.sh
 
 ## 6 精度对比
 
--   **[离线推理TopN精度](#61-离线推理TopN精度)**  
--   **[开源TopN精度](#62-开源TopN精度)**  
+-   **[离线推理精度](#61-离线推理精度)**  
+-   **[开源精度](#62-开源精度)**  
 -   **[精度对比](#63-精度对比)**  
 
-### 6.1 离线推理TopN精度统计
+### 6.1 离线推理精度统计
 
 后处理统计TopN精度
 
@@ -179,9 +187,10 @@ python3.7 imagenet_acc_eval.py result/dumpOutput_device0/ /root/datasets/imagene
 ```
 {"title": "Overall statistical evaluation", "value": [{"key": "Number of images", "value": "50000"}, {"key": "Number of classes", "value": "1000"}, {"key": "Top1 accuracy", "value": "77.62%"}, {"key": "Top2 accuracy", "value": "87.42%"}, {"key": "Top3 accuracy", "value": "90.79%"}, {"key": "Top4 accuracy", "value": "92.56%"}, {"key": "Top5 accuracy", "value": "93.69%"}]
 ```
-经过对bs1与bs16的om测试，本模型batch1的精度与batch16的精度没有差别，精度数据均如上
+经过对bs1与bs16的om测试，本模型batch1的精度与batch16的精度没有差别，精度数据均如上  
+~~因为batch可能影响精度，如果模型支持多batch的话，精度测试需要且仅测试bs1与bs16的精度~~  
 
-### 6.2 开源TopN精度
+### 6.2 开源精度
 [torchvision官网精度](https://pytorch.org/vision/stable/models.html)
 ```
 Model               Acc@1     Acc@5
@@ -190,13 +199,16 @@ ResNeXt-50-32x4d    77.618    93.698
 ### 6.3 精度对比
 将得到的om离线模型推理TopN精度与该模型github代码仓上公布的精度对比，精度下降在1%范围之内，故精度达标。  
  **精度调试：**  
->没有遇到精度不达标的问题，故不需要进行精度调试
+~~对于CANN包算子有问题导致精度不达标或需要规避才能达标，则需要在精度调试里写明定位主要过程，原因与措施~~  
+>没有遇到精度不达标的问题，故不需要进行精度调试  
 
 ## 7 性能对比
 
 -   **[npu性能数据](#71-npu性能数据)**  
 -   **[T4性能数据](#72-T4性能数据)**  
 -   **[性能对比](#73-性能对比)**  
+
+~~性能数据需要测bs1，16，4，8，32的性能数据，且需要计算出单卡吞吐率。对于npu，bs1,16要在整个数据集上推理测性能，为了避免长期占用device，bs4,8,32也可以使用纯推理测性能~~  
 
 ### 7.1 npu性能数据
 benchmark工具在整个数据集上推理时也会统计性能数据，但是推理整个数据集较慢，如果这么测性能那么整个推理期间需要确保独占device，使用npu-smi info可以查看device是否空闲。也可以使用benchmark纯推理功能测得性能数据，但是由于随机数不能模拟数据分布，纯推理功能测的有些模型性能数据可能不太准，benchmark纯推理功能测性能仅为快速获取大概的性能数据以便调试优化使用，可初步确认benchmark工具在整个数据集上推理时由于device也被其它推理任务使用了导致的性能不准的问题。模型的性能以使用benchmark工具在整个数据集上推理得到bs1与bs16的性能数据为准，对于使用benchmark工具测试的batch4，8，32的性能数据在README.md中如下作记录即可。  
@@ -249,11 +261,12 @@ batch32 310单卡吞吐率：377.787x4=1511.148fps
 
 ### 7.2 T4性能数据
 在装有T4卡的服务器上测试gpu性能，测试过程请确保卡没有运行其他任务，TensorRT版本：7.2.3.4，cuda版本：11.0，cudnn版本：8.2  
+~~目前T4服务器安装的cuda,cudnn,TensorRT版本如上~~  
 batch1性能：
 ```
 trtexec --onnx=resnext50.onnx --fp16 --shapes=image:1x3x224x224 --threads
 ```
-gpu T4是4个device并行执行的结果，mean是时延（tensorrt的时延是batch个数据的推理时间），即吞吐率的倒数乘以batch
+gpu T4是4个device并行执行的结果，mean是时延（tensorrt的时延是batch个数据的推理时间），即吞吐率的倒数乘以batch。其中--fp16是算子精度，目前算子精度只测--fp16的。注意--shapes是onnx的输入节点名与shape，当onnx输入节点的batch为-1时，可以用同一个onnx文件测不同batch的性能，否则用固定batch的onnx测不同batch的性能不准  
 ```
 [03/24/2021-03:54:47] [I] GPU Compute
 [03/24/2021-03:54:47] [I] min: 1.26575 ms
@@ -321,6 +334,11 @@ batch1：374.313x4 > 1000x1/(1.31054/1)
 batch16：524.094x4 > 1000x1/(12.9561/16)  
 310单个device的吞吐率乘4即单卡吞吐率比T4单卡的吞吐率大，故310性能高于T4性能，性能达标。  
 对于batch1与batch16，310性能均高于T4性能1.2倍，该模型放在Benchmark/cv/classification目录下。  
+~~对比bs1和16，小于1倍放于Research，1-1.2倍放于Official，大于1.2倍放于Benchmark，而实际提交代码时目前都放在Research目录下~~  
  **性能优化：**  
->没有遇到性能不达标的问题，故不需要进行性能优化
+~~对于CANN包算子有问题导致性能不达标或需要规避才能达标，则需要在性能优化里写明定位主要过程，原因与措施~~  
+>没有遇到性能不达标的问题，故不需要进行性能优化  
+
+~~如果蓝区商用版本测精度或性能不达标，蓝区最新社区CANN版本测可以达标，这里需要写出原因与最新蓝区社区CANN包版本，用最新版本测。如果是无法规避的算子缺陷导致性能不达标，这里需要添加性能不达标的原因与解决方案。如果onnx因包含自定义算子不支持推理，需要说明性能是在t4上测的在线推理，如果模型不支持batch 16，也需要说明一下~~
+
 

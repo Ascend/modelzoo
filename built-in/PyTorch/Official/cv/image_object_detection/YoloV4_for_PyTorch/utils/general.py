@@ -560,10 +560,9 @@ def build_targets(p, targets, model):
             # overlaps
             gxy = t[:, 2:4]  # grid xy
             z = torch.zeros_like(gxy)
-            j, k = ((gxy % 1. < g) & (gxy > 1.)).int().T.bool()
-            l, m = ((gxy % 1. > (1 - g)) & (gxy < (gain[[2, 3]] - 1.))).int().T.bool()
-
-            mask = torch.cat((mask.view(-1), j, k, l,m), 0).to(a.dtype)
+            j, k = ((gxy % 1. < g) & (gxy > 1.)).int().T
+            l, m = ((gxy % 1. > (1 - g)) & (gxy < (gain[[2, 3]] - 1.))).int().T
+            mask = torch.cat((mask.view(-1).int(), j, k, l, m), 0)
             a, t = torch.cat((a, a, a, a, a), 0) * mask, torch.cat((t, t, t, t, t), 0) * mask.view(-1, 1)
             offsets = torch.cat((z, z + off[0], z + off[1], z + off[2], z + off[3]), 0) * g
             offsets = offsets * mask.view(-1, 1)

@@ -3,20 +3,18 @@
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
-Network="ResNet34_ID1594_for_PyTorch"
+Network="Yolov4_for_PyTorch"
 # 训练batch_size
-batch_size=256
+batch_size=32
 # 训练使用的npu卡数
 export RANK_SIZE=1
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
 # 训练epoch
-train_epochs=1
+train_epochs=300
 # 指定训练所使用的npu device卡id
 device_id=0
-# 学习率
-learning_rate=1.6
 
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
@@ -73,22 +71,18 @@ fi
 start_time=$(date +%s)
 # source 环境变量
 source ${test_path_dir}/env.sh
-python3.7 ./main.py \
-    ${data_path} \
-    -a resnet34 \
-    --addr=$(hostname -I |awk '{print $1}') \
-    --seed=49 \
-    --workers=$(nproc) \
-    --learning-rate=${learning_rate} \
-    --mom=0.9 \
-    --weight-decay=1.0e-04  \
-    --print-freq=1 \
-    --device='npu' \
-    --gpu=$ASCEND_DEVICE_ID \
-    --dist-backend 'hccl' \
-    --epochs=${train_epochs} \
-    --batch-size=${batch_size} \
-    --amp > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+taskset -c 0-23 python3.7 train.py \
+                --device_id ${ASCEND_DEVICE_ID} \
+                --img 608 608 \
+                --data coco.yaml \
+                --cfg cfg/yolov4.cfg \
+                --weights '' \
+                --name yolov4 \
+                --batch-size ${batch_size} \
+                --amp \
+                --opt-level O1 \
+                --loss_scale 128 \
+                --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 
@@ -99,7 +93,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
+FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $4}'|awk 'END {print}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 

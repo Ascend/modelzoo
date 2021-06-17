@@ -1,7 +1,7 @@
 source ./test/env.sh
 taskset -c 0-95 python3.7 train_8p.py --img 608 608 \
-	                                    --data coco.yaml \
-				                              --cfg cfg/yolov4_8p.cfg \
+                                      --data coco.yaml \
+                                      --cfg cfg/yolov4_8p.cfg \
                                       --weights '' \
                                       --name yolov4 \
                                       --batch-size 256 \

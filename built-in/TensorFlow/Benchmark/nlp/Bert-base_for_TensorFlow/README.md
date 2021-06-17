@@ -175,6 +175,11 @@
 - 启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
 
    [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+- 脚本修改:
+  版本Atlas Data Center SolutionV100R020C30之前的版本:
+
+  修改src/pretrain/run_pretraining.py文件，将apply_grads/overflow_status_reduce_all改为apply_grads/All
+
 
  - 单卡训练
     
@@ -201,22 +206,6 @@
         ```
         bash scripts/run_8p.sh
         ```
-
--  验证。
-
-    1. 提供三个脚本，分别是文本分类任务，序列标注任务，阅读理解任务，并且提供了XNLI，LCQMC，CHNSENTI，NER，CMRC的数据处理方法示例，用户可根据自己的下游任务需要改写和处理数据。然后运行脚本，参考超参已经写入脚本供用户参考。
-    
-        执行命令：
-        
-        ```
-        bash scripts/run_downstream_classifier.sh进行分类下游任务。
-        
-        bash scripts/run_downstream_ner.sh进行序列标注下游任务。
-        
-        bash scripts/run_downstream_reading.sh进行阅读理解下游任务。
-        ```
-    
-    2. 执行命令前请先阅读相应bash脚本，补充相应文件路径。
 
 
 <h2 id="高级参考.md">高级参考</h2>
@@ -324,11 +313,4 @@ I0521 19:45:05.733291 281473385623568 basic_session_run_hooks.py:260] global_ste
 
 ```
 
-调优过程
-
-通过“快速上手”中的调优说明(即验证章节)，对自己的下游任务进行调优和预测。
-
-## 推理/验证过程<a name="section1465595372416"></a>
-
-见下游任务Finetune（“快速上手”中的验证章节）。
 

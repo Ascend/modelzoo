@@ -11,7 +11,7 @@ export JOB_ID=10087
 # 数据集路径,保持为空,不需要修改
 data_path=""
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
+#export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
@@ -169,18 +169,18 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-step_sec=`grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log| sed -n 20p | awk '{print $2}'`
-FPS=`awk 'BEGIN{printf "%d\n", '$step_sec' * '$train_batch_size' * '$RANK_SIZE'}'`
+#step_sec=`grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log| sed -n 20p | awk '{print $2}'`
+#FPS=`awk 'BEGIN{printf "%d\n", '$step_sec' * '$train_batch_size' * '$RANK_SIZE'}'`
 #打印，不需要修改
-echo "Final Performance images/sec : $FPS"
+#echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-masked_lm_accuracy=`grep -a 'masked_lm_accuracy' $cur_path/output/$ASCEND_DEVICE_ID/$output_dir/eval_results.txt|awk '{print $3}'`
-next_sentence_accuracy=`grep -a 'next_sentence_accuracy' $cur_path/output/$ASCEND_DEVICE_ID/$output_dir/eval_results.txt|awk '{print $3}'`
+#masked_lm_accuracy=`grep -a 'masked_lm_accuracy' $cur_path/output/$ASCEND_DEVICE_ID/$output_dir/eval_results.txt|awk '{print $3}'`
+#next_sentence_accuracy=`grep -a 'next_sentence_accuracy' $cur_path/output/$ASCEND_DEVICE_ID/$output_dir/eval_results.txt|awk '{print $3}'`
 
 #打印，不需要修改
-echo "Final Train masked_lm_accuracy : ${masked_lm_accuracy}"
-echo "Final Train next_sentence_accuracy : ${next_sentence_accuracy}"
+#echo "Final Train masked_lm_accuracy : ${masked_lm_accuracy}"
+#echo "Final Train next_sentence_accuracy : ${next_sentence_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 #稳定性精度看护结果汇总
@@ -191,13 +191,22 @@ CaseName=${Network}_${type}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 
 ##获取性能数据
 #吞吐量，不需要修改
-ActualFPS=${FPS}
+#ActualFPS=${FPS}
 #单迭代训练时长，不需要修改
 #TrainingTime=`expr ${train_batch_size} \* 1000 / ${FPS}`
-TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${train_batch_size}'*1000/'${FPS}'}'`
+#TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${train_batch_size}'*1000/'${FPS}'}'`
+
+###获取错误信息
+error_msg="EE9999"
+#判断错误信息是否和历史状态一致，此处无需修改
+Status=`grep "${error_msg}" $cur_path/output/2/train_2.log|wc -l`
+#失败阶段，枚举值图准备FAIL/图拆分FAIL/图优化FAIL/图编译FAIL/图执行FAIL/流程OK
+ModelStatus="图执行FAIL"
+#DTS单号或者issue链接
+DTS_Number="DTS2021051407QSFEP1H00"
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep "INFO:tensorflow:global_step = " ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $6}'| cut -d , -f 1 >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+#grep "INFO:tensorflow:global_step = " ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $6}'| cut -d , -f 1 >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
@@ -205,10 +214,14 @@ ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseNam
 #关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "ModelStatus = ${ModelStatus}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "DTS_Number = ${DTS_Number}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "Status = ${Status}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "error_msg = ${error_msg}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

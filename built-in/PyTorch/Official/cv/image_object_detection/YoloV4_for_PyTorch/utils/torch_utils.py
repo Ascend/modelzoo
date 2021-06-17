@@ -218,7 +218,8 @@ class ModelEMA:
             d = self.decay(self.updates)
 
             if device=='npu':
-                from tensor_fused_plugin import combine_npu
+                # from tensor_fused_plugin import combine_npu
+                from apex.contrib.combine_tensors import combine_npu
                 d_inv = 1. - d
                 d = torch.tensor([d], device=device)
                 if not self.is_fused:

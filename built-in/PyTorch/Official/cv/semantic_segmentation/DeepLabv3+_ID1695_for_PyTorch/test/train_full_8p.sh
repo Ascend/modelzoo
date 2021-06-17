@@ -23,6 +23,8 @@ do
         train_epochs=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --more_path1* ]];then
+        more_path1=`echo ${para#*=}`
     fi
 done
 
@@ -50,9 +52,10 @@ fi
 data_path=\"${data_path}\"
 sed -i 's#dataset_path=.*$#dataset_path='$data_path'#' ./mypath.py
 # cp pth文件
-if [ -f /npu/traindata/resnet101-5d3b4d8f.pth ]; then
+if [ -f ${more_path1}/resnet101-5d3b4d8f.pth ]; then
+    echo "pth file exists"
     mkdir -p /root/.cache/torch/checkpoints
-    cp /npu/traindata/resnet101-5d3b4d8f.pth /root/.cache/torch/checkpoints/resnet101-5d3b4d8f.pth
+    cp ${more_path1}/resnet101-5d3b4d8f.pth /root/.cache/torch/checkpoints/resnet101-5d3b4d8f.pth
 fi
 
 #################创建日志输出目录，不需要修改#################
@@ -69,7 +72,7 @@ fi
 # 训练开始时间，不需要修改
 start_time=$(date +%s)
 # source 环境变量
-source ${test_path_dir}/env.sh
+# source ${test_path_dir}/env.sh
 python3.7 -m train_NPU_8p \
     --backbone resnet \
     --lr ${learning_rate} \

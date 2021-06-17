@@ -13,8 +13,7 @@ data_path=""
 
 # 训练epoch
 train_epochs=300
-# 学习率
-learning_rate=1.0
+
 
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
@@ -66,7 +65,7 @@ taskset -c 0-95 python3.7 train_8p.py --img 608 608 \
 				                              --cfg cfg/yolov4_8p.cfg \
                                       --weights '' \
                                       --name yolov4 \
-                                      --batch-size 256 \
+                                      --batch-size ${batch_size} \
                                       --epochs=${train_epochs} \
                                       --amp \
                                       --opt-level O1 \
@@ -90,7 +89,7 @@ e2e_time=$(( $end_time - $start_time ))
 # 结果打印，不需要修改
 echo "------------------ Final result ------------------"
 # 输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
+FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $4}'|awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 

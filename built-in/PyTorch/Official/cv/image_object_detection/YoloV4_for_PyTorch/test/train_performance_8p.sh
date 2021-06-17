@@ -3,18 +3,17 @@
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
-Network="ResNet34_ID1594_for_PyTorch"
+Network="Yolov4_for_PyTorch"
 # 训练batch_size
-batch_size=4096
+batch_size=256
 # 训练使用的npu卡数
 export RANK_SIZE=8
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
 # 训练epoch
-train_epochs=2
-# 学习率
-learning_rate=1.0
+train_epochs=300
+
 
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
@@ -61,25 +60,25 @@ fi
 start_time=$(date +%s)
 # source 环境变量
 source ${test_path_dir}/env.sh
-python3.7 ./main.py \
-    ${data_path} \
-    -a resnet34 \
-    --addr=$(hostname -I |awk '{print $1}') \
-    --seed=49 \
-    --workers=$(nproc) \
-    --learning-rate=${learning_rate} \
-    --mom=0.9 \
-    --weight-decay=1.0e-04  \
-    --print-freq=1 \
-    --dist-url='tcp://127.0.0.1:41111' \
-    --dist-backend 'hccl' \
-    --multiprocessing-distributed \
-    --world-size=1 \
-    --rank=0 \
-    --device='npu' \
-    --epochs=${train_epochs} \
-    --amp \
-    --batch-size=${batch_size} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+taskset -c 0-95 python3.7 train_8p.py --img 608 608 \
+	                                    --data coco.yaml \
+				                              --cfg cfg/yolov4_8p.cfg \
+                                      --weights '' \
+                                      --name yolov4 \
+                                      --batch-size ${batch_size}\
+**                                   --epochs=${train_epochs} \
+                                      --amp \
+                                      --opt-level O1 \
+                                      --loss_scale 128 \
+                                      --multiprocessing_distributed \
+                                      --device 'npu' \
+                                      --global_rank 0 \
+                                      --device_list 0,1,2,3,4,5,6,7 \
+                                      --world_size 1 \
+                                      --addr $(hostname -I |awk '{print $1}') \
+                                      --dist_url 'tcp://127.0.0.1:41111' \
+                                      --dist_backend 'hccl' \
+                                      --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 
@@ -90,7 +89,7 @@ e2e_time=$(( $end_time - $start_time ))
 # 结果打印，不需要修改
 echo "------------------ Final result ------------------"
 # 输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
+FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $4}'|awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
@@ -128,4 +127,4 @@ echo "ActualFPS = ${ActualFPS}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${C
 echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log-

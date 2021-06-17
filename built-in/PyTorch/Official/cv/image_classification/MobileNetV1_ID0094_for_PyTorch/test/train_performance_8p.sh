@@ -8,7 +8,7 @@ cur_path=`pwd`
 export RANK_SIZE=8
 export JOB_ID=10087
 RANK_ID_START=0
-source env.sh
+
 RANK_SIZE=8
 # 数据集路径,保持为空,不需要修改
 data_path="/npu/traindata/imagenet_pytorch/"

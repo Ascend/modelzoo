@@ -76,7 +76,7 @@ def test(data,
 
     else:  # called directly
         loc = 'npu:{}'.format(opt.device)
-        device = torch.device(loc) if opt.device != 'cpu' else torch.device('cpu')
+        device = torch.device(loc) if opt.device == 'npu' else torch.device('cpu')
         merge, save_txt = opt.merge, opt.save_txt  # use Merge NMS, save *.txt labels
         if save_txt:
             out = Path('inference/output')
@@ -136,7 +136,7 @@ def test(data,
         img = img.to(device, non_blocking=True)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
-        # targets = targets.to(device)
+        targets = targets.to(device)
         nb, _, height, width = img.shape  # batch size, channels, height, width
         whwh = torch.Tensor([width, height, width, height])
 
@@ -148,14 +148,14 @@ def test(data,
             t0 += time_synchronized() - t
 
             # Compute loss
-            if training:  # if model has loss hyperparameters
-                loss += compute_loss([x.float() for x in train_out], targets, model)[1][:3]  # GIoU, obj, cls
+            # if training:  # if model has loss hyperparameters
+            #    loss += compute_loss([x.float() for x in train_out], targets, model)[1][:3]  # GIoU, obj, cls
 
             # Run NMS
             t = time_synchronized()
             output = non_max_suppression(inf_out, conf_thres=conf_thres, iou_thres=iou_thres, merge=merge)
             t1 += time_synchronized() - t
-
+        targets = targets.cpu()
         # Statistics per image
         for si, pred in enumerate(output):
             labels = targets[targets[:, 0] == si, 1:]

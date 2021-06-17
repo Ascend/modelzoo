@@ -214,10 +214,10 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
-        model = densenet121(pretrained=True)
+        model = densenet121(pretrained=True, pretrained_weight_path=args.pretrained_weight, num_classes=args.class_num)
     else:
         print("=> creating model '{}'".format(args.arch))
-        model = densenet121()
+        model = densenet121(num_classes=args.class_num)
 
     parameters = model.parameters()
     if args.fine_tuning:
@@ -225,10 +225,10 @@ def main_worker(gpu, ngpus_per_node, args):
         for param in model.parameters():
             param.requires_grad = False
         if args.arch == 'densenet121':
-            model.classifier = nn.Linear(1024, 101)
+            model.classifier = nn.Linear(1024, args.class_num)
             parameters = model.classifier.parameters()
         elif args.arch == 'densenet201':
-            model.classifier = nn.Linear(1920, 101)
+            model.classifier = nn.Linear(1920, args.class_num)
             parameters = model.classifier.parameters()
         else:
             print("Error:Fine-tuning is not supported on this architecture")
@@ -277,12 +277,8 @@ def main_worker(gpu, ngpus_per_node, args):
         batch_size=args.batch_size, shuffle=True,
         num_workers=args.workers, pin_memory=False, drop_last=True)
 
-    # create model
-    print("[npu id:", args.gpu, "]", "=> creating model '{}'".format(args.arch))
-    model = densenet121()
-    model = model.to(loc)
-
     # define loss function (criterion) and optimizer
+    model = model.to(loc)
     criterion = nn.CrossEntropyLoss().to(loc)
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum=args.momentum,

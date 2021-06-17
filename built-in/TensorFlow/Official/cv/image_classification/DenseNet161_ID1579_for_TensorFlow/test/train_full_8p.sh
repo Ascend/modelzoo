@@ -2,7 +2,7 @@
 
 #当前路径,不需要修改
 cur_path=`pwd`
-source env.sh
+#source env.sh
 #集合通信参数,不需要修改
 
 export RANK_SIZE=8

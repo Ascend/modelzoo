@@ -1,9 +1,7 @@
-numpy == 1.17
+numpy
 opencv-python >= 4.1
-torch == 1.6
-torchvision
 matplotlib
 pycocotools
 tqdm
 pillow
-tensorboard >= 1.14
+tensorboard == 1.14

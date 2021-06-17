@@ -45,7 +45,6 @@ if [ $? != 0 ]; then
     exit -1
 fi
 echo "====accuracy data===="
-echo "pth top1:77.618% top5:93.698%"
 python3.7 test/parse.py result_bs1.json
 if [ $? != 0 ]; then
     echo "fail!"
@@ -57,8 +56,6 @@ if [ $? != 0 ]; then
     exit -1
 fi
 echo "====performance data===="
-echo "t4 bs1  fps:763.044"
-echo "t4 bs16 fps:1234.940"
 python3.7 test/parse.py result/perf_vision_batchsize_1_device_0.txt
 if [ $? != 0 ]; then
     echo "fail!"

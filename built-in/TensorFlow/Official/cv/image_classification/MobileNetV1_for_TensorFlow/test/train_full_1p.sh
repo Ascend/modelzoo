@@ -1,5 +1,5 @@
 #!/bin/bash
-source env.sh
+
 #当前路径,不需要修改
 cur_path=`pwd`
 

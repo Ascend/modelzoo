@@ -171,8 +171,9 @@ def train(hyp, opt, device, tb_writer=None):
     if rank in [-1, 0]:
         ema.updates = start_epoch * nb // accumulate  # set EMA updates ***
         # local_rank is set to -1. Because only the first process is expected to do evaluation.
-        testloader = create_dataloader(test_path, imgsz_test, batch_size, gs, opt, hyp=hyp, augment=False,
-                                       cache=opt.cache_images, rect=True, local_rank=-1, world_size=opt.world_size)[0]
+        testloader = create_dataloader(test_path, imgsz_test, batch_size, imgsz_test + 32, opt, hyp=hyp, augment=False,
+                                       cache=opt.cache_images, pad=0.0, rect=True, local_rank=-1,
+                                       world_size=opt.world_size)[0]
 
     # Model parameters
     hyp['cls'] *= nc / 80.  # scale coco-tuned hyp['cls'] to current dataset
@@ -241,6 +242,7 @@ def train(hyp, opt, device, tb_writer=None):
             print(('\n' + '%10s' * 8) % ('Epoch', 'gpu_mem', 'GIoU', 'obj', 'cls', 'total', 'targets', 'img_size'))
             pbar = tqdm(pbar, total=nb)  # progress bar
         optimizer.zero_grad()
+        start_time = time.time()
         for i, (imgs, targets, paths, _) in pbar:  # batch -------------------------------------------------------------
             ni = i + nb * epoch  # number integrated batches (since train start)
             imgs = imgs.to(device, non_blocking=True).float() / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
@@ -315,7 +317,9 @@ def train(hyp, opt, device, tb_writer=None):
                         # tb_writer.add_graph(model, imgs)  # add model to tensorboard
 
             # end batch ------------------------------------------------------------------------------------------------
-
+        if rank in [-1, 0]:
+            epoch_time = time.time() - start_time
+            print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
         # Scheduler
         scheduler.step()
 

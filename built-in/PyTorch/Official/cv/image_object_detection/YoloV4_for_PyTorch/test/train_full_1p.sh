@@ -15,8 +15,6 @@ data_path=""
 train_epochs=300
 # 指定训练所使用的npu device卡id
 device_id=0
-# 学习率
-learning_rate=1.6
 
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
@@ -74,8 +72,9 @@ start_time=$(date +%s)
 # source 环境变量
 source ${test_path_dir}/env.sh
 taskset -c 0-23 python3.7 train.py \
-                --device_id $ASCEND_DEVICE_ID \
-                --img 608 608 --data coco.yaml \
+                --device_id ${ASCEND_DEVICE_ID} \
+                --img 608 608 \
+                --data coco.yaml \
                 --cfg cfg/yolov4.cfg \
                 --weights '' \
                 --name yolov4 \
@@ -94,7 +93,7 @@ e2e_time=$(( $end_time - $start_time ))
 # 结果打印，不需要修改
 echo "------------------ Final result ------------------"
 # 输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
+FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $4}'|awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
