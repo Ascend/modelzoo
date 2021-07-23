@@ -27,6 +27,8 @@ do
         data_path=`echo ${para#*=}`
     elif [[ $para == --more_path1* ]];then
         more_path1=`echo ${para#*=}`
+    elif [[ $para == --precision_mode* ]];then
+        precision_mode=`echo ${para#*=}`
     fi
 done
 
@@ -83,15 +85,17 @@ fi
 #################启动训练脚本#################
 #训练开始时间，不需要修改
 start_time=$(date +%s)
+
 # source 环境变量
-# source ${test_path_dir}/env.sh
-python3.7 train_NPU.py \
+source ${test_path_dir}/env.sh
+
+python3 train.py \
     --backbone resnet \
     --lr ${learning_rate} \
     --workers 64 \
     --epochs ${train_epochs} \
     --batch-size ${batch_size} \
-    --gpu-ids ${ASCEND_DEVICE_ID} \
+    --device_id ${ASCEND_DEVICE_ID} \
     --checkname deeplab-resnet \
     --eval-interval 1 \
     --dataset pascal > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &

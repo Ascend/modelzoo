@@ -55,7 +55,7 @@ class SBDSegmentation(data.Dataset):
         :param split: train/val
         :param transform: transform to apply
         """
-        super(SBDSegmentation,self).__init__()
+        super().__init__()
         self._base_dir = base_dir
         self._dataset_dir = os.path.join(self._base_dir, 'dataset')
         self._image_dir = os.path.join(self._dataset_dir, 'img')

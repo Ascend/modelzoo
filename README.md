@@ -46,11 +46,10 @@ Thank You!
             
 		
 
-
-     -Official
-	
- 
-	
+- built-in
+    - Official
+- contrib
+    - Official
 
 - MindSpore
 	
@@ -100,19 +99,36 @@ Thank You!
     -Official
 
 	- [AlexNet_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/AlexNet_for_ACL)
+	- [CRNN_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/CRNN_for_ACL)
+	- [Deeplapv3_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Deeplapv3_for_ACL)
+	- [Deeplapv3_plus_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Deeplapv3_plus_for_ACL)
+	- [DenseNet121_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/DenseNet121_for_ACL)
+	- [EfficientNet_B0_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/EfficientNet_B0_for_ACL)
+	- [Face_Resnet50_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Face_Resnet50_for_ACL)
+	- [Facenet_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Facenet_for_ACL)	
 	- [GoogleNet_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/GoogleNet_for_ACL)
-	- [Inceptionv4_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Inceptionv4_for_ACL)
+	- [Inceptionv3_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Inceptionv3_for_ACL)
+ 	- [Inceptionv4_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Inceptionv4_for_ACL)
+	- [MobileNetv1_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/MobileNetv1_for_ACL)
 	- [MobileNetv2_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/MobileNetv2_for_ACL)
+	- [MobileNetv3_Large_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/MobileNetv3_Large_for_ACL)
+	- [OpenPose_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/OpenPose_for_ACL)
 	- [ResNext50_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet101_for_ACL)
 	- [Resnet101_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet101_for_ACL)
 	- [Resnet50_HC_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet50_HC_for_ACL)
 	- [Resnet50_TF_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet50_TF_for_ACL)
+	- [Resnet18_TF_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet18_TF_for_ACL)
+	- [Resnet34_TF_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet34_TF_for_ACL)
+	- [RetinaNet_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/RetinaNet_for_ACL)
+	- [SSD-Resnet34_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/SSD-Resnet34_for_ACL)
+	- [SSD_Resnet50_FPN_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/SSD_Resnet50_FPN_for_ACL)
 	- [Vgg16_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Vgg16_for_ACL)
+	- [Vgg19_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Vgg19_for_ACL)
+	- [Xception_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Xception_for_ACL)
 	- [YOLOv3_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/YOLOv3_for_ACL)
 	- [BertTnews_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/nlp/BertTnews_for_ACL)
 	- [JASPER_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/nlp/JASPER_for_ACL)
-
-
+	- [WideDeep_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/recommendation/WideDeep_for_ACL)
 		
 
 					

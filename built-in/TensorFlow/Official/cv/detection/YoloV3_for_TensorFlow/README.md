@@ -78,7 +78,7 @@ Training hyperparameter (single card-single scale):
 ```python
 python3 coco_trainval_anns.py
 python3 coco_minival_anns.py
-```  
+```
 One line for one image, in the format like `image_index image_absolute_path img_width img_height box_1 box_2 ... box_n`.    
 Box_x format: 
 - `label_index x_min y_min x_max y_max`. (The origin of coordinates is at the left top corner, left top => (xmin, ymin), right bottom => (xmax, ymax).)       
@@ -347,23 +347,11 @@ Configuration file description:
 ### Running the example
 
 #### Training
-1. single scale
-Using `npu_train_*p_single.sh`. The hyper-parameters and the corresponding annotations can be found in `args_single.py`:
-
-```shell
-bash npu_train_1p_single.sh 
-or 
-bash npu_train_8p_single.sh
+```
+bash npu_train.sh --data_path=... [--save_dir=... --batch_size=... --mode=... --rank_size=...]
 ```
 
-2. multi scale
-Using `npu_train_*p_multi.sh`. The hyper-parameters and the corresponding annotations can be found in `args_multi.py`:
-
-```shell
-bash npu_train_1p_multi.sh 
-or 
-bash npu_train_8p_multi.sh
-```
+bash npu_train.sh --help/-h for help info.
 
 Check the `args.py` for more details. You should set the parameters yourself in your own specific task.
 
@@ -372,9 +360,9 @@ Check the `args.py` for more details. You should set the parameters yourself in 
 All the results of the training will be stored:
 
      1. nohup.out -- training task main_log
-
+    
      2. training/t1/D0/train_0.log -- training host log
-
+    
      3. training/t1/D0/training/train.log -- training perf log
 
 #### Evaluation

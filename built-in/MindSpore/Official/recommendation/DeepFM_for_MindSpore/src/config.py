@@ -16,7 +16,8 @@
 network config setting, will be used in train.py and eval.py
 """
 
-class DataConfig:
+
+class DataConfig(object):
     """data config"""
     data_vocab_size = 184965
     train_num_of_parts = 21
@@ -25,7 +26,8 @@ class DataConfig:
     data_field_size = 39
     data_format = 1
 
-class ModelConfig:
+
+class ModelConfig(object):
     """model config"""
     batch_size = DataConfig.batch_size
     data_field_size = DataConfig.data_field_size
@@ -37,7 +39,8 @@ class ModelConfig:
     keep_prob = 0.9
     convert_dtype = True
 
-class TrainConfig:
+
+class TrainConfig(object):
     """train config"""
     batch_size = DataConfig.batch_size
     l2_coef = 8e-5
@@ -45,12 +48,12 @@ class TrainConfig:
     epsilon = 5e-8
     loss_scale = 1024.0
 
-    train_epochs = 5
+    train_epochs = 15
 
     save_checkpoint = True
     ckpt_file_name_prefix = "deepfm"
     save_checkpoint_steps = 1
-    keep_checkpoint_max = 50
+    keep_checkpoint_max = 5
 
     eval_callback = True
     loss_callback = True

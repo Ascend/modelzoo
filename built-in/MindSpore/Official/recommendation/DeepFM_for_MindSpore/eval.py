@@ -28,13 +28,24 @@ from src.dataset import create_dataset, DataType
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 parser = argparse.ArgumentParser(description='CTR Prediction')
-parser.add_argument('--checkpoint_path', type=str, default=None, help='Checkpoint file path')
-parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
+parser.add_argument(
+    '--checkpoint_path',
+    type=str,
+    default=None,
+    help='Checkpoint file path')
+parser.add_argument(
+    '--dataset_path',
+    type=str,
+    default=None,
+    help='Dataset path')
 parser.add_argument('--device_target', type=str, default="Ascend", choices=("Ascend", "GPU", "CPU"),
                     help="device target, support Ascend, GPU and CPU.")
 args_opt, _ = parser.parse_known_args()
 device_id = int(os.getenv('DEVICE_ID', '0'))
-context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=device_id)
+context.set_context(
+    mode=context.GRAPH_MODE,
+    device_target=args_opt.device_target,
+    device_id=device_id)
 
 
 def add_write(file_path, print_str):
@@ -57,7 +68,11 @@ if __name__ == '__main__':
     train_net.set_train()
     eval_net.set_train(False)
     auc_metric = AUCMetric()
-    model = Model(train_net, eval_network=eval_net, metrics={"auc": auc_metric})
+    model = Model(
+        train_net,
+        eval_network=eval_net,
+        metrics={
+            "auc": auc_metric})
     param_dict = load_checkpoint(args_opt.checkpoint_path)
     load_param_into_net(eval_net, param_dict)
 

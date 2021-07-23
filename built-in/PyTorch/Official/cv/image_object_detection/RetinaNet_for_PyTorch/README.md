@@ -68,6 +68,7 @@ source pt_set_env.sh
 chmod +x ./tools/dist_train.sh
 sh train_retinanet_1p.sh
 ```
+若需要指定训练使用的卡号, 可修改train_retinanet_1p.sh文件 "--gpu-ids 0"配置项,其中卡号为0-7
 
 ### 8卡
 1. 运行 train_retinanet_8p.sh

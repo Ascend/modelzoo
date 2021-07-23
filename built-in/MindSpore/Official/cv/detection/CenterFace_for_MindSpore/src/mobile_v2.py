@@ -22,6 +22,7 @@ from src.var_init import KaimingNormal
 
 __all__ = ['MobileNetV2', 'mobilenet_v2']
 
+
 def _make_divisible(v, divisor, min_value=None):
     """
     This function is taken from the original tf repo.
@@ -46,7 +47,9 @@ class ConvBNReLU(nn.Cell):
     """
     Convolution and batchnorm and relu
     """
-    def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1):
+
+    def __init__(self, in_planes, out_planes,
+                 kernel_size=3, stride=1, groups=1):
         padding = (kernel_size - 1) // 2
         super(ConvBNReLU, self).__init__()
         if groups == 1:
@@ -56,7 +59,11 @@ class ConvBNReLU(nn.Cell):
             conv = nn.Conv2d(in_planes, out_planes, kernel_size, stride, pad_mode="pad", padding=padding,
                              has_bias=False, group=groups, weight_init=KaimingNormal(mode='fan_out'))
 
-        layers = [conv, nn.BatchNorm2d(out_planes).add_flags_recursive(fp32=True), nn.ReLU6()]  #, momentum=0.9
+        layers = [
+            conv,
+            nn.BatchNorm2d(out_planes).add_flags_recursive(
+                fp32=True),
+            nn.ReLU6()]  # , momentum=0.9
         self.features = nn.SequentialCell(layers)
         self.in_planes = in_planes
         self.print = P.Print()
@@ -70,6 +77,7 @@ class InvertedResidual(nn.Cell):
     """
     Inverted residual module
     """
+
     def __init__(self, inp, oup, stride, expand_ratio):
         super(InvertedResidual, self).__init__()
         self.stride = stride
@@ -84,9 +92,18 @@ class InvertedResidual(nn.Cell):
             layers.append(ConvBNReLU(inp, hidden_dim, kernel_size=1))
         layers.extend([
             # dw
-            ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim),
+            ConvBNReLU(
+                hidden_dim,
+                hidden_dim,
+                stride=stride,
+                groups=hidden_dim),
             # pw-linear
-            nn.Conv2d(hidden_dim, oup, kernel_size=1, stride=1, has_bias=False),
+            nn.Conv2d(
+                hidden_dim,
+                oup,
+                kernel_size=1,
+                stride=1,
+                has_bias=False),
             nn.BatchNorm2d(oup).add_flags_recursive(fp32=True)
         ])
 
@@ -113,7 +130,9 @@ class MobileNetV2(nn.Cell):
         round_nearest (int): Round the number of channels in each layer to be a multiple of this number
         Set to 1 to turn off rounding
     """
-    def __init__(self, width_mult=1.0, inverted_residual_setting=None, round_nearest=8):
+
+    def __init__(self, width_mult=1.0,
+                 inverted_residual_setting=None, round_nearest=8):
         super(MobileNetV2, self).__init__()
         block = InvertedResidual
         input_channel = 32
@@ -131,20 +150,28 @@ class MobileNetV2(nn.Cell):
         self.feat_id = [1, 2, 4, 6]
         self.feat_channel = []
 
-        # only check the first element, assuming user knows t,c,n,s are required
-        if inverted_residual_setting is None or len(inverted_residual_setting[0]) != 4:
+        # only check the first element, assuming user knows t,c,n,s are
+        # required
+        if inverted_residual_setting is None or len(
+                inverted_residual_setting[0]) != 4:
             raise ValueError("inverted_residual_setting should be non-empty "
                              "or a 4-element list, got {}".format(inverted_residual_setting))
 
         # building first layer
-        input_channel = _make_divisible(input_channel * width_mult, round_nearest)
+        input_channel = _make_divisible(
+            input_channel * width_mult, round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]
 
         for index, (t, c, n, s) in enumerate(inverted_residual_setting):
             output_channel = _make_divisible(c * width_mult, round_nearest)
             for i in range(n):
                 stride = s if i == 0 else 1
-                features.append(block(input_channel, output_channel, stride, expand_ratio=t))
+                features.append(
+                    block(
+                        input_channel,
+                        output_channel,
+                        stride,
+                        expand_ratio=t))
                 input_channel = output_channel
 
             if index == 1:
@@ -164,13 +191,13 @@ class MobileNetV2(nn.Cell):
                 self.feat_channel.append(output_channel)
                 features = []
 
-
     def construct(self, x):
         x1 = self.need_fp1(x)
         x2 = self.need_fp2(x1)
         x3 = self.need_fp3(x2)
         x4 = self.need_fp4(x3)
         return x1, x2, x3, x4
+
 
 def mobilenet_v2(**kwargs):
     return MobileNetV2(**kwargs)

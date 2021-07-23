@@ -132,7 +132,7 @@ def main():
             args.opt_level = 'O1'
         resnet, optimizer = amp.initialize(resnet, optimizer,
                                            opt_level=args.opt_level,
-                                           loss_scale=args.loss_scale_value)
+                                           loss_scale=args.loss_scale_value, combine_grad=True)
 
     if args.resume:
         if os.path.isfile(args.resume):

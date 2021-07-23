@@ -38,19 +38,71 @@ context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=False,
 
 parser = argparse.ArgumentParser('mindspore coco training')
 parser.add_argument('--data_dir', type=str, default='', help='train data dir')
-parser.add_argument('--test_model', type=str, default='', help='test model dir')
-parser.add_argument('--ground_truth_mat', type=str, default='', help='ground_truth, mat type')
-parser.add_argument('--save_dir', type=str, default='', help='save_path for evaluate')
-parser.add_argument('--ground_truth_path', type=str, default='', help='ground_truth path, contain all mat file')
-parser.add_argument('--eval', type=int, default=0, help='if do eval after test')
-parser.add_argument('--eval_script_path', type=str, default='', help='evaluate script path')
-parser.add_argument('--rank', type=int, default=0, help='local rank of distributed')
-parser.add_argument('--ckpt_path', type=str, default='outputs/', help='checkpoint save location')
-parser.add_argument('--ckpt_name', type=str, default="", help='input model name')
-parser.add_argument('--device_num', type=int, default=1, help='device num for testing')
-parser.add_argument('--steps_per_epoch', type=int, default=198, help='steps for each epoch')
-parser.add_argument('--start', type=int, default=0, help='start loop number, used to calculate first epoch number')
-parser.add_argument('--end', type=int, default=18, help='end loop number, used to calculate last epoch number')
+parser.add_argument(
+    '--test_model',
+    type=str,
+    default='',
+    help='test model dir')
+parser.add_argument(
+    '--ground_truth_mat',
+    type=str,
+    default='',
+    help='ground_truth, mat type')
+parser.add_argument(
+    '--save_dir',
+    type=str,
+    default='',
+    help='save_path for evaluate')
+parser.add_argument(
+    '--ground_truth_path',
+    type=str,
+    default='',
+    help='ground_truth path, contain all mat file')
+parser.add_argument(
+    '--eval',
+    type=int,
+    default=0,
+    help='if do eval after test')
+parser.add_argument(
+    '--eval_script_path',
+    type=str,
+    default='',
+    help='evaluate script path')
+parser.add_argument(
+    '--rank',
+    type=int,
+    default=0,
+    help='local rank of distributed')
+parser.add_argument(
+    '--ckpt_path',
+    type=str,
+    default='outputs/',
+    help='checkpoint save location')
+parser.add_argument(
+    '--ckpt_name',
+    type=str,
+    default="",
+    help='input model name')
+parser.add_argument(
+    '--device_num',
+    type=int,
+    default=1,
+    help='device num for testing')
+parser.add_argument(
+    '--steps_per_epoch',
+    type=int,
+    default=198,
+    help='steps for each epoch')
+parser.add_argument(
+    '--start',
+    type=int,
+    default=0,
+    help='start loop number, used to calculate first epoch number')
+parser.add_argument(
+    '--end',
+    type=int,
+    default=18,
+    help='end loop number, used to calculate last epoch number')
 
 args, _ = parser.parse_known_args()
 
@@ -71,7 +123,8 @@ if __name__ == "__main__":
 
         if args.ckpt_name == "":
             ckpt_num = loop * args.device_num + args.rank + 1
-            ckpt_name = "0-" + str(ckpt_num) + "_" + str(args.steps_per_epoch * ckpt_num) + ".ckpt"
+            ckpt_name = "0-" + str(ckpt_num) + "_" + \
+                str(args.steps_per_epoch * ckpt_num) + ".ckpt"
         else:
             ckpt_name = args.ckpt_name
 
@@ -84,7 +137,8 @@ if __name__ == "__main__":
             param_dict = load_checkpoint(test_model)
             param_dict_new = {}
             for key, values in param_dict.items():
-                if key.startswith('moments.') or key.startswith('moment1.') or key.startswith('moment2.'):
+                if key.startswith('moments.') or key.startswith(
+                        'moment1.') or key.startswith('moment2.'):
                     continue
                 elif key.startswith('centerface_network.'):
                     param_dict_new[key[19:]] = values
@@ -94,10 +148,11 @@ if __name__ == "__main__":
             load_param_into_net(network, param_dict_new)
             args.logger.info('load_model {} success'.format(test_model))
         else:
-            args.logger.info('{} not exists or not a pre-trained file'.format(test_model))
+            args.logger.info(
+                '{} not exists or not a pre-trained file'.format(test_model))
             continue
 
-        train_network_type_nms = 1 # default with num
+        train_network_type_nms = 1  # default with num
         if train_network_type_nms:
             network = CenterFaceWithNms(network)
             args.logger.info('train network type with nms')
@@ -115,7 +170,7 @@ if __name__ == "__main__":
         if args.ckpt_name == "":
             save_path = args.save_dir + str(ckpt_num) + '/'
         else:
-            save_path = args.save_dir+ '/'
+            save_path = args.save_dir + '/'
         detector = CenterFaceDetector(config, network)
 
         for index, event in enumerate(event_list):
@@ -123,7 +178,8 @@ if __name__ == "__main__":
             im_dir = event[0][0]
             if not os.path.exists(save_path + im_dir):
                 os.makedirs(save_path + im_dir)
-                args.logger.info('save_path + im_dir={}'.format(save_path + im_dir))
+                args.logger.info(
+                    'save_path + im_dir={}'.format(save_path + im_dir))
             for num, file in enumerate(file_list_item):
                 im_name = file[0][0]
                 zip_name = '%s/%s.jpg' % (im_dir, im_name)
@@ -137,12 +193,16 @@ if __name__ == "__main__":
                 f.write('{:d}\n'.format(len(dets)))
                 for b in dets[1]:
                     x1, y1, x2, y2, s = b[0], b[1], b[2], b[3], b[4]
-                    f.write('{:.1f} {:.1f} {:.1f} {:.1f} {:.3f}\n'.format(x1, y1, (x2 - x1 + 1), (y2 - y1 + 1), s))
+                    f.write(
+                        '{:.1f} {:.1f} {:.1f} {:.1f} {:.3f}\n'.format(
+                            x1, y1, (x2 - x1 + 1), (y2 - y1 + 1), s))
                 f.close()
                 args.logger.info('event:{}, num:{}'.format(index + 1, num + 1))
 
                 end = time.time()
-                args.logger.info("============num {} time {}".format(num, (end-start)*1000))
+                args.logger.info(
+                    "============num {} time {}".format(
+                        num, (end - start) * 1000))
                 start = end
 
         if args.eval:

@@ -21,22 +21,33 @@ import numpy as np
 __all__ = ["LambdaLR", "MultiplicativeLR", "StepLR", "MultiStepLR", "ExponentialLR", "CosineAnnealingLR", "CyclicLR",
            "CosineAnnealingWarmRestarts", "OneCycleLR", "POLYLR"]
 
-class _WarmUp():
+
+class _WarmUp(object):
     """
     Basic class for warm up
     """
+
     def __init__(self, warmup_init_lr):
         self.warmup_init_lr = warmup_init_lr
 
+    """
+    Get learning rate during warmup
+    """
+
     def get_lr(self, current_step=0):
-        # Get learning rate during warmup
+        """
+        get lr
+        """
+
         current_step = 0
         raise NotImplementedError
+
 
 class _LinearWarmUp(_WarmUp):
     """
     Class for linear warm up
     """
+
     def __init__(self, lr, warmup_epochs, steps_per_epoch, warmup_init_lr=0):
         self.base_lr = lr
         self.warmup_init_lr = warmup_init_lr
@@ -45,17 +56,29 @@ class _LinearWarmUp(_WarmUp):
         super(_LinearWarmUp, self).__init__(warmup_init_lr)
 
     def get_warmup_steps(self):
+        """
+        get warmup steps
+        """
+
         return self.warmup_steps
 
+
     def get_lr(self, current_step=0):
-        lr_inc = (float(self.base_lr) - float(self.warmup_init_lr)) / float(self.warmup_steps)
+        """
+        get lr
+        """
+
+        lr_inc = (float(self.base_lr) - float(self.warmup_init_lr)) / \
+            float(self.warmup_steps)
         lr = float(self.warmup_init_lr) + lr_inc * current_step
         return lr
+
 
 class _ConstWarmUp(_WarmUp):
     """
     Class for const warm up
     """
+
     def __init__(self, warmup_init_lr):
         super(_ConstWarmUp, self).__init__(warmup_init_lr)
         self.warmup_init_lr = warmup_init_lr
@@ -64,16 +87,24 @@ class _ConstWarmUp(_WarmUp):
         current_step = 0
         return self.warmup_init_lr
 
-class _LRScheduler():
+
+class _LRScheduler(object):
     """
     Basic class for learning rate scheduler
     """
+
     def __init__(self, lr, max_epoch, steps_per_epoch):
         self.base_lr = lr
         self.steps_per_epoch = steps_per_epoch
         self.total_steps = int(max_epoch * steps_per_epoch)
+    """
+    get lr
+    """
 
     def get_lr(self):
+        """
+        get lr
+        """
         # Compute learning rate using chainable form of the scheduler
         raise NotImplementedError
 
@@ -100,7 +131,8 @@ class LambdaLR(_LRScheduler):
         >>> lr = scheduler.get_lr()
     """
 
-    def __init__(self, lr, lr_lambda, steps_per_epoch, max_epoch, warmup_epochs=0):
+    def __init__(self, lr, lr_lambda, steps_per_epoch,
+                 max_epoch, warmup_epochs=0):
         self.lr_lambda = lr_lambda
         self.warmup = _LinearWarmUp(lr, warmup_epochs, steps_per_epoch)
         super(LambdaLR, self).__init__(lr, max_epoch, steps_per_epoch)
@@ -111,7 +143,7 @@ class LambdaLR(_LRScheduler):
         lr_each_step = []
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 cur_ep = i // self.steps_per_epoch
                 lr = self.base_lr * self.lr_lambda(cur_ep)
@@ -141,7 +173,9 @@ class MultiplicativeLR(_LRScheduler):
         >>> scheduler = MultiplicativeLR(lr=0.1, lr_lambda=lambda1, steps_per_epoch=5000, max_epoch=90)
         >>> lr = scheduler.get_lr()
     """
-    def __init__(self, lr, lr_lambda, steps_per_epoch, max_epoch, warmup_epochs=0):
+
+    def __init__(self, lr, lr_lambda, steps_per_epoch,
+                 max_epoch, warmup_epochs=0):
         self.lr_lambda = lr_lambda
         self.warmup = _LinearWarmUp(lr, warmup_epochs, steps_per_epoch)
         super(MultiplicativeLR, self).__init__(lr, max_epoch, steps_per_epoch)
@@ -153,7 +187,7 @@ class MultiplicativeLR(_LRScheduler):
         current_lr = self.base_lr
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 cur_ep = i // self.steps_per_epoch
                 if i % self.steps_per_epoch == 0 and cur_ep > 0:
@@ -193,7 +227,8 @@ class StepLR(_LRScheduler):
         >>> lr = scheduler.get_lr()
     """
 
-    def __init__(self, lr, epoch_size, gamma, steps_per_epoch, max_epoch, warmup_epochs=0):
+    def __init__(self, lr, epoch_size, gamma,
+                 steps_per_epoch, max_epoch, warmup_epochs=0):
         self.epoch_size = epoch_size
         self.gamma = gamma
         self.warmup = _LinearWarmUp(lr, warmup_epochs, steps_per_epoch)
@@ -205,10 +240,10 @@ class StepLR(_LRScheduler):
         lr_each_step = []
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 cur_ep = i // self.steps_per_epoch
-                lr = self.base_lr * self.gamma**(cur_ep // self.epoch_size)
+                lr = self.base_lr * self.gamma ** (cur_ep // self.epoch_size)
 
             lr_each_step.append(lr)
 
@@ -219,6 +254,7 @@ class POLYLR(_LRScheduler):
     """
     Poly learning rate scheduler
     """
+
     def __init__(self, lr, steps_per_epoch, max_epoch, end_lr, power):
         self.end_lr = end_lr
         self.power = power
@@ -232,9 +268,11 @@ class POLYLR(_LRScheduler):
         total_steps = self.steps_per_epoch * self.max_epoch
         for i in range(total_steps):
             step_ = min(i, total_steps)
-            lr_each_step.append((self.lr - self.end_lr) * ((1.0 - step_ / total_steps) ** self.power) + self.end_lr)
+            lr_each_step.append(
+                (self.lr - self.end_lr) * ((1.0 - step_ / total_steps) ** self.power) + self.end_lr)
         print("lr_each_step:", lr_each_step[-1])
         return np.array(lr_each_step).astype(np.float32)
+
 
 class MultiStepLR(_LRScheduler):
     """
@@ -262,7 +300,8 @@ class MultiStepLR(_LRScheduler):
         >>> lr = scheduler.get_lr()
     """
 
-    def __init__(self, lr, milestones, gamma, steps_per_epoch, max_epoch, warmup_epochs=0):
+    def __init__(self, lr, milestones, gamma,
+                 steps_per_epoch, max_epoch, warmup_epochs=0):
         self.milestones = Counter(milestones)
         self.gamma = gamma
         self.warmup = _LinearWarmUp(lr, warmup_epochs, steps_per_epoch)
@@ -275,7 +314,7 @@ class MultiStepLR(_LRScheduler):
         current_lr = self.base_lr
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 cur_ep = i // self.steps_per_epoch
                 if i % self.steps_per_epoch == 0 and cur_ep in self.milestones:
@@ -320,7 +359,7 @@ class ExponentialLR(_LRScheduler):
         current_lr = self.base_lr
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 if i % self.steps_per_epoch == 0 and i > 0:
                     current_lr = current_lr * self.gamma
@@ -372,7 +411,8 @@ class CosineAnnealingLR(_LRScheduler):
         >>> lr = scheduler.get_lr()
     """
 
-    def __init__(self, lr, t_max, steps_per_epoch, max_epoch, warmup_epochs=0, eta_min=0):
+    def __init__(self, lr, t_max, steps_per_epoch,
+                 max_epoch, warmup_epochs=0, eta_min=0):
         self.t_max = t_max
         self.eta_min = eta_min
         self.warmup = _LinearWarmUp(lr, warmup_epochs, steps_per_epoch)
@@ -385,12 +425,12 @@ class CosineAnnealingLR(_LRScheduler):
         current_lr = self.base_lr
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 cur_ep = i // self.steps_per_epoch
                 if i % self.steps_per_epoch == 0 and i > 0:
                     current_lr = self.eta_min + (self.base_lr - self.eta_min) * \
-                        (1. + math.cos(math.pi*cur_ep / self.t_max)) / 2
+                        (1. + math.cos(math.pi * cur_ep / self.t_max)) / 2
 
                 lr = current_lr
 
@@ -472,7 +512,8 @@ class CyclicLR(_LRScheduler):
         self.max_lr = max_lr
 
         step_size_up = float(step_size_up)
-        step_size_down = float(step_size_down) if step_size_down is not None else step_size_up
+        step_size_down = float(
+            step_size_down) if step_size_down is not None else step_size_up
         self.total_size = step_size_up + step_size_down
         self.step_ratio = step_size_up / self.total_size
 
@@ -507,7 +548,7 @@ class CyclicLR(_LRScheduler):
         return 1 / (2. ** (x - 1))
 
     def _exp_range_scale_fn(self, x):
-        return self.gamma**(x)
+        return self.gamma ** (x)
 
     def get_lr(self):
         warmup_steps = self.warmup.get_warmup_steps()
@@ -515,7 +556,7 @@ class CyclicLR(_LRScheduler):
         lr_each_step = []
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 # Calculates the learning rate at batch index.
                 cycle = math.floor(1 + i / self.total_size)
@@ -580,11 +621,14 @@ class CosineAnnealingWarmRestarts(_LRScheduler):
         >>> lr = scheduler.get_lr()
     """
 
-    def __init__(self, lr, steps_per_epoch, max_epoch, t_0, t_mult=1, eta_min=0, warmup_epochs=0):
+    def __init__(self, lr, steps_per_epoch, max_epoch, t_0,
+                 t_mult=1, eta_min=0, warmup_epochs=0):
         if t_0 <= 0 or not isinstance(t_0, int):
-            raise ValueError("Expected positive integer t_0, but got {}".format(t_0))
+            raise ValueError(
+                "Expected positive integer t_0, but got {}".format(t_0))
         if t_mult < 1 or not isinstance(t_mult, int):
-            raise ValueError("Expected integer t_mult >= 1, but got {}".format(t_mult))
+            raise ValueError(
+                "Expected integer t_mult >= 1, but got {}".format(t_mult))
         self.t_0 = t_0
         self.t_i = t_0
         self.t_mult = t_mult
@@ -592,7 +636,12 @@ class CosineAnnealingWarmRestarts(_LRScheduler):
         self.t_cur = 0
 
         self.warmup = _LinearWarmUp(lr, warmup_epochs, steps_per_epoch)
-        super(CosineAnnealingWarmRestarts, self).__init__(lr, max_epoch, steps_per_epoch)
+        super(
+            CosineAnnealingWarmRestarts,
+            self).__init__(
+            lr,
+            max_epoch,
+            steps_per_epoch)
 
     def get_lr(self):
         warmup_steps = self.warmup.get_warmup_steps()
@@ -600,7 +649,7 @@ class CosineAnnealingWarmRestarts(_LRScheduler):
         lr_each_step = []
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 if i % self.steps_per_epoch == 0 and i > 0:
                     self.t_cur += 1
@@ -609,7 +658,7 @@ class CosineAnnealingWarmRestarts(_LRScheduler):
                         self.t_i = self.t_i * self.t_mult
 
                 lr = self.eta_min + (self.base_lr - self.eta_min) * \
-                            (1 + math.cos(math.pi * self.t_cur / self.t_i)) / 2
+                    (1 + math.cos(math.pi * self.t_cur / self.t_i)) / 2
 
             lr_each_step.append(lr)
 
@@ -660,6 +709,7 @@ class OneCycleLR(_LRScheduler):
         >>> scheduler = OneCycleLR(lr=0.1, steps_per_epoch=5000, max_epoch=90)
         >>> lr = scheduler.get_lr()
     """
+
     def __init__(self,
                  lr,
                  steps_per_epoch,
@@ -678,11 +728,13 @@ class OneCycleLR(_LRScheduler):
 
         # Validate pct_start
         if pct_start < 0 or pct_start > 1 or not isinstance(pct_start, float):
-            raise ValueError("Expected float between 0 and 1 pct_start, but got {}".format(pct_start))
+            raise ValueError(
+                "Expected float between 0 and 1 pct_start, but got {}".format(pct_start))
 
         # Validate anneal_strategy
         if anneal_strategy not in ['cos', 'linear']:
-            raise ValueError("anneal_strategy must by one of 'cos' or 'linear', instead got {}".format(anneal_strategy))
+            raise ValueError(
+                "anneal_strategy must by one of 'cos' or 'linear', instead got {}".format(anneal_strategy))
         if anneal_strategy == 'cos':
             self.anneal_func = self._annealing_cos
         elif anneal_strategy == 'linear':
@@ -707,18 +759,24 @@ class OneCycleLR(_LRScheduler):
         lr_each_step = []
         for i in range(self.total_steps):
             if i < warmup_steps:
-                lr = self.warmup.get_lr(i+1)
+                lr = self.warmup.get_lr(i + 1)
             else:
                 if i <= self.step_size_up:
-                    lr = self.anneal_func(self.base_lr, self.max_lr, i / self.step_size_up)
+                    lr = self.anneal_func(
+                        self.base_lr, self.max_lr, i / self.step_size_up)
 
                 else:
                     down_step_num = i - self.step_size_up
-                    lr = self.anneal_func(self.max_lr, self.min_lr, down_step_num / self.step_size_down)
+                    lr = self.anneal_func(
+                        self.max_lr,
+                        self.min_lr,
+                        down_step_num /
+                        self.step_size_down)
 
             lr_each_step.append(lr)
 
         return np.array(lr_each_step).astype(np.float32)
+
 
 def linear_warmup_lr(current_step, warmup_steps, base_lr, init_lr):
     """
@@ -728,7 +786,9 @@ def linear_warmup_lr(current_step, warmup_steps, base_lr, init_lr):
     lr = float(init_lr) + lr_inc * current_step
     return lr
 
-def warmup_step_lr(lr, lr_epochs, steps_per_epoch, warmup_epochs, max_epoch, gamma=0.1):
+
+def warmup_step_lr(lr, lr_epochs, steps_per_epoch,
+                   warmup_epochs, max_epoch, gamma=0.1):
     """
     Warmup step learning rate scheduler
     """
@@ -749,22 +809,40 @@ def warmup_step_lr(lr, lr_epochs, steps_per_epoch, warmup_epochs, max_epoch, gam
         if i < warmup_steps:
             lr = linear_warmup_lr(i + 1, warmup_steps, base_lr, warmup_init_lr)
         else:
-            lr = lr * gamma**milestones_steps_counter[i]
+            lr = lr * gamma ** milestones_steps_counter[i]
         lr_each_step.append(lr)
 
     return np.array(lr_each_step).astype(np.float32)
 
+
 def multi_step_lr(lr, milestones, steps_per_epoch, max_epoch, gamma=0.1):
-    return warmup_step_lr(lr, milestones, steps_per_epoch, 0, max_epoch, gamma=gamma)
+    """
+    multi step learning rate scheduler
+    lr: learning rate
+    milestones: which epcoh changes
+    steps_per_epoch: steps of an epcoh
+    """
+    return warmup_step_lr(lr, milestones, steps_per_epoch,
+                          0, max_epoch, gamma=gamma)
+
 
 def step_lr(lr, epoch_size, steps_per_epoch, max_epoch, gamma=0.1):
+    """
+    step learning rate scheduler
+    lr: learning rate
+    epoch_size: which epcoh changes
+    steps_per_epoch: steps of an epcoh
+    """
     lr_epochs = []
     for i in range(1, max_epoch):
         if i % epoch_size == 0:
             lr_epochs.append(i)
-    return multi_step_lr(lr, lr_epochs, steps_per_epoch, max_epoch, gamma=gamma)
+    return multi_step_lr(lr, lr_epochs, steps_per_epoch,
+                         max_epoch, gamma=gamma)
 
-def warmup_cosine_annealing_lr(lr, steps_per_epoch, warmup_epochs, max_epoch, t_max, eta_min=0):
+
+def warmup_cosine_annealing_lr(
+        lr, steps_per_epoch, warmup_epochs, max_epoch, t_max, eta_min=0):
     """
     Warmup cosine learning rate scheduler
     """
@@ -779,13 +857,15 @@ def warmup_cosine_annealing_lr(lr, steps_per_epoch, warmup_epochs, max_epoch, t_
         if i < warmup_steps:
             lr = linear_warmup_lr(i + 1, warmup_steps, base_lr, warmup_init_lr)
         else:
-            lr = eta_min + (base_lr - eta_min) * (1. + math.cos(math.pi*last_epoch / t_max)) / 2
+            lr = eta_min + (base_lr - eta_min) * \
+                (1. + math.cos(math.pi * last_epoch / t_max)) / 2
         lr_each_step.append(lr)
 
     return np.array(lr_each_step).astype(np.float32)
 
 
-def warmup_cosine_annealing_lr_v2(lr, steps_per_epoch, warmup_epochs, max_epoch, t_max, eta_min=0):
+def warmup_cosine_annealing_lr_v2(
+        lr, steps_per_epoch, warmup_epochs, max_epoch, t_max, eta_min=0):
     """
     Warmup cosine v2 learning rate scheduler
     """
@@ -797,7 +877,7 @@ def warmup_cosine_annealing_lr_v2(lr, steps_per_epoch, warmup_epochs, max_epoch,
     last_lr = 0
     last_epoch_v1 = 0
 
-    t_max_v2 = int(max_epoch*1/3)
+    t_max_v2 = int(max_epoch * 1 / 3)
 
     lr_each_step = []
     for i in range(total_steps):
@@ -805,28 +885,31 @@ def warmup_cosine_annealing_lr_v2(lr, steps_per_epoch, warmup_epochs, max_epoch,
         if i < warmup_steps:
             lr = linear_warmup_lr(i + 1, warmup_steps, base_lr, warmup_init_lr)
         else:
-            if i < total_steps*2/3:
-                lr = eta_min + (base_lr - eta_min) * (1. + math.cos(math.pi*last_epoch / t_max)) / 2
+            if i < total_steps * 2 / 3:
+                lr = eta_min + (base_lr - eta_min) * (1. +
+                                                      math.cos(math.pi * last_epoch / t_max)) / 2
                 last_lr = lr
                 last_epoch_v1 = last_epoch
             else:
                 base_lr = last_lr
-                last_epoch = last_epoch-last_epoch_v1
-                lr = eta_min + (base_lr - eta_min) * (1. + math.cos(math.pi * last_epoch / t_max_v2)) / 2
+                last_epoch = last_epoch - last_epoch_v1
+                lr = eta_min + (base_lr - eta_min) * (1. +
+                                                      math.cos(math.pi * last_epoch / t_max_v2)) / 2
 
         lr_each_step.append(lr)
     return np.array(lr_each_step).astype(np.float32)
 
 
-def warmup_cosine_annealing_lr_sample(lr, steps_per_epoch, warmup_epochs, max_epoch, t_max, eta_min=0):
+def warmup_cosine_annealing_lr_sample(
+        lr, steps_per_epoch, warmup_epochs, max_epoch, t_max, eta_min=0):
     """
     Warmup cosine learning rate scheduler sampler
     """
     start_sample_epoch = 60
     step_sample = 2
     tobe_sampled_epoch = 60
-    end_sampled_epoch = start_sample_epoch + step_sample*tobe_sampled_epoch
-    max_sampled_epoch = max_epoch+tobe_sampled_epoch
+    end_sampled_epoch = start_sample_epoch + step_sample * tobe_sampled_epoch
+    max_sampled_epoch = max_epoch + tobe_sampled_epoch
     t_max = max_sampled_epoch
 
     base_lr = lr
@@ -839,12 +922,14 @@ def warmup_cosine_annealing_lr_sample(lr, steps_per_epoch, warmup_epochs, max_ep
 
     for i in range(total_sampled_steps):
         last_epoch = i // steps_per_epoch
-        if last_epoch in range(start_sample_epoch, end_sampled_epoch, step_sample):
+        if last_epoch in range(
+                start_sample_epoch, end_sampled_epoch, step_sample):
             continue
         if i < warmup_steps:
             lr = linear_warmup_lr(i + 1, warmup_steps, base_lr, warmup_init_lr)
         else:
-            lr = eta_min + (base_lr - eta_min) * (1. + math.cos(math.pi*last_epoch / t_max)) / 2
+            lr = eta_min + (base_lr - eta_min) * \
+                (1. + math.cos(math.pi * last_epoch / t_max)) / 2
         lr_each_step.append(lr)
 
     assert total_steps == len(lr_each_step)

@@ -101,16 +101,16 @@ def main():
     cfg = getattr(__import__(configs, fromlist=[cfg_file]), cfg_file)
     #------------------------------------------------------------------
 
-    if FLAGS.data_path == "PATH_TO_BE_CONFIGURED":
-        pass
-    else:
-        f1 = open("../configs/config.py", "r")
-        lines = f1.readlines()
-        f2 = open("../configs/config.py", "w")
-        for line in lines:
-            f2.write(line.replace('\'data_url\': \'file://PATH_TO_BE_CONFIGURED\',', '\'data_url\': \'file://' + FLAGS.data_path + '\','))
-        f2.close()
-        f1.close()
+    #if FLAGS.data_path == "PATH_TO_BE_CONFIGURED":
+    #    pass
+    #else:
+    #    f1 = open("../configs/config.py", "r")
+    #    lines = f1.readlines()
+    #    f2 = open("../configs/config.py", "w")
+    #    for line in lines:
+    #        f2.write(line.replace('\'data_url\': \'file://PATH_TO_BE_CONFIGURED\',', '\'data_url\': \'file://' + FLAGS.data_path + '\','))
+    #    f2.close()
+    #    f1.close()
 
     config = cfg.res50_config()
     config['iterations_per_loop'] = int(FLAGS.iterations_per_loop)

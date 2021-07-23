@@ -38,7 +38,6 @@ from modeling.aspp import build_aspp
 from modeling.decoder import build_decoder
 from modeling.backbone import build_backbone
 
-import numpy as np
 class DeepLab(nn.Module):
     def __init__(self, backbone='resnet', output_stride=16, num_classes=21,
                  sync_bn=True, freeze_bn=False,device=None):
@@ -53,15 +52,10 @@ class DeepLab(nn.Module):
 
         self.backbone = build_backbone(backbone, output_stride, BatchNorm)
         self.aspp = build_aspp(backbone, output_stride, BatchNorm)
-        self.aspp.gen_dropout_seed()
         self.decoder = build_decoder(num_classes, backbone, BatchNorm)
-        self.decoder.gen_dropout_seed()
 
         self.freeze_bn = freeze_bn
-        if device == None:
-          pass
-        else:
-            print('Model built with device: {}'.format(device))
+        if device != None:
             self.aspp = self.aspp.to(device)
             self.backbone = self.backbone.to(device)
             self.decoder = self.decoder.to(device)
@@ -111,8 +105,6 @@ class DeepLab(nn.Module):
                         for p in m[1].parameters():
                             if p.requires_grad:
                                 yield p
-
-
 
 if __name__ == "__main__":
     model = DeepLab(backbone='mobilenet', output_stride=16)

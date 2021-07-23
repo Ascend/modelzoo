@@ -24,18 +24,29 @@ from mindspore import Tensor
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('--ckpt_fn', type=str, default='/model_path/centerface.ckpt',
                     help='ckpt for user to get cell/module name')
-parser.add_argument('--pt_fn', type=str, default='/model_path/centerface.pth', help='checkpoint filename to convert')
+parser.add_argument(
+    '--pt_fn',
+    type=str,
+    default='/model_path/centerface.pth',
+    help='checkpoint filename to convert')
 parser.add_argument('--out_fn', type=str, default='/model_path/centerface_out.ckpt',
                     help='convert output ckpt/pth path')
-parser.add_argument('--pt2ckpt', type=int, default=1, help='1 : pt2ckpt; 0 : ckpt2pt')
+parser.add_argument(
+    '--pt2ckpt',
+    type=int,
+    default=1,
+    help='1 : pt2ckpt; 0 : ckpt2pt')
 
 args = parser.parse_args()
+
 
 def load_model(model_path):
     """
     Load model
     """
-    checkpoint = torch.load(model_path, map_location=lambda storage, loc: storage)
+    checkpoint = torch.load(
+        model_path,
+        map_location=lambda storage, loc: storage)
     print('loaded {}, epoch {}'.format(model_path, checkpoint['epoch']))
     state_dict_ = checkpoint['state_dict']
     state_dict = {}
@@ -50,6 +61,7 @@ def load_model(model_path):
             state_dict[k] = state_dict_[k]
 
     return state_dict
+
 
 def save_model(path, epoch=0, model=None, optimizer=None, state_dict=None):
     """
@@ -66,6 +78,7 @@ def save_model(path, epoch=0, model=None, optimizer=None, state_dict=None):
         data['optimizer'] = optimizer.state_dict()
     torch.save(data, path)
 
+
 def load_model_ms(model_path):
     """
     Load mindspore model
@@ -77,16 +90,18 @@ def load_model_ms(model_path):
         param_dict_new = {}
         for key, values in param_dict.items():
             if key in state_dict_useless or key.startswith('moments.') \
-                or key.startswith('moment1.') or key.startswith('moment2.'):
+                    or key.startswith('moment1.') or key.startswith('moment2.'):
                 continue
             elif key.startswith('centerface_network.'):
                 param_dict_new[key[19:]] = values
             else:
                 param_dict_new[key] = values
     else:
-        assert FileNotFoundError('{} not exists or not a pre-trained file'.format(model_path))
+        assert FileNotFoundError(
+            '{} not exists or not a pre-trained file'.format(model_path))
         exit(1)
     return param_dict_new
+
 
 def name_map(ckpt):
     """
@@ -119,6 +134,7 @@ def name_map(ckpt):
         out[pt_name] = name
     return out
 
+
 def pt_to_ckpt(pt, ckpt, out_path):
     """
     Pt convert to ckpt file
@@ -140,6 +156,7 @@ def pt_to_ckpt(pt, ckpt, out_path):
     save_checkpoint(new_params_list, out_path)
     return state_dict_ms
 
+
 def ckpt_to_pt(pt, ckpt, out_path):
     """
     Ckpt convert to pt file
@@ -155,9 +172,15 @@ def ckpt_to_pt(pt, ckpt, out_path):
         parameter = parameter.asnumpy()
         state_dict[key] = torch.from_numpy(parameter)
 
-    save_model(out_path, epoch=0, model=None, optimizer=None, state_dict=state_dict)
+    save_model(
+        out_path,
+        epoch=0,
+        model=None,
+        optimizer=None,
+        state_dict=state_dict)
 
     return state_dict
+
 
 if __name__ == "__main__":
     if args.pt2ckpt == 1:

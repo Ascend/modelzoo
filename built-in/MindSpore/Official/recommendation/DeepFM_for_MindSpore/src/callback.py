@@ -31,6 +31,7 @@ class EvalCallBack(Callback):
     Note
         If per_print_times is 0 do not print loss.
     """
+
     def __init__(self, model, eval_dataset, auc_metric, eval_file_path):
         super(EvalCallBack, self).__init__()
         self.model = model
@@ -60,6 +61,7 @@ class LossCallBack(Callback):
         loss_file_path (str) The file absolute path, to save as loss_file;
         per_print_times (int) Print loss every times. Default 1.
     """
+
     def __init__(self, loss_file_path, per_print_times=1):
         super(LossCallBack, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
@@ -71,7 +73,8 @@ class LossCallBack(Callback):
         """Monitor the loss in training."""
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs.asnumpy()
-        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+        cur_step_in_epoch = (cb_params.cur_step_num -
+                             1) % cb_params.batch_num + 1
         cur_num = cb_params.cur_step_num
         if self._per_print_times != 0 and cur_num % self._per_print_times == 0:
             with open(self.loss_file_path, "a+") as loss_file:
@@ -88,6 +91,7 @@ class TimeMonitor(Callback):
     Args
         data_size (int) step size of an epoch.
     """
+
     def __init__(self, data_size):
         super(TimeMonitor, self).__init__()
         self.data_size = data_size
@@ -98,7 +102,8 @@ class TimeMonitor(Callback):
     def epoch_end(self, run_context):
         epoch_mseconds = (time.time() - self.epoch_time) * 1000
         per_step_mseconds = epoch_mseconds / self.data_size
-        print("epoch time: {0}, per step time: {1}".format(epoch_mseconds, per_step_mseconds), flush=True)
+        print("epoch time: {0}, per step time: {1}".format(
+            epoch_mseconds, per_step_mseconds), flush=True)
 
     def step_begin(self, run_context):
         self.step_time = time.time()

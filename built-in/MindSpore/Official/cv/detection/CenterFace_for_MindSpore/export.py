@@ -26,14 +26,33 @@ from src.config import ConfigCenterface
 parser = argparse.ArgumentParser(description='centerface export')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--file_name", type=str, default="centerface", help="output file name.")
-parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', help='file format')
+parser.add_argument(
+    "--ckpt_file",
+    type=str,
+    required=True,
+    help="Checkpoint file path.")
+parser.add_argument(
+    "--file_name",
+    type=str,
+    default="centerface",
+    help="output file name.")
+parser.add_argument(
+    '--file_format',
+    type=str,
+    choices=[
+        "AIR",
+        "ONNX",
+        "MINDIR"],
+    default='AIR',
+    help='file format')
 parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
                     help="device target")
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+context.set_context(
+    mode=context.GRAPH_MODE,
+    device_target=args.device_target,
+    device_id=args.device_id)
 
 if __name__ == '__main__':
     config = ConfigCenterface()
@@ -42,7 +61,8 @@ if __name__ == '__main__':
     param_dict = load_checkpoint(args.ckpt_file)
     param_dict_new = {}
     for key, values in param_dict.items():
-        if key.startswith('moments.') or key.startswith('moment1.') or key.startswith('moment2.'):
+        if key.startswith('moments.') or key.startswith(
+                'moment1.') or key.startswith('moment2.'):
             continue
         elif key.startswith('centerface_network.'):
             param_dict_new[key[19:]] = values
@@ -53,5 +73,10 @@ if __name__ == '__main__':
     net = CenterFaceWithNms(net)
     net.set_train(False)
 
-    input_data = Tensor(np.zeros([args.batch_size, 3, config.input_h, config.input_w]), mindspore.float32)
-    export(net, input_data, file_name=args.file_name, file_format=args.file_format)
+    input_data = Tensor(np.zeros(
+        [args.batch_size, 3, config.input_h, config.input_w]), mindspore.float32)
+    export(
+        net,
+        input_data,
+        file_name=args.file_name,
+        file_format=args.file_format)

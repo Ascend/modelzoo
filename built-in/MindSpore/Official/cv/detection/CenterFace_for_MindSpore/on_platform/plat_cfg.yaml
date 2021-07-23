@@ -1,0 +1,150 @@
+algorithm:
+  # 算法名称
+  name: "CenterFace"
+  # 框架名称
+  framework: "mindspore"
+  # 模型简要描述，可选
+  description:
+    zh: "基于mindspore的centerface人脸检测模型"
+    en: "Face detection model named centerface based on mindspore"
+# 模型训练相关配置
+train:
+  on_common_platform:
+    # 训练入口脚本, 仅支持py脚本
+    entry: "start.py"
+    # 每个模型都必须支持的参数
+    comm_para:
+      # 模型输入路径
+      input_path:
+        - name: "data_path"
+          type: "string"
+          desc: "数据集路径"
+      # 模型输出路径
+      output_path:
+        - name: "model_path"
+          type: "string"
+          desc: "模型文件路径"
+    # 模型自定义参数，不同模型输入参数不同，训练脚本支持参数，包括训练所支持的超参数
+    custom_para:
+      # 超参数以及超参数的属性
+      - name: "max_train_steps"
+        # 支持类型，支持boolean/float/int/string
+        # modelarts仅支持Integer/Continuous/String/range看依瞳诉求；
+        type: int
+        # 是否为必填参数
+        required: true
+        # 超参数的默认值，如果是非必填，
+        default: 1000
+        # 该参数的简要描述
+        desc: "最大训练步数"
+        # 非必填，默认为True，该参数与modelarts类似
+        editable: true
+      # ...
+  # 如果modelarts与common_platform的entry与parameters不一致，则需要
+  on_modelarts:
+    # 训练入口脚本, 仅支持py脚本
+    entry: "on_platform/modelarts/start.py"
+    # 每个模型都必须支持的参数
+    comm_para:
+      input_path:
+        # modelarts中的数据集路径name
+        - name: "data_url"
+          type: "string"
+          desc:
+            zh: "obs数据集路径"
+            en: "data url"
+      output_path:
+        # modelarts中的数据集路径name
+        - name: "train_url"
+          type: "string"
+          desc:
+            zh: "obs输出路径"
+            en: "train url"
+    custom_para:
+      - name: "max_epoch"
+        type: "int"
+        required: true
+        default: 140
+        desc:
+          zh: "最大训练轮数"
+          en: "max epoch"
+        # 非必填，默认为True
+        # False表示在ModelArts创建训练任务时可见参数，但不支持修改
+        editable: true
+      - name: "pretrained_backbone"
+        type: "string"
+        required: false
+        desc:
+          zh: "预训练模型路径"
+          en: "pretrained backbone"
+        editable: true
+      - name: "resume"
+        type: "string"
+        required: false
+        desc:
+          zh: "断点训练"
+          en: "breakpoint training"
+        editable: true
+      - name: "lr_scheduler"
+        type: "string"
+        required: true
+        default: "multistep"
+        desc:
+          zh: "调整学习率方式,可选exponential, cosine_annealing"
+          en: "lr-scheduler, option type exponential, cosine_annealing"
+        editable: true
+      - name: "lr"
+        type: "float"
+        required: true
+        default: 5e-4
+        desc:
+          zh: "初始学习率"
+          en: "learning rate"
+        editable: true
+      - name: "lr_epochs"
+        type: "string"
+        required: false
+        default: "90,120"
+        desc:
+          zh: "学习率在哪些epoch强制改变"
+          en: "epoch of lr changing"
+        editable: true
+      - name: "per_batch_size"
+        type: "int"
+        required: true
+        default: 8
+        desc:
+          zh: "一次训练所选取的样本数"
+          en: "batch size for per npu"
+        editable: true
+      - name: "warmup_epochs"
+        type: "float"
+        required: true
+        default: 0
+        desc:
+          zh: "预热学习率"
+          en: "warmup epochs"
+        editable: true
+      - name: "weight_decay"
+        type: "float"
+        required: true
+        default: 0.0000
+        desc:
+          zh: "权重衰减"
+          en: "weight decay"
+        editable: true
+      - name: "t-max"
+        type: "int"
+        required: true
+        default: 140
+        desc:
+          zh: "训练T_max轮之后重新设置学习率"
+          en: "T-max in cosine_annealing scheduler"
+        editable: true
+      - name: "loss_scale"
+        type: "int"
+        required: true
+        default: 1024
+        desc:
+          zh: "静态损耗标度"
+          en: "static loss scale"

@@ -1,4 +1,5 @@
-source ../../test/env.sh
+source ../../test/env_npu.sh
+rm -f nohup.out
 
 nohup python3 train.py  \
         --model densenet161 \

@@ -17,6 +17,16 @@
 root=$PWD
 save_path=$root/output/centerface/
 ground_truth_path=$root/dataset/centerface/ground_truth
+if [ $# == 1 ]
+then
+    save_path=$1
+fi
+
+if [ $# == 2 ]
+then
+    save_path=$1
+    ground_truth_path=$2
+fi
 echo "start eval"
 python ../dependency/evaluate/eval.py --pred=$save_path --gt=$ground_truth_path
 echo "end eval"

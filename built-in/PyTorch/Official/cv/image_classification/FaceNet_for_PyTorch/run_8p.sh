@@ -6,9 +6,18 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 export ASCEND_GLOBAL_EVENT_ENABLE=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
+export COMBINED_ENABLE=1
 export DYNAMIC_OP="ADD#MUL"
+export HCCL_WHITELIST_DISABLE=1
 
-/usr/local/Ascend/driver/tools/msnpureport -g error
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 0
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 1
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 2
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 3
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 4
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 5
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 6
+/usr/local/Ascend/driver/tools/msnpureport -g error -d 7
 /usr/local/Ascend/driver/tools/msnpureport -e disable
 
 python3.7 fine_tune_new_8p.py \

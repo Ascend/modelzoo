@@ -15,11 +15,6 @@ export SOC_VERSION=Ascend910
 
 export JOB_ID=10087
 export FUSION_TENSOR_SIZE=1000000000
-#export SLOG_PRINT_TO_STDOUT=1
-#export DUMP_GE_GRAPH=2
-#export DUMP_GRAPH_LEVEL=3
-
-
 
 for((RANK_ID=0;RANK_ID<8;RANK_ID++));
 do
@@ -28,8 +23,6 @@ export RANK_ID=$RANK_ID
 export RANK_SIZE=1
 export DEVICE_ID=$RANK_ID
 export DEVICE_INDEX=$RANK_ID
-
-su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[debug]\" --device "$RANK_ID
 
 RESTORE_PATH=./training/t1/D$RANK_ID/training/
 

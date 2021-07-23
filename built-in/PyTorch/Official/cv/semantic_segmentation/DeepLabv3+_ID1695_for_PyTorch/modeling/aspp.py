@@ -35,7 +35,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from modeling.sync_batchnorm.batchnorm import SynchronizedBatchNorm2d
-import numpy as np
+from utils.dropout import DropoutV2
+
 class _ASPPModule(nn.Module):
     def __init__(self, inplanes, planes, kernel_size, padding, dilation, BatchNorm):
         super(_ASPPModule, self).__init__()
@@ -91,17 +92,8 @@ class ASPP(nn.Module):
         self.conv1 = nn.Conv2d(1280, 256, 1, bias=False)
         self.bn1 = BatchNorm(256)
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.5)
-        self.seed_tensor = torch.tensor([0,1])
-        #self.dropout = F.dropoutV1(0.5)
+        self.dropout = DropoutV2(0.5)
         self._init_weight()
-        self.is_train = False
-    def gen_dropout_seed(self): 
-
-         self.seed = torch.from_numpy(np.random.uniform(1, 2 ** 10 - 1, size=(32 * 1024 * 12,)).astype(np.float32)) 
-         print('gen_dropout_seed done. The first seed is: ', self.seed[0]) 
-         self.seed = self.seed.npu() 
-
 
     def forward(self, x):
         x1 = self.aspp1(x)
@@ -110,20 +102,14 @@ class ASPP(nn.Module):
         x4 = self.aspp4(x)
         x5 = self.global_avg_pool(x)
         x5 = F.interpolate(x5, size=x4.size()[2:], mode='bilinear', align_corners=False)
-        #x5 = F.interpolate(x5, size=x4.size()[2:], mode='bilinear', align_corners=True)
         x = torch.cat((x1, x2, x3, x4, x5), dim=1)
 
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
 
-        #return self.dropout(x)
-        #return torch.npu_dropoutV2(x,self.seed_tensor.to(torch.device('npu:2')),0.5)
-        #return torch.dropoutV1(x,0.5,False)
-        #return x
-        if self.is_train:
-        	x,_,_ = torch.npu_dropoutV2(x, self.seed, p=0.5)
-        return x
+        return self.dropout(x)
+
     def _init_weight(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

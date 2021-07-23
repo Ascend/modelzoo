@@ -131,6 +131,15 @@ do
 done 
 wait
 
+ckpt_path=`ls -l ${cur_path}/../results | awk '{print $NF}' | tail -2 | head -1 | awk -F '.' '{print $2}'`
+python3.7 $cur_path/../eval_image_classifier_mobilenet.py \
+    --alsologtostderr \
+    --checkpoint_path=${cur_path}/../results/model.${ckpt_path} \
+    --dataset_dir=${data_path} \
+    --dataset_name=imagenet \
+    --dataset_split_name=validation \
+    --model_name="mobilenet_v1"  > ${cur_path}/output/${ASCEND_DEVICE_ID}/eval_${ASCEND_DEVICE_ID}.log 2>&1 
+
 #训练结束时间，不需要修改
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
@@ -143,7 +152,7 @@ FPS=`grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep -A 1 top1 $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $3}'`
+train_accuracy=`grep acc: $cur_path/output/${ASCEND_DEVICE_ID}/eval_${ASCEND_DEVICE_ID}.log|awk -F '[' '{print $2}' | awk -F ']' '{print $1}' `
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

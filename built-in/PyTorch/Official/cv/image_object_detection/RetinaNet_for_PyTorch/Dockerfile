@@ -6,6 +6,7 @@ COPY requirements.txt .
 RUN mkdir requirements
 COPY requirements/* ./requirements/
 RUN pip3.7 install -r requirements.txt
+RUN chmod 777 /tmp
 RUN apt-get update && apt-get install -y git 2to3 libgl1-mesa-glx
 RUN git config --global http.sslverify false
 RUN git clone -b v1.2.6 --depth=1 https://github.com/open-mmlab/mmcv.git

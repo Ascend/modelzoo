@@ -59,13 +59,19 @@ class H5Dataset():
         else:
             self._file_prefix = 'test'
             self._num_of_parts = test_num_of_parts
-        self.data_size = self._bin_count(self._hdf_data_dir, self._file_prefix, self._num_of_parts)
+        self.data_size = self._bin_count(
+            self._hdf_data_dir,
+            self._file_prefix,
+            self._num_of_parts)
         print("data_size: {}".format(self.data_size))
 
     def _bin_count(self, hdf_data_dir, file_prefix, num_of_parts):
         size = 0
         for part in range(num_of_parts):
-            _y = pd.read_hdf(os.path.join(hdf_data_dir, f'{file_prefix}_output_part_{str(part)}.h5'))
+            _y = pd.read_hdf(
+                os.path.join(
+                    hdf_data_dir,
+                    f'{file_prefix}_output_part_{str(part)}.h5'))
             size += _y.shape[0]
         return size
 
@@ -87,8 +93,8 @@ class H5Dataset():
                     np.random.shuffle(parts)
             for i, p in enumerate(parts):
                 yield os.path.join(self._hdf_data_dir, f'{self._file_prefix}_input_part_{str(p)}.h5'), \
-                      os.path.join(self._hdf_data_dir, f'{self._file_prefix}_output_part_{str(p)}.h5'), \
-                      i + 1 == len(parts)
+                    os.path.join(self._hdf_data_dir, f'{self._file_prefix}_output_part_{str(p)}.h5'), \
+                    i + 1 == len(parts)
 
     def _generator(self, X, y, batch_size, shuffle=True):
         """
@@ -108,7 +114,8 @@ class H5Dataset():
                 np.random.shuffle(sample_index)
         assert X.shape[0] > 0
         while True:
-            batch_index = sample_index[batch_size * counter: batch_size * (counter + 1)]
+            batch_index = sample_index[batch_size *
+                                       counter: batch_size * (counter + 1)]
             X_batch = X[batch_index]
             y_batch = y[batch_index]
             counter += 1
@@ -142,8 +149,8 @@ class H5Dataset():
                 X_id = X[:, 0:self.max_length]
                 X_va = X[:, self.max_length:]
                 yield np.array(X_id.astype(dtype=np.int32)), \
-                      np.array(X_va.astype(dtype=np.float32)), \
-                      np.array(y.astype(dtype=np.float32))
+                    np.array(X_va.astype(dtype=np.float32)), \
+                    np.array(y.astype(dtype=np.float32))
 
 
 def _get_h5_dataset(directory, train_mode=True, epochs=1, batch_size=1000):
@@ -200,16 +207,20 @@ def _get_mindrecord_dataset(directory, train_mode=True, epochs=1, batch_size=100
 
     if rank_size is not None and rank_id is not None:
         data_set = ds.MindDataset(os.path.join(directory, file_prefix_name + file_suffix_name),
-                                  columns_list=['feat_ids', 'feat_vals', 'label'],
-                                  num_shards=rank_size, shard_id=rank_id, shuffle=shuffle,
-                                  num_parallel_workers=8)
+                                  columns_list=[
+            'feat_ids', 'feat_vals', 'label'],
+            num_shards=rank_size, shard_id=rank_id, shuffle=shuffle,
+            num_parallel_workers=8)
     else:
         data_set = ds.MindDataset(os.path.join(directory, file_prefix_name + file_suffix_name),
-                                  columns_list=['feat_ids', 'feat_vals', 'label'],
-                                  shuffle=shuffle, num_parallel_workers=8)
-    data_set = data_set.batch(int(batch_size / line_per_sample), drop_remainder=True)
+                                  columns_list=[
+            'feat_ids', 'feat_vals', 'label'],
+            shuffle=shuffle, num_parallel_workers=8)
+    data_set = data_set.batch(
+        int(batch_size / line_per_sample), drop_remainder=True)
     data_set = data_set.map(operations=(lambda x, y, z: (np.array(x).flatten().reshape(batch_size, 39),
-                                                         np.array(y).flatten().reshape(batch_size, 39),
+                                                         np.array(y).flatten().reshape(
+                                                             batch_size, 39),
                                                          np.array(z).flatten().reshape(batch_size, 1))),
                             input_columns=['feat_ids', 'feat_vals', 'label'],
                             column_order=['feat_ids', 'feat_vals', 'label'],
@@ -254,14 +265,15 @@ def _get_tf_dataset(directory, train_mode=True, epochs=1, batch_size=1000,
     else:
         data_set = ds.TFRecordDataset(dataset_files=dataset_files, shuffle=shuffle,
                                       schema=schema, num_parallel_workers=8)
-    data_set = data_set.batch(int(batch_size / line_per_sample), drop_remainder=True)
+    data_set = data_set.batch(
+        int(batch_size / line_per_sample), drop_remainder=True)
     data_set = data_set.map(operations=(lambda x, y, z: (
         np.array(x).flatten().reshape(batch_size, 39),
         np.array(y).flatten().reshape(batch_size, 39),
         np.array(z).flatten().reshape(batch_size, 1))),
-                            input_columns=['feat_ids', 'feat_vals', 'label'],
-                            column_order=['feat_ids', 'feat_vals', 'label'],
-                            num_parallel_workers=8)
+        input_columns=['feat_ids', 'feat_vals', 'label'],
+        column_order=['feat_ids', 'feat_vals', 'label'],
+        num_parallel_workers=8)
     data_set = data_set.repeat(epochs)
     return data_set
 

@@ -19,7 +19,7 @@ Network="Textcnn_ID0123_For_Tensorflow"
 #训练epoch
 train_epochs=10
 #训练batch_size
-batch_size=64
+batch_size=512
 #学习率
 learning_rate=0.001
 #训练模式
@@ -157,7 +157,7 @@ FPS=`echo "$batch_size $train_time"|awk '{print $1*1000/$2}'`
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep "Test Acc:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $NF}'`
+train_accuracy=`grep "Test Acc:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $NF}'|sed 's/%//g'`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

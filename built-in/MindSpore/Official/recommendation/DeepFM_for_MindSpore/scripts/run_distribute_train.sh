@@ -23,7 +23,7 @@ export RANK_SIZE=$1
 DATA_URL=$2
 export RANK_TABLE_FILE=$3
 
-for ((i=0; i<RANK_SIZE;i++))
+for ((i=0; i<RANK_SIZE;i++));
 do
     export DEVICE_ID=$i
     export RANK_ID=$i
@@ -37,8 +37,9 @@ do
     python -u train.py \
     --dataset_path=$DATA_URL \
     --ckpt_path="./" \
-    --eval_file_name='auc.log' \
-    --loss_file_name='loss.log' \
+    --eval_file_name='./auc.log' \
+    --loss_file_name='./loss.log' \
     --do_eval=True > output.log 2>&1 &
     cd ../
 done
+wait

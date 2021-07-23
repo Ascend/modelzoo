@@ -91,7 +91,8 @@ class MaskedLM(tf.keras.Model):
         lambda x: tf.reshape(x, [-1, num_predictions, vocab_size]))
 
     self.logits = reshape_layer(logits)
-    predictions = tf.keras.layers.Activation(tf.nn.log_softmax)(self.logits)
+    #predictions = tf.keras.layers.Activation(tf.nn.log_softmax)(self.logits)
+    predictions = tf.keras.layers.Activation(tf.nn.log_softmax,dtype=tf.float32)(self.logits)
 
     if output == 'logits':
       output_tensors = self.logits

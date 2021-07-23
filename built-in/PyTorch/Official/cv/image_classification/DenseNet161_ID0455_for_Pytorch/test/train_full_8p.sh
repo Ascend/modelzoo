@@ -51,6 +51,13 @@ do
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
 
+    # 非平台场景时source 环境变量
+    check_etp_flag=`env | grep etp_running_flag`
+    etp_flag=`echo ${check_etp_flag#*=}`
+    if [ x"${etp_flag}" != x"true" ];then
+        source ${cur_path}/env_npu.sh
+    fi
+
     # 绑核，不需要的绑核的模型删除，需要的模型审视修改
     #let a=RANK_ID*12
     #let b=RANK_ID+1
@@ -109,6 +116,7 @@ TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要模型审视修改
 grep Epoch: $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep eta:|awk -F "loss: " '{print $NF}' | awk -F " " '{print $1}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 

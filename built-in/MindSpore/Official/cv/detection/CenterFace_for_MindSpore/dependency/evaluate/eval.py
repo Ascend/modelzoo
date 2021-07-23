@@ -36,10 +36,12 @@ import numpy as np
 from scipy.io import loadmat
 from bbox import bbox_overlaps
 
+
 def get_gt_boxes(gt_dir):
     """ gt dir: (wider_face_val.mat, wider_easy_val.mat, wider_medium_val.mat, wider_hard_val.mat)"""
 
-    gt_mat = loadmat(os.path.join(gt_dir, 'wider_face_val.mat')) # you own ground_truth name
+    # you own ground_truth name
+    gt_mat = loadmat(os.path.join(gt_dir, 'wider_face_val.mat'))
     hard_mat = loadmat(os.path.join(gt_dir, 'wider_hard_val.mat'))
     medium_mat = loadmat(os.path.join(gt_dir, 'wider_medium_val.mat'))
     easy_mat = loadmat(os.path.join(gt_dir, 'wider_easy_val.mat'))
@@ -108,7 +110,8 @@ def read_pred_file(filepath):
         img_file = lines[0].rstrip('\n\r')
         lines = lines[2:]
 
-    boxes = np.array(list(map(lambda x: [float(a) for a in x.rstrip('\r\n').split(' ')], lines))).astype('float')
+    boxes = np.array(list(map(lambda x: [float(a) for a in x.rstrip(
+        '\r\n').split(' ')], lines))).astype('float')
     return img_file.split('/')[-1], boxes
 
 
@@ -151,7 +154,7 @@ def norm_score(pred_norm):
         for _, v in k.items():
             if v.size == 0:
                 continue
-            v[:, -1] = (v[:, -1] - min_score)/diff
+            v[:, -1] = (v[:, -1] - min_score) / diff
 
 
 def image_eval(pred_eval, gt, ignore, iou_thresh):
@@ -196,14 +199,14 @@ def img_pr_info(thresh_num, pred_info, proposal_list, pred_recall):
     pr_info = np.zeros((thresh_num, 2)).astype('float')
     for t in range(thresh_num):
 
-        thresh = 1 - (t+1)/thresh_num
+        thresh = 1 - (t + 1) / thresh_num
         r_index = np.where(pred_info[:, 4] >= thresh)[0]
         if r_index.size == 0:
             pr_info[t, 0] = 0
             pr_info[t, 1] = 0
         else:
             r_index = r_index[-1]
-            p_index = np.where(proposal_list[:r_index+1] == 1)[0]
+            p_index = np.where(proposal_list[:r_index + 1] == 1)[0]
             pr_info[t, 0] = len(p_index)
             pr_info[t, 1] = pred_recall[r_index]
     return pr_info
@@ -246,7 +249,8 @@ def evaluation(pred_evaluation, gt_path, iou_thresh=0.4):
     print_pred = pred_evaluation
     pred_evaluation = get_preds(pred_evaluation)
     norm_score(pred_evaluation)
-    facebox_list, event_list, file_list, hard_gt_list, medium_gt_list, easy_gt_list = get_gt_boxes(gt_path)
+    facebox_list, event_list, file_list, hard_gt_list, medium_gt_list, easy_gt_list = get_gt_boxes(
+        gt_path)
     event_num = len(event_list)
     thresh_num = 1000
     setting_gts = [easy_gt_list, medium_gt_list, hard_gt_list]
@@ -282,10 +286,12 @@ def evaluation(pred_evaluation, gt_path, iou_thresh=0.4):
                     continue
                 ignore = np.zeros(gt_boxes.shape[0])
                 if keep_index.size != 0:
-                    ignore[keep_index-1] = 1
-                pred_recall, proposal_list = image_eval(pred_info, gt_boxes, ignore, iou_thresh)
+                    ignore[keep_index - 1] = 1
+                pred_recall, proposal_list = image_eval(
+                    pred_info, gt_boxes, ignore, iou_thresh)
 
-                pr_curve += img_pr_info(thresh_num, pred_info, proposal_list, pred_recall)
+                pr_curve += img_pr_info(thresh_num,
+                                        pred_info, proposal_list, pred_recall)
 
         pr_curve = dataset_pr_info(thresh_num, pr_curve, count_face)
 
@@ -306,7 +312,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--pred', default='',
                         help='test output, txt contain box positions and scores')
-    parser.add_argument('-g', '--gt', default='', help='ground truth path, mat format')
+    parser.add_argument(
+        '-g',
+        '--gt',
+        default='',
+        help='ground truth path, mat format')
     args = parser.parse_args()
 
     pred = args.pred

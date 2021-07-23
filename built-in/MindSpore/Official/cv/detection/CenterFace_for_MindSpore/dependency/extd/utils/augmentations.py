@@ -1,4 +1,4 @@
-#EXTD: Extremely Tiny Face Detector via Iterative Filter Reuse
+# EXTD: Extremely Tiny Face Detector via Iterative Filter Reuse
 # MIT license
 
 # Copyright (c) 2019-present NAVER Corp.
@@ -26,6 +26,7 @@ import random
 import numpy as np
 import cv2
 
+
 def anchor_crop_image_sampling(image, anns):
     """
     Crop anchors.
@@ -35,12 +36,14 @@ def anchor_crop_image_sampling(image, anns):
 
     boxes = []
     for ann in anns:
-        boxes.append([ann['bbox'][0], ann['bbox'][1], ann['bbox'][0] + ann['bbox'][2], ann['bbox'][1] + ann['bbox'][3]])
+        boxes.append([ann['bbox'][0], ann['bbox'][1], ann['bbox']
+                     [0] + ann['bbox'][2], ann['bbox'][1] + ann['bbox'][3]])
     boxes = np.asarray(boxes, dtype=np.float32)
 
     height, width, _ = image.shape
 
-    box_area = (boxes[:, 2] - boxes[:, 0] + 1) * (boxes[:, 3] - boxes[:, 1] + 1)
+    box_area = (boxes[:, 2] - boxes[:, 0] + 1) * \
+        (boxes[:, 3] - boxes[:, 1] + 1)
     rand_idx = random.randint(0, len(box_area) - 1)
     rand_side = box_area[rand_idx] ** 0.5
 
@@ -59,9 +62,20 @@ def anchor_crop_image_sampling(image, anns):
     if int(height * ratio * width * ratio) > max_size * max_size:
         ratio = (max_size * max_size / (height * width)) ** 0.5
 
-    interp_methods = [cv2.INTER_LINEAR, cv2.INTER_CUBIC, cv2.INTER_AREA, cv2.INTER_NEAREST, cv2.INTER_LANCZOS4]
+    interp_methods = [
+        cv2.INTER_LINEAR,
+        cv2.INTER_CUBIC,
+        cv2.INTER_AREA,
+        cv2.INTER_NEAREST,
+        cv2.INTER_LANCZOS4]
     interp_method = random.choice(interp_methods)
-    image = cv2.resize(image, None, None, fx=ratio, fy=ratio, interpolation=interp_method)
+    image = cv2.resize(
+        image,
+        None,
+        None,
+        fx=ratio,
+        fy=ratio,
+        interpolation=interp_method)
 
     boxes[:, 0] *= ratio
     boxes[:, 1] *= ratio
@@ -70,7 +84,13 @@ def anchor_crop_image_sampling(image, anns):
 
     boxes = boxes.tolist()
     for i, _ in enumerate(anns):
-        anns[i]['bbox'] = [boxes[i][0], boxes[i][1], boxes[i][2] - boxes[i][0], boxes[i][3] - boxes[i][1]]
+        anns[i]['bbox'] = [
+            boxes[i][0],
+            boxes[i][1],
+            boxes[i][2] -
+            boxes[i][0],
+            boxes[i][3] -
+            boxes[i][1]]
         for j in range(5):
             anns[i]['keypoints'][j * 3] *= ratio
             anns[i]['keypoints'][j * 3 + 1] *= ratio

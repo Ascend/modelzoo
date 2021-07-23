@@ -5,16 +5,17 @@
 # 网络名称，同目录名称
 Network="DeepLabv3+_ID1695_for_PyTorch"
 # 训练batch_size
-batch_size=32
+batch_size=64
 # 训练使用的npu卡数
 export RANK_SIZE=8
+RANK_ID_START=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
 # 训练epoch
 train_epochs=10
 # 学习率
-learning_rate=0.001
+learning_rate=0.008
 
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
@@ -25,6 +26,8 @@ do
         data_path=`echo ${para#*=}`
     elif [[ $para == --more_path1* ]];then
         more_path1=`echo ${para#*=}`
+    elif [[ $para == --precision_mode* ]];then
+        precision_mode=`echo ${para#*=}`
     fi
 done
 
@@ -33,7 +36,6 @@ if [[ $data_path == "" ]];then
     echo "[Error] para \"data_path\" must be confing"
     exit 1
 fi
-
 
 ###############指定训练脚本执行路径###############
 # cd到与test文件夹同层级目录下执行脚本，提高兼容性；test_path_dir为包含test文件夹的路径
@@ -57,39 +59,43 @@ if [ -f ${more_path1}/resnet101-5d3b4d8f.pth ]; then
     cp ${more_path1}/resnet101-5d3b4d8f.pth /root/.cache/torch/checkpoints/resnet101-5d3b4d8f.pth
 fi
 
-#################创建日志输出目录，不需要修改#################
-ASCEND_DEVICE_ID=0
-if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
-    rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
-    mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-else
-    mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-fi
-
-
 #################启动训练脚本#################
 # 训练开始时间，不需要修改
 start_time=$(date +%s)
-# source 环境变量
-# source ${test_path_dir}/env.sh
-python3.7 -m train_NPU_8p \
-    --backbone resnet \
-    --lr ${learning_rate} \
-    --workers 64 \
-    --epochs ${train_epochs} \
-    --batch-size ${batch_size} \
-    --gpu-ids 0 \
-    --checkname deeplab-resnet \
-    --eval-interval 1 \
-    --dataset pascal \
-    --multiprocessing_distributed \
-    --rank 0 \
-    --addr $(hostname -I|awk '{print $1}') \
-    --world_size 8 \
-    --device_num 8 \
-    --device_list 0,1,2,3,4,5,6,7 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
+for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
+do
+    #设置环境变量，不需要修改
+    echo "Device ID: $RANK_ID"
+    export RANK_ID=$RANK_ID
+    export ASCEND_DEVICE_ID=$RANK_ID
+    ASCEND_DEVICE_ID=$RANK_ID
+
+    #创建DeviceID输出目录，不需要修改
+    if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
+        rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
+        mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+    else
+        mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+    fi
+    # source 环境变量
+    source ${test_path_dir}/env.sh
+
+    python3 train.py \
+        --backbone resnet \
+        --lr ${learning_rate} \
+        --workers 64 \
+        --epochs ${train_epochs} \
+        --batch-size ${batch_size} \
+        --checkname deeplab-resnet \
+        --eval-interval 1 \
+        --dataset pascal \
+        --multiprocessing_distributed > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+done
 wait
+
+#8p情况下仅0卡(主节点)有完整日志,因此后续日志提取仅涉及0卡
+ASCEND_DEVICE_ID=0
 
 # 训练结束时间，不需要修改
 end_time=$(date +%s)

@@ -125,65 +125,9 @@ npu_device.global_options().precision_mode=FLAGS.precision_mode
 
 ## 数据集准备<a name="section361114841316"></a>
 
-### Download and preprocess datasets
+参考：
 
-Download the [wikipedia dump](https://dumps.wikimedia.org/enwiki/20200101/enwiki-20200101-pages-articles-multistream.xml.bz2) and extract the pages
-The wikipedia dump can be downloaded from this link in this directory, and should contain the following file:
-enwiki-20200101-pages-articles-multistream.xml.bz2
-
-Run [WikiExtractor.py](https://github.com/attardi/wikiextractor) to extract the wiki pages from the XML
-The generated wiki pages file will be stored as <data dir>/LL/wiki_nn; for example <data dir>/AA/wiki_00. Each file is ~1MB, and each sub directory has 100 files from wiki_00 to wiki_99, except the last sub directory. For the 20200101 dump, the last file is FE/wiki_17.
-
-Clean up
-The clean up scripts (some references here) are in the scripts directory.
-The following command will run the clean up steps, and put the results in ./results
-./process_wiki.sh '<data dir>/*/wiki_??'
-
-After running the process_wiki.sh script, for the 20200101 wiki dump, there will be 500 files, named part-00xxx-of-00500 in the ./results directory.
-
-Exact steps (starting in the bert path)  
-
-```shell
-cd cleanup_scripts  
-mkdir -p wiki  
-cd wiki  
-wget https://dumps.wikimedia.org/enwiki/20200101/enwiki-20200101-pages-articles-multistream.xml.bz2    # Optionally use curl instead  
-bzip2 -d enwiki-20200101-pages-articles-multistream.xml.bz2  
-cd ..    # back to bert/cleanup_scripts  
-git clone https://github.com/attardi/wikiextractor.git  
-python3 wikiextractor/WikiExtractor.py wiki/enwiki-20200101-pages-articles-multistream.xml    # Results are placed in bert/cleanup_scripts/text  
-./process_wiki.sh '<text/*/wiki_??'  
-python3 extract_test_set_articles.py  
-```
-
-MD5sums:
-7f59165e21b7d566db610ff6756c926b - bert_config.json  
-00d47075e0f583fb7c0791fac1c57cb3 - enwiki-20200101-pages-articles-multistream.xml.bz2   
-50797acd537880bfb5a7ade80d976129  model.ckpt-28252.data-00000-of-00001
-f97de3ae180eb8d479555c939d50d048  model.ckpt-28252.index
-dbd16c731e8a8113bc08eeed0326b8e7  model.ckpt-28252.meta
-64800d5d8528ce344256daf115d4965e - vocab.txt  
-
-### Generate the BERT input dataset
-
-The create_pretraining_data.py script duplicates the input plain text, replaces different sets of words with masks for each duplication, and serializes the output into the TFRecord file format. 
-
-```shell
-python3 create_pretraining_data.py \
-   --input_file=<path to ./results of previous step>/part-XX-of-00500 \
-   --output_file=<tfrecord dir>/part-XX-of-00500 \
-   --vocab_file=<path to vocab.txt> \
-   --do_lower_case=True \
-   --max_seq_length=512 \
-   --max_predictions_per_seq=76 \
-   --masked_lm_prob=0.15 \
-   --random_seed=12345 \
-   --dupe_factor=10
-```
-
-The generated tfrecord has 500 parts, totalling to ~365GB.
-
-The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
+https://github.com/sgpyc/training/tree/bert_tf2_input/language_model/tensorflow/bert
 
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。
@@ -259,11 +203,11 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
         2. 1单卡训练指令（脚本位于BertLarge_TF2.x_for_Tensorflow/test/train_full_1p_16bs.sh）,请确保下面例子中的“--data_path”修改为用户的tfrecord的路径,这里选择将tfrecord文件夹放在home目录下。
         
             bash test/train_full_1p_16bs.sh --data_path=/home/tfrecord 
-
+    
     3. 8卡训练
-
+    
         3.1 8卡训练指令（脚本位于BertLarge_TF2.x_for_Tensorflow/test/train_full_8p_128bs.sh),请确保下面例子中的“--data_path”修改为用户的tfrecord的路径。
-
+    
             bash test/train_full_8p_128bs.sh --data_path=/home/tfrecord 
 
 
@@ -288,12 +232,8 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
         |	|--part-00000-of-00500.tfrecord
         |	|--part-00001-of-00500.tfrecord
         |   |--......
+        ```
 ```
-        
-
-
-  
-
 
 -  模型训练。
 
@@ -307,7 +247,7 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
 
 ## 脚本和示例代码<a name="section08421615141513"></a>
 
-```shell
+​```shell
 |--bert			#网络代码目录
 |   |--tf2_common
 |   |--modeling
@@ -320,25 +260,6 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
 |	|--train_full_8p_64bs.sh
 |   |--......
 
-
-
-#1P 16bs steps=100000
-./train_full_1p_16bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=96000
-./train_full_8p_64bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=24000
-./train_full_8p_128bs.sh --data_path=/home/tfrecord
-
-#1P 16bs steps=2000
-./train_performance_1p_16bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=200
-./train_performance_8p_64bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=100
-./train_performance_8p_128bs.sh --data_path=/home/tfrecord
 ```
 
 ## 脚本参数<a name="section6669162441511"></a>
@@ -371,11 +292,6 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
 ## 训练过程<a name="section1589455252218"></a>
 
 通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡，8卡网络训练。模型存储路径为${cur_path}/output/$ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。以8卡训练为例，loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
-
-
-## 推理/验证过程<a name="section1465595372416"></a>
-
-训练过程中做eval，这里我们设置steps_between_eval=2000，即每2000步评估一次。log也生成在${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中
 
 
 

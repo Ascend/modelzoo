@@ -9,20 +9,27 @@ export RANK_SIZE=1
 export JOB_ID=10087
 RANK_ID_START=0
 
-export SLOG_PRINT_TO_STDOUT=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
-#设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
-
-#设置dump开关，根据实际情况打开
-#export DUMP_GE_GRAPH=2
-#export DUMP_GRAPH_LEVEL=3
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="BertBase-squad_for_TensorFlow"
+Network="CTPN_ID0053_for_TensorFlow"
+#训练epoch
+#train_epochs=1
+#训练batch_size
+batch_size=1
+#训练step
+train_steps=50000
+#save_checkpoint_steps
+save_checkpoint_steps=2000
+#学习率
+learning_rate=1e-5
+
+
+#TF2.X独有，不需要修改
+#export NPU_LOOP_SIZE=${train_steps}
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_mix_precision"
@@ -32,6 +39,8 @@ data_dump_flag=False
 data_dump_step="10"
 profiling=False
 autotune=False
+
+
 
 # 帮助信息，不需要修改
 if [[ $1 == --help || $1 == -h ]];then
@@ -43,9 +52,9 @@ if [[ $1 == --help || $1 == -h ]];then
     --data_dump_flag	     data dump flag, default is False
     --data_dump_step		 data dump step, default is 10
     --profiling		         if or not profiling for performance debug, default is False
-    --autotune               whether to enable autotune, default is False
     --data_path		         source data of training
     -h/--help		         show help message
+    --autotune               whether to enable autotune, default is False
     "
     exit 1
 fi
@@ -69,6 +78,8 @@ do
         profiling=`echo ${para#*=}`
         profiling_dump_path=${cur_path}/output/profiling
         mkdir -p ${profiling_dump_path}
+    elif [[ $para == --loss_scale_flag* ]];then
+        loss_scale_flag=`echo ${para#*=}`
     elif [[ $para == --autotune* ]];then
         autotune=`echo ${para#*=}`
 		export autotune=$autotune
@@ -90,25 +101,20 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-
-
-
-
-
-
+#CTPN独有
+cd $cur_path/../utils/bbox/
+chmod +x make.sh
+./make.sh
 
 #训练开始时间，不需要修改
 start_time=$(date +%s)
-
 #进入训练脚本目录，需要模型审视修改
-cd $cur_path/../
+cd $cur_path/..
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
     #设置环境变量，不需要修改
-	ASCEND_DEVICE_ID=$RANK_ID
     echo "Device ID: $ASCEND_DEVICE_ID"
     export RANK_ID=$RANK_ID
-  
     #创建DeviceID输出目录，不需要修改
     if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
         rm -rf ${cur_path}/output/${ASCEND_DEVICE_ID}
@@ -116,25 +122,16 @@ do
     else
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
-
-    
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path，--autotune
-    python3 main/train_npu.py \
-	    --dataset_dir=$data_path \
-		--logs_path=${cur_path}/output/$ASCEND_DEVICE_ID/ \
-		--checkpoint_path=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt/ \
-		--pretrained_model_path=$data_path/vgg_16.ckpt \
-        --over_dump=${over_dump} \
-        --over_dump_path=${over_dump_path} \
-		> ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-        #--data_dump_flag=${data_dump_flag} \
-        #--data_dump_step=${data_dump_step} \
-        #--data_dump_path=${data_dump_path} \
-        #--profiling=${profiling} \
-        #--profiling_dump_path=${profiling_dump_path} \
-        #--autotune=${autotune}
-done 
+    nohup python3 main/train_npu.py \
+        --precision_mode=$precision_mode \
+        --pretrained_model_path=$data_path/vgg_16.ckpt \
+        --dataset_dir=$data_path \
+        --max_steps=$train_steps \
+        --save_checkpoint_steps=$save_checkpoint_steps \
+        --checkpoint_path=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+done
 wait
 
 #训练结束时间，不需要修改
@@ -144,34 +141,30 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}'`
+train_time=`grep Step  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $13}'`
+FPS=`awk 'BEGIN{printf "%.2f\n",'1000'*'${batch_size}'/'${train_time}'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
-
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep train_accuracy $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $8}'|cut -c 1-5`
+train_accuracy=`grep "total loss" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $12}' | awk -F ',' '{print $1}'`
+#train_accuracy=`grep Calculated $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}' | awk -F '}' '{print $1}'`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
-
 #稳定性精度看护结果汇总
 #训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
 CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
-
 ##获取性能数据
 #吞吐量，不需要修改
 ActualFPS=${FPS}
 #单迭代训练时长，不需要修改
-TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'*1000/'${FPS}'}'`
-
+TrainingTime=$train_time
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep train_loss $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v BatchTimestamp|awk '{print $10}'|sed 's/,//g'|sed '/^$/d' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
-
+grep "total loss" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk '{print $12}' | awk -F ',' '{print $1}'>> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
-
 #关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
@@ -183,3 +176,4 @@ echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${Ca
 echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+

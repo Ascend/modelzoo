@@ -21,7 +21,7 @@ python3.7 ${currentDir}/DistributedResnet50/main_apex_d76_npu.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed=49 \
         --workers=128 \
-        --learning-rate=1.6 \
+        --learning-rate=0.8 \
         --warmup=8 \
         --label-smoothing=0.1 \
         --mom=0.9 \

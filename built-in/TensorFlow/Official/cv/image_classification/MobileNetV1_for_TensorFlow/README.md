@@ -12,9 +12,9 @@
 
 **版本（Version）：1.2**
 
-**修改时间（Modified） ：2020.10.14**
+**修改时间（Modified） ：2021.7.21**
 
-**大小（Size）：47M**
+**大小（Size）：51.7M**
 
 **框架（Framework）：TensorFlow 1.15.0**
 
@@ -26,25 +26,27 @@
 
 **应用级别（Categories）：Official**
 
-**描述（Description）：基于TensorFlow框架的MobileNetV2图像分类网络训练代码**
+**描述（Description）：基于TensorFlow框架的MobileNetV1图像分类网络训练代码**
 
 
 
 <h2 id="概述.md">概述</h2>
 
-MobileNetV2是一种轻量型的适用于移动端的网络，其主要是由depthwise separable，linear bottlenecks，以及inverted residuals构成。MobileNetV2作为一种轻量级backbone，被广泛应用在分类，目标检测，实例分割等计算机视觉任务中。
+MobileNetv1专注于移动端或者嵌入式设备中的轻量级CNN网络。是将传统的卷积操作改为两层的卷积操作。它基于流线型架构，该架构使用深度可分离卷积来构建轻量级深度神经网络。MobileNets 在广泛的应用程序和用例中的有效性，包括对象检测、细粒度分类、人脸属性和大规模地理定位。
+
 -   参考论文：
 
-    [Sandler, Mark, et al. "Mobilenetv2: Inverted residuals and linear bottlenecks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2018.](https://arxiv.org/abs/1801.04381)
+	https://arxiv.org/abs/1704.04861
+
 
 -   参考实现：
 
-    [https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet)
+    [https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet](https://github.com/tensorflow/models/tree/master/research/slim)
         
 
 -   适配昇腾 AI 处理器的实现：
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV1_for_TensorFlow
         
 
 -   通过Git获取对应commit\_id的代码方法如下：
@@ -63,30 +65,12 @@ MobileNetV2是一种轻量型的适用于移动端的网络，其主要是由dep
 
 ## 默认配置<a name="section91661242121611"></a>
 
--   数据集预处理（以ImageNet2012数据集为例，仅作为用户参考示例）：
-	for training:
-    -   Convert DataType and RandomResizeCrop
-    -   RandomHorizontalFlip, prob=0.5
-	-	Subtract with 0.5 and multiply with 2.0
-	for inference:
-	-	Convert dataType
-	-	CenterCrop 87.5% of the original image and resize to (224,224)
-	-	Subtract with 0.5 and multiply 2.0
--   训练数据集预处理（当前代码以ImageNet验证集为例，仅作为用户参考示例）：
-    -   图像的输入尺寸为224\*224
-    -   随机裁剪图像尺寸
-    -   随机水平翻转图像
-    -   根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
-
--   测试数据集预处理（当前代码以ImageNet验证集为例，仅作为用户参考示例）：
-    -   图像的输入尺寸为224\*224（将图像最小边缩放到256，同时保持宽高比，然后在中心裁剪图像）
-    -   根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
 
 -   训练超参：
     -   Batch size: 256
     -   Momentum: 0.9
     -   LR scheduler: cosine annealing
-    -   Learning rate\(LR\): 0.8
+    -   Learning rate\(LR\): 0.4
     -   Weight decay: 0.00004
     -   Label smoothing: 0.1
     -   Train epoch: 300
@@ -170,211 +154,64 @@ run_config = NPURunConfig(
 
 ## 模型训练<a name="section715881518135"></a>
 
-1.  单击“立即下载”，并选择合适的下载方式下载源码包。
-2.  检查目录下是否有存在8卡IP的json配置文件“8p.json”，请用户根据实际数据配置`device_ip`参数。
-    8P配置文件示例。
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
 
+- 启动训练之前，首先要配置程序运行相关环境变量。
 
-```
-{
- "group_count": "1",
- "group_list": [
-  {
-   "group_name": "worker",
-   "device_count": "8",
-   "instance_count": "1",
-   "instance_list": [
-    {
-     "devices":[
-      {"device_id":"0","device_ip":"192.168.100.101"},
-      {"device_id":"1","device_ip":"192.168.101.101"},
-      {"device_id":"2","device_ip":"192.168.102.101"},
-      {"device_id":"3","device_ip":"192.168.103.101"},
-      {"device_id":"4","device_ip":"192.168.100.100"},
-      {"device_id":"5","device_ip":"192.168.101.100"},
-      {"device_id":"6","device_ip":"192.168.102.100"},
-      {"device_id":"7","device_ip":"192.168.103.100"}
-     ],
-     "pod_name":"ascend8p",
-     "server_id":"127.0.0.1"
-    }
-   ]
-  }
- ],
- "status": "completed"
-}
-```
+  环境变量配置信息参见：
 
--   开始训练。
-    1. 启动训练之前，首先要配置程序运行相关环境变量。
+     [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-       环境变量配置信息参见：
+- 单卡训练 
 
-          [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+  1. 配置训练参数。
 
-    2. 单卡训练
-        
-        2.1 在脚本train_1p.sh中（脚本位于MobileNetV2_for_TensorFlow/train_1p.sh），配置`dataset_dir`训练数据集路径参数，请用户根据实际路径配置，参考示例如下。
+     首先在脚本test/train_performance_1p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
 
-            `--dataset_dir=/opt/npu/slimImagenet` 
-    
+     ```
+      --dataset_dir=/npu/traindata/imagemat_TF
+     ```
 
-        2.2 单卡训练训练指令（脚本位于MobileNetV2_for_TensorFlow/run_1p.sh）
+  2. 启动训练。
 
-            `bash run_1p.sh`
+     启动单卡性能训练 （脚本为MobileNetV1_for_TensorFlow/test/train_performance_1p.sh） 
 
-    1. 8卡训练
-        
-        2.1 在脚本train_8p.sh中（脚本位于MobileNetV2_for_TensorFlow/train_8p.sh），配置`dataset_dir`训练数据集路径参数，请用户根据实际路径配置，参考示例如下。
+     ```
+     bash train_performance_1p.sh
+     ```
+	 
+	 启动单卡精度训练 （脚本为MobileNetV1_for_TensorFlow/test/train_full_1p.sh） 
 
-            `--dataset_dir=/opt/npu/slimImagenet` 
-    
+     ```
+     bash train_full_1p.sh
+     ```
+- 8卡训练
 
-        2.2 单卡训练训练指令（脚本位于MobileNetV2_for_TensorFlow/run_8p.sh）
+  1. 配置训练参数。
 
-            `bash run_8p.sh`
+     首先在脚本test/train_full_8p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
 
+     ```
+      --dataset_dir=/npu/traindata/imagemat_TF
+     ```
 
--   验证。
+  2. 启动训练。
 
-    1. 训练完成之后，可以开始测试，修改eval_image_classifier_mobilenet.py脚本中checkpoint的文件路径以及dataset_dir路径，请用户根据实际路径配置，示例如下。
+     启动8卡性能训练 （脚本为MobileNetV1_for_TensorFlow/test/train_performance_8p.sh） 
 
-        
-        ```
-        --checkpoint_path=path/to/checkpoint 
-        --dataset_dir=path/to/validaton
-        ```
+     ```
+     bash train_performance_8p.sh
+     ```
+	 
+     启动8卡精度训练 （脚本为MobileNetV1_for_TensorFlow/test/train_full_8p.sh） 
 
-
-    2. 执行测试指令
-    
-        `python3 eval_image_classifier_mobilenet.py --checkpoint_path=path/to/checkpoint --dataset_dir=path/to/validaton`
-
-<h2 id="迁移学习指导.md">迁移学习指导</h2>
-
--   数据集准备。
-
-    数据集要求如下：
-
-    1.1 获取数据。
-
-    1.2 如果要使用自己的数据集，请参见“数据集准备”，需要将数据集转化为tfrecord格式。
-
-    1.3 准确标注类别标签的数据集。
-
-    1.4 数据集每个类别所占比例大致相同。
-
-    1.5 数据集文件结构，请用户自行参照tfrecord脚本生成train/eval使用的TFRecord文件，包含训练集和验证集两部分，目录参考：
-
-        ```
-        |--|imagenet_tfrecord
-        |   train-00000-of-01024
-        |   train-00001-of-01024
-        |   train-00002-of-01024
-        |   ...
-        |   validation-00000-of-00128
-        |   validation-00000-of-00128
-        |   ...
-        ```
-
-
--   模型修改。
-
-    1. 模型分类类别修改。
-
-        1.1 使用自有数据集进行分类，如需将分类类别修改为10。修改nets/inception_resnet_v2.py将num_classes=1001设置为num_classes=10。
-
-        ```
-        def inception_resnet_v2(inputs, num_classes=1001, is_training=True,
-        dropout_keep_prob=0.8,
-        reuse=None,
-        scope='InceptionResnetV2',
-        create_aux_logits=True,
-        activation_fn=tf.nn.relu):
-        ```
-
-        1.2 修改nets/mobilenet/mobilenet_v2.py，将num_classes=1001设置为num_classes=10。
-
-        ```
-        def mobilenet(input_tensor,
-        num_classes=1001,
-        depth_multiplier=1.0,
-        scope='MobilenetV2',
-        conv_defs=None,
-        finegrain_classification_mode=False,
-        ```
-
-        1.3 修改nets/inception_v2.py，将num_classes=1000设置为num_classes=10。
-
-
-        ```
-        def inception_v2(inputs,
-        num_classes=1000,
-        is_training=True,
-        dropout_keep_prob=0.8,
-        min_depth=16,
-        depth_multiplier=1.0,
-        prediction_fn=slim.softmax,
-        ```
-
-
-
-        1.4 修改estimator_impl.py，将num_classes=1001设置为num_classes=10。
-
-        ```
-        def model_fn(self, features, labels, mode, params):
-        num_classes = 1001
-        ```
-
-        1.5 修改nets/post_training_quantization.py，将num_classes=1001设置为num_classes=10。
-
-        ```
-        flags.DEFINE_integer("num_classes", 1001,
-                             "Number of output classes for the model.")
-        ```
-
-        1.6 修改datasets/imagenet.py，将_NUM_CLASSES=1001设置为_NUM_CLASSES=10。
-
-        `_NUM_CLASSES = 1001`
-
-    2. 加载预训练模型。
-
-       配置文件增加参数
-
-        2.1 修改文件train.py（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。
-            
-            
-            #用户根据预训练的实际ckpt进行配置
-            tf.app.flags.DEFINE_string(
-            'restore_path', '/code/ckpt/model.ckpt-187500', 'The directory where the ckpt files are stored.')
-            #不加载预训练网络中FC层权重
-            tf.app.flags.DEFINE_list(
-            'restore_exclude', ['MobilenetV2/Logits/'], 'The directory where the fc files are stored.')
-            
-
-        2.2 模型加载修改，修改文件estimator_impl.py，增加以下代码行。
-
-            
-            estimator_spec = tf.estimator.EstimatorSpec(
-                    mode=tf.estimator.ModeKeys.TRAIN, loss=total_loss, train_op=train_op)
-            #restore ckpt for finetune，
-            variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.env.FLAGS.restore_exclude)
-            tf.train.init_from_checkpoint(self.env.FLAGS.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})   
-            
-
-    
--   模型训练。
-
-    参考“模型训练”中训练步骤。
-
--   模型评估。
-
-    参考“模型训练”中验证步骤。
+     ```
+     bash train_full_8p.sh
+     ```
 
 <h2 id="高级参考.md">高级参考</h2>
 
-
-脚本和示例代码
+## 脚本和示例代码<a name="section08421615141513"></a>
 
 ```
 ├── train.py                                          //网络训练与测试代码
@@ -387,9 +224,7 @@ run_config = NPURunConfig(
 ├── estimator_impl.py
 ```
 
-
 ## 脚本参数<a name="section6669162441511"></a>
-
 
 ```
 --dataset_dir              数据集路径，默认：/opt/npu/slimImagenet
@@ -412,57 +247,16 @@ run_config = NPURunConfig(
 
 ## 训练过程<a name="section1589455252218"></a>
 
-1. 配置8卡训练脚本（train_8p.sh）的参数，详细可参考“快速上手”。checkpoint和log文件默认保存在“result/8p/”下面，以下为log信息示例。
+1.  通过“模型训练”中的训练指令启动性能或者精度训练。单卡和多卡通过运行不同脚本，支持单卡、8卡网络训练。
 
-```
-2020-06-28 15:20:50.593892: I tf_adapter/kernels/geop_npu.cc:780] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp10_0, ret_status:success ,tf session: directdbe078fad5c67345 ,graph id: 61 [0 ms]
-2020-06-28 15:20:50.594560: I tf_adapter/kernels/geop_npu.cc:65] BuildOutputTensorInfo, num_outputs:1
-2020-06-28 15:20:50.594604: I tf_adapter/kernels/geop_npu.cc:94] BuildOutputTensorInfo, output index:0, total_bytes:8, shape:, tensor_ptr:281463098667072, output281463099285952
-2020-06-28 15:20:50.594621: I tf_adapter/kernels/geop_npu.cc:758] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp10_0[ 827us]
-step:73750  epoch:117.89251518342262 ips:11012.314306960132 loss:2.76953125  total_loss:3.094825029373169  lr:0.5281736254692078, train_accuracy:0.5798249840736389
-I0628 15:20:50.594920 281472846090256 logger.py:42] step:73750  epoch:117.89251518342262 ips:11012.314306960132 loss:2.76953125  total_loss:3.094825029373169  lr:0.5281736254692078, train_accuracy:0.5798249840736389
-INFO:tensorflow:loss = 3.094825, step = 73750
-I0628 15:20:50.595537 281472846090256 basic_session_run_hooks.py:262] loss = 3.094825, step = 73750
-2020-06-28 15:20:50.595977: I tf_adapter/kernels/geop_npu.cc:555] [GEOP] Begin GeOp::ComputeAsync, kernel_name:GeOp10_0, num_inputs:0, num_outputs:1
-2020-06-28 15:20:50.596056: I tf_adapter/kernels/geop_npu.cc:423] [GEOP] tf session directdbe078fad5c67345, graph id: 61 no need to rebuild
-2020-06-28 15:20:50.596076: I tf_adapter/kernels/geop_npu.cc:766] [GEOP] Call ge session RunGraphAsync, kernel_name:GeOp10_0 ,tf session: directdbe078fad5c67345 ,graph id: 61
-2020-06-28 15:20:50.596142: I tf_adapter/kernels/geop_npu.cc:780] [GEOP] End GeOp::ComputeAsync, kernel_name:GeOp10_0, ret_status:success ,tf session: directdbe078fad5c67345 ,graph id: 61 [0 ms]
-2020-06-28 15:20:50.597643: I tf_adapter/kernels/geop_npu.cc:65] BuildOutputTensorInfo, num_outputs:1
-2020-06-28 15:20:50.597666: I tf_adapter/kernels/geop_npu.cc:94] BuildOutputTensorInfo, output index:0, total_bytes:8, shape:, tensor_ptr:281463098682112, output281463099635088
-2020-06-28 15:20:50.597679: I tf_adapter/kernels/geop_npu.cc:758] [GEOP] RunGraphAsync callback, status:0, kernel_name:GeOp10_0[ 1603us]
-INFO:tensorflow:global_step...73750
-```
+2.  参考脚本的模型存储路径为result/8p/*。
 
 ## 推理/验证过程<a name="section1465595372416"></a>
 
-1. 通过“快速上手”中的测试指令启动测试。
-2. 当前只能针对该工程训练出的checkpoint进行推理测试。
-3. 推理脚本参数checkpoint_path可以配置为checkpoint所在的文件夹路径，则该路径下所有.ckpt文件都会根据进行推理，也可以是某个checkpoint的路径，默认读取“result/8p/0/results/”下面最新的文件。
-4. 测试结束后会打印验证集的top1 accuracy，如下所示。
+1.  通过“模型训练”中的测试指令启动测试。
 
+2.  当前只能针对该工程训练出的checkpoint进行推理测试。
 
-```
-2020-06-26 09:15:46.236574: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0xaaab02f1d790 initialized for platform Host (this does not guarantee that XLA       will be used). Devices:
-2020-06-26 09:15:46.236626: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
-WARNING:tensorflow:From eval_image_classifier_mobilenet.py:159: The name tf.global_variables_initializer is deprecated. Please use tf.compat.v1.global_variables_initializer instead.
+3.  推理脚本的参数checkpoint_path可以配置为checkpoint所在的文件夹路径，则该路径下所有.ckpt文件都会根据进行推理。
 
-W0626 09:15:46.409178 281473216393232 module_wrapper.py:139] From eval_image_classifier_mobilenet.py:159: The name tf.global_variables_initializer is deprecated. Please use tf.compat.v1.global_variables_initializer instead.
-WARNING:tensorflow:From eval_image_classifier_mobilenet.py:160: The name tf.local_variables_initializer is deprecated. Please use tf.compat.v1.local_variables_initializer instead.
-W0626 09:15:47.034382 281473216393232 module_wrapper.py:139] From eval_image_classifier_mobilenet.py:160: The name tf.local_variables_initializer is deprecated. Please use tf.compat.v1.local_variables_initializer instead.
-INFO:tensorflow:Restoring parameters from /opt/npu/mobilenetv2_v1.1/result/8p/0/results/model.ckpt-125000
-I0626 09:15:47.133081 281473216393232 saver.py:1284] Restoring parameters from /opt/npu/mobilenetv2_v1.1/result/8p/0/results/model.ckpt-125000
-WARNING:tensorflow:From eval_image_classifier_mobilenet.py:164: The name tf.train.write_graph is deprecated. Please use tf.io.write_graph instead.
-W0626 09:15:47.560457 281473216393232 module_wrapper.py:139] From eval_image_classifier_mobilenet.py:164: The name tf.train.write_graph is deprecated. Please use tf.io.write_graph instead.
-0, _metric_update_op: [0.74609375]
-1, _metric_update_op: [0.7480469]
-2, _metric_update_op: [0.7447917]
-3, _metric_update_op: [0.74121094]
-4, _metric_update_op: [0.73359376]
-5, _metric_update_op: [0.7317708]
-6, _metric_update_op: [0.72935265]
-7, _metric_update_op: [0.7260742]
-8, _metric_update_op: [0.7204861]
-9, _metric_update_op: [0.721875]
-
-```
-
+4.  测试结束后会打印验证集的top1 accuracy，，打印在eval_*.log中

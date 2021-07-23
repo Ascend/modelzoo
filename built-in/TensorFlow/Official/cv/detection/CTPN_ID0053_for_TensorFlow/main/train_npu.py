@@ -67,6 +67,7 @@ tf.app.flags.DEFINE_string("over_dump", "False",
                            "whether to enable overflow")
 tf.app.flags.DEFINE_string("over_dump_path", "./",
                     "path to save overflow dump files")
+tf.app.flags.DEFINE_string('precision_mode', 'allow_fp32_to_fp16', '')
 # modify for npu overflow end
 
 FLAGS = tf.app.flags.FLAGS
@@ -168,6 +169,8 @@ def main(argv=None):
     config = tf.ConfigProto()
     custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
     custom_op.name =  "NpuOptimizer"
+    if FLAGS.precision_mode == "allow_mix_precision":
+        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
     custom_op.parameter_map["use_off_line"].b = True
 
     #  init autotune module start

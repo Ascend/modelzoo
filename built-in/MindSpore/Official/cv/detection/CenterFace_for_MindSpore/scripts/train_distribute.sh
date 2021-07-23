@@ -54,51 +54,36 @@ rank_table=$root/rank_table_8p.json
 if [ $# == 1 ]
 then
     rank_table=$(get_real_path $1)
-    if [ ! -f $rank_table ]
-    then
-        echo "error: rank_table=$rank_table is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 2 ]
 then
+    rank_table=$(get_real_path $1)
     pretrained_backbone=$(get_real_path $2)
-    if [ ! -f $pretrained_backbone ]
-    then
-        echo "error: pretrained_backbone=$pretrained_backbone is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 3 ]
 then
+    rank_table=$(get_real_path $1)
+    pretrained_backbone=$(get_real_path $2)
     dataset_path=$(get_real_path $3)
-    if [ ! -f $dataset_path ]
-    then
-        echo "error: dataset_path=$dataset_path is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 4 ]
 then
+    rank_table=$(get_real_path $1)
+    pretrained_backbone=$(get_real_path $2)
+    dataset_path=$(get_real_path $3)
     annot_path=$(get_real_path $4)
-    if [ ! -f $annot_path ]
-    then
-        echo "error: annot_path=$annot_path is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 5 ]
 then
+    rank_table=$(get_real_path $1)
+    pretrained_backbone=$(get_real_path $2)
+    dataset_path=$(get_real_path $3)
+    annot_path=$(get_real_path $4)
     img_dir=$(get_real_path $5)
-    if [ ! -f $img_dir ]
-    then
-        echo "error: img_dir=$img_dir is not a file"
-    exit 1
-    fi
 fi
 
 echo $rank_table

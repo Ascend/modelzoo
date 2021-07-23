@@ -40,17 +40,12 @@ class SegmentationLosses(object):
         self.size_average = size_average
         self.batch_average = batch_average
         self.cuda = cuda
-        if device:
-          self.device = device
-        else:
-          self.device = None
+        self.device = device
     def build_loss(self, mode='ce'):
         """Choices: ['ce' or 'focal']"""
         if mode == 'ce':
-            #self.CrossEntropyLoss().to(device)
             return self.CrossEntropyLoss
         elif mode == 'focal':
-            #self.FocalLoss().to(device)
             return self.FocalLoss
         else:
             raise NotImplementedError
@@ -63,9 +58,6 @@ class SegmentationLosses(object):
             criterion = criterion.to(self.device)
         if self.cuda:
             criterion = criterion.cuda()
-        #if self.device:
-        #    criterion = criterion.to(self.device)
-        #loss = criterion(logit, target.long())
         if self.device:
             loss = criterion(logit, target)
         else:

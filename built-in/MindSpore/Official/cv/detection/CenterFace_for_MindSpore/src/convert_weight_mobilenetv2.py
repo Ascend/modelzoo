@@ -31,6 +31,7 @@ parser.add_argument('--out_ckpt_fn', type=str, default='/model_path/mobilenet_v2
 
 args = parser.parse_args()
 
+
 def load_model(model_path):
     """
     Load model
@@ -48,6 +49,7 @@ def load_model(model_path):
             state_dict[k] = state_dict_[k]
     return state_dict
 
+
 def load_model_ms(model_path):
     """
     Load mindspore model
@@ -59,16 +61,19 @@ def load_model_ms(model_path):
         param_dict_new = {}
         for key, values in param_dict.items():
             if key in state_dict_useless or key.startswith('moments.') \
-                or key.startswith('moment1.') or key.startswith('moment2.'):
+                    or key.startswith('moment1.') or key.startswith('moment2.'):
                 continue
-            elif key.startswith('centerface_network.'): #useless, since the start name is "network.backbone."
+            # useless, since the start name is "network.backbone."
+            elif key.startswith('centerface_network.'):
                 param_dict_new[key[19:]] = values
             else:
                 param_dict_new[key] = values
     else:
-        assert FileNotFoundError('{} not exists or not a pre-trained file'.format(model_path))
+        assert FileNotFoundError(
+            '{} not exists or not a pre-trained file'.format(model_path))
         exit(1)
     return param_dict_new
+
 
 def name_map(ckpt):
     """
@@ -106,6 +111,7 @@ def name_map(ckpt):
         out[pt_name] = name
     return out
 
+
 def pt_to_ckpt(pt, ckpt, out_ckpt):
     """
     Pt convert to ckpt file
@@ -126,6 +132,7 @@ def pt_to_ckpt(pt, ckpt, out_ckpt):
 
     save_checkpoint(new_params_list, out_ckpt)
     return state_dict_ms
+
 
 if __name__ == "__main__":
     # beta <=> bias, gamma <=> weight

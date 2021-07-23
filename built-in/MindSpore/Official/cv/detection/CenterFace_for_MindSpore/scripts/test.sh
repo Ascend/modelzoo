@@ -56,50 +56,45 @@ ckpt="0-125_24750.ckpt" # the model saved for epoch=125
 if [ $# == 1 ]
 then
     model_path=$(get_real_path $1)
-    if [ ! -f $model_path ]
-    then
-        echo "error: model_path=$model_path is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 2 ]
 then
+    model_path=$(get_real_path $1)
     dataset_path=$(get_real_path $2)
-    if [ ! -f $dataset_path ]
-    then
-        echo "error: dataset_path=$dataset_path is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 3 ]
 then
+    model_path=$(get_real_path $1)
+    dataset_path=$(get_real_path $2)
     ground_truth_mat=$(get_real_path $3)
-    if [ ! -f $ground_truth_mat ]
-    then
-        echo "error: ground_truth_mat=$ground_truth_mat is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 4 ]
 then
+    model_path=$(get_real_path $1)
+    dataset_path=$(get_real_path $2)
+    ground_truth_mat=$(get_real_path $3)
     save_path=$(get_real_path $4)
-    if [ ! -f $save_path ]
-    then
-        echo "error: save_path=$save_path is not a file"
-    exit 1
-    fi
 fi
 
 if [ $# == 5 ]
 then
+    model_path=$(get_real_path $1)
+    dataset_path=$(get_real_path $2)
+    ground_truth_mat=$(get_real_path $3)
+    save_path=$(get_real_path $4)
     device_id=$5
 fi
 
 if [ $# == 6 ]
 then
+    model_path=$(get_real_path $1)
+    dataset_path=$(get_real_path $2)
+    ground_truth_mat=$(get_real_path $3)
+    save_path=$(get_real_path $4)
+    device_id=$5
     ckpt=$6
 fi
 

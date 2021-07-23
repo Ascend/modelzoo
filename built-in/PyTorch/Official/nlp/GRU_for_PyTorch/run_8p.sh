@@ -49,6 +49,7 @@ else
         --batch-size 4096 \
         --epoch 10 \
         --rank 0 \
+        --npu $i \
         --device-list '0,1,2,3,4,5,6,7' \
         --amp  > ./gru_8p.log 2>&1 &
     done

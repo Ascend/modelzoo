@@ -51,6 +51,13 @@ do
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
 
+    # 非平台场景时source 环境变量
+    check_etp_flag=`env | grep etp_running_flag`
+    etp_flag=`echo ${check_etp_flag#*=}`
+    if [ x"${etp_flag}" != x"true" ];then
+        source ${cur_path}/env_npu.sh
+    fi
+
     # 绑核，不需要的绑核的模型删除，需要的模型审视修改
     #let a=RANK_ID*12
     #let b=RANK_ID+1

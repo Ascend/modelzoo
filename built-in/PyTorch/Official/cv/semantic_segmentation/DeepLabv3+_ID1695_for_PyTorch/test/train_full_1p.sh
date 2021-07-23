@@ -11,7 +11,7 @@ export RANK_SIZE=1
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
-# 训练epoch,100
+# 训练epoch
 train_epochs=100
 # 指定训练所使用的npu device卡id
 device_id=0
@@ -27,6 +27,8 @@ do
         data_path=`echo ${para#*=}`
     elif [[ $para == --more_path1* ]];then
         more_path1=`echo ${para#*=}`
+    elif [[ $para == --precision_mode* ]];then
+        precision_mode=`echo ${para#*=}`
     fi
 done
 
@@ -35,7 +37,6 @@ if [[ $data_path == "" ]];then
     echo "[Error] para \"data_path\" must be confing"
     exit 1
 fi
-
 
 # 校验是否指定了device_id,分动态分配device_id与手动指定device_id,此处不需要修改
 if [ $ASCEND_DEVICE_ID ];then
@@ -62,7 +63,6 @@ else
     test_path_dir=${cur_path}/test
 fi
 
-
 # 数据集路径加引号；更改mypath.py中的数据集路径
 data_path=\"${data_path}\"
 sed -i 's#dataset_path=.*$#dataset_path='$data_path'#' ./mypath.py
@@ -85,15 +85,17 @@ fi
 #################启动训练脚本#################
 #训练开始时间，不需要修改
 start_time=$(date +%s)
+
 # source 环境变量
-# source ${test_path_dir}/env.sh
-python3.7 train_NPU.py \
+source ${test_path_dir}/env.sh
+
+python3 train.py \
     --backbone resnet \
     --lr ${learning_rate} \
     --workers 64 \
     --epochs ${train_epochs} \
     --batch-size ${batch_size} \
-    --gpu-ids ${ASCEND_DEVICE_ID} \
+    --device_id ${ASCEND_DEVICE_ID} \
     --checkname deeplab-resnet \
     --eval-interval 1 \
     --dataset pascal > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &

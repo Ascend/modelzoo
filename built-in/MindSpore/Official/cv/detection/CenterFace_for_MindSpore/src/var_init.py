@@ -22,6 +22,7 @@ from mindspore.common.initializer import Initializer as MeInitializer
 import mindspore.nn as nn
 from mindspore import Tensor
 
+
 def assignment(arr, num):
     """Assign the value of `num` to `arr`."""
     if arr.shape == ():
@@ -34,6 +35,7 @@ def assignment(arr, num):
         else:
             arr[:] = num
     return arr
+
 
 def calculate_gain(nonlinearity, param=None):
     r"""Return the recommended gain value for the given nonlinearity function.
@@ -57,7 +59,14 @@ def calculate_gain(nonlinearity, param=None):
     Examples:
         >>> gain = nn.init.calculate_gain('leaky_relu', 0.2)  # leaky_relu with negative_slope=0.2
     """
-    linear_fns = ['linear', 'conv1d', 'conv2d', 'conv3d', 'conv_transpose1d', 'conv_transpose2d', 'conv_transpose3d']
+    linear_fns = [
+        'linear',
+        'conv1d',
+        'conv2d',
+        'conv3d',
+        'conv_transpose1d',
+        'conv_transpose2d',
+        'conv_transpose3d']
     if nonlinearity in linear_fns or nonlinearity == 'sigmoid':
         return 1
     if nonlinearity == 'tanh':
@@ -71,7 +80,8 @@ def calculate_gain(nonlinearity, param=None):
             # True/False are instances of int, hence check above
             negative_slope = param
         else:
-            raise ValueError("negative_slope {} not a valid number".format(param))
+            raise ValueError(
+                "negative_slope {} not a valid number".format(param))
         return math.sqrt(2.0 / (1 + negative_slope ** 2))
 
     raise ValueError("Unsupported nonlinearity {}".format(nonlinearity))
@@ -81,7 +91,9 @@ def _calculate_correct_fan(array, mode):
     mode = mode.lower()
     valid_modes = ['fan_in', 'fan_out']
     if mode not in valid_modes:
-        raise ValueError("Mode {} not supported, please use one of {}".format(mode, valid_modes))
+        raise ValueError(
+            "Mode {} not supported, please use one of {}".format(
+                mode, valid_modes))
 
     fan_in, fan_out = _calculate_fan_in_and_fan_out(array)
     return fan_in if mode == 'fan_in' else fan_out
@@ -117,7 +129,8 @@ def kaiming_uniform_(arr, a=0, mode='fan_in', nonlinearity='leaky_relu'):
     fan = _calculate_correct_fan(arr, mode)
     gain = calculate_gain(nonlinearity, a)
     std = gain / math.sqrt(fan)
-    bound = math.sqrt(3.0) * std  # Calculate uniform bounds from standard deviation
+    # Calculate uniform bounds from standard deviation
+    bound = math.sqrt(3.0) * std
     return np.random.uniform(-bound, bound, arr.shape)
 
 
@@ -160,7 +173,8 @@ def _calculate_fan_in_and_fan_out(arr):
     """
     dimensions = len(arr.shape)
     if dimensions < 2:
-        raise ValueError("Fan in and fan out can not be computed for array with fewer than 2 dimensions")
+        raise ValueError(
+            "Fan in and fan out can not be computed for array with fewer than 2 dimensions")
 
     num_input_fmaps = arr.shape[1]
     num_output_fmaps = arr.shape[0]
@@ -196,12 +210,17 @@ def xavier_uniform_(arr, gain=1.):
     """
     fan_in, fan_out = _calculate_fan_in_and_fan_out(arr)
     std = gain * math.sqrt(2.0 / float(fan_in + fan_out))
-    a = math.sqrt(3.0) * std  # Calculate uniform bounds from standard deviation
+    # Calculate uniform bounds from standard deviation
+    a = math.sqrt(3.0) * std
 
     return np.random.uniform(-a, a, arr.shape)
 
 
 class XavierUniform(MeInitializer):
+    """
+    XavierUniform
+    """
+
     def __init__(self, gain=1.):
         super(XavierUniform, self).__init__()
         self.gain = gain
@@ -212,6 +231,10 @@ class XavierUniform(MeInitializer):
 
 
 class KaimingUniform(MeInitializer):
+    """
+    KaimingUniform
+    """
+
     def __init__(self, a=0, mode='fan_in', nonlinearity='leaky_relu'):
         super(KaimingUniform, self).__init__()
         self.a = a
@@ -224,6 +247,10 @@ class KaimingUniform(MeInitializer):
 
 
 class KaimingNormal(MeInitializer):
+    """
+    KaimingNormal
+    """
+
     def __init__(self, a=0, mode='fan_in', nonlinearity='leaky_relu'):
         super(KaimingNormal, self).__init__()
         self.a = a
@@ -234,7 +261,12 @@ class KaimingNormal(MeInitializer):
         tmp = kaiming_normal_(arr, self.a, self.mode, self.nonlinearity)
         assignment(arr, tmp)
 
+
 class RandomNormal(MeInitializer):
+    """
+    RandomNormal
+    """
+
     def __init__(self, std=0.001):
         super(RandomNormal, self).__init__()
         self.std = std
@@ -243,6 +275,7 @@ class RandomNormal(MeInitializer):
         std = self.std
         tmp = np.random.normal(0, std, arr.shape)
         assignment(arr, tmp)
+
 
 def default_recurisive_init(custom_cell):
     """
@@ -274,8 +307,14 @@ def default_recurisive_init(custom_cell):
                 cell.bias.set_data(init.initializer('zeros', cell.bias.data.shape,
                                                     cell.bias.data.dtype).to_tensor())
         elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d)):
-            cell.gamma.set_data(init.initializer('ones', cell.gamma.data.shape).to_tensor())
-            cell.beta.set_data(init.initializer('zeros', cell.beta.data.shape).to_tensor())
+            cell.gamma.set_data(
+                init.initializer(
+                    'ones',
+                    cell.gamma.data.shape).to_tensor())
+            cell.beta.set_data(
+                init.initializer(
+                    'zeros',
+                    cell.beta.data.shape).to_tensor())
         elif isinstance(cell, nn.Conv2dTranspose):
             cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5), mode='fan_out'),
                                                   cell.weight.data.shape,

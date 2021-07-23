@@ -47,7 +47,7 @@ config = {
     'epochs_between_evals': 4,                              #used if mode is "train_and_evaluate"
     'stop_threshold': 80.0,                                 #used if mode is "train_and_evaluate"
     'data_dir':'/opt/npu/resnet_data_new',
-    'data_url': 'file://PATH_TO_BE_CONFIGURED',
+    'data_url': 'file:///npu/traindata/imagenet_TF',
     'data_type': 'TFRECORD',
     'model_name': 'resnet50', 
     'num_classes': 1001,

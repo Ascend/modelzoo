@@ -1,7 +1,8 @@
-source ../../test/env.sh
+source ../../test/env_npu.sh
 export RANK_SIZE=8
+rm -f nohup.out
 
-for((RANK_ID=0;RANK_ID<8;RANK_ID++));
+for((RANK_ID=0;RANK_ID<RANK_SIZE;RANK_ID++));
 do
     export RANK_ID=$RANK_ID
 

@@ -46,7 +46,7 @@ ulimit -c unlimited
 root=${current_exec_path} # your script path
 pretrained_backbone=${dirname_path}/mobilenet_v2.ckpt # or mobilenet_v2-b0353104.ckpt
 dataset_path=$root/dataset/centerface
-annot_path=$dataset_path/annotations/train.json
+annot_path=$dataset_path/annotations/train_wider_face.json
 img_dir=$dataset_path/images/train/images
 use_device_id=0
 

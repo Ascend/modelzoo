@@ -37,10 +37,12 @@ from src.callback import EvalCallBack, LossCallBack
 np_type = np.float32
 ms_type = mstype.float32
 
+
 class AUCMetric(Metric):
     """
     Metric method
     """
+
     def __init__(self):
         super(AUCMetric, self).__init__()
         self.pred_probs = []
@@ -52,27 +54,43 @@ class AUCMetric(Metric):
         self.true_labels = []
 
     def update(self, *inputs):
+        """Update predictions and labels"""
         batch_predict = inputs[1].asnumpy()
         batch_label = inputs[2].asnumpy()
         self.pred_probs.extend(batch_predict.flatten().tolist())
         self.true_labels.extend(batch_label.flatten().tolist())
 
     def eval(self):
+        """Eval network on auc"""
         if len(self.true_labels) != len(self.pred_probs):
-            raise RuntimeError('true_labels.size() is not equal to pred_probs.size()')
+            raise RuntimeError(
+                'true_labels.size() is not equal to pred_probs.size()')
         auc = roc_auc_score(self.true_labels, self.pred_probs)
         return auc
 
 
 def init_method(method, shape, name, max_val=1.0):
+    """init methods"""
     if method in ['uniform']:
-        params = Parameter(initializer(Uniform(max_val), shape, ms_type), name=name)
+        params = Parameter(
+            initializer(
+                Uniform(max_val),
+                shape,
+                ms_type),
+            name=name)
     elif method == "one":
         params = Parameter(initializer("ones", shape, ms_type), name=name)
     elif method == 'zero':
         params = Parameter(initializer("zeros", shape, ms_type), name=name)
     elif method == "normal":
-        params = Parameter(Tensor(np.random.normal(loc=0.0, scale=0.01, size=shape).astype(dtype=np_type)), name=name)
+        params = Parameter(
+            Tensor(
+                np.random.normal(
+                    loc=0.0,
+                    scale=0.01,
+                    size=shape).astype(
+                    dtype=np_type)),
+            name=name)
     return params
 
 
@@ -84,16 +102,24 @@ def init_var_dict(init_args, var_list):
         key, shape, method = var_list[i]
         if key not in var_map.keys():
             if method in ['random', 'uniform']:
-                var_map[key] = Parameter(initializer(Uniform(max_val), shape, ms_type), name=key)
+                var_map[key] = Parameter(
+                    initializer(
+                        Uniform(max_val),
+                        shape,
+                        ms_type),
+                    name=key)
             elif method == "one":
-                var_map[key] = Parameter(initializer("ones", shape, ms_type), name=key)
+                var_map[key] = Parameter(initializer(
+                    "ones", shape, ms_type), name=key)
             elif method == "zero":
-                var_map[key] = Parameter(initializer("zeros", shape, ms_type), name=key)
+                var_map[key] = Parameter(initializer(
+                    "zeros", shape, ms_type), name=key)
             elif method == 'normal':
                 var_map[key] = Parameter(Tensor(np.random.normal(loc=0.0, scale=0.01, size=shape).
                                                 astype(dtype=np_type)), name=key)
     return var_map
 #
+
 
 class DenseLayer(nn.Cell):
     """
@@ -101,11 +127,14 @@ class DenseLayer(nn.Cell):
     Containing: activation, matmul, bias_add;
     Args:
     """
+
     def __init__(self, input_dim, output_dim, weight_bias_init, act_str, scale_coef=1.0, convert_dtype=True,
                  use_act=True):
         super(DenseLayer, self).__init__()
         weight_init, bias_init = weight_bias_init
-        self.weight = init_method(weight_init, [input_dim, output_dim], name="weight")
+        self.weight = init_method(
+            weight_init, [
+                input_dim, output_dim], name="weight")
         self.bias = init_method(bias_init, [output_dim], name="bias")
         self.act_func = self._init_activation(act_str)
         self.matmul = P.MatMul(transpose_b=False)
@@ -164,6 +193,7 @@ class DeepFMModel(nn.Cell):
                                 (list[str], weight_bias_init=['random', 'zero'])
         keep_prob(float): if dropout_flag is True, keep_prob rate to keep connect; (float, keep_prob=0.8)
     """
+
     def __init__(self, config):
         super(DeepFMModel, self).__init__()
 
@@ -183,7 +213,8 @@ class DeepFMModel(nn.Cell):
         self.embedding_table = var_map["V_l2"]
         " Deep Layers "
         self.deep_input_dims = self.field_size * self.emb_dim
-        self.all_dim_list = [self.deep_input_dims] + self.deep_layer_dims_list + [1]
+        self.all_dim_list = [self.deep_input_dims] + \
+            self.deep_layer_dims_list + [1]
         self.dense_layer_1 = DenseLayer(self.all_dim_list[0], self.all_dim_list[1], self.weight_bias_init,
                                         self.deep_layer_act, self.keep_prob, convert_dtype=convert_dtype)
         self.dense_layer_2 = DenseLayer(self.all_dim_list[1], self.all_dim_list[2], self.weight_bias_init,
@@ -236,10 +267,12 @@ class DeepFMModel(nn.Cell):
         out = linear_out + fm_out + deep_out
         return out, self.fm_w, self.embedding_table
 
+
 class NetWithLossClass(nn.Cell):
     """
     NetWithLossClass definition
     """
+
     def __init__(self, network, l2_coef=1e-6):
         super(NetWithLossClass, self).__init__(auto_prefix=False)
         self.loss = P.SigmoidCrossEntropyWithLogits()
@@ -249,7 +282,14 @@ class NetWithLossClass(nn.Cell):
         self.ReduceMean_false = P.ReduceMean(keep_dims=False)
         self.ReduceSum_false = P.ReduceSum(keep_dims=False)
     #
+
     def construct(self, batch_ids, batch_wts, label):
+        """
+        Args:
+            batch_ids: batch ids;  [bs, field_size]
+            batch_wts: batch weights; [bs, field_size]
+            label: label; [bs, 1]
+        """
         predict, fm_id_weight, fm_id_embs = self.network(batch_ids, batch_wts)
         log_loss = self.loss(predict, label)
         mean_log_loss = self.ReduceMean_false(log_loss)
@@ -264,12 +304,17 @@ class TrainStepWrap(nn.Cell):
     """
     TrainStepWrap definition
     """
+
     def __init__(self, network, lr, eps, loss_scale=1000.0):
         super(TrainStepWrap, self).__init__(auto_prefix=False)
         self.network = network
         self.network.set_train()
         self.weights = ParameterTuple(network.trainable_params())
-        self.optimizer = Adam(self.weights, learning_rate=lr, eps=eps, loss_scale=loss_scale)
+        self.optimizer = Adam(
+            self.weights,
+            learning_rate=lr,
+            eps=eps,
+            loss_scale=loss_scale)
         self.hyper_map = C.HyperMap()
         self.grad = C.GradOperation(get_by_list=True, sens_param=True)
         self.sens = loss_scale
@@ -277,40 +322,85 @@ class TrainStepWrap(nn.Cell):
         self.reducer_flag = False
         self.grad_reducer = None
         parallel_mode = _get_parallel_mode()
-        if parallel_mode in (ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL):
+        if parallel_mode in (ParallelMode.DATA_PARALLEL,
+                             ParallelMode.HYBRID_PARALLEL):
             self.reducer_flag = True
         if self.reducer_flag:
             mean = _get_gradients_mean()
             degree = _get_device_num()
-            self.grad_reducer = DistributedGradReducer(self.optimizer.parameters, mean, degree)
+            self.grad_reducer = DistributedGradReducer(
+                self.optimizer.parameters, mean, degree)
 
     def construct(self, batch_ids, batch_wts, label):
+        """
+        Args:
+            batch_ids: batch ids;  [bs, field_size]
+            batch_wts: batch weights; [bs, field_size]
+            label: label; [bs, 1]
+        """
         weights = self.weights
         loss = self.network(batch_ids, batch_wts, label)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens) #
-        grads = self.grad(self.network, weights)(batch_ids, batch_wts, label, sens)
+        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
+        grads = self.grad(
+            self.network,
+            weights)(
+            batch_ids,
+            batch_wts,
+            label,
+            sens)
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
         return F.depend(loss, self.optimizer(grads))
 
-class PredictWithSigmoid(nn.Cell):
+
+class EvalWithSigmoid(nn.Cell):
     """
-    Predict method
+    Evalue method
     """
+
     def __init__(self, network):
-        super(PredictWithSigmoid, self).__init__(auto_prefix=False)
+        super(EvalWithSigmoid, self).__init__(auto_prefix=False)
         self.network = network
         self.sigmoid = P.Sigmoid()
 
     def construct(self, batch_ids, batch_wts, labels):
+        """
+        Args:
+            batch_ids: batch ids;  [bs, field_size]
+            batch_wts: batch weights; [bs, field_size]
+            label: label; [bs, 1]
+        """
         logits, _, _, = self.network(batch_ids, batch_wts)
         pred_probs = self.sigmoid(logits)
 
         return logits, pred_probs, labels
 
 
-class ModelBuilder():
+class PredictWithSigmoid(nn.Cell):
+    """
+    Predict method
+    """
+
+    def __init__(self, network):
+        super(PredictWithSigmoid, self).__init__(auto_prefix=False)
+        self.network = network
+        self.sigmoid = P.Sigmoid()
+
+    def construct(self, batch_ids, batch_wts):
+        """
+        Args:
+            batch_ids: batch ids;  [bs, field_size]
+            batch_wts: batch weights; [bs, field_size]
+            label: label; [bs, 1]
+        """
+        logits, _, _, = self.network(batch_ids, batch_wts)
+        pred_probs = self.sigmoid(logits)
+
+        return pred_probs
+
+
+class ModelBuilder(object):
     """
     Model builder for DeepFM.
 
@@ -318,6 +408,7 @@ class ModelBuilder():
         model_config (ModelConfig): Model configuration.
         train_config (TrainConfig): Train configuration.
     """
+
     def __init__(self, model_config, train_config):
         self.model_config = model_config
         self.train_config = train_config
@@ -341,7 +432,7 @@ class ModelBuilder():
         if self.train_config.eval_callback:
             if model is None:
                 raise RuntimeError("train_config.eval_callback is {}; get_callback_list() args model is {}".format(
-                                        self.train_config.eval_callback, model))
+                    self.train_config.eval_callback, model))
             if eval_dataset is None:
                 raise RuntimeError("train_config.eval_callback is {}; get_callback_list() args eval_dataset is {}".
                                    format(self.train_config.eval_callback, eval_dataset))
@@ -360,9 +451,11 @@ class ModelBuilder():
         return None
 
     def get_train_eval_net(self):
+        """get train net and eval net"""
         deepfm_net = DeepFMModel(self.model_config)
-        loss_net = NetWithLossClass(deepfm_net, l2_coef=self.train_config.l2_coef)
+        loss_net = NetWithLossClass(
+            deepfm_net, l2_coef=self.train_config.l2_coef)
         train_net = TrainStepWrap(loss_net, lr=self.train_config.learning_rate,
                                   eps=self.train_config.epsilon, loss_scale=self.train_config.loss_scale)
-        eval_net = PredictWithSigmoid(deepfm_net)
+        eval_net = EvalWithSigmoid(deepfm_net)
         return train_net, eval_net

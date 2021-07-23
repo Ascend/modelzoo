@@ -1,0 +1,36 @@
+{
+    "Switch":{
+        "GraphFusion":{
+
+        },
+        "UBFusion":{
+                "MatmulGelugradUbFusion":"off",
+                "TbeEltwiseFusionPass":"off",
+                "TbeFullyconnectionElemwiseQuantFusionPass":"off"
+        }
+    },
+    "Priority":{
+        "GraphFusion":{
+            "Top":{
+			
+            },
+            "Main":{
+			
+            },
+            "Down":{
+			
+            }
+        },
+        "UBFusion":{
+            "Top":{
+
+            },
+            "Main":{
+			
+            },
+            "Down":{
+			
+            }
+        }
+    }
+}

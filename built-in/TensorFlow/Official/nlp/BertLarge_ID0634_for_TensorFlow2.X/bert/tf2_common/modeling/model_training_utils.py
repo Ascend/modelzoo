@@ -339,6 +339,7 @@ def run_customized_training_loop(
       grads = npu.distribute.all_reduce(grads,"mean")
 
       (grads, _) = tf.clip_by_global_norm(grads, clip_norm=1.0)
+      #grads = [(tf.clip_by_norm(grad,clip_norm=1.0)) if grad is not None else grad for grad in grads]
 
       if accum_vars is None:
         return grads, loss, model_outputs, metric_outputs
@@ -596,7 +597,7 @@ def run_customized_training_loop(
       train_steps(train_iterator,
                   tf.convert_to_tensor(steps, dtype=tf.int32))
       train_loss = _float_metric_value(train_loss_metric)
-      train_loss_ave = npu.distribute.all_reduce(train_loss.astype(np.float32),"mean")
+      # train_loss_ave = npu.distribute.all_reduce(train_loss.astype(np.float32),"mean")
 
       end_time=time.time()
       timeHistory=(steps / (end_time - start_time))
@@ -609,7 +610,7 @@ def run_customized_training_loop(
       # Updates training logging.
       if isinstance(optimizer, npu.train.optimizer.NpuLossScaleOptimizer):
         training_status='Train Step: %d/%d / loss = %s / loss_scale = %s / dynamic_counter = %s / learning_rate = %s / not_overflow_status = %s' % (
-          current_step,total_training_steps,train_loss_ave,optimizer.loss_scale.numpy(),optimizer.dynamic_counter,
+          current_step,total_training_steps,train_loss,optimizer.loss_scale.numpy(),optimizer.dynamic_counter,
           optimizer.inner_optimizer.learning_rate(current_step).numpy(),optimizer.last_step_finite.numpy()
         )
       else:

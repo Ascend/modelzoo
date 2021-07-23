@@ -65,6 +65,12 @@ parser.add_argument("--data_url", default='/cache/data_url',
                     help="setting dir of training data.")
 parser.add_argument("--train_url", default='/cache/training',
                     help="setting dir of training output.")
+parser.add_argument("--train_file", default='',
+                    help="path of train annotation file.")
+parser.add_argument("--save_dir", default='./training/',
+                    help="path of ckpt.")
+parser.add_argument("--batch_size", type=int, default=16,
+                    help="batchsize.")
 
 # modify for npu overflow start
 # enable overflow
@@ -95,6 +101,13 @@ if args_input.mode == 'modelarts_single' or args_input.mode == 'modelarts_multi'
         os.makedirs(real_path)
     mox.file.copy_parallel(args_input.data_url, real_path)
     print('training data finish copy to %s.' % real_path)
+
+if args_input.train_file:
+    args.train_file = args_input.train_file
+if args_input.save_dir:
+    args.save_dir = args_input.save_dir
+if args_input.batch_size:
+    args.batch_size = args_input.batch_size
 
 print('setting train mode %s.' % args_input.mode)
 

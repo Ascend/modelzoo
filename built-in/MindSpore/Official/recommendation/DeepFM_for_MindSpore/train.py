@@ -31,8 +31,16 @@ from src.callback import EvalCallBack, LossCallBack
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 parser = argparse.ArgumentParser(description='CTR Prediction')
-parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
-parser.add_argument('--ckpt_path', type=str, default=None, help='Checkpoint path')
+parser.add_argument(
+    '--dataset_path',
+    type=str,
+    default=None,
+    help='Dataset path')
+parser.add_argument(
+    '--ckpt_path',
+    type=str,
+    default=None,
+    help='Checkpoint path')
 parser.add_argument('--eval_file_name', type=str, default="./auc.log",
                     help='Auc log file path. Default: "./auc.log"')
 parser.add_argument('--loss_file_name', type=str, default="./loss.log",
@@ -55,14 +63,20 @@ if __name__ == '__main__':
     if rank_size > 1:
         if args_opt.device_target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=device_id)
+            context.set_context(
+                mode=context.GRAPH_MODE,
+                device_target=args_opt.device_target,
+                device_id=device_id)
             context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+            context.set_auto_parallel_context(
+                parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
             init()
             rank_id = int(os.environ.get('RANK_ID'))
         elif args_opt.device_target == "GPU":
             init()
-            context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
+            context.set_context(
+                mode=context.GRAPH_MODE,
+                device_target=args_opt.device_target)
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=get_group_size(),
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
@@ -74,9 +88,14 @@ if __name__ == '__main__':
     else:
         if args_opt.device_target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=device_id)
+            context.set_context(
+                mode=context.GRAPH_MODE,
+                device_target=args_opt.device_target,
+                device_id=device_id)
         else:
-            context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
+            context.set_context(
+                mode=context.GRAPH_MODE,
+                device_target=args_opt.device_target)
         rank_size = None
         rank_id = None
 
@@ -95,7 +114,11 @@ if __name__ == '__main__':
     model_builder = ModelBuilder(model_config, train_config)
     train_net, eval_net = model_builder.get_train_eval_net()
     auc_metric = AUCMetric()
-    model = Model(train_net, eval_network=eval_net, metrics={"auc": auc_metric})
+    model = Model(
+        train_net,
+        eval_network=eval_net,
+        metrics={
+            "auc": auc_metric})
 
     time_callback = TimeMonitor(data_size=ds_train.get_dataset_size())
     loss_callback = LossCallBack(loss_file_path=args_opt.loss_file_name)
@@ -103,8 +126,10 @@ if __name__ == '__main__':
 
     if train_config.save_checkpoint:
         if rank_size:
-            train_config.ckpt_file_name_prefix = train_config.ckpt_file_name_prefix + str(get_rank())
-            args_opt.ckpt_path = os.path.join(args_opt.ckpt_path, 'ckpt_' + str(get_rank()) + '/')
+            train_config.ckpt_file_name_prefix = train_config.ckpt_file_name_prefix + \
+                str(get_rank())
+            args_opt.ckpt_path = os.path.join(
+                args_opt.ckpt_path, 'ckpt_' + str(get_rank()) + '/')
         if args_opt.device_target != "Ascend":
             config_ck = CheckpointConfig(save_checkpoint_steps=steps_size,
                                          keep_checkpoint_max=train_config.keep_checkpoint_max)
@@ -124,4 +149,5 @@ if __name__ == '__main__':
         eval_callback = EvalCallBack(model, ds_eval, auc_metric,
                                      eval_file_path=args_opt.eval_file_name)
         callback_list.append(eval_callback)
+    print("start training")
     model.train(train_config.train_epochs, ds_train, callbacks=callback_list)

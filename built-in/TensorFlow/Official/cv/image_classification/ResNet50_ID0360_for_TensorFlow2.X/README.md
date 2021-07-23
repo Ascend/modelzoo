@@ -26,23 +26,19 @@
 
 **应用级别（Categories）：Official**
 
-**描述（Description）：基于TensorFlow框架的BertLarge自然语言处理网络训练代码**
+**描述（Description）：基于TensorFlow框架的ResNet50分类检测网络训练代码**
 
 <h2 id="概述.md">概述</h2>
 
 ## 简述
 
-BERT is a method of pre-training language representations, meaning that we traina general-purpose "language understanding" model on a large text corpus (likeWikipedia), and then use that model for downstream NLP tasks that we care about(like question answering). BERT outperforms previous methods because it is the first *unsupervised*, *deeply bidirectional* system for pre-training NLP.
-
-*Unsupervised* means that BERT was trained using only a plain text corpus, which is important because an enormous amount of plain text data is publicly available on the web in many languages.    
-
 - 开源代码路径
 
-  https://github.com/sgpyc/training/tree/bert_tf2/language_model/tensorflow2/bert
+  https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classification
 
 -   适配昇腾 AI 处理器的实现：
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertLarge_TF2.x_for_Tensorflow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNet50_ID0360_for_TensorFlow2.X
 
 -   通过Git获取对应commit\_id的代码方法如下：
     
@@ -54,18 +50,15 @@ BERT is a method of pre-training language representations, meaning that we train
     
 
 ## 默认配置<a name="section91661242121611"></a>
--   网络结构
-    -   24-layer, 1024-hidden, 16-heads, 340M parameters
-    
 -   训练超参（单卡）：
-    -   Batch size: 16
-    -   max_predictions_per_seq: 76
+    -   Batch size: 256
+    -   momentum=0.901
     -   max_seq_length: 512
-    -   Learning rate\(LR\): 0.000058711
-    -   Weight decay: 0.01
-    -   beta_1:  0.91063
-    -   beta_2: 0.96497
-    -   Train epoch: 12
+    -   Learning rate\(LR\): 0.495
+    -   label_smoothing: 0.1
+    -   weight_decay: 0.000025
+    -   num_accumulation_steps: 1
+    -   Train epoch: 42
 
 
 ## 支持特性<a name="section1899153513554"></a>
@@ -125,65 +118,9 @@ npu_device.global_options().precision_mode=FLAGS.precision_mode
 
 ## 数据集准备<a name="section361114841316"></a>
 
-### Download and preprocess datasets
+参考：
 
-Download the [wikipedia dump](https://dumps.wikimedia.org/enwiki/20200101/enwiki-20200101-pages-articles-multistream.xml.bz2) and extract the pages
-The wikipedia dump can be downloaded from this link in this directory, and should contain the following file:
-enwiki-20200101-pages-articles-multistream.xml.bz2
-
-Run [WikiExtractor.py](https://github.com/attardi/wikiextractor) to extract the wiki pages from the XML
-The generated wiki pages file will be stored as <data dir>/LL/wiki_nn; for example <data dir>/AA/wiki_00. Each file is ~1MB, and each sub directory has 100 files from wiki_00 to wiki_99, except the last sub directory. For the 20200101 dump, the last file is FE/wiki_17.
-
-Clean up
-The clean up scripts (some references here) are in the scripts directory.
-The following command will run the clean up steps, and put the results in ./results
-./process_wiki.sh '<data dir>/*/wiki_??'
-
-After running the process_wiki.sh script, for the 20200101 wiki dump, there will be 500 files, named part-00xxx-of-00500 in the ./results directory.
-
-Exact steps (starting in the bert path)  
-
-```shell
-cd cleanup_scripts  
-mkdir -p wiki  
-cd wiki  
-wget https://dumps.wikimedia.org/enwiki/20200101/enwiki-20200101-pages-articles-multistream.xml.bz2    # Optionally use curl instead  
-bzip2 -d enwiki-20200101-pages-articles-multistream.xml.bz2  
-cd ..    # back to bert/cleanup_scripts  
-git clone https://github.com/attardi/wikiextractor.git  
-python3 wikiextractor/WikiExtractor.py wiki/enwiki-20200101-pages-articles-multistream.xml    # Results are placed in bert/cleanup_scripts/text  
-./process_wiki.sh '<text/*/wiki_??'  
-python3 extract_test_set_articles.py  
-```
-
-MD5sums:
-7f59165e21b7d566db610ff6756c926b - bert_config.json  
-00d47075e0f583fb7c0791fac1c57cb3 - enwiki-20200101-pages-articles-multistream.xml.bz2   
-50797acd537880bfb5a7ade80d976129  model.ckpt-28252.data-00000-of-00001
-f97de3ae180eb8d479555c939d50d048  model.ckpt-28252.index
-dbd16c731e8a8113bc08eeed0326b8e7  model.ckpt-28252.meta
-64800d5d8528ce344256daf115d4965e - vocab.txt  
-
-### Generate the BERT input dataset
-
-The create_pretraining_data.py script duplicates the input plain text, replaces different sets of words with masks for each duplication, and serializes the output into the TFRecord file format. 
-
-```shell
-python3 create_pretraining_data.py \
-   --input_file=<path to ./results of previous step>/part-XX-of-00500 \
-   --output_file=<tfrecord dir>/part-XX-of-00500 \
-   --vocab_file=<path to vocab.txt> \
-   --do_lower_case=True \
-   --max_seq_length=512 \
-   --max_predictions_per_seq=76 \
-   --masked_lm_prob=0.15 \
-   --random_seed=12345 \
-   --dupe_factor=10
-```
-
-The generated tfrecord has 500 parts, totalling to ~365GB.
-
-The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
+https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classification
 
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。
@@ -256,15 +193,15 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
 
     2. 单卡训练
        
-        2. 1单卡训练指令（脚本位于BertLarge_TF2.x_for_Tensorflow/test/train_full_1p_16bs.sh）,请确保下面例子中的“--data_path”修改为用户的tfrecord的路径,这里选择将tfrecord文件夹放在home目录下。
+        2.1 单卡训练指令（脚本位于ResNet50_ID0360_for_TensorFlow2.X/test/train_full_1p.sh）,请确保下面例子中的“--data_path”修改为用户的ImageNet数据集的路径,这里选择将ImageNet文件夹放在home目录下。
         
-            bash test/train_full_1p_16bs.sh --data_path=/home/tfrecord 
-
+            bash test/train_full_1p_16bs.sh --data_path=/home/ImageNet
+    
     3. 8卡训练
-
-        3.1 8卡训练指令（脚本位于BertLarge_TF2.x_for_Tensorflow/test/train_full_8p_128bs.sh),请确保下面例子中的“--data_path”修改为用户的tfrecord的路径。
-
-            bash test/train_full_8p_128bs.sh --data_path=/home/tfrecord 
+    
+        3.1 8卡训练指令（脚本位于ResNet50_ID0360_for_TensorFlow2.X/test/train_full_8p_256bs_SGD.sh),请确保下面例子中的“--data_path”修改为用户的ImageNet的路径。
+    
+            bash test/train_full_8p_128bs.sh --data_path=/home/ImageNet
 
 
 
@@ -275,26 +212,7 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
     1.  获取数据。
         请参见“快速上手”中的数据集准备。
     2.  数据集每个类别所占比例大致相同。
-    3.  数据目录结构如下：
-        
-        ```
-        |--eval
-        |   |--eval_10K.tfrecord 
-        |   |--eval.tfrecord
-        |--tf2_ckpt
-        |   |--model.ckpt-28252.data-00000-of-00001
-        |   |--model.ckpt-28252.index
-        |--train
-        |	|--part-00000-of-00500.tfrecord
-        |	|--part-00001-of-00500.tfrecord
-        |   |--......
 ```
-        
-
-
-  
-
-
 -  模型训练。
 
     请参考“快速上手”章节。
@@ -307,8 +225,8 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
 
 ## 脚本和示例代码<a name="section08421615141513"></a>
 
-```shell
-|--bert			#网络代码目录
+​```shell
+|--tensorflow			#网络代码目录
 |   |--tf2_common
 |   |--modeling
 |	|--......
@@ -316,66 +234,31 @@ The dataset was generated using Python 3.7.6 and tensorflow-gpu 1.15.2.
 |   |--bert_config.json
 |   |--rank_table_8p.json
 |--test			#训练脚本目录
-|	|--train_full_1p_16bs.sh
-|	|--train_full_8p_64bs.sh
+|	|--train_full_1p.sh
+|	|--train_full_8p_256bs_SGD.sh
 |   |--......
 
-
-
-#1P 16bs steps=100000
-./train_full_1p_16bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=96000
-./train_full_8p_64bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=24000
-./train_full_8p_128bs.sh --data_path=/home/tfrecord
-
-#1P 16bs steps=2000
-./train_performance_1p_16bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=200
-./train_performance_8p_64bs.sh --data_path=/home/tfrecord
-
-#8P 64bs step=100
-./train_performance_8p_128bs.sh --data_path=/home/tfrecord
 ```
 
 ## 脚本参数<a name="section6669162441511"></a>
 
 ```
-	--max_seq_length		      		The maximum total input sequence length after WordPiece tokenizationTrue,default:128
-    --max_predictions_per_seq           Maximum predictions per sequence_output,default:20  
-    --train_batch_size					Total batch size for training,default:32
-    --num_steps_per_epoch		        Total number of training steps to run per epoch,default:1000
-    --warmup_steps						Warmup steps for optimizer,default:10000
-    --start_warmup_step					The starting step of warmup,default:0
-	--stop_steps						The number of steps to stop training,default:None
-	--do_eval							Whether to run eval,default:False
-	--device_warmup						Whether or not to enable device warmup,default:False
-	--steps_between_eval				Steps between an eval. Is multiple of steps per loop,default:10000
-	--steps_before_eval_start			Steps before starting eval,default:0
-	--num_eval_samples					Number of eval samples,default:10000
-	--eval_batch_size					Total batch size for training,default:32
-	--weight_decay_rate					The weight_decay_rate value for the optimizer,default:0.01
-	--beta_1							The beta_1 value for the optimizer,default:0.9
-	--beta_2							The beta_2 value for the optimizer,default:0.999
-	--precision_mode         			precision mode,default:allow_fp32_to_fp16
-    --over_dump		         			if or not over detection, default is False
-    --data_dump_flag	     			data dump flag, default is False
-    --data_dump_step		 			data dump step, default is 10
-    --profiling		         			if or not profiling for performance debug, default is False
-    --data_path		         			source data of training
+--use_tf_function
+--data_dir							The location of the input data.
+--model_dir							The location of the model checkpoint files
+--epochs_between_evals				The number of training epochs to run between
+--train_epochs						The number of epochs used to train.
+--clean								If set, model_dir will be removed if it exists.
+--batch_size						Batch size for training and evaluation
+--distribution_strategy				The Distribution Strategy to use for training
+--dtype								The TensorFlow datatype used for calculations
+--drop_eval_remainder	
+--device_warmup_steps				The number of steps to apply for device warmup
 ```
 
 ## 训练过程<a name="section1589455252218"></a>
 
 通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡，8卡网络训练。模型存储路径为${cur_path}/output/$ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。以8卡训练为例，loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
-
-
-## 推理/验证过程<a name="section1465595372416"></a>
-
-训练过程中做eval，这里我们设置steps_between_eval=2000，即每2000步评估一次。log也生成在${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中
 
 
 

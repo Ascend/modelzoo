@@ -95,6 +95,7 @@ def read_vocab(vocab_dir):
 def read_category():
     '读取分类目录，固定'
     categories = ['体育', '财经', '房产', '家居', '教育', '科技', '时尚', '时政', '游戏', '娱乐']
+    #categories = ['体育', '财经', '房产', '家居', '教育', '科技', '时尚', '时政', '游戏', '娱乐', '彩票', '股票', '社会', '星座']  # 需要同步修改cnn_model.py中第11行num_classes = 14
     categories = [native_content(x) for x in categories]
     cat_to_id = dict(zip(categories, range(len(categories))))
     return (categories, cat_to_id)

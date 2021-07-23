@@ -19,8 +19,11 @@ from mindspore.ops import operations as P
 from mindspore.common import dtype as mstype
 
 # focal loss: afa=2, beta=4
+
+
 class FocalLoss(nn.Cell):
     '''nn.Cell warpper for focal loss'''
+
     def __init__(self):
         super(FocalLoss, self).__init__()
         self.log = P.Log()
@@ -37,21 +40,27 @@ class FocalLoss(nn.Cell):
                                                                                                        P.Shape()(gt),
                                                                                                        0.0))
 
-        neg_weights = self.pow(1 - gt, 4) # beta=4
+        neg_weights = self.pow(1 - gt, 4)  # beta=4
         # afa=2
         pos_loss = self.log(pred) * self.pow(1 - pred, 2) * pos_inds
-        neg_loss = self.log(1 - pred) * self.pow(pred, 2) * neg_weights * neg_inds
+        neg_loss = self.log(1 - pred) * self.pow(pred, 2) * \
+            neg_weights * neg_inds
 
         num_pos = self.sum(pos_inds, ())
-        num_pos = P.Select()(P.Equal()(num_pos, 0.0), P.Fill()(P.DType()(num_pos), P.Shape()(num_pos), 1.0), num_pos)
+        num_pos = P.Select()(
+            P.Equal()(
+                num_pos, 0.0), P.Fill()(
+                P.DType()(num_pos), P.Shape()(num_pos), 1.0), num_pos)
 
         pos_loss = self.sum(pos_loss, ())
         neg_loss = self.sum(neg_loss, ())
         loss = - (pos_loss + neg_loss) / num_pos
         return loss
 
+
 class SmoothL1LossNew(nn.Cell):
     """Smoothl1loss"""
+
     def __init__(self):
         super(SmoothL1LossNew, self).__init__()
         self.transpose = P.Transpose()
@@ -77,7 +86,7 @@ class SmoothL1LossNew(nn.Cell):
         target = self.cast(target, mstype.float32)
         output = self.cast(output, mstype.float32)
         num = self.cast(self.sum(mask, ()), mstype.float32)
-        mask = self.expand_dims(mask, -1) # [batch,h,w]--[batch,h,w,c]
+        mask = self.expand_dims(mask, -1)  # [batch,h,w]--[batch,h,w,c]
         output = output * mask
         target = target * mask
         loss = self.smooth_l1_loss(output, target)
@@ -85,17 +94,21 @@ class SmoothL1LossNew(nn.Cell):
             loss = loss * wight_mask
             loss = self.sum(loss, ())
         else:
-            #some version need: F.depend(loss, F.sqrt(F.cast(wight_mask, mstype.float32)))
+            # some version need: F.depend(loss, F.sqrt(F.cast(wight_mask,
+            # mstype.float32)))
             loss = self.sum(loss, ())
         loss = loss / (num + 1e-4)
         return loss
 
+
 class SmoothL1LossNewCMask(nn.Cell):
     """Smoothl1loss with mask"""
+
     def __init__(self):
         super(SmoothL1LossNewCMask, self).__init__()
         self.transpose = P.Transpose()
-        self.smooth_l1_loss = nn.L1Loss(reduction='sum') # or use nn.SmoothL1Loss()
+        self.smooth_l1_loss = nn.L1Loss(
+            reduction='sum')  # or use nn.SmoothL1Loss()
         self.shape = P.Shape()
         self.expand_dims = P.ExpandDims()
         self.sum = P.ReduceSum()
@@ -118,7 +131,7 @@ class SmoothL1LossNewCMask(nn.Cell):
         ind = self.expand_dims(ind, -1)
         output = output * ind
         target = target * ind
-        loss = self.smooth_l1_loss(output*cmask, target*cmask)
-        #loss = self.sum(loss, ()) # if use SmoothL1Loss, this is needed
+        loss = self.smooth_l1_loss(output * cmask, target * cmask)
+        # loss = self.sum(loss, ()) # if use SmoothL1Loss, this is needed
         loss = loss / (num + 1e-4)
         return loss

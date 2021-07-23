@@ -156,14 +156,14 @@
 
 -  数据集准备<a name="section361114841316"></a>
 
-   数据集以文本格式表示，每段之间以空行隔开。源码包目录下“data/pretrain-toy/”给出了sample_text以及处理后的样例tfrecord数据集，如wikipedia。
+   数据集以文本格式表示，每段之间以空行隔开，如wikipedia。
    运行如下命令，将数据集转换为tfrecord格式。
-
+   
 ```
-    python utils/create_pretraining_data.py \   
-      --input_file=./your/path/some_input_data.txt \   
-      --output_file=/data/some_output_data.tfrecord \   
-      --vocab_file=./your/path/vocab.txt \   
+      python src/pretrain/create_pretraining_data.py \   
+      --input_file=<path to your testdata> \   
+      --output_file=<tfrecord dir>/some_output_data.tfrecord \   
+      --vocab_file=<path to vocab.txt> \   
       --do_lower_case=True \   
       --max_seq_length=128 \   
       --max_predictions_per_seq=20 \   

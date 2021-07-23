@@ -57,57 +57,139 @@ parser = argparse.ArgumentParser('mindspore coco training')
 
 # dataset related
 parser.add_argument('--data_dir', type=str, default='', help='train data dir')
-parser.add_argument('--annot_path', type=str, default='', help='train data annotation path')
-parser.add_argument('--img_dir', type=str, default='', help='train data img dir')
-parser.add_argument('--per_batch_size', default=8, type=int, help='batch size for per gpu')
+parser.add_argument(
+    '--annot_path',
+    type=str,
+    default='',
+    help='train data annotation path')
+parser.add_argument(
+    '--img_dir',
+    type=str,
+    default='',
+    help='train data img dir')
+parser.add_argument(
+    '--per_batch_size',
+    default=8,
+    type=int,
+    help='batch size for per gpu')
 
 # network related
 parser.add_argument('--pretrained_backbone', default='', type=str, help='model_path, local pretrained backbone'
                                                                         ' model to load')
-parser.add_argument('--resume', default='', type=str, help='path of pretrained centerface_model')
+parser.add_argument(
+    '--resume',
+    default='',
+    type=str,
+    help='path of pretrained centerface_model')
 
 # optimizer and lr related
 parser.add_argument('--lr_scheduler', default='multistep', type=str,
                     help='lr-scheduler, option type: exponential, cosine_annealing')
-parser.add_argument('--lr', default=4e-3, type=float, help='learning rate of the training')
-parser.add_argument('--lr_epochs', type=str, default='90,120', help='epoch of lr changing')
+parser.add_argument('--lr', default=5e-4, type=float,
+                    help='learning rate of the training')
+parser.add_argument(
+    '--lr_epochs',
+    type=str,
+    default='90,120',
+    help='epoch of lr changing')
 parser.add_argument('--lr_gamma', type=float, default=0.1,
                     help='decrease lr by a factor of exponential lr_scheduler')
-parser.add_argument('--eta_min', type=float, default=0., help='eta_min in cosine_annealing scheduler')
-parser.add_argument('--t_max', type=int, default=140, help='T-max in cosine_annealing scheduler')
-parser.add_argument('--max_epoch', type=int, default=140, help='max epoch num to train the model')
-parser.add_argument('--warmup_epochs', default=0, type=float, help='warmup epoch')
-parser.add_argument('--weight_decay', type=float, default=0.0005, help='weight decay')
+parser.add_argument('--eta_min', type=float, default=0.,
+                    help='eta_min in cosine_annealing scheduler')
+parser.add_argument(
+    '--t_max',
+    type=int,
+    default=140,
+    help='T-max in cosine_annealing scheduler')
+parser.add_argument('--max_epoch', type=int, default=140,
+                    help='max epoch num to train the model')
+parser.add_argument(
+    '--warmup_epochs',
+    default=0,
+    type=float,
+    help='warmup epoch')
+parser.add_argument(
+    '--weight_decay',
+    type=float,
+    default=0.0000,
+    help='weight decay')
 parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
 parser.add_argument('--optimizer', default='adam', type=str,
                     help='optimizer type, default: adam')
 
 # loss related
-parser.add_argument('--loss_scale', type=int, default=1024, help='static loss scale')
-parser.add_argument('--label_smooth', type=int, default=0, help='whether to use label smooth in CE')
-parser.add_argument('--label_smooth_factor', type=float, default=0.1, help='smooth strength of original one-hot')
+parser.add_argument(
+    '--loss_scale',
+    type=int,
+    default=1024,
+    help='static loss scale')
+parser.add_argument('--label_smooth', type=int, default=0,
+                    help='whether to use label smooth in CE')
+parser.add_argument(
+    '--label_smooth_factor',
+    type=float,
+    default=0.1,
+    help='smooth strength of original one-hot')
 
- # logging related
-parser.add_argument('--log_interval', type=int, default=100, help='logging interval')
-parser.add_argument('--ckpt_path', type=str, default='outputs/', help='checkpoint save location')
-parser.add_argument('--ckpt_interval', type=int, default=None, help='ckpt_interval')
+# logging related
+parser.add_argument(
+    '--log_interval',
+    type=int,
+    default=100,
+    help='logging interval')
+parser.add_argument(
+    '--ckpt_path',
+    type=str,
+    default='outputs/',
+    help='checkpoint save location')
+parser.add_argument(
+    '--ckpt_interval',
+    type=int,
+    default=None,
+    help='ckpt_interval')
 
-parser.add_argument('--is_save_on_master', type=int, default=1, help='save ckpt on master or all rank')
+parser.add_argument(
+    '--is_save_on_master',
+    type=int,
+    default=1,
+    help='save ckpt on master or all rank')
 
 # distributed related
-parser.add_argument('--is_distributed', type=int, default=1, help='if multi device')
-parser.add_argument('--rank', type=int, default=0, help='local rank of distributed')
-parser.add_argument('--group_size', type=int, default=1, help='world size of distributed')
+parser.add_argument(
+    '--is_distributed',
+    type=int,
+    default=1,
+    help='if multi device')
+parser.add_argument(
+    '--rank',
+    type=int,
+    default=0,
+    help='local rank of distributed')
+parser.add_argument(
+    '--group_size',
+    type=int,
+    default=1,
+    help='world size of distributed')
 
 # roma obs
 parser.add_argument('--train_url', type=str, default="", help='train url')
 
-# profiler init, can open when you debug. if train, donot open, since it cost memory and disk space
-parser.add_argument('--need_profiler', type=int, default=0, help='whether use profiler')
+# profiler init, can open when you debug. if train, donot open, since it
+# cost memory and disk space
+parser.add_argument(
+    '--need_profiler',
+    type=int,
+    default=0,
+    help='whether use profiler')
 
 # reset default config
-parser.add_argument('--training_shape', type=str, default="", help='fix training shape')
-parser.add_argument('--resize_rate', type=int, default=None, help='resize rate for multi-scale training')
+parser.add_argument(
+    '--training_shape',
+    type=str,
+    default="",
+    help='fix training shape')
+parser.add_argument('--resize_rate', type=int, default=None,
+                    help='resize rate for multi-scale training')
 
 args, _ = parser.parse_known_args()
 
@@ -132,7 +214,8 @@ if __name__ == "__main__":
         args.rank = get_rank()
         args.group_size = get_group_size()
 
-    # select for master rank save ckpt or all rank save, compatiable for model parallel
+    # select for master rank save ckpt or all rank save, compatiable for model
+    # parallel
     args.rank_save_ckpt_flag = 0
     if args.is_save_on_master:
         if args.rank == 0:
@@ -161,15 +244,20 @@ if __name__ == "__main__":
 
     # context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=degree, parameter_broadcast=True, gradients_mean=True)
     # Notice: parameter_broadcast should be supported, but current version has bugs, thus been disabled.
-    # To make sure the init weight on all npu is the same, we need to set a static seed in default_recurisive_init when weight initialization
-    context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=degree)
+    # To make sure the init weight on all npu is the same, we need to set a
+    # static seed in default_recurisive_init when weight initialization
+    context.set_auto_parallel_context(
+        parallel_mode=parallel_mode,
+        gradients_mean=True,
+        device_num=degree)
     network = CenterfaceMobilev2()
     # init, to avoid overflow, some std of weight should be enough small
     default_recurisive_init(network)
 
     if args.pretrained_backbone:
         network = load_backbone(network, args.pretrained_backbone, args)
-        args.logger.info('load pre-trained backbone {} into network'.format(args.pretrained_backbone))
+        args.logger.info(
+            'load pre-trained backbone {} into network'.format(args.pretrained_backbone))
     else:
         args.logger.info('Not load pre-trained backbone, please be careful')
 
@@ -177,7 +265,8 @@ if __name__ == "__main__":
         param_dict = load_checkpoint(args.resume)
         param_dict_new = {}
         for key, values in param_dict.items():
-            if key.startswith('moments.') or key.startswith('moment1.') or key.startswith('moment2.'):
+            if key.startswith('moments.') or key.startswith(
+                    'moment1.') or key.startswith('moment2.'):
                 continue
             elif key.startswith('centerface_network.'):
                 param_dict_new[key[19:]] = values
@@ -187,7 +276,8 @@ if __name__ == "__main__":
         load_param_into_net(network, param_dict_new)
         args.logger.info('load_model {} success'.format(args.resume))
     else:
-        args.logger.info('{} not set/exists or not a pre-trained file'.format(args.resume))
+        args.logger.info(
+            '{} not set/exists or not a pre-trained file'.format(args.resume))
 
     network = CenterFaceWithLossCell(network)
     args.logger.info('finish get network')
@@ -313,7 +403,8 @@ if __name__ == "__main__":
         hps_mask = Tensor(hps_mask)
         landmarks = Tensor(landmarks)
 
-        loss, overflow, scaling = network(images, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks)
+        loss, overflow, scaling = network(
+            images, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks)
         # Tensor to numpy
         overflow = np.all(overflow.asnumpy())
         loss = loss.asnumpy()
@@ -329,18 +420,18 @@ if __name__ == "__main__":
         if args.rank_save_ckpt_flag:
             # ckpt progress
             cb_params.cur_epoch_num = epoch
-            cb_params.cur_step_num = i + 1 + (epoch-1)*args.steps_per_epoch
-            cb_params.batch_num = i + 2 + (epoch-1)*args.steps_per_epoch
+            cb_params.cur_step_num = i + 1 + (epoch - 1) * args.steps_per_epoch
+            cb_params.batch_num = i + 2 + (epoch - 1) * args.steps_per_epoch
             ckpt_cb.step_end(run_context)
 
-        if (i_all+1) % args.steps_per_epoch == 0:
+        if (i_all + 1) % args.steps_per_epoch == 0:
             time_used = time.time() - t_end
             fps = args.per_batch_size * args.steps_per_epoch * args.group_size / time_used
             if args.rank == 0:
                 args.logger.info(
                     'epoch[{}], {}, {:.2f} imgs/sec, lr:{}'
-                    .format(epoch, loss_meter, fps, lr[i + (epoch-1)*args.steps_per_epoch])
-                    )
+                    .format(epoch, loss_meter, fps, lr[i + (epoch - 1) * args.steps_per_epoch])
+                )
             t_end = time.time()
             loss_meter.reset()
 

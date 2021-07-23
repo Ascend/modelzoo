@@ -24,6 +24,7 @@ import numpy as np
 from mindspore.train.serialization import load_checkpoint
 import mindspore.nn as nn
 
+
 def load_backbone(net, ckpt_path, args):
     """
     Load backbone
@@ -49,9 +50,12 @@ def load_backbone(net, ckpt_path, args):
     replace_idx = 0
     for name, cell in net.cells_and_names():
         if name.startswith(centerface_backbone_prefix):
-            name = name.replace(centerface_backbone_prefix, mobilev2_backbone_prefix)
+            name = name.replace(
+                centerface_backbone_prefix,
+                mobilev2_backbone_prefix)
             if isinstance(cell, (nn.Conv2d, nn.Dense)):
-                name, replace_name, replace_idx = replace_names(name, replace_name, replace_idx)
+                name, replace_name, replace_idx = replace_names(
+                    name, replace_name, replace_idx)
                 mobilev2_weight = '{}.weight'.format(name)
                 mobilev2_bias = '{}.bias'.format(name)
                 if mobilev2_weight in param_dict:
@@ -65,18 +69,21 @@ def load_backbone(net, ckpt_path, args):
                 else:
                     not_found_param.append(mobilev2_bias)
             elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d)):
-                name, replace_name, replace_idx = replace_names(name, replace_name, replace_idx)
+                name, replace_name, replace_idx = replace_names(
+                    name, replace_name, replace_idx)
                 mobilev2_moving_mean = '{}.moving_mean'.format(name)
                 mobilev2_moving_variance = '{}.moving_variance'.format(name)
                 mobilev2_gamma = '{}.gamma'.format(name)
                 mobilev2_beta = '{}.beta'.format(name)
                 if mobilev2_moving_mean in param_dict:
-                    cell.moving_mean.set_data(param_dict[mobilev2_moving_mean].data)
+                    cell.moving_mean.set_data(
+                        param_dict[mobilev2_moving_mean].data)
                     find_param.append(mobilev2_moving_mean)
                 else:
                     not_found_param.append(mobilev2_moving_mean)
                 if mobilev2_moving_variance in param_dict:
-                    cell.moving_variance.set_data(param_dict[mobilev2_moving_variance].data)
+                    cell.moving_variance.set_data(
+                        param_dict[mobilev2_moving_variance].data)
                     find_param.append(mobilev2_moving_variance)
                 else:
                     not_found_param.append(mobilev2_moving_variance)
@@ -91,13 +98,18 @@ def load_backbone(net, ckpt_path, args):
                 else:
                     not_found_param.append(mobilev2_beta)
 
-    args.logger.info('================found_param {}========='.format(len(find_param)))
+    args.logger.info(
+        '================found_param {}========='.format(
+            len(find_param)))
     args.logger.info(find_param)
-    args.logger.info('================not_found_param {}========='.format(len(not_found_param)))
+    args.logger.info(
+        '================not_found_param {}========='.format(
+            len(not_found_param)))
     args.logger.info(not_found_param)
     args.logger.info('=====load {} successfully ====='.format(ckpt_path))
 
     return net
+
 
 def get_param_groups(network):
     """
@@ -122,19 +134,25 @@ def get_param_groups(network):
         else:
             decay_params.append(x)
 
-    return [{'params': no_decay_params, 'weight_decay': 0.0}, {'params': decay_params}]
+    return [{'params': no_decay_params, 'weight_decay': 0.0},
+            {'params': decay_params}]
 
 
-class DistributedSampler():
+class DistributedSampler(object):
     """
     Distributed sampler
     """
+
     def __init__(self, dataset, rank, group_size, shuffle=True, seed=0):
         self.dataset = dataset
         self.rank = rank
         self.group_size = group_size
         self.dataset_length = len(self.dataset)
-        self.num_samples = int(math.ceil(self.dataset_length * 1.0 / self.group_size))
+        self.num_samples = int(
+            math.ceil(
+                self.dataset_length *
+                1.0 /
+                self.group_size))
         self.total_size = self.num_samples * self.group_size
         self.shuffle = shuffle
         self.seed = seed
@@ -188,16 +206,19 @@ class AverageMeter():
         fmtstr = '{name}:{avg' + self.fmt + '}'
         return fmtstr.format(**self.__dict__)
 
+
 class LOGGER(logging.Logger):
     """
     Logger class
     """
+
     def __init__(self, logger_name, rank=0):
         super(LOGGER, self).__init__(logger_name)
         if rank % 8 == 0:
             console = logging.StreamHandler(sys.stdout)
             console.setLevel(logging.INFO)
-            formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
+            formatter = logging.Formatter(
+                '%(asctime)s:%(levelname)s:%(message)s')
             console.setFormatter(formatter)
             self.addHandler(console)
 
@@ -208,7 +229,8 @@ class LOGGER(logging.Logger):
         self.rank = rank
         if not os.path.exists(log_dir):
             os.makedirs(log_dir, exist_ok=True)
-        log_name = datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S') + '_rank_{}.log'.format(rank)
+        log_name = datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S') + \
+            '_rank_{}.log'.format(rank)
         self.log_fn = os.path.join(log_dir, log_name)
         fh = logging.FileHandler(self.log_fn)
         fh.setLevel(logging.INFO)
@@ -232,14 +254,18 @@ class LOGGER(logging.Logger):
         if self.isEnabledFor(logging.INFO) and self.rank == 0:
             line_width = 2
             important_msg = '\n'
-            important_msg += ('*'*70 + '\n')*line_width
-            important_msg += ('*'*line_width + '\n')*2
-            important_msg += '*'*line_width + ' '*8 + msg + '\n'
-            important_msg += ('*'*line_width + '\n')*2
-            important_msg += ('*'*70 + '\n')*line_width
+            important_msg += ('*' * 70 + '\n') * line_width
+            important_msg += ('*' * line_width + '\n') * 2
+            important_msg += '*' * line_width + ' ' * 8 + msg + '\n'
+            important_msg += ('*' * line_width + '\n') * 2
+            important_msg += ('*' * 70 + '\n') * line_width
             self.info(important_msg, *args, **kwargs)
 
+
 def get_logger(path, rank):
+    """
+    get logger
+    """
     logger = LOGGER("centerface", rank)
     logger.setup_logging_file(path, rank)
     return logger

@@ -220,3 +220,37 @@ def lamb_apply_weight_assign(input0,input1,input2,input3,input4,name=None):
       raise RuntimeError("tf.lamb_apply_weight_assign() is not compatible with eager execution")
     result = gen_npu_ops.lamb_apply_weight_assign(input0,input1,input2,input3,input4,name)
     return result
+
+def dropout_v3(x, keep_prob, noise_shape=None, seed=None, name=None):
+  """ The gradient for gelu
+
+  Args:
+    x: A tensor with type is float
+    keep_prob: A tensor, float, rate of every element reserved
+    noise_shape: A 1-D tensor, with type int32, shape of keep/drop what random generated.
+    seed: Random seed.
+    name: Layer name.
+  
+  Returns:
+    A tensor.
+  """
+  x = ops.convert_to_tensor(x,name="x")
+  if not x.dtype.is_floating:
+    raise ValueError("x has to be a floating point tensor since it's going to be scaled. Got a %s tensor instead." % x.dtype)
+  
+  if isinstance(keep_prob,numbers.Real) and not 0 < keep_prob <=1:
+    raise ValueError("Keep_prob must be a scalar tensor or a float in the range (0,1], got %g" % keep_prob)
+  
+  if isinstance(keep_prob,float) and keep_prob==1:
+    return x
+  
+  seed, seed2 = get_seed(seed)
+  noise_shape = _get_noise_shape(x,noise_shape)
+  gen_out = gen_npu_ops.drop_out_gen_mask_v3(noise_shape,keep_prob,seed,seed2,name)
+  result = gen_npu_ops.drop_out_do_mask_v3(x, gen_out, keep_prob, name)
+  return result
+
+@ops.RegisterGradient("DropOutDoMaskV3")
+def _DropOutDoMaskV3Grad(op,grad):
+  result = gen_npu_ops.drop_out_do_mask_v3(grad, op.inputs[1], op.inputs[2])
+  return [result, None, None]

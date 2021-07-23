@@ -1,25 +1,27 @@
 # Contents
 
-- [CenterFace Description](#CenterFace-description)
+- [Contents](#contents)
+- [CenterFace Description](#centerface-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Testing Process](#testing-process)
-        - [Evaluation](#testing)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-    - [Convert Process](#convert-process)
-        - [Convert](#convert)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+  - [Testing Process](#testing-process)
+    - [Testing](#testing)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
+  - [Convert Process](#convert-process)
+    - [Convert](#convert)
 - [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#inference-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+    - [Inference Performance](#inference-performance)
+- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [CenterFace Description](#contents)
@@ -42,46 +44,43 @@ Four loss is presented, total loss is their weighted mean.
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset support: [WiderFace] or datasetd with the same format as WiderFace
-Annotation support: [WiderFace] or annotation as the same format as WiderFace
-
 - The directory structure is as follows, the name of directory and file is user define:
 
-    ```path
-        ├── dataset
-            ├── centerface
-                ├── annotations
-                │   ├─ train.json
-                │   └─ val.json
-                ├─ images
-                │   ├─ train
-                │   │    └─images
-                │   │       ├─class1_image_folder
-                │   │       ├─ ...
-                │   │       └─classn_image_folder
-                │   └─ val
-                │       └─images
-                │           ├─class1_image_folder
-                │           ├─ ...
-                │           └─classn_image_folder
-                └─ ground_truth
-                   ├─val.mat
-                   ├─ ...
-                   └─xxx.mat
-    ```
+      ```path
+          ├── dataset
+              ├── centerface
+                  ├── annotations
+                  │   ├─ train_wider_face.json
+                  ├── images
+                  │   ├─ train
+                  │   │    └─images
+                  │   │       ├─class1_image_folder
+                  │   │       ├─ ...
+                  │   │       └─classn_image_folder
+                  │   └─ val
+                  │       └─images
+                  │           ├─class1_image_folder
+                  │           ├─ ...
+                  │           └─classn_image_folder
+                  ├── ground_truth
+                      ├─wider_easy_val.mat
+                      ├─wider_face_val.mat
+                      ├─wider_hard_val.mat
+                      └─wider_medium_val.mat
+      ```
 
-we suggest user to use WiderFace dataset to experience our model,
-other datasets need to use the same format as WiderFace.
+  we suggest user to use WiderFace dataset to experience our model,
+  other datasets need to use the same format as WiderFace. In our model, the annotation file is in coco format, the images file is widerface dataset, the ground_truth file format is .mat. The annotation file can download from [Baidu](https://pan.baidu.com/s/1j_2wggZ3bvCuOAfZvjWqTg) password: f9hh. The images file can download from [Widerface](http://shuoyang1213.me/WIDERFACE/index.html). The ground_truth file can download from [ground_truth](https://github.com/chenjun2hao/CenterFace.pytorch/tree/master/evaluate/ground_truth).
 
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor. If you want to try Ascend, please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources.
+  - Prepare hardware environment with Ascend processor. If you want to try Ascend, please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources.
 - Framework
-    - [MindSpore](https://www.mindspore.cn/install/en)
+  - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+  - [MindSpore tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
 
 # [Quick Start](#contents)
 
@@ -98,6 +97,9 @@ step1: prepare pretrained model: train a mobilenet_v2 model by mindspore or use 
 #            --pytorch: same as official pytorch model(e.g., official mobilenet_v2-b0353104.pth)
 python convert_weight_mobilenetv2.py --ckpt_fn=./mobilenet_v2_key.ckpt --pt_fn=./mobilenet_v2-b0353104.pth --out_ckpt_fn=./mobilenet_v2.ckpt
 ```
+
+The mobilenet_v2-b0353104.pth can download from [mobilenet_v2](https://download.pytorch.org/models/mobilenet_v2-b0353104.pth).
+If NPU environment is not compatible, try to run in GPU environment.
 
 step2: prepare user rank_table
 
@@ -116,13 +118,16 @@ cd scripts;
 ln -sf [USE_DATA_DIR] dataset
 # check you dir to make sure your datas are in the right path
 ls ./dataset/centerface # data path
-ls ./dataset/centerface/annotations/train.json # annot_path
+ls ./dataset/centerface/annotations/train_wider_face.json # annot_path
 ls ./dataset/centerface/images/train/images # img_dir
 ```
 
 ```python
 # enter script dir, train CenterFace
-sh train_distribute.sh
+# single device
+bash train_standalone.sh or bash train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE]
+# multi-device
+bash train_distribute.sh or bash train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE]
 # after training
 mkdir ./model
 cp device0/outputs/*/*.ckpt ./model # cp model to [MODEL_PATH]
@@ -142,13 +147,13 @@ cd -; #cd ../../scripts;
 mkdir ./output
 mkdir ./output/centerface
 # check you dir to make sure your datas are in the right path
-ls ./dataset/images/val/images/ # data path
-ls ./dataset/centerface/ground_truth/val.mat # annot_path
+ls ./dataset/centerface/images/val/images/ # data path
+ls ./dataset/centerface/ground_truth/wider_face_val.mat # annot_path
 ```
 
 ```python
 # test CenterFace
-sh test_distribute.sh
+bash test_distribute.sh
 ```
 
 step5: eval
@@ -158,7 +163,7 @@ step5: eval
 # cd ../dependency/evaluate;
 # python setup.py install;
 # cd -; #cd ../../scripts;
-sh eval_all.sh
+bash eval_all.sh
 ```
 
 # [Script Description](#contents)
@@ -319,7 +324,7 @@ cd scripts
 #   DATASET: dataset path
 #   ANNOTATIONS: annotation path
 #   images: img_dir in dataset path
-sh train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]
+bash train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]
 # after training
 cp device0/outputs/*/*.ckpt [MODEL_PATH]
 ```
@@ -333,7 +338,7 @@ cd scripts;
 # or use symbolic link as quick start
 # or use the command as follow, most are the same as train_standalone.sh, the different is RANK_TABLE
 #   RANK_TABLE: for multi-device only, from generate_rank_table.py or user writing
-sh train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]
+bash train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]
 # after training
 cp device0/outputs/*/*.ckpt [MODEL_PATH]
 ```
@@ -343,21 +348,18 @@ After training with 8 device, the loss value will be achieved as follows:
 ```python
 # grep "loss is " device0/xxx.log
 # epoch: 1 step: 1, loss is greater than 500 and less than 5000
-2020-09-24 19:00:53,550:INFO:epoch:1, iter:0, average_loss:loss:1148.415649, loss:1148.4156494140625, overflow:False, loss_scale:1024.0
-[WARNING] DEBUG(51499,python):2020-09-24-19:00:53.590.008 [mindspore/ccsrc/debug/dump_proto.cc:218] SetValueToProto] Unsupported type UInt
-2020-09-24 19:00:53,784:INFO:epoch:1, iter:1, average_loss:loss:798.286713, loss:448.15777587890625, overflow:False, loss_scale:1024.0
+2021-03-23 07:12:12,147:INFO:epoch:1, iter:0, avg_loss:loss:786.104248, loss:786.104248046875, overflow:False, loss_scale:1024.0
+2021-03-23 07:12:12,350:INFO:epoch:1, iter:1, avg_loss:loss:569.002609, loss:351.9009704589844, overflow:False, loss_scale:1024.0
 ...
-2020-09-24 19:01:58,095:INFO:epoch:2, iter:197, average_loss:loss:1.942609, loss:1.5492267608642578, overflow:False, loss_scale:1024.0
-2020-09-24 19:01:58,501:INFO:epoch[2], loss:1.942609, 477.97 imgs/sec, lr:0.004000000189989805
-2020-09-24 19:01:58,502:INFO:==========end epoch===============
-2020-09-24 19:02:00,780:INFO:epoch:3, iter:0, average_loss:loss:2.107658, loss:2.1076583862304688, overflow:False, loss_scale:1024.0
+2021-03-23 07:13:01,820:INFO:epoch:2, iter:197, avg_loss:loss:1.927492, loss:1.664547324180603, overflow:False, loss_scale:1024.0
+2021-03-23 07:13:02,238:INFO:epoch[2], loss:1.927492, 462.25 imgs/sec, lr:0.004000000189989805
+2021-03-23 07:13:02,309:INFO:epoch:3, iter:0, avg_loss:loss:1.696034, loss:1.6960344314575195, overflow:False, loss_scale:1024.0
 ...
 # epoch: 140 average loss is greater than 0.3 and less than 1.5:
-2020-09-24 20:19:16,255:INFO:epoch:140, iter:196, average_loss:loss:0.906300, loss:1.1071504354476929, overflow:False, loss_scale:1024.0
-2020-09-24 20:19:16,347:INFO:epoch:140, iter:197, average_loss:loss:0.904684, loss:0.586264967918396, overflow:False, loss_scale:1024.0
-2020-09-24 20:19:16,747:INFO:epoch[140], loss:0.904684, 480.10 imgs/sec, lr:3.9999998989515007e-05
-2020-09-24 20:19:16,748:INFO:==========end epoch===============
-2020-09-24 20:19:16,748:INFO:==========end training===============
+2021-03-23 08:16:11,545:INFO:epoch:140, iter:196, avg_loss:loss:0.912602, loss:0.9277399182319641, overflow:False, loss_scale:1024.0
+2021-03-23 08:16:11,675:INFO:epoch:140, iter:197, avg_loss:loss:0.911487, loss:0.6917725801467896, overflow:False, loss_scale:1024.0
+2021-03-23 08:16:11,951:INFO:epoch[140], loss:0.911487, 588.05 imgs/sec, lr:3.9999998989515007e-05
+2021-03-23 08:16:12,112:INFO:==========end training===============
 ```
 
 The model checkpoint will be saved in the scripts/device0/output/xxx/xxx.ckpt
@@ -372,7 +374,7 @@ cd scripts;
 cd ../dependency/centernet/src/lib/external;
 python setup.py install;
 make;
-cd ../../../scripts;
+cd ../../scripts;
 mkdir [SAVE_PATH]
 ```
 
@@ -388,7 +390,7 @@ mkdir [SAVE_PATH]
 #   SAVE_PATH: save_path for evaluate
 #   DEVICE_ID: use device id
 #   CKPT: test model name
-sh test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT]
+bash test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT]
 ```
 
 2. test many out ckpt for user to choose the best one
@@ -422,7 +424,7 @@ open it you can see:
 # after test, prepare for eval CenterFace, get MAP
 cd ../dependency/evaluate;
 python setup.py install;
-cd ../../../scripts;
+cd ../../scripts;
 ```
 
 1. eval a single testing output
@@ -430,7 +432,7 @@ cd ../../../scripts;
 ```python
 # you need to change the parameter in eval.sh
 # default eval the ckpt saved in ./scripts/output/centerface/999
-sh eval.sh
+bash eval.sh or bash eval.sh [pred] [gt]
 ```
 
 2. eval many testing output for user to choose the best one
@@ -438,7 +440,7 @@ sh eval.sh
 ```python
 # you need to change the parameter in eval_all.sh
 # default eval the ckpt saved in ./scripts/output/centerface/[89-140]
-sh eval_all.sh
+bash eval_all.sh or bash eval_all.sh [pred] [gt]
 ```
 
 3. test+eval
@@ -448,18 +450,17 @@ sh eval_all.sh
 # or use symbolic link as quick start, default eval the ckpt saved in ./scripts/output/centerface/999
 # or use the command as follow, most are the same as test.sh, the different are:
 #   GROUND_TRUTH_PATH: ground truth path
-sh test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [CKPT] [GROUND_TRUTH_PATH]
+bash test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [CKPT] [GROUND_TRUTH_PATH]
 ```
 
 you can see the MAP below by eval.sh
 
 ```log
-(ci3.7) [root@bms-aiserver scripts]# ./eval.sh
-start eval
-==================== Results = ==================== ./scripts/output/centerface/999
-Easy   Val AP: 0.923914407045363
-Medium Val AP: 0.9166100571371586
-Hard   Val AP: 0.7810750535799462
+(ci3.7) [root@bms-aiserver scripts]# bash eval.sh or bash eval.sh [pred] [gt]
+==================== Results = ==================== ./scripts/outputs/centerface/140
+Easy   Val AP: 0.9206182787007993
+Medium Val AP: 0.9173183100368525
+Hard   Val AP: 0.7817584461201261
 =================================================
 end eval
 ```
@@ -467,31 +468,34 @@ end eval
 you can see the MAP below by eval_all.sh
 
 ```log
-(ci3.7) [root@bms-aiserver scripts]# ./eval_all.sh
+(ci3.7) [root@bms-aiserver scripts]# bash eval_all.sh or bash eval_all.sh [pred] [gt]
 ==================== Results = ==================== ./scripts/output/centerface/89
-Easy   Val AP: 0.8884892849068273
-Medium Val AP: 0.8928813452811216
-Hard   Val AP: 0.7721131614294564
+Easy   Val AP: 0.8936318136407687
+Medium Val AP: 0.8979048294911587
+Hard   Val AP: 0.7686040774641636
 =================================================
 ==================== Results = ==================== ./scripts/output/centerface/90
-Easy   Val AP: 0.8836073914165545
-Medium Val AP: 0.8875938506473486
-Hard   Val AP: 0.775956751740446
+Easy   Val AP: 0.8902698768408237
+Medium Val AP: 0.892289516639168
+Hard   Val AP: 0.7645320608741875
+=================================================
 ...
 ==================== Results = ==================== ./scripts/output/centerface/125
-Easy   Val AP: 0.923914407045363
-Medium Val AP: 0.9166100571371586
-Hard   Val AP: 0.7810750535799462
+Easy   Val AP: 0.9204046747187106
+Medium Val AP: 0.9167227213722241
+Hard   Val AP: 0.7830467644993906
 =================================================
-==================== Results = ==================== ./scripts/output/centerface/126
-Easy   Val AP: 0.9218741197149122
-Medium Val AP: 0.9151860193570651
-Hard   Val AP: 0.7825645670331809
+...
+==================== Results = ==================== ./scripts/output/centerface/131
+Easy   Val AP: 0.9219767240943944
+Medium Val AP: 0.9183270693788983
+Hard   Val AP: 0.7838974687232889
+=================================================
 ...
 ==================== Results = ==================== ./scripts/output/centerface/140
-Easy   Val AP: 0.9250715236965638
-Medium Val AP: 0.9170429723233877
-Hard   Val AP: 0.7822182013830674
+Easy   Val AP: 0.9206182787007993
+Medium Val AP: 0.9173183100368525
+Hard   Val AP: 0.7817584461201261
 =================================================
 ```
 
@@ -502,7 +506,7 @@ Hard   Val AP: 0.7822182013830674
 If you want to infer the network on Ascend 310, you should convert the model to AIR:
 
 ```python
-python export.py [BATCH_SIZE] [PRETRAINED_BACKBONE]
+python export.py [ckpt_file]
 ```
 
 # [Model Description](#contents)
@@ -513,42 +517,42 @@ python export.py [BATCH_SIZE] [PRETRAINED_BACKBONE]
 
 CenterFace on 13K images(The annotation and data format must be the same as widerFace)
 
-| Parameters                 | CenterFace                                                  |
-| -------------------------- | ----------------------------------------------------------- |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             |
-| uploaded Date              | 10/29/2020 (month/day/year)                                 |
-| MindSpore Version          | 1.0.0                                                 |
-| Dataset                    | 13K images                                                  |
-| Training Parameters        | epoch=140, steps=198 * epoch, batch_size = 8, lr=0.004      |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | Focal Loss, L1 Loss, Smooth L1 Loss                         |
-| outputs                    | heatmaps                                                    |
-| Loss                       | 0.3-1.5, average loss for last epoch is in 0.8-1.0          |
-| Speed                      | 1p 65 img/s, 8p 475 img/s                                   |
-| Total time                 | train(8p) 1.1h, test 50min, eval 5-10min                    |
-| Checkpoint for Fine tuning | 22M (.ckpt file)                                            |
+| Parameters                 | CenterFace                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------ |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G                                      |
+| uploaded Date              | 3/24/2021(month/day/year)                                                            |
+| MindSpore Version          | 1.1.1                                                                                |
+| Dataset                    | 13K images                                                                           |
+| Training Parameters        | epoch=140, steps=198 \* epoch, batch_size = 8, lr=0.004                              |
+| Optimizer                  | Adam                                                                                 |
+| Loss Function              | Focal Loss, L1 Loss, Smooth L1 Loss                                                  |
+| outputs                    | heatmaps                                                                             |
+| Loss                       | 0.3-1.5, average loss for last epoch is in 0.8-1.0                                   |
+| Speed                      | 1p 76 img/s, 8p 460 img/s                                                            |
+| Total time                 | train(8p) 1.1h, test 5min, eval 2min                                                 |
+| Checkpoint for Fine tuning | 23.1M (.ckpt file)                                                                   |
 | Scripts                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/centerface> |
 
 ### Inference Performance
 
 CenterFace on 3.2K images(The annotation and data format must be the same as widerFace)
 
-| Parameters                 | CenterFace                                                  |
-| -------------------------- | ----------------------------------------------------------- |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             |
-| uploaded Date              | 10/29/2020 (month/day/year)                                 |
-| MindSpore Version          | 1.0.0                                               |
-| Dataset                    | 3.2K images                                                 |
-| batch_size                 | 1                                                           |
-| outputs                    | box position and sorces, and probability                    |
-| Accuracy                   | Easy 92.2%  Medium 91.5% Hard 78.2% (+-0.5%)                |
-| Model for inference        | 22M (.ckpt file)                                            |
+| Parameters          | CenterFace                                      |
+| ------------------- | ----------------------------------------------- |
+| Resource            | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G |
+| uploaded Date       | 3/24/2021 (month/day/year)                      |
+| MindSpore Version   | 1.1.1                                           |
+| Dataset             | 3.2K images                                     |
+| batch_size          | 1                                               |
+| outputs             | box position and sorces, and probability        |
+| Accuracy            | Easy 92.19% Medium 91.83% Hard 78.38% (+-0.5%)  |
+| Model for inference | 23.1M (.ckpt file)                              |
 
 # [Description of Random Situation](#contents)
 
-In dataset.py, we set the seed inside ```create_dataset``` function.
+In dataset.py, we set the seed inside `create_dataset` function.
 In var_init.py, we set seed for weight initilization
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).

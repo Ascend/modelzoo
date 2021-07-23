@@ -14,7 +14,8 @@
 # ============================================================================
 """centerface unique configs"""
 
-class ConfigCenterface():
+
+class ConfigCenterface(object):
     """
     Config setup
     """
@@ -30,8 +31,8 @@ class ConfigCenterface():
     aug_rot = 0
     color_aug = True
     flip = 0.5
-    input_res = 512 #768 #800
-    output_res = 128 #192 #200
+    input_res = 512  # 768 #800
+    output_res = 128  # 192 #200
     num_classes = 1
     num_joints = 5
     reg_offset = True
@@ -47,12 +48,12 @@ class ConfigCenterface():
     # for test
     mean = [0.408, 0.447, 0.470]
     std = [0.289, 0.274, 0.278]
-    test_scales = [0.999,]
+    test_scales = [0.999, ]
     nms = 1
     flip_test = 0
     fix_res = True
-    input_h = 832 #800
-    input_w = 832 #800
+    input_h = 832  # 800
+    input_w = 832  # 800
     K = 200
     down_ratio = 4
     test_batch_size = 1

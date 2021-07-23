@@ -40,6 +40,13 @@ def _read_file(filename):
     with open(filename, 'r', encoding='utf-8') as f:
         return f.read().replace('\n', '').replace('\t', '').replace('\u3000', '')
 
+def _count_num(cat_dir):
+    count_num = 0
+    for fn in os.listdir(cat_dir):
+        count_num += 1
+    print('count_num:', count_num)
+    return count_num
+
 def save_file(dirname):
     """
     将多个文件整合并存到3个文件中
@@ -53,16 +60,17 @@ def save_file(dirname):
         cat_dir = os.path.join(dirname, category)
         if not os.path.isdir(cat_dir):
             continue
+        count_num = _count_num(cat_dir)
         files = os.listdir(cat_dir)
         count = 0
         for cur_file in files:
             filename = os.path.join(cat_dir, cur_file)
             content = _read_file(filename)
-            if count < 5000:
+            if count < count_num * 0.96:  # 训练集占比
                 f_train.write(category + '\t' + content + '\n')
-            elif count < 6000:
+            elif count < count_num * 0.98:  # 测试集占比
                 f_test.write(category + '\t' + content + '\n')
-            else:
+            else:  #  验证集占比
                 f_val.write(category + '\t' + content + '\n')
             count += 1
 

@@ -16,6 +16,7 @@
 from src.deepfm import ModelBuilder
 from src.config import ModelConfig, TrainConfig
 
+
 def create_network(name, *args, **kwargs):
     if name == 'deepfm':
         model_config = ModelConfig()

@@ -18,7 +18,9 @@ batch_size=128
 #参数校验，不需要修改
 for para in $*
 do
-    if [[ $para == --data_path* ]];then
+    if [[ $para == --device_id* ]];then
+        device_id=`echo ${para#*=}`
+    elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
     fi
 done
@@ -26,6 +28,17 @@ done
 #校验是否传入data_path,不需要修改
 if [[ $data_path == "" ]];then
     echo "[Error] para \"data_path\" must be confing"
+    exit 1
+fi
+
+# 校验是否指定了device_id,分动态分配device_id与手动指定device_id,此处不需要修改
+if [ $ASCEND_DEVICE_ID ];then
+    echo "device id is ${ASCEND_DEVICE_ID}"
+elif [ ${device_id} ];then
+    export ASCEND_DEVICE_ID=${device_id}
+    echo "device id is ${ASCEND_DEVICE_ID}"
+else
+    "[Error] device id must be config"
     exit 1
 fi
 
@@ -41,6 +54,13 @@ if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
     mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
 else
     mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
+fi
+
+#非平台场景时source 环境变量
+check_etp_flag=`env | grep etp_running_flag`
+etp_flag=`echo ${check_etp_flag#*=}`
+if [ x"${etp_flag}" != x"true" ];then
+    source ${cur_path}/env_npu.sh
 fi
 
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改

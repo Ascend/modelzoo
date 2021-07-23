@@ -6,17 +6,17 @@
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+    - [Distributed Training](#distributed-training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+    - [Inference Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -24,7 +24,7 @@
 
 Learning sophisticated feature interactions behind user behaviors is critical in maximizing CTR for recommender systems. Despite great progress, existing methods seem to have a strong bias towards low- or high-order interactions, or require expertise feature engineering. In this paper, we show that it is possible to derive an end-to-end learning model that emphasizes both low- and high-order feature interactions. The proposed model, DeepFM, combines the power of factorization machines for recommendation and deep learning for feature learning in a new neural network architecture.
 
-[Paper](https://arxiv.org/abs/1703.04247):  Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction
+[Paper](https://arxiv.org/abs/1703.04247): Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction
 
 # [Model Architecture](#contents)
 
@@ -33,21 +33,46 @@ The FM and deep component share the same input raw feature vector, which enables
 
 # [Dataset](#contents)
 
-- [1] A dataset used in  Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J]. 2017.
+- [1] Criteo Dataset
+  - Official source: https://labs.criteo.com/2014/02/download-kaggle-display-advertising-challenge-dataset/
+  - kaggle source: https://www.kaggle.com/mrkmakr/criteo-dataset
 
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend/GPU/CPU）
-    - Prepare hardware environment with Ascend, GPU, or CPU processor. If you want to try Ascend, please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources.
+  - Prepare hardware environment with Ascend, GPU, or CPU processor. If you want to try Ascend, please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources.
 - Framework
-    - [MindSpore](https://www.mindspore.cn/install/en)
+  - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
 
 # [Quick Start](#contents)
 
-After installing MindSpore via the official website, you can start training and evaluation as follows:
+1. Clone code
+
+```bash
+git clone https://gitee.com/mindspore/mindspore.git
+cd mindspore/model_zoo/official/recommend/deepfm
+```
+
+2. Download dataset
+
+> Please refer to [1] for download link.
+
+```bash
+mkdir -p data/origin_data && cd data/origin_data
+wget DATA_LINK
+tar -zxvf dac.tar.gz
+```
+
+3. Use this script to preprocess the data. The processing process may take an hour, and the generated MindRecord data is stored in the data/mindrecord path.
+
+```bash
+python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
+```
+
+4. After installing MindSpore via the official website, you can start training and evaluation as follows:
 
 - runing on Ascend
 
@@ -131,8 +156,6 @@ After installing MindSpore via the official website, you can start training and 
 ```path
 .
 └─deepfm
-  ├─README.md
-  ├─mindspore_hub_conf.md             # config for mindspore hub
   ├─scripts
     ├─run_standalone_train.sh         # launch standalone training(1p) in Ascend or GPU
     ├─run_distribute_train.sh         # launch distributed training(8p) in Ascend
@@ -143,9 +166,14 @@ After installing MindSpore via the official website, you can start training and 
     ├─config.py                       # parameter configuration
     ├─callback.py                     # define callback function
     ├─deepfm.py                       # deepfm network
+    ├─preprocess_data.py              # preprocess data
+    ├─generate_synthetic_data.py      # generate synthetic data
     ├─dataset.py                      # create dataset for deepfm
+  ├─train.py                          # train net
   ├─eval.py                           # eval net
-  └─train.py                          # train net
+  ├─export.py                         # export model
+  ├─mindspore_hub_conf.py             # config for mindspore hub
+  ├─README.md
 ```
 
 ## [Script Parameters](#contents)
@@ -183,6 +211,43 @@ Parameters for both training and evaluation can be set in config.py
                         Ascend or GPU. Default: Ascend
   ```
 
+## Prepare data set
+
+### Processing real world data
+
+1. Download the dataset and store it in a certain path, such as ./data/origin_data.
+
+```bash
+mkdir -p data/origin_data && cd data/origin_data
+wget DATA_LINK
+tar -zxvf dac.tar.gz
+```
+
+> Get the download link from [1].
+
+2. Use this script to preprocess data.
+
+```bash
+python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
+```
+
+### Generate and process synthetic data
+
+1. The following command will generate 40 million rows of click data in the following format:
+
+> "label\tdense_feature[0]\tdense_feature[1]...\tsparse_feature[0]\tsparse_feature[1]...".
+
+```bash
+mkdir -p syn_data/origin_data
+python src/generate_synthetic_data.py --output_file=syn_data/origin_data/train.txt --number_examples=40000000 --dense_dim=13 --slot_dim=51 --vocabulary_size=2000000000 --random_slot_values=0
+```
+
+2. Preprocess the generated data.
+
+```bash
+python src/preprocess_data.py --data_path=./syn_data/  --dense_dim=13 --slot_dim=51 --threshold=0 --train_line_count=40000000 --skip_id_convert=1
+```
+
 ## [Training Process](#contents)
 
 ### Training
@@ -204,8 +269,8 @@ Parameters for both training and evaluation can be set in config.py
   After training, you'll get some checkpoint files under `./checkpoint` folder by default. The loss value are saved in loss.log file.
 
   ```log
-  2020-05-27 15:26:29 epoch: 1 step: 41257, loss is 0.498953253030777
-  2020-05-27 15:32:32 epoch: 2 step: 41257, loss is 0.45545706152915955
+  2021-03-04 21:57:12 epoch: 1 step: 2582, loss is 0.4697781205177307
+  2021-03-04 22:01:02 epoch: 2 step: 2582, loss is 0.46246230602264404
   ...
   ```
 
@@ -249,7 +314,7 @@ Parameters for both training and evaluation can be set in config.py
   The above python command will run in the background. You can view the results through the file "eval_output.log". The accuracy is saved in auc.log file.
 
   ```log
-  {'result': {'AUC': 0.8057789065281104, 'eval_time': 35.64779996871948}}
+  {'result': {AUC: 0.8078456952530648, eval time: 21.29369044303894s}}
   ```
 
 - evaluation on dataset when running on GPU
@@ -262,42 +327,46 @@ Parameters for both training and evaluation can be set in config.py
 
 ### Training Performance
 
-| Parameters                 | Ascend                                                      | GPU                    |
-| -------------------------- | ----------------------------------------------------------- | ---------------------- |
-| Model Version              | DeepFM                                                      | To do                  |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G              | To do                  |
-| uploaded Date              | 09/15/2020 (month/day/year)                                 | To do                  |
-| MindSpore Version          | 1.0.0                                                 | To do                  |
-| Dataset                    | [1]                                                         | To do                  |
-| Training Parameters        | epoch=15, batch_size=1000, lr=1e-5                          | To do                  |
-| Optimizer                  | Adam                                                        | To do                  |
-| Loss Function              | Sigmoid Cross Entropy With Logits                           | To do                  |
-| outputs                    | Accuracy                                                    | To do                  |
-| Loss                       | 0.45                                                        | To do                  |
-| Speed                      | 1pc: 8.16 ms/step;                                          | To do                  |
-| Total time                 | 1pc: 90 mins;                                               | To do                  |
-| Parameters (M)             | 16.5                                                        | To do                  |
-| Checkpoint for Fine tuning | 190M (.ckpt file)                                           | To do                  |
-| Scripts                    | [deepfm script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm) | To do                  |
+| Parameters                 | Ascend                                                                                                 | GPU   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------ | ----- |
+| Model Version              | DeepFM                                                                                                 | To do |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G                                                         | To do |
+| uploaded Date              | 03/27/2021 (month/day/year)                                                                            | To do |
+| MindSpore Version          | 1.1.1                                                                                                  | To do |
+| Dataset                    | [1]                                                                                                    | To do |
+| Training Parameters        | epoch=15, batch_size=16000, lr=5e-4                                                                    | To do |
+| Optimizer                  | Adam                                                                                                   | To do |
+| Loss Function              | Sigmoid Cross Entropy With Logits                                                                      | To do |
+| outputs                    | AUC                                                                                                    | To do |
+| Loss                       | 0.44                                                                                                   | To do |
+| Speed                      | 1pc: 22.89 ms/step;                                                                                    | To do |
+| Total time                 | 1pc: 18 mins;                                                                                          | To do |
+| Parameters (M)             | 16.5                                                                                                   | To do |
+| Checkpoint for Fine tuning | 216M (.ckpt file)                                                                                      | To do |
+| Scripts                    | [deepfm script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm) | To do |
 
 ### Inference Performance
 
-| Parameters          | Ascend                      | GPU                         |
-| ------------------- | --------------------------- | --------------------------- |
-| Model Version       | DeepFM                      | To do                       |
-| Resource            | Ascend 910                  | To do                       |
-| Uploaded Date       | 05/27/2020 (month/day/year) | To do                       |
-| MindSpore Version   | 0.3.0-alpha                 | To do                       |
-| Dataset             | [1]                         | To do                       |
-| batch_size          | 1000                        | To do                       |
-| outputs             | accuracy                    | To do                       |
-| Accuracy            | 1pc: 80.55%;                | To do                       |
-| Model for inference | 190M (.ckpt file)           | To do                       |
+| Parameters          | Ascend                      | GPU   |
+| ------------------- | --------------------------- | ----- |
+| Model Version       | DeepFM                      | To do |
+| Resource            | Ascend 910                  | To do |
+| Uploaded Date       | 03/27/2021 (month/day/year) | To do |
+| MindSpore Version   | 1.1.1                       | To do |
+| Dataset             | [1]                         | To do |
+| batch_size          | 16000                       | To do |
+| outputs             | AUC                         | To do |
+| Accuracy            | 1pc: 80.78%;                | To do |
+| Model for inference | 216M (.ckpt file)           | To do |
 
 # [Description of Random Situation](#contents)
 
-We set the random seed before training in train.py.
+The following three random situations:
+
+- Disruption of the data set.
+- Random initialization of model weights.
+- Dropout.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).

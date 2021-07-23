@@ -210,7 +210,7 @@ def main_worker(npu, npus_per_node, args):
             args.opt_level = 'O1'
         resnet, optimizer = amp.initialize(resnet, optimizer,
                                            opt_level=args.opt_level,
-                                           loss_scale=args.loss_scale_value)
+                                           loss_scale=args.loss_scale_value, combine_grad=True)
 
     resnet = torch.nn.parallel.DistributedDataParallel(resnet,
                                                       device_ids=[args.npu],

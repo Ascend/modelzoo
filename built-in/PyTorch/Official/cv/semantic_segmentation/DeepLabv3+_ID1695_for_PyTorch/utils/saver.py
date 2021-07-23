@@ -59,6 +59,7 @@ class Saver(object):
             if self.runs:
                 previous_miou = [0.0]
                 for run in self.runs:
+                    miou = 0
                     run_id = run.split('_')[-1]
                     path = os.path.join(self.directory, 'experiment_{}'.format(str(run_id)), 'best_pred.txt')
                     if os.path.exists(path):
@@ -67,7 +68,7 @@ class Saver(object):
                                miou = np.float(f.readline())
                             except:
                                print("An exception occurred")
-                            
+
                             previous_miou.append(miou)
                     else:
                         continue

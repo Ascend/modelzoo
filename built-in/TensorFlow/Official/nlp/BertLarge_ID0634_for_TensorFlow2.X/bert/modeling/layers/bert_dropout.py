@@ -106,6 +106,7 @@ class Dropout(Layer):
     def dropped_inputs():
       if True:
         output = npu_ops.dropout(inputs,1.0 - self.rate)
+        #output = npu_ops.dropout_v3(inputs,1.0 - self.rate)
         return output
       else:
         return nn.dropout(inputs,

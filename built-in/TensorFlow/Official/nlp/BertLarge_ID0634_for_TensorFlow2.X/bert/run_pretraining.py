@@ -49,7 +49,7 @@ from tf2_common.modeling import performance
 from tf2_common.utils.misc import distribution_utils
 from tf2_common.utils.mlp_log import mlp_log
 import npu_device
-from hccl.split.api import set_split_strategy_by_size
+from hccl.split.api import set_split_strategy_by_idx
 
 flags.DEFINE_string(name='precision_mode', default= 'allow_fp32_to_fp16',
                     help='allow_fp32_to_fp16/force_fp16/ ' 
@@ -74,6 +74,8 @@ flags.DEFINE_boolean(name='use_npu_lamb', default=True,
                     help='whether to enable npu lamb optimizer, default is True')
 flags.DEFINE_boolean(name='use_fastgelu', default=True,
                     help='whether to enable fastgelu, default is True')
+flags.DEFINE_boolean(name='use_mixlist', default=True,
+                    help='whether to enable mixlist, default is True')
 
 flags.DEFINE_string('train_files', None,
                     'File path to retrieve training data for pre-training.')
@@ -112,7 +114,7 @@ flags.DEFINE_float('beta_2', 0.999, 'The beta_2 value for the optimizer.')
 flags.DEFINE_float('epsilon', 1e-6, 'The epsilon value for the optimizer.')
 flags.DEFINE_integer('num_accumulation_steps', 1,
                      'number of steps to accumulate with large batch size.')
-flags.DEFINE_float('stop_threshold', 0.712, 'Stop threshold for MLPerf.')
+flags.DEFINE_float('stop_threshold', 0.912, 'Stop threshold for MLPerf.')
 flags.DEFINE_float('poly_power', 1.0, 'The power of poly decay.')
 common_flags.define_common_bert_flags()
 
@@ -139,12 +141,15 @@ def npu_config():
                         "training_trace":"on", \
                         "task_trace":"on", \
                         "aicpu":"on", \
-                        "fp_point":"", \
-                        "bp_point":""}'
+                        "aic_metrics":"PipeUtilization",\
+                        "fp_point":"While_body_while_body_44418_1223/while/model/bert_pretrainer/transformer_encoder/self_attention_mask/mul", \
+                        "bp_point":"While_body_while_body_44418_1223/gradient_tape/while/model/bert_pretrainer/transformer_encoder/position_embedding/Pad"}'
     npu_device.global_options().profiling_config.profiling_options = profiling_options
   npu_device.global_options().precision_mode=FLAGS.precision_mode
   npu_device.global_options().variable_memory_max_size=str("4*1024*1024*1024")
   npu_device.global_options().graph_memory_max_size=str("27*1024*1024*1024")
+  if FLAGS.use_mixlist:
+    npu_device.global_options().modify_mixlist="../configs/ops_info.json"
   npu_device.open().as_default()
 
 
@@ -336,7 +341,7 @@ def run_bert_pretrain(strategy, custom_callbacks=None):
                'strategy.')
 
   performance.set_mixed_precision_policy(common_flags.dtype())
-  set_split_strategy_by_size([40,30,10,20])
+  set_split_strategy_by_idx([49,113,177,241,305,353,385,397])
   _, masked_lm_accuracy, run_steps = run_customized_training(
       strategy=strategy,
       optimizer_type=FLAGS.optimizer_type,
