@@ -99,7 +99,7 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-sed -i "s|data/|${data_path}/data/|g" ${cur_path}/../config/config.json
+#sed -i "s|data/|${data_path}/data/|g" ${cur_path}/../config/config.json
 
 #############执行训练#########################
 #训练开始时间，不需要修改
@@ -123,7 +123,7 @@ do
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_path, --model_dir, --precision_mode, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path，--autotune
-    nohup python3 train_cls-npu.py > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    nohup python3 train_cls-npu.py --data_path=$data_path > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 if [ $? -ne 0 ];then
   exit 1
 fi

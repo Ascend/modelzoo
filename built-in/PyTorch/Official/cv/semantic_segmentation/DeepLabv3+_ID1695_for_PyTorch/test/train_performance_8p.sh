@@ -65,21 +65,25 @@ start_time=$(date +%s)
 
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
-    #设置环境变量，不需要修改
+    # 设置环境变量，不需要修改
     echo "Device ID: $RANK_ID"
     export RANK_ID=$RANK_ID
     export ASCEND_DEVICE_ID=$RANK_ID
     ASCEND_DEVICE_ID=$RANK_ID
 
-    #创建DeviceID输出目录，不需要修改
+    # 创建DeviceID输出目录，不需要修改
     if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
         rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
         mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
     else
         mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
     fi
-    # source 环境变量
-    source ${test_path_dir}/env.sh
+    # 非平台场景时source环境变量
+    check_etp_flag=`env | grep etp_running_flag`
+    etp_flag=`echo ${check_etp_flag#*=}`
+    if [ x"${etp_flag}" != x"true" ];then
+        source ${test_path_dir}/env_npu.sh
+    fi
 
     python3 train.py \
         --backbone resnet \
@@ -94,7 +98,7 @@ do
 done
 wait
 
-#8p情况下仅0卡(主节点)有完整日志,因此后续日志提取仅涉及0卡
+# 8p情况下仅0卡(主节点)有完整日志,因此后续日志提取仅涉及0卡
 ASCEND_DEVICE_ID=0
 
 # 训练结束时间，不需要修改

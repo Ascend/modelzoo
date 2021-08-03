@@ -13,5 +13,5 @@ $benchmark_dir/benchmark --om $om_name --dataDir $cur_dir/input_bins/ --modelTyp
 
 #post process
 cd yolov4_postprocess
-python3 yolov4_postprocess.py $cur_dir/$output_dir/$model_name ./detections_npu/
+python3 yolov4_postprocess.py $cur_dir/$output_dir/$model_name ../voc2017val/
 python3 pascalvoc.py --detfolder ./detections_npu/ -np

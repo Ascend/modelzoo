@@ -14,7 +14,7 @@ export TASK_QUEUE_ENABLE=1
 export DYNAMIC_OP="ADD#MUL"
 
 python3 -u train_1p.py \
-  ./data/dataset/wmt14_en_de_joined_dict/ \
+  ${DATA_DIR} \
   --device-id 7\
   --arch transformer_wmt_en_de \
   --share-all-embeddings \

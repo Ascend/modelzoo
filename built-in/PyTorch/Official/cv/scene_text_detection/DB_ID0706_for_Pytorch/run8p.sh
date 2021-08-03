@@ -2,7 +2,7 @@ source env.sh
 export PYTHONPATH=./:$PYTHONPATH
 export TASK_QUEUE_ENABLE=0
 export DYNAMIC_OP="ADD"
-python3.7 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml --resume path-to-model-directory/MLT-Pretrain-ResNet50 \
+taskset -c 0-95 python3.7 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml --resume path-to-model-directory/MLT-Pretrain-ResNet50 \
         --data_path datasets/icdar2015/ \
         --seed=515 \
         --distributed \

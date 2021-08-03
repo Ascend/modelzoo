@@ -80,7 +80,7 @@ start_time=$(date +%s)
 # source 环境变量
 source ${test_path_dir}/env.sh
 
-python -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
+taskset -c 0-23 python -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
         --data_path ${data_path} \
         --resume ${ckpt_path} \
         --seed=515 \

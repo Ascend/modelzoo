@@ -34,6 +34,8 @@ export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
+export ASCEND_GLOBAL_EVENT_ENABLE=0
+export HCCL_WHITELIST_DISABLE=1
 
 ulimit -c unlimited
 echo "/var/log/npu/dump/core.%e.%p" > /proc/sys/kernel/core_pattern

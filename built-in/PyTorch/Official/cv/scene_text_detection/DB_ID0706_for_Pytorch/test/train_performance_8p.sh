@@ -69,7 +69,7 @@ start_time=$(date +%s)
 source ${test_path_dir}/env.sh
 
 
-python -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
+taskset -c 0-95 python -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
     --data_path ${data_path} \
     --resume ${resume} \
     --seed=515 \

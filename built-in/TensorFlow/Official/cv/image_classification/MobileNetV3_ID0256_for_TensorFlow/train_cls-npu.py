@@ -1,6 +1,35 @@
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import json
 import pandas as pd
+import argparse
 
 from keras.optimizers import Adam
 from keras.preprocessing.image import ImageDataGenerator
@@ -11,7 +40,12 @@ from tensorflow.python.keras import backend as K
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from npu_bridge.estimator import npu_ops
 
-
+parse = argparse.ArgumentParser()
+parse.add_argument("--data_path",metavar='DIR',default = "",help="path to dataset")
+args = parse.parse_args()
+data_path = args.data_path
+train_dir = os.path.join(data_path,"data/train")
+eval_dir = os.path.join(data_path,"data/eval")
 
 def generate(batch, shape, ptrain, pval):
     """Data generation and augmentation
@@ -96,7 +130,7 @@ def train():
     
     model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
-    train_generator, validation_generator, count1, count2 = generate(batch, shape[:2], cfg['train_dir'], cfg['eval_dir'])
+    train_generator, validation_generator, count1, count2 = generate(batch, shape[:2], train_dir, eval_dir)
 
     hist = model.fit_generator(
         train_generator,

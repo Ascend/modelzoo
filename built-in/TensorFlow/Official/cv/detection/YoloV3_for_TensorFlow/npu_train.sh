@@ -15,7 +15,7 @@ MAIN_PATH=$(dirname $(readlink -f $0))
 
 # local variable
 RANK_SIZE=1
-RANK_TABLE_FILE=./hccl_config/${RANK_SIZE}p.json
+#RANK_TABLE_FILE=./hccl_config/${RANK_SIZE}p.json
 RANK_ID_START=0
 SAVE_PATH=training/t1
 
@@ -65,7 +65,11 @@ su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --dev
 TMP_PATH=$SAVE_PATH/D$RANK_ID
 mkdir -p $TMP_PATH
 cp run_yolov3.sh $TMP_PATH/
-cp $RANK_TABLE_FILE $TMP_PATH/rank_table.json
+if [ $RANK_SIZE -gt 1 ];then
+export RANK_TABLE_FILE=./hccl_config/${RANK_SIZE}p.json
+#cp $RANK_TABLE_FILE $TMP_PATH/rank_table.json
+fi
+
 cd $TMP_PATH
 nohup bash run_yolov3.sh --RANK_ID=$RANK_ID --RANK_SIZE=$RANK_SIZE --MAIN_PATH=$MAIN_PATH --MODE=$MODE --data_path=$data_path --save_dir=$save_dir --batch_size=$batch_size > train_$RANK_ID.log &
 cd -

@@ -25,7 +25,7 @@ def main():
     lstm_path = './lstm_bin/'
 
     with open('./lstm.info', 'w') as f:
-        for i in range(test_num - 1):
+        for i in range(test_num):
             ids_name = lstm_path + 'inputs_{}.bin'.format(i)
             f.write(str(i) + ' ' + ids_name + ' ' + '(' + args.batchsize + ',390,243)')
             f.write('\n')
