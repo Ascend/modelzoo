@@ -62,9 +62,3 @@ Our result were obtained by running the applicable inference script. To achieve 
 |       model       | **data**   |       accuracy      |    Road      |    Others    |    precision    |    F1_score    |    Iou    |
 | :---------------: | :-------:  | :-----------------: | :----------: | :----------: | :-------------: | :------------: | :-------: |
 | offline Inference |  49 images |     97.19%          |    60.25%    |    99.36%    |     97.88%      |      97.44%    |    76.02% |
-
-#### Inference performance results
-
-|       model       | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |     204.48 img/s      |

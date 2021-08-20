@@ -4,7 +4,7 @@ cd ${currentDir}
 
 # user env
 export JOB_ID=bert-large-1p
-export RANK_TABLE_FILE=../configs/1p.json
+#export RANK_TABLE_FILE=../configs/1p.json
 export RANK_SIZE=1
 export RANK_INDEX=0
 export RANK_ID=0

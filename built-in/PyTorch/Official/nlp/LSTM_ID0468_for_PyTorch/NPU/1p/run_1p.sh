@@ -40,12 +40,12 @@ fi
 
 if [ $stage -le 2 ]; then
     echo "Step 2: Acoustic Model(CTC) Training..."
-    taskset -c 0-128 python3 steps/train_ctc.py \
-    --use_npu True \
-    --device_id $device_id \
+    taskset -c 0-95 python3 steps/train_ctc.py \
+    --device_id 0 \
+    --apex \
     --loss_scale 128 \
     --opt_level O2 \
-    --conf $config_file > ${train_log_dir}/lstm_1p.log 2>&1 & 
+    --conf 'conf/ctc_config.yaml' > ${train_log_dir}/lstm_1p.log 2>&1 & 
     exit 1 
 fi
 

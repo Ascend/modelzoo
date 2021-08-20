@@ -99,7 +99,7 @@ def main(_):
         # dump_debug_mode：溢出检测模式，取值：all/aicore_overflow/atomic_overflow
         custom_op.parameter_map["dump_debug_mode"].s = tf.compat.as_bytes("all")
     if args.profiling.strip()=="True":
-        custom_op.parameter_map["profiling_mode"].b = True
+        custom_op.parameter_map["profiling_mode"].b = False
         profilingvalue=('{"output":"%s","training_trace":"on","task_trace":"on","aicpu":"on","fp_point":"","bp_point":""}' %(args.profiling_dump_path))
         custom_op.parameter_map["profiling_options"].s = tf.compat.as_bytes(profilingvalue)
 

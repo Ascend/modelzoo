@@ -14,6 +14,8 @@
 
 # !/usr/bin/python
 # encoding=utf-8
+import warnings
+warnings.filterwarnings('ignore')
 
 import os
 import sys
@@ -28,7 +30,6 @@ import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import apex
 from torch.utils.tensorboard import SummaryWriter
-
 sys.path.append('./')
 from models.model_ctc import *
 from utils.data_loader import Vocab, SpeechDataset, SpeechDataLoader
@@ -239,13 +240,13 @@ def main(args, conf):
     print(params)
 
     loss_fn = nn.CTCLoss(reduction='sum').to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
-    #optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+
+    optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
 
     model = model.to(device)
-    #if args.opt_level:
+
     if args.apex:
-        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
+        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale, combine_grad=True)
 
     count = 0
     learning_rate = init_lr

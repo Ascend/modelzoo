@@ -114,16 +114,19 @@ do
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path，--autotune
     nohup python3.7 $cur_path/../train.py \
+    --dataset_dir=${data_path} \
+    --max_epoch=150 \
+    --iterations_per_loop=10 \
+    --model_name="vgg_19" \
+    --moving_average_decay=0.9999 \
+    --label_smoothing=0.1 \
+    --weight_decay='0.00004' \
     --batch_size=${batch_size} \
-    --rank_size=1 \
-    --mode=train_and_evaluate \
-    --max_epochs=150 \
-    --epochs_between_evals=5 \
-    --iterations_per_loop=5000 \
-    --data_dir=${data_path} \
-    --display_every=10 \
-    --log_dir=$cur_path/output/model_1p \
-    --log_name=vgg19_1p.log  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    --learning_rate_decay_type='cosine_annealing' \
+    --learning_rate=0.01 \
+    --optimizer='momentum' \
+    --momentum='0.9' \
+    --warmup_epochs=5  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
 wait
 
@@ -134,12 +137,12 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $6}'| awk -F "." '{print $1}'`
+FPS=`grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $7}' |awk -F ":" '{print $2}'| awk -F "." '{print $1}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep -A 1 top1 $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $3}'`
+train_accuracy=`grep 'accuracy =' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $13}'|awk -F "," '{print $1}'`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
@@ -157,7 +160,7 @@ ActualFPS=${FPS}
 TrainingTime=`expr ${batch_size} \* ${RANK_SIZE} \* 1000 \/ ${FPS}`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep loss $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | grep -v top1 | awk -F  " " '{print $(NF-3)}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $8}' |awk -F ":" '{print $2}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`

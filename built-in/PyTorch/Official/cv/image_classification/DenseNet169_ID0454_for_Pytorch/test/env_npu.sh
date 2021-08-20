@@ -30,7 +30,7 @@ fi
 export ASCEND_SLOG_PRINT_TO_STDOUT=0
 #设置默认日志级别,0-debug/1-info/2-warning/3-error
 export ASCEND_GLOBAL_LOG_LEVEL=3
-#设置Host侧Event日志开启标志,0-关闭/1-开启
+#设置Event日志开启标志,0-关闭/1-开启
 export ASCEND_GLOBAL_EVENT_ENABLE=0
 #设置是否开启taskque,0-关闭/1-开启
 export TASK_QUEUE_ENABLE=1
@@ -42,11 +42,19 @@ export COMBINED_ENABLE=1
 export DYNAMIC_OP="ADD#MUL"
 #HCCL白名单开关,1-关闭/0-开启
 export HCCL_WHITELIST_DISABLE=1
-#设置Device侧日志等级为error
-${install_path}/driver/tools/msnpureport -g error
+export HCCL_IF_IP=$(hostname -I |awk '{print $1}')
+
+#设置device侧日志登记为error
+${install_path}/driver/tools/msnpureport -g error -d 0
+${install_path}/driver/tools/msnpureport -g error -d 1
+${install_path}/driver/tools/msnpureport -g error -d 2
+${install_path}/driver/tools/msnpureport -g error -d 3
+${install_path}/driver/tools/msnpureport -g error -d 4
+${install_path}/driver/tools/msnpureport -g error -d 5
+${install_path}/driver/tools/msnpureport -g error -d 6
+${install_path}/driver/tools/msnpureport -g error -d 7
 #关闭Device侧Event日志
 ${install_path}/driver/tools/msnpureport -e disable
-
 
 path_lib=$(python3.7 -c """
 import sys

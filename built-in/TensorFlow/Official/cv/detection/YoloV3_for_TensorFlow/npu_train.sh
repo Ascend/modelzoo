@@ -11,7 +11,7 @@
 MAIN_PATH=$(dirname $(readlink -f $0))
 
 # set env
-
+export ASCEND_GLOBAL_LOG_LEVEL=3
 
 # local variable
 RANK_SIZE=1
@@ -36,6 +36,7 @@ if [[ $1 == --help || $1 == -h]];then
     --batch_size           batchsize, default is 16
     --mode                 single or multi scale train, default is single
     --rank_size            num of NPUs for training, default is 1"
+fi
 
 # params override
 for para in $*
@@ -58,24 +59,19 @@ if [[ $data_path == '' ]];then
     exit 1
 fi
 
+if [ $RANK_SIZE -gt 1 ];then
+export RANK_TABLE_FILE=./hccl_config/${RANK_SIZE}p.json
+fi
+
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
 echo
-su HwHiAiUser -c "adc --host 0.0.0.0:22118 --log \"SetLogLevel(0)[error]\" --device "$RANK_ID
+
 TMP_PATH=$SAVE_PATH/D$RANK_ID
 mkdir -p $TMP_PATH
 cp run_yolov3.sh $TMP_PATH/
-if [ $RANK_SIZE -gt 1 ];then
-export RANK_TABLE_FILE=./hccl_config/${RANK_SIZE}p.json
-#cp $RANK_TABLE_FILE $TMP_PATH/rank_table.json
-fi
-
 cd $TMP_PATH
 nohup bash run_yolov3.sh --RANK_ID=$RANK_ID --RANK_SIZE=$RANK_SIZE --MAIN_PATH=$MAIN_PATH --MODE=$MODE --data_path=$data_path --save_dir=$save_dir --batch_size=$batch_size > train_$RANK_ID.log &
 cd -
 
 done
-
-
-
-

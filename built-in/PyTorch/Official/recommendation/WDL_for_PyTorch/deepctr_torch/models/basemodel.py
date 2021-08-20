@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 
 # Copyright 2020 Huawei Technologies Co., Ltd
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at# 
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0# 
-# 
+# You may obtain a copy of the License at#
+#
+#     http://www.apache.org/licenses/LICENSE-2.0#
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,14 +18,17 @@ from __future__ import print_function
 
 import time
 
+import sklearn
 import numpy as np
 
 import torch
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as Data
 
-from sklearn.metrics import *
+from sklearn.metrics import log_loss, roc_auc_score, mean_squared_error, accuracy_score
+
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -36,7 +39,7 @@ from ..layers.utils import slice_arrays
 
 
 class Linear(nn.Module):
-    def __init__(self, feature_columns, feature_index, init_std=0.0001, device='cpu'):
+    def __init__(self, feature_columns, feature_index, init_std=0.01, device='cpu'):
         super(Linear, self).__init__()
         self.feature_index = feature_index
         self.device = device
@@ -56,13 +59,14 @@ class Linear(nn.Module):
 
     def forward(self, X, sparse_feat_refine_weight=None):
 
-        sparse_embedding_list = [self.embedding_dict[feat.embedding_name](X[idx].long()) for
-                                 idx, feat in enumerate(self.sparse_feature_columns)]
+        sparse_embedding_list = [self.embedding_dict[feat.embedding_name](
+            X[:, self.feature_index[feat.embedding_name][0]].long()) for
+            feat in self.sparse_feature_columns]
 
-        dense_value_list = [X[idx + len(self.sparse_feature_columns)] for idx, feat in enumerate(
-            self.dense_feature_columns)]
+        dense_value_list = [X[:, self.feature_index[feat.name][0]:self.feature_index[feat.name][1]] for
+                            feat in self.dense_feature_columns]
 
-        linear_logit = torch.zeros([X[0].shape[0], 1]).to(sparse_embedding_list[0].device)
+        linear_logit = torch.zeros([X.shape[0], 1]).to(X.device)
         if len(sparse_embedding_list) > 0:
             sparse_embedding_cat = torch.cat(sparse_embedding_list, dim=-1)
             if sparse_feat_refine_weight is not None:
@@ -80,7 +84,7 @@ class Linear(nn.Module):
 
 class BaseModel(nn.Module):
     def __init__(self, linear_feature_columns, dnn_feature_columns, l2_reg_linear=1e-5, l2_reg_embedding=1e-5,
-                 init_std=0.0001, seed=1024, task='binary', device='cpu', gpus=None, dist=False):
+                 init_std=0.01, seed=1024, task='binary', device='cpu', gpus=None, dist=False):
 
         super(BaseModel, self).__init__()
         torch.manual_seed(seed)
@@ -100,10 +104,6 @@ class BaseModel(nn.Module):
         self.dnn_feature_columns = dnn_feature_columns
 
         self.embedding_dict = create_embedding_matrix(dnn_feature_columns, init_std, sparse=False, device=device)
-        #         nn.ModuleDict(
-        #             {feat.embedding_name: nn.Embedding(feat.dimension, embedding_size, sparse=True) for feat in
-        #              self.dnn_feature_columns}
-        #         )
 
         self.linear_model = Linear(
             linear_feature_columns, self.feature_index, device=device)
@@ -177,14 +177,10 @@ class BaseModel(nn.Module):
             if len(x[i].shape) == 1:
                 x[i] = np.expand_dims(x[i], axis=1)
 
-        tensor_list = []
-        for idx, k in enumerate(x):
-            if idx < 26:
-                tensor_list.append(torch.from_numpy(k).squeeze().long())
-            else:
-                tensor_list.append(torch.from_numpy(k).float())
-        tensor_list += [torch.from_numpy(y)]
-        train_tensor_data = Data.TensorDataset(*tensor_list)
+        train_tensor_data = Data.TensorDataset(
+            torch.from_numpy(
+                np.concatenate(x, axis=-1)).float(),
+            torch.from_numpy(y))
 
         if batch_size is None:
             batch_size = 256
@@ -201,18 +197,21 @@ class BaseModel(nn.Module):
 
         num_rank = 1
         if self.dist:
-            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[torch.device(self.device)], broadcast_buffers=False)
+            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[torch.device(self.device)],
+                                                              broadcast_buffers=False)
             num_rank = torch.distributed.get_world_size()
 
-        if self.gpus:
-            print('parallel running on these gpus:', self.gpus)
-            model = torch.nn.DataParallel(model, device_ids=self.gpus)
-            batch_size *= len(self.gpus)  # input `batch_size` is batch_size per gpu
+            train_sampler = torch.utils.data.distributed.DistributedSampler(train_tensor_data, shuffle=True)
         else:
-            print(self.device)
+            train_sampler = None
 
-        train_loader = DataLoader(
-            dataset=train_tensor_data, shuffle=shuffle, batch_size=batch_size, num_workers=8, drop_last=True, pin_memory=True)
+        train_loader = train_loader = DataLoader(dataset=train_tensor_data,
+                                                 shuffle=(train_sampler is None),
+                                                 batch_size=batch_size,
+                                                 num_workers=8,
+                                                 drop_last=True,
+                                                 pin_memory=True,
+                                                 sampler=train_sampler)
 
         sample_num = len(train_tensor_data)
         steps_per_epoch = len(train_loader)
@@ -223,6 +222,8 @@ class BaseModel(nn.Module):
         total_time = 0
         total_step = 0
         for epoch in range(initial_epoch, epochs):
+            if self.dist:
+                train_sampler.set_epoch(epoch)
             epoch_logs = {}
             start_time = time.time()
             loss_epoch = 0
@@ -231,11 +232,11 @@ class BaseModel(nn.Module):
             end = time.time()
             for step, p_train in enumerate(train_loader):
                 data_time = time.time() - end
-                x_list = [p.to(self.device, non_blocking=True) for p in p_train[:-1]]
+                x = p_train[0].to(self.device, non_blocking=True)
                 y_train = p_train[-1]
                 y = y_train.float().to(self.device, non_blocking=True)
 
-                y_pred = model(x_list).squeeze()
+                y_pred = model(x).squeeze()
 
                 optim.zero_grad()
                 loss = loss_func(y_pred.float(), y.squeeze().float(), reduction='mean')
@@ -262,9 +263,9 @@ class BaseModel(nn.Module):
                 train_time = step_time - data_time
                 if (self.dist and torch.distributed.get_rank() == 0) or not self.dist:
                     print("Epoch {} Step {}/{} data_time:{: .4f}, train_time:{: .4f}, step_time:{: .4f}, " \
-                            "avg_time:{: .4f}, sample_per_sec:{: .4f}, avg_sample_per_sec:{: .4f}, loss:{: .4f}".format(
+                          "avg_time:{: .4f}, sample_per_sec:{: .4f}, avg_sample_per_sec:{: .4f}, loss:{: .4f}".format(
                         epoch, step, steps_per_epoch, data_time, train_time, step_time, avg_time,
-                        batch_size / step_time, avg_sample_per_sec ,total_loss.item(), loss.item()))
+                        batch_size / step_time, avg_sample_per_sec, total_loss.item(), loss.item()))
 
                 if verbose > 0:
                     for name, metric_fun in self.metrics.items():
@@ -277,14 +278,17 @@ class BaseModel(nn.Module):
                 if args.steps > 0 and total_step >= args.steps:
                     exit(0)
                 end = time.time()
-            torch.save(model.state_dict(), 'wdl-model.pth')
+
+            if args.device_id % args.device_num == 0:  # remember transfer device_id to name rank
+                torch.save(model.state_dict(), 'wdl-model.pth.tar')
+
             # Add epoch_logs
             epoch_logs["loss"] = total_loss_epoch / sample_num
             for name, result in train_result.items():
                 epoch_logs[name] = np.sum(result) / steps_per_epoch
 
             if do_validation:
-                eval_result = self.evaluate(val_x, val_y, batch_size)
+                eval_result = self.evaluate(val_x, val_y, args.eval_batch_size)
                 for name, result in eval_result.items():
                     epoch_logs["val_" + name] = result
             # verbose
@@ -338,23 +342,15 @@ class BaseModel(nn.Module):
             if len(x[i].shape) == 1:
                 x[i] = np.expand_dims(x[i], axis=1)
 
-        tensor_list = []
-        for idx, k in enumerate(x):
-            if idx < 26:
-                tensor_list.append(torch.from_numpy(k).squeeze().long())
-            else:
-                tensor_list.append(torch.from_numpy(k).float())
-
-        tensor_data = Data.TensorDataset(*tensor_list)
-
+        tensor_data = Data.TensorDataset(
+            torch.from_numpy(np.concatenate(x, axis=-1)).float())
         test_loader = DataLoader(
             dataset=tensor_data, shuffle=False, batch_size=batch_size)
 
         pred_ans = []
         with torch.no_grad():
             for _, x_test in enumerate(test_loader):
-                # x = x_test[0].float().to(self.device)
-                x = [p.to(self.device) for p in x_test]
+                x = x_test[0].float().to(self.device)
 
                 y_pred = model(x).cpu().data.numpy()  # .squeeze()
                 pred_ans.append(y_pred)
@@ -375,10 +371,12 @@ class BaseModel(nn.Module):
             raise ValueError(
                 "DenseFeat is not supported in dnn_feature_columns")
 
-        sparse_embedding_list = [embedding_dict[feat.embedding_name](X[idx].long()) for
-                                 idx, feat in enumerate(sparse_feature_columns)]
+        sparse_embedding_list = [embedding_dict[feat.embedding_name](
+            X[:, self.feature_index[feat.embedding_name][0]].long()) for
+            idx, feat in enumerate(sparse_feature_columns)]
 
-        dense_value_list = [X[idx + 26] for idx, feat in enumerate(dense_feature_columns)]
+        dense_value_list = [X[:, self.feature_index[feat.name][0]:self.feature_index[feat.name][1]] for
+                            idx, feat in enumerate(dense_feature_columns)]
 
         return sparse_embedding_list, dense_value_list
 
@@ -453,7 +451,7 @@ class BaseModel(nn.Module):
             if optimizer == "sgd":
                 optim = torch.optim.SGD(self.parameters(), lr=0.01)
             elif optimizer == "adam":
-                #optim = torch.optim.Adam(self.parameters())  # 0.001
+                # optim = torch.optim.Adam(self.parameters())  # 0.001
                 import apex
                 optim = apex.optimizers.NpuFusedAdam(self.parameters(), lr=lr, weight_decay=1e-5)
             elif optimizer == "adagrad":

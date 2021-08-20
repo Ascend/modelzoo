@@ -72,8 +72,3 @@ Our result was obtained by running the applicable inference script. To achieve t
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 50000 images | 71.0 %/ 89.8% |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |Platform |
-| :---------------: | :--------: | :-------------------: |:-------------------: 
-| offline Inference |     1      |       105 imgs/s       |  Ascend310*1        |

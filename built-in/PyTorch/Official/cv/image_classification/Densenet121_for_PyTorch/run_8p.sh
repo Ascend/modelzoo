@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
+source env_npu.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
 /usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
@@ -41,7 +41,7 @@ then
 else
     for i in $(seq 0 7)
     do
-    python3.7 /densenet121_8p_main.py \
+    python3.7 ${currentDir}/densenet121_8p_main.py \
         --addr=$(hostname -I|awk '{print $1}') \
         --seed 49 \
         --workers 160 \

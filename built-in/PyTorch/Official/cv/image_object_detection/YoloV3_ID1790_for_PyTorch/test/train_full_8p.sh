@@ -35,33 +35,35 @@ start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/../
-for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
-do
-    #设置环境变量，不需要修改
-    echo "Device ID: $RANK_ID"
-    export RANK_ID=$RANK_ID
-    export ASCEND_DEVICE_ID=$RANK_ID
-    ASCEND_DEVICE_ID=$RANK_ID
 
-    #创建DeviceID输出目录，不需要修改
-    if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
-        rm -rf ${cur_path}/output/${ASCEND_DEVICE_ID}
-        mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
-    else
-        mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
-    fi
+#设置环境变量，不需要修改
+RANK_ID=0
+ASCEND_DEVICE_ID=0
+echo "Device ID: $RANK_ID"
+export RANK_ID=$RANK_ID
+export ASCEND_DEVICE_ID=$RANK_ID
+ASCEND_DEVICE_ID=$RANK_ID
 
-    # 绑核，不需要的绑核的模型删除，需要的模型审视修改
-    #let a=RANK_ID*12
-    #let b=RANK_ID+1
-    #let c=b*12-1
+#创建DeviceID输出目录，不需要修改
+if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
+    rm -rf ${cur_path}/output/${ASCEND_DEVICE_ID}
+    mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
+else
+    mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
+fi
 
-    #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
-    PORT=29500 ./tools/dist_train.sh configs/yolo/yolov3_d53_320_273e_coco.py 8 \
-        --cfg-options optimizer.lr=0.0032  \
-        --seed 0  \
-        --local_rank 0  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-done
+# 绑核，不需要的绑核的模型删除，需要的模型审视修改
+#let a=RANK_ID*12
+#let b=RANK_ID+1
+#let c=b*12-1
+chmod +x ${cur_path}/../tools/dist_train.sh
+
+#执行训练脚本，以下传参不需要修改，其他需要模型审视修改
+PORT=29500 ./tools/dist_train.sh configs/yolo/yolov3_d53_320_273e_coco.py 8 \
+    --cfg-options optimizer.lr=0.0032  \
+    --seed 0  \
+    --local_rank 0  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+
 wait
 
 #8p情况下仅0卡(主节点)有完整日志,因此后续日志提取仅涉及0卡
@@ -93,7 +95,7 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据，不需要修改
 #吞吐量
-ActualFPS=`awk -v x="$FPS" -v y="$RANK_SIZE" 'BEGIN{printf "%.3f\n", x*y}'`
+ActualFPS=${FPS}
 #单迭代训练时长
 TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${time}'}'`
 

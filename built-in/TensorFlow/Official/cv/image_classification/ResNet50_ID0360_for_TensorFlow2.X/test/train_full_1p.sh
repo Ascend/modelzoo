@@ -15,7 +15,7 @@ data_path=""
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="ResNet50_TF2.X_for_TensorFlow"
+Network="ResNet50_ID0360_for_TensorFlow2.X"
 #训练epoch
 train_epochs=42
 #训练batch_size

@@ -71,9 +71,3 @@ Our result was obtained by running the applicable inference script. To achieve t
 |       model       | **data**  |    Top1/Top5    |
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 50000 images | 70.9 %/ 89.9% |
-
-#### Inference performance results
-
-|       model       | batch size | Inference performance |Platform |
-| :---------------: | :--------: | :-------------------: |:-------------------: 
-| offline Inference |     1      |       1075 imgs/s       |  Ascend310*1        |

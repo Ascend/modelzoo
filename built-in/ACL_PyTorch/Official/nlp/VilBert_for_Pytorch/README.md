@@ -42,7 +42,7 @@ python3.7 patch.py
 
 #### 4. 下载网络权重并导出onnx（需要联网）
 
-- 下载vilbert-vqa-pretrained.2021-03-15.tar.gz权重，放置于根目录下，与export_onnx.py同级，下载连接：https://storage.googleapis.com/allennlp-public-models/vilbert-vqa-pretrained.2021-03-15.tar.gz
+- 下载vilbert-vqa-pretrained.2021-03-15.tar.gz权重，放置于models目录下，下载连接：https://storage.googleapis.com/allennlp-public-models/vilbert-vqa-pretrained.2021-03-15.tar.gz
 - 下载faster-rcnn预训练模型，放置于/root/.cache/torch/hub/checkpoints目录下，下载连接：https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_coco-258fb6c6.pth
 - 下载bert-base-uncased预训练权重，放置于根目录下的bert-base-uncased目录，下载连接：https://huggingface.co/bert-base-uncased/resolve/main/pytorch_model.bin
 

@@ -27,6 +27,7 @@ learning_rate=0.0001
 
 #TF2.X独有，需要模型审视修改
 export NPU_LOOP_SIZE=1000
+export GE_USE_STATIC_MEMORY=1
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_fp32_to_fp16"
@@ -143,7 +144,7 @@ do
   	--steps_between_eval=1000 \
   	--steps_per_loop=${NPU_LOOP_SIZE} \
   	--stop_steps=96000 \
-	--use_fastgelu=False \
+	--use_fastgelu=True \
 	--enable_checkpoint_and_summary=True \
   	--train_batch_size=${batch_size} \
   	--verbosity=0 \

@@ -6,21 +6,21 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
-**修改时间（Modified） ：2021.5.25**
+**修改时间（Modified） ：2021.8.15**
 
-**大小（Size）：471M**
+**大小（Size）：142KB**
 
-**框架（Framework）：TensorFlow 2.4.1**
+**框架（Framework）：TensorFlow_2.4.1**
 
 **模型格式（Model Format）：ckpt**
 
-**精度（Precision）：FP32**
+**精度（Precision）：Mixed**
 
 **处理器（Processor）：昇腾910**
 
@@ -31,6 +31,12 @@
 <h2 id="概述.md">概述</h2>
 
 ## 简述
+
+Resnet是残差网络(Residual Network)的缩写,该系列网络广泛用于目标分类等领域以及作为计算机视觉任务主干经典神经网络的一部分，典型的网络有resnet50, resnet101等。Resnet网络的证明网络能够向更深（包含更多隐藏层）的方向发展。
+
+- 参考论文
+
+  [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) by Kaiming He, et. al.
 
 - 开源代码路径
 
@@ -50,7 +56,24 @@
     
 
 ## 默认配置<a name="section91661242121611"></a>
+-   训练数据集预处理
+    
+    （以ImageNet2012训练集为例，仅作为用户参考示例）：
+    
+    图像的输入尺寸为224*224
+    
+    根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
+    
+-   测试数据集预处理
+
+    （以ImageNet2012验证集为例，仅作为用户参考示例）
+
+    图像的输入尺寸为224*224（将图像最小边缩放到256，同时保持宽高比，然后在中心裁剪图像）
+
+    根据ImageNet数据集通用的平均值和标准偏差对输入图像进行归一化
+
 -   训练超参（单卡）：
+    
     -   Batch size: 256
     -   momentum=0.901
     -   max_seq_length: 512
@@ -75,7 +98,21 @@
 昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
 ## 开启混合精度<a name="section20779114113713"></a>
-相关代码示例。
+拉起脚本中，传入--precision_mode='allow_mix_precision'
+
+```
+./train_full_1p.sh --help
+parameter explain:
+    --precision_mode         precision mode(allow_fp32_to_fp16/force_fp16/must_keep_origin_dtype/allow_mix_precision)
+    --over_dump                  if or not over detection, default is False
+    --data_dump_flag         data dump flag, default is False
+    --data_dump_step             data dump step, default is 10
+    --profiling                  if or not profiling for performance debug, default is False
+    --data_path                  source data of training
+    -h/--help                    show help message
+```
+
+对应代码：
 
 ```
 flags.DEFINE_string(name='precision_mode', default= 'allow_fp32_to_fp16',
@@ -118,9 +155,11 @@ npu_device.global_options().precision_mode=FLAGS.precision_mode
 
 ## 数据集准备<a name="section361114841316"></a>
 
-参考：
+1. 请用户自行准备好数据集，包含训练集和验证集两部分，可选用的数据集为ImageNet2012。
+2. 训练集和验证集的tfrecord位于指定文件夹下，训练的数据集统一以train-XX前缀开始，验证集以validation-XX前缀开始。
+3. 当前提供的训练脚本中，是以ImageNet2012数据集为例。可以参考简述->开源代码路径进行数据集准备
 
-https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classification
+
 
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。
@@ -191,13 +230,13 @@ https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classific
           [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
 
-    2. 单卡训练
+    1. 单卡训练
        
         2.1 单卡训练指令（脚本位于ResNet50_ID0360_for_TensorFlow2.X/test/train_full_1p.sh）,请确保下面例子中的“--data_path”修改为用户的ImageNet数据集的路径,这里选择将ImageNet文件夹放在home目录下。
         
             bash test/train_full_1p_16bs.sh --data_path=/home/ImageNet
     
-    3. 8卡训练
+    2. 8卡训练
     
         3.1 8卡训练指令（脚本位于ResNet50_ID0360_for_TensorFlow2.X/test/train_full_8p_256bs_SGD.sh),请确保下面例子中的“--data_path”修改为用户的ImageNet的路径。
     
@@ -205,27 +244,10 @@ https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classific
 
 
 
-<h2 id="迁移学习指导.md">迁移学习指导</h2>
+<h2 id="迁移学习指导.md">高级参考</h2>
 
-- 数据集准备。
-
-    1.  获取数据。
-        请参见“快速上手”中的数据集准备。
-    2.  数据集每个类别所占比例大致相同。
+- 脚本和示例代码
 ```
--  模型训练。
-
-    请参考“快速上手”章节。
-
--  模型评估。
-   
-    可以参考“模型训练”中训练步骤。
-
-<h2 id="高级参考.md">高级参考</h2>
-
-## 脚本和示例代码<a name="section08421615141513"></a>
-
-​```shell
 |--tensorflow			#网络代码目录
 |   |--tf2_common
 |   |--modeling
@@ -258,7 +280,7 @@ https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classific
 
 ## 训练过程<a name="section1589455252218"></a>
 
-通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡，8卡网络训练。模型存储路径为${cur_path}/output/$ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。以8卡训练为例，loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
+通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡，8卡网络训练。模型存储路径为${cur_path}/output/$ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。以8卡训练为例，loss及eval精度信息在${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
 
 
 

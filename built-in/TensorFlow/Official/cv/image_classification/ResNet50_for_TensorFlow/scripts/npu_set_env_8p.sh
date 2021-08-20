@@ -9,7 +9,7 @@ export RANK_INDEX=0
 export RANK_ID=0
 
 # profiling env
-export PROFILING_MODE=true
+export PROFILING_MODE=false
 export AICPU_PROFILING_MODE=false
 export PROFILING_OPTIONS=task_trace:training_trace
 export FP_POINT=fp32_vars/conv2d/Conv2Dfp32_vars/BatchNorm/FusedBatchNormV3_Reduce

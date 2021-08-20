@@ -84,11 +84,6 @@ Our result was obtained by running the applicable inference script. To achieve t
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 50000 images | 61.4 %/ 82.9% |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |Platform |
-| :---------------: | :--------: | :-------------------: |:-------------------: 
-| offline Inference |     1      |       156 imgs/s       |  Ascend310*1        |
 
 ## Reference
 https://github.com/Ascend/modelzoo/tree/master/contrib/TensorFlow/Research/cv/shufflenetv2/shufflenetv2_tf_uestclzx

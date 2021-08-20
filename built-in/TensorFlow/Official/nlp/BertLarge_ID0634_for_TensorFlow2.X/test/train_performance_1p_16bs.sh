@@ -29,7 +29,9 @@ learning_rate=0.000058711
 #TF2.X独有，不需要修改
 #export NPU_LOOP_SIZE=${train_steps}
 export NPU_LOOP_SIZE=100
+export GE_USE_STATIC_MEMORY=1
 export NPU_ENABLE_PERF=true
+
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_fp32_to_fp16"
 #维持参数，以下不需要修改

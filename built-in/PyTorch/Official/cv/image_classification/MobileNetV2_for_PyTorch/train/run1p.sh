@@ -3,6 +3,7 @@
 source npu_set_env.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+/usr/local/Ascend/driver/tools/msnpureport -e disable
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
@@ -23,6 +24,7 @@ python3.7 ${currentDir}/mobilenetv2_8p_main_anycard.py \
     --dist-backend 'hccl' \
     --multiprocessing-distributed \
     --world-size 1 \
+    --class-nums 1000 \
     --batch-size 512 \
     --epochs 600 \
     --rank 0 \

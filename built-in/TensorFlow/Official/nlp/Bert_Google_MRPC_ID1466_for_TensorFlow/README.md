@@ -8,13 +8,13 @@
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Natural Language Processing**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
-**修改时间（Modified） ：2021.7.17**
+**修改时间（Modified） ：2021.8.15**
 
-**大小（Size）：1.3G**
+**大小（Size）：108KB**
 
 **框架（Framework）：TensorFlow 1.15.0**
 
@@ -202,18 +202,4 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 
 ## 训练过程<a name="section1589455252218"></a>
 
-1.  通过“模型训练”中的训练指令启动单卡训练。
-
-2.  若不指定output_dir，训练日志及结果见test/output/${ASCEND_DEVICE_ID}的train_*.log
-
-
-
-## 推理/验证过程<a name="section1465595372416"></a>
-
-执行训练脚本默认执行验证过程，验证结果在test/output/${ASCEND_DEVICE_ID}的*_acc.log中打印，如下
-
-```
-ActualFPS = 548
-TrainAccuracy = 0.845588
-AcutalLoss = 0.505248
-```
+通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡网络训练。模型存储路径为curpath/output/ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。loss信息在文件curpath/output/{ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。

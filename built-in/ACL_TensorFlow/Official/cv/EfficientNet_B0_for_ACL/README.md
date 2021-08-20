@@ -66,8 +66,3 @@ Our result were obtained by running the applicable inference script. To achieve 
 | :---------------: | :-------: | :-----------: |
 | offline Inference | 5W images | 75.86%/92.72% |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |       383 img/s       |

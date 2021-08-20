@@ -91,7 +91,7 @@ Our result were obtained by running the applicable inference script. To achieve 
 
 #### Inference accuracy results
 
-| model  | Npu_nums | **MAP** |  FPS  |
-| :----: | :------: | :-----: | :---: |
-| Yolov3 |    1     |  31.3   | 81.74 |
-| Yolov3 |    8     |  31.3   |  89   |
+| model  | Npu_nums | **MAP** | 
+| :----: | :------: | :-----: | 
+| Yolov3 |    1     |  31.3   | 
+| Yolov3 |    8     |  31.3   |

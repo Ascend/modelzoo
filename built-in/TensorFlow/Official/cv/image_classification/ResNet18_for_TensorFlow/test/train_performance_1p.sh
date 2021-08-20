@@ -18,7 +18,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="ResNet18_for_TensorFlow"
+Network="ResNet18_ID1573_for_TensorFlow"
 #训练epoch
 train_epochs=1
 #训练batch_size

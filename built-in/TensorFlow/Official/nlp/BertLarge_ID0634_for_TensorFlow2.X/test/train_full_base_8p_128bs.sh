@@ -19,7 +19,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
-Network="BertLarge_TF2.X_for_TensorFlow"
+Network="BertLarge_ID0634_for_TensorFlow2.X"
 #训练batch_size
 batch_size=128
 eval_batch_size=16
@@ -32,6 +32,7 @@ learning_rate=0.00015
 
 #TF2.X独有，需要模型审视修改
 export NPU_LOOP_SIZE=1
+export GE_USE_STATIC_MEMORY=1
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_fp32_to_fp16"
@@ -186,7 +187,7 @@ BatchSize=${batch_size}
 #设备类型
 DeviceType=`uname -m`
 #用例名称
-CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}_base_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 
 ##获取性能数据
 #吞吐量，不需要修改

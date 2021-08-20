@@ -146,8 +146,9 @@ def npu_config():
                         "bp_point":"While_body_while_body_44418_1223/gradient_tape/while/model/bert_pretrainer/transformer_encoder/position_embedding/Pad"}'
     npu_device.global_options().profiling_config.profiling_options = profiling_options
   npu_device.global_options().precision_mode=FLAGS.precision_mode
-  npu_device.global_options().variable_memory_max_size=str("4*1024*1024*1024")
-  npu_device.global_options().graph_memory_max_size=str("27*1024*1024*1024")
+  npu_device.global_options().variable_memory_max_size=4*1024*1024*1024
+  #npu_device.global_options().graph_memory_max_size=str("27*1024*1024*1024")
+  npu_device.global_options().graph_memory_max_size=29205777612
   if FLAGS.use_mixlist:
     npu_device.global_options().modify_mixlist="../configs/ops_info.json"
   npu_device.open().as_default()

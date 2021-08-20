@@ -168,18 +168,22 @@ fi
 set -x
 if [ -z "$LOGFILE" ] ; then
    for i in $(seq 0 7)
-   do 
-   let p_start=0+24*i
-   let p_end=23+24*i
-   taskset -c $p_start-$p_end $CMD --local_rank=$i &
+   do
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
+    let b=RANK_ID+1
+    let c=b*${corenum}/${RANK_SIZE}-1
+   taskset -c $a-$c $CMD --local_rank=$i &
    done
 else
    (
      for i in $(seq 0 7)
      do 
-     let p_start=0+24*i
-     let p_end=23+24*i
-     taskset -c $p_start-$p_end $CMD --local_rank=$i &
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
+    let b=RANK_ID+1
+    let c=b*${corenum}/${RANK_SIZE}-1
+    taskset -c $a-$c $CMD --local_rank=$i &
      done
    ) |& tee $LOGFILE
 fi
@@ -257,17 +261,21 @@ set -x
 if [ -z "$LOGFILE" ] ; then
    for i in $(seq 0 7)
    do 
-   let p_start=0+24*i
-   let p_end=23+24*i
-   taskset -c $p_start-$p_end $CMD --local_rank=$i &
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
+    let b=RANK_ID+1
+    let c=b*${corenum}/${RANK_SIZE}-1
+   taskset -c $a-$c  $CMD --local_rank=$i &
    done
 else
    (
      for i in $(seq 0 7)
      do 
-     let p_start=0+24*i
-     let p_end=23+24*i
-     taskset -c $p_start-$p_end $CMD --local_rank=$i &
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
+    let b=RANK_ID+1
+    let c=b*${corenum}/${RANK_SIZE}-1
+     taskset -c $a-$c  $CMD --local_rank=$i &
      done
    ) |& tee $LOGFILE
 fi

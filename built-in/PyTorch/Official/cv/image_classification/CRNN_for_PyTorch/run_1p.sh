@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
+source env_npu.sh
 export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export TASK_QUEUE_ENABLE=1
@@ -7,8 +7,6 @@ export PTCOPY_ENABLE=1
 export COMBINED_ENABLE=1
 export SWITCH_MM_OUTPUT_ENABLE=1
 
-/usr/local/Ascend/driver/tools/msnpureport -g error -d 0
-/usr/local/Ascend/driver/tools/msnpureport -g error -d 4
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`

@@ -1,5 +1,5 @@
 #!/bin/bash
-#source env.sh
+#source env_npu.sh
 #当前路径,不需要修改
 cur_path=`pwd`
 
@@ -105,14 +105,11 @@ do
     else
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
-    # 绑核，不需要的绑核的模型删除，需要的模型审视修改
-    #let a=RANK_ID*12
-    #let b=RANK_ID+1
-    #let c=b*12-1
+
     
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    taskset -c 0-95 python3 ${cur_path}/../examples/imagenet/main.py \
+python3 ${cur_path}/../examples/imagenet/main.py \
         --data=${data_path} \
         --arch=efficientnet-b2 \
         --batch-size=${batch_size} \

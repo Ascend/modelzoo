@@ -15,10 +15,11 @@ data_path=""
 
 #设置默认日志级别,不需要修改
 export ASCEND_GLOBAL_LOG_LEVEL=3
+export GE_USE_STATIC_MEMORY=1
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="BertLarge_TF2.X_for_TensorFlow"
+Network="BertLarge_ID0634_for_TensorFlow2.X"
 #训练batch_size
 eval_batch_size=4
 batch_size=16

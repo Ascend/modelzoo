@@ -7,7 +7,7 @@ source ./run_npu_env.sh
 export JOB_ID=80000
 
 export RANK_SIZE=1
-export RANK_TABLE_FILE=./1p.json
+#export RANK_TABLE_FILE=./1p.json
 
 sleep 5
 

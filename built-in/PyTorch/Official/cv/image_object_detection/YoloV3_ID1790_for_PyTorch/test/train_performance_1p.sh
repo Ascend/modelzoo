@@ -33,6 +33,7 @@ fi
 start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
+ASCEND_DEVICE_ID=0
 cd $cur_path/../
 
 #创建DeviceID输出目录，不需要修改
@@ -42,6 +43,7 @@ if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
 else
     mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
 fi
+chmod +x ${cur_path}/../tools/dist_train.sh
 
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 PORT=29500 ./tools/dist_train.sh configs/yolo/yolov3_d53_320_273e_coco.py 1  \

@@ -610,7 +610,7 @@ def init_npu():
   custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
   custom_op.parameter_map["use_off_line"].b = True
 
-  custom_op.parameter_map["profiling_mode"].b = True
+  custom_op.parameter_map["profiling_mode"].b = False
   #custom_op.parameter_map["profiling_options"].s = tf.compat.as_bytes("task_trace:training_trace") 
   custom_op.parameter_map["profiling_options"].s = tf.compat.as_bytes('{"output":"/var/log/npu/profiling","training_trace":"on","task_trace":"on","fp_point":"resnet_model/conv2d/Conv2Dresnet_model/     batch_normalization/FusedBatchNormV3_Reduce","bp_point":"gradients/AddN_70"}')
 

@@ -69,16 +69,3 @@ Our result were obtained by running the applicable training script. To achieve t
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 16281     | 85.44 % |
 
-#### Inference performance results
-
-model: offline Inference  batch size: 1
-
-Inference performance:
-  ```
-[e2e] throughputRate: 610.768, lantency: 26656.6
-[data read] throughputRate: 179777, moduleLantency: 0.00556243
-[wide preprocess] throughputRate: 179530, moduleLantency: 0.00557009
-[deep preprocess] throughputRate: 24092.8, moduleLantency: 0.0415061
-[infer] throughputRate: 618.437, Interface throughputRate: 795.149, moduleLantency: 1.60387
-[post] throughputRate: 618.435, moduleLantency: 1.61698
-  ```

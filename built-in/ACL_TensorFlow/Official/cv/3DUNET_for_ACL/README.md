@@ -69,8 +69,3 @@ Our result were obtained by running the applicable inference script. To achieve 
 | :---------------: | :-------:  | :-----------------: |  :-------------: | :------------: |:--------:|:----------:|
 | offline Inference |  68 images |        72.59%       |      78.48%      |     70.46%     |  73.84%  |   90.74%   |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |       2.50 img/s      |

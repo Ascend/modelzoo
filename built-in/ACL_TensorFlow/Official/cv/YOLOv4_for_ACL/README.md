@@ -77,11 +77,6 @@ Our result was obtained by running the applicable inference script. To achieve t
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 5000 images | 60.7% |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |Platform |
-| :---------------: | :--------: | :-------------------: |:-------------------: 
-| offline Inference |     1      |       65 imgs/s       |  Ascend310*1        |
 
 ## Reference
 [1] https://github.com/hunglc007/tensorflow-yolov4-tflite

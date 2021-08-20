@@ -6,7 +6,7 @@ cur_path=`pwd`
 #集合通信参数,不需要修改
 #保证rank table file 文件rank_table_8p.json存放在和test同级的configs目录下
 export RANK_SIZE=8
-export RANK_TABLE_FILE=${cur_path}/8p.json
+export RANK_TABLE_FILE=${cur_path}/../8p.json
 export JOB_ID=10087
 RANK_ID_START=0
 
@@ -125,24 +125,28 @@ do
     fi
     
      # 绑核，不需要的绑核的模型删除，需要模型审视修改
-    let a=RANK_ID*12
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l` 
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
     let b=RANK_ID+1
-    let c=b*12-1
+    let c=b*${corenum}/${RANK_SIZE}-1
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
     nohup taskset -c $a-$c python3.7 $cur_path/../train.py \
-    --batch_size=${batch_size} \
-    --rank_size=8 \
-    --mode=train_and_evaluate \
-    --max_epochs=150 \
-    --iterations_per_loop=5004 \
-    --epochs_between_evals=5 \
-    --data_dir=${data_path} \
-    --lr=0.01 \
-    --log_dir=$cur_path/output/model_8p \
-    --log_name=vgg19_8p.log  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-done 
+        --dataset_dir=${data_path} \
+        --max_epoch=150 \
+        --model_name="vgg_19" \
+        --moving_average_decay=0.9999 \
+        --label_smoothing=0.1 \
+        --weight_decay='0.00004' \
+        --batch_size=${batch_size} \
+        --learning_rate_decay_type='cosine_annealing' \
+        --learning_rate=0.08 \
+        --optimizer='momentum' \
+        --momentum='0.9' \
+        --warmup_epochs=5  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+
+done
 wait
 
 #训练结束时间，不需要修改
@@ -152,12 +156,13 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $6}'| awk -F "." '{print $1}'`
+FPS=`grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $7}' |awk -F ":" '{print $2}'| awk -F "." '{print $1}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep -A 1 top1 $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $3}'`
+train_accuracy=`grep 'accuracy =' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $13}'|awk -F "," '{print $1}'`
+
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
@@ -175,7 +180,7 @@ ActualFPS=${FPS}
 TrainingTime=`expr ${batch_size} \* ${RANK_SIZE} \* 1000 \/ ${FPS}`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep loss $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | grep -v top1 | awk -F  " " '{print $(NF-3)}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $8}' |awk -F ":" '{print $2}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`

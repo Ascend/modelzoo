@@ -42,7 +42,17 @@ export COMBINED_ENABLE=1
 export DYNAMIC_OP="ADD#MUL"
 #HCCL白名单开关,1-关闭/0-开启
 export HCCL_WHITELIST_DISABLE=1
-
+#设置device侧日志登记为error
+${install_path}/driver/tools/msnpureport -g error -d 0
+${install_path}/driver/tools/msnpureport -g error -d 1
+${install_path}/driver/tools/msnpureport -g error -d 2
+${install_path}/driver/tools/msnpureport -g error -d 3
+${install_path}/driver/tools/msnpureport -g error -d 4
+${install_path}/driver/tools/msnpureport -g error -d 5
+${install_path}/driver/tools/msnpureport -g error -d 6
+${install_path}/driver/tools/msnpureport -g error -d 7
+#关闭Device侧Event日志
+${install_path}/driver/tools/msnpureport -e disable
 
 path_lib=$(python3.7 -c """
 import sys

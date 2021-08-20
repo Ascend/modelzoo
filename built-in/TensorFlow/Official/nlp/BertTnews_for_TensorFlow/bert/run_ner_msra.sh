@@ -1,7 +1,7 @@
 export JOB_ID=10086
 #export PROFILING_DIR=/var/log/npu/profiling/container/0
 export DEVICE_ID=0
-export PROFILING_MODE=true
+export PROFILING_MODE=false
 export RANK_ID=0
 export RANK_SIZE=1
 export RANK_TABLE_FILE=new_rank_table_1p.json

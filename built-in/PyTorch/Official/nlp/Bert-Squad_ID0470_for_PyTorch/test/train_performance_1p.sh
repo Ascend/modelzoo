@@ -120,6 +120,8 @@ do
 		  --num_train_epochs ${train_epochs} \
 		  --seed 1 \
 		  --fp16 \
+		  --max_steps 100 \
+		  --use_npu \
 		  --loss_scale 4096 \
 		  --vocab_file "data/uncased_L-24_H-1024_A-16/vocab.txt" \
 		  --do_eval \

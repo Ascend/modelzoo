@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+source ./env.sh
 python3.7 test_net.py \
     --arch=rfcn \
     --dataset=pascal_voc \

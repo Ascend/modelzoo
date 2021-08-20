@@ -1,0 +1,2 @@
+tensorflow=1.15.0
+python=3.7.5

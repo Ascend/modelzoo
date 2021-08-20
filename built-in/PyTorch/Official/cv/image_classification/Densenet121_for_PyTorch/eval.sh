@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
+source env_npu.sh
 ip=$(hostname -I|awk '{print $1}')
 export ASCEND_SLOG_PRINT_TO_STDOUT=0
 su HwHiAiUser -c "adc --host ${ip}:22118 --log \"SetLogLevel(0)[error]\" --device 7"

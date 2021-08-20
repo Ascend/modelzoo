@@ -17,7 +17,7 @@ data_path=""
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network=pix2pix_for_TensorFlow
+Network=Pix2Pix_ID0359_for_TensorFlow
 #训练epoch
 train_epochs=2
 #训练batch_size

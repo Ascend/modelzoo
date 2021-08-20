@@ -154,7 +154,7 @@ CMD+=" --npu_id=6"
 CMD+=" --loss_scale=16384.0"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="taskset -c 0-31 python3.7 -u $CMD"
+CMD="taskset -c 0-31  python3.7 -u $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size \* $num_gpus)
@@ -232,7 +232,7 @@ CMD+=" --npu_id=6"
 CMD+=" --loss_scale=16384.0"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="taskset -c 0-31 python3.7 -u $CMD"
+CMD="taskset -c 0-31  python3.7 -u $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size_phase2 \* $num_gpus)

@@ -8,7 +8,7 @@
 
 **发布者（Publisher）：huawei**
 
-**应用领域（Application Domain）：Classification**
+**应用领域（Application Domain）： Image Classification**
 
 **版本（Version）：1.2**
 

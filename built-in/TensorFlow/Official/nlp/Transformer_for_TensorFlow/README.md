@@ -206,7 +206,7 @@ run_config = NPURunConfig(
     
     ```
             bash transformer_1p/transformer_main_1p.sh
-        ```
+    ```
 
 
     5.  8卡训练。
@@ -255,9 +255,9 @@ run_config = NPURunConfig(
         4.2 执行指令：
 
             perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
-    
+        
             例如：
-    
+        
             perl multi-bleu.perl /data/wmt-ende/newstest2014.tok.de.forbleu < output-0603.forbleu
 
 <h2 id="高级参考.md">高级参考</h2>
@@ -425,10 +425,48 @@ BLEU = 28.74, 59.5/34.3/22.2/15.0 (BP=1.000, ratio=1.029, hyp_len=66369, ref_len
 MODEL_DIR="./model_dir_base"  ckpt的路径
 vocab_source: /home/wmt-ende/vocab.share   --- vocab文件的路径
 vocab_target: /home/wmt-ende/vocab.share   --- vocab文件的路径
---output_filename: "infer-b${beam}.pb"  --- 输出的pb模型的文件名
-
-注意：模型固化大概需要一个小时
 ```
+
+注意：
+
+1、模型固化前需要参考 [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)设置环境变量；可以直接执行脚本
+
+source  env.sh 使环境变量生效，环境变量的路径中，export install_path=/usr/local/Ascend 根据实际替换
+
+2、由于Transformer模型较大，同时涉及动态shape，在线推理的图编译时间会较长；建议如果做在线推理的话，使用medium的模型端到端打通；
+
+训练时修改transformer_main_1p.sh或者8p下对应的脚本命令修改最后的拉起命令为train-ende_medium.sh，样例脚本如下
+
+```
+$ cat transformer_main_1p.sh
+#!/bin/bash
+dir=`pwd`
+
+# Autotune
+export FLAG_AUTOTUNE="" #"RL,GA"
+export TUNE_BANK_PATH=/home/HwHiAiUser/custom_tune_bank
+export ASCEND_DEVICE_ID=0
+mkdir -p $TUNE_BANK_PATH
+chown -R HwHiAiUser:HwHiAiUser $TUNE_BANK_PATH
+
+# DataDump
+export FLAG_ENABLE_DUMP=False
+export DUMP_PATH=/var/log/npu/dump
+export DUMP_STEP="0|2"
+export DUMP_MODE="all"
+mkdir -p $DUMP_PATH
+chown -R HwHiAiUser:HwHiAiUser $DUMP_PATH
+
+export JOB_ID=10086
+export DEVICE_ID=2
+export RANK_ID=0
+export RANK_SIZE=1
+export RANK_TABLE_FILE=${dir}/new_rank_table_1p.json
+cd ../
+sh train-ende_medium.sh
+```
+
+3、medium的模型固化时间大概15min
 
 
 
@@ -448,3 +486,4 @@ python3.7.5 transformer_online_inference.py
 --batchSize  在线推理的BatchSize
 ```
 
+在线推理由于涉及动态shape的模型编译，时间会比较长；如果是medium的模型，完全执行完约1h

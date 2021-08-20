@@ -87,18 +87,18 @@ We also supoort the predict_openpose.sh to run the steps all above except **buil
 ***
 OpenPose Inference ：
 
-| Type | IoU | Area | MaxDets | Result | fps |
-| :------- | :------- | :------- | :------- | :------- | :------- |
-| Average Precision  (AP) | 0.50:0.95 | all | 20 | 0.399 | 16.48 |
-| Average Precision  (AP) | 0.50 | all | 20 | 0.648 | 16.48 |
-| Average Precision  (AP) | 0.75| all | 20 | 0.400 | 16.48 |
-| Average Precision  (AP) | 0.50:0.95 | medium | 20 | 0.364 | 16.48 |
-| Average Precision  (AP) | 0.50:0.95 | large | 20 | 0.443 | 16.48 |
-| Average Recall     (AR) | 0.50:0.95 | all | 20 | 0.456 | 16.48 |
-| Average Recall     (AR) | 0.50 | all | 20 | 0.683 | 16.48 |
-| Average Recall     (AR) | 0.75 | all | 20 | 0.465 | 16.48 |
-| Average Recall     (AR) | 0.50:0.95 | medium | 20 | 0.371 | 16.48 |
-| Average Recall     (AR) | 0.50:0.95 | large | 20 | 0.547 | 16.48 |
+| Type | IoU | Area | MaxDets | Result |
+| :------- | :------- | :------- | :------- | :------- |
+| Average Precision  (AP) | 0.50:0.95 | all | 20 | 0.399 |
+| Average Precision  (AP) | 0.50 | all | 20 | 0.648 |
+| Average Precision  (AP) | 0.75| all | 20 | 0.400 |
+| Average Precision  (AP) | 0.50:0.95 | medium | 20 | 0.364 |
+| Average Precision  (AP) | 0.50:0.95 | large | 20 | 0.443 |
+| Average Recall     (AR) | 0.50:0.95 | all | 20 | 0.456 |
+| Average Recall     (AR) | 0.50 | all | 20 | 0.683 |
+| Average Recall     (AR) | 0.75 | all | 20 | 0.465 |
+| Average Recall     (AR) | 0.50:0.95 | medium | 20 | 0.371 |
+| Average Recall     (AR) | 0.50:0.95 | large | 20 | 0.547 |
 
 ***
 

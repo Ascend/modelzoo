@@ -80,9 +80,10 @@ do
     fi
 
      # 绑核，不需要的绑核的模型删除，需要模型审视修改
-    let a=RANK_ID*12
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
     let b=RANK_ID+1
-    let c=b*12-1
+    let c=b*${corenum}/${RANK_SIZE}-1
     nohup taskset -c $a-$c python3.7 ${cur_path}/../main.py \
         --arch=mobilenet \
         --data=${data_path} \

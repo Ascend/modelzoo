@@ -117,7 +117,7 @@ parser.add_argument('--loss-scale', default=64., type=float,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
-parser.add_argument('--class-nums', default=10, type=int, help='class-nums only for pretrain')
+parser.add_argument('--class-nums', default=1000, type=int, help='class-nums only for pretrain')
 
 
 warnings.filterwarnings('ignore')

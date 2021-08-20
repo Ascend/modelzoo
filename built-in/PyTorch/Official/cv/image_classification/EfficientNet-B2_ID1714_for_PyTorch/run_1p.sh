@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source npu_set_env.sh
+source env_npu.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
 
@@ -10,7 +10,7 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-taskset -c 0-95 python3.7 ${currentDir}/examples/imagenet/main.py \
+python3.7 ${currentDir}/examples/imagenet/main.py \
     --data=/data/imagenet \
     --arch=efficientnet-b0 \
     --batch-size=512 \

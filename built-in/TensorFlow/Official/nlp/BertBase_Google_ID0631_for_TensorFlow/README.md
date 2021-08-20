@@ -10,7 +10,7 @@
 ## 基本信息
 
 - 发布者（Publisher）：huawei
-- 应用领域（Application Domain）：NLP
+- 应用领域（Application Domain）：Natural Language Processing
 - 版本（Version）：1.2
 - 修改时间（Modified） ：2021.07.17
 - 大小（Size）：1.3G

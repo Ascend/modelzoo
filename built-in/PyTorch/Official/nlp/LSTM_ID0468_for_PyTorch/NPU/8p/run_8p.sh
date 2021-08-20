@@ -40,16 +40,18 @@ fi
 if [ $stage -le 2 ]; then
     echo "Step 2: Acoustic Model(CTC) Training..."
     taskset -c 0-128 python3 steps/train_ctc.py \
-    --rank 0 \
-    --world_size 1 \
-    --dist_backend 'hccl' \
-    --dist_url 'tcp://127.0.0.1:50000' \
-    --multiprocessing_distributed \
-    --device_list 0,1,2,3,4,5,6,7 \
-    --loss_scale 128 \
-    --opt_level O2 \
-    --conf $config_file \
-    --addr $(hostname -I |awk '{print $1}') > ${train_log_dir}/lstm_8p.log 2>&1 &
+	--rank 0 \
+	--world_size 1 \
+	--dist_backend 'hccl' \
+	--dist_url 'tcp://127.0.0.1:50000' \
+	--multiprocessing_distributed \
+	--device_list 0,1,2,3,4,5,6,7 \
+	--device_id 0 \
+	--apex \
+	--loss_scale 128 \
+	--opt_level O2 \
+	--conf 'conf/ctc_config.yaml' \
+	--addr $(hostname -I |awk '{print $1}') > ${train_log_dir}/lstm_8p.log 2>&1 &
     exit 1
 
 fi

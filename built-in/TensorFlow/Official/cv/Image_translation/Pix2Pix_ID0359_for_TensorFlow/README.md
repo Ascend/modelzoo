@@ -10,10 +10,10 @@
 ## 基本信息
 
 -   发布者（Publisher）：Huawei
--   应用领域（Application Domain）： CV
--   版本（Version）：1.2
+-   应用领域（Application Domain）： Machine Translation
+-   版本（Version）：1.1
 -   修改时间（Modified） ：2021.7.19
--   大小（Size）：687M**
+-   大小（Size）：736K
 -   框架（Framework）：TensorFlow 1.15.0
 -   模型格式（Model Format）：ckpt
 -   精度（Precision）：Mixed

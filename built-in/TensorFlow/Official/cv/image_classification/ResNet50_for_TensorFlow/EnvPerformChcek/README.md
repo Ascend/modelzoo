@@ -15,3 +15,14 @@ EnvCheck.sh
  **Matters needing attention** 
 
 For the check of computing power, you need to obtain the npusmi tool query of product release
+
+Supplement some requirements for relevant parameters obtained by npusmi tool:
+
+Device count no less than 8
+Device health status should be 0 (normal)
+Device memory frequency no less than 1000 HZ
+Device HBM frequency no less than 1000 HZ
+RoCE network health status should be 0(RDFX_DETECT_OK) or 6(RDFX_DETECT_INIT)
+AICPU current frequency no less than 2000 
+AICPU num no less than 14
+AICore frequency no less than 1000 HZ

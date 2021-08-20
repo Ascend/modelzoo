@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source scripts/npu_set_env.sh
+source scripts/env_npu.sh
 
 device_id_list=0,1,2,3,4,5,6,7
 currentDir=$(cd "$(dirname "$0")";pwd)/..
@@ -13,7 +13,7 @@ python3.7 -u ${currentDir}/8p_main_med.py \
     --data=/data/imagenet \
     --addr=$(hostname -I |awk '{print $1}') \
     --seed=49  \
-    --workers=184 \
+    --workers=$(nproc) \
     --learning-rate=4 \
     --print-freq=1 \
     --eval-freq=5 \

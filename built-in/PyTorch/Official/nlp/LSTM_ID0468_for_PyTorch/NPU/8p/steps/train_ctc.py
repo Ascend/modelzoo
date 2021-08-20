@@ -14,6 +14,8 @@
 
 # !/usr/bin/python
 # encoding=utf-8
+import warnings
+warnings.filterwarnings('ignore')
 
 import os
 import sys
@@ -36,7 +38,6 @@ from apex import amp
 sys.path.append('./')
 from models.model_ctc import *
 from utils.data_loader import Vocab, SpeechDataset, SpeechDataLoader
-import warnings
 
 supported_rnn = {'nn.LSTM': nn.LSTM, 'nn.GRU': nn.GRU, 'nn.RNN': nn.RNN}
 supported_activate = {'relu': nn.ReLU, 'tanh': nn.Tanh, 'sigmoid': nn.Sigmoid}
@@ -75,7 +76,6 @@ parser.add_argument('--opt_level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--addr', default='90.88.145.42', type=str, help='master addr')
 
-warnings.filterwarnings('ignore')
 
 MAX = 2147483647
 
@@ -350,12 +350,12 @@ def main_worker(dev, npus_per_node, args, opts):
     print(params)
 
     loss_fn = nn.CTCLoss(reduction='sum').to(device)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
+
     optimizer = apex.optimizers.NpuFusedAdam(model.parameters(), lr=init_lr, weight_decay=weight_decay)
     model = model.to(device)
-    #if args.opt_level:
+
     if args.apex:
-        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
+        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale, combine_grad=True)
 
     model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[device_id], broadcast_buffers=False)
 

@@ -10,10 +10,10 @@
 ## 基本信息
 
 -   发布者（Publisher）：Huawei
--   应用领域（Application Domain）： CV
--   版本（Version）：1.2
+-   应用领域（Application Domain）： Image Classification
+-   版本（Version）：1.1
 -   修改时间（Modified） ：2021.7.21
--   大小（Size）：687M**
+-   大小（Size）：80K
 -   框架（Framework）：TensorFlow 1.15.0
 -   模型格式（Model Format）：ckpt
 -   精度（Precision）：Mixed
@@ -22,6 +22,8 @@
 -   描述（Description）：基于TensorFlow框架IRIS数据集的MLP模型
 
 ## 概述
+
+- 多层感知器（Multilayer Perceptron,缩写MLP）是一种前向结构的人工神经网络，映射一组输入向量到一组输出向量。MLP可以被看作是一个有向图，由多个的节点层所组成，每一层都全连接到下一层。除了输入节点，每个节点都是一个带有非线性激活函数的神经元（或称处理单元）。一种被称为反向传播算法的监督学习方法（BP算法）常被用来训练MLP。MLP是感知器的推广，克服了感知器不能对线性不可分数据进行识别的弱点。
 
 - 参考论文：
 

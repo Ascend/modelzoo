@@ -90,7 +90,7 @@ def parse_args():
                         help="""log directory""")
     parser.add_argument('--restore_path', default='',
                         help="""restore path""")
-    parser.add_argument('--restore_exclude', default=['dense_2'],
+    parser.add_argument('--restore_exclude', default=['dense_2','global_step'],
                         type=ast.literal_eval, help="""restore_exclude""")
     parser.add_argument('--class_num', default=1000, type=int,
                         help="the class num")

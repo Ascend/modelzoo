@@ -55,10 +55,10 @@ fi
 
 
 
-#CPU使用统计，当前参考值80%
+#CPU使用统计，当前参考值70%
 cpu_idle=$(sar -u 1 1| awk '/Average/{print $8}')
 #if [ $(echo "$cpu_idle < 80"|bc) = 1 ];then
-if [ $(awk -v x=$cpu_idle -v y=80 'BEGIN {printf"%d",x/y}') = 0 ];then
+if [ $(awk -v x=$cpu_idle -v y=70 'BEGIN {printf"%d",x/y}') = 0 ];then
 echo -e "CPU空闲率为:\033[31m$cpu_idle （不满足性能要求）\033[0m"
 Perform_flag=1
 else
@@ -104,18 +104,18 @@ swap_total=$(free -m | awk '/Swap/{print $2}')
 swap_free=$(free -m | awk '/Swap/{print $NF}')
 swap_leftpert=$(printf "%d" $((swap_free*100/swap_total)))
 #if [ $(echo "$swap_total < 4095"|bc) = 1 ] && [ $(echo "$swap_leftpert < 80"|bc) = 1 ];then
-if [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') = 0 ] && [ $(awk -v x=$swap_leftpert -v y=80 'BEGIN {printf"%d",x/y}') = 0 ];then
+if [ $(awk -v x=$swap_total -v y=2000 'BEGIN {printf"%d",x/y}') = 0 ] && [ $(awk -v x=$swap_leftpert -v y=70 'BEGIN {printf"%d",x/y}') = 0 ];then
 echo -e "本机swap总容量:\033[31m$swap_total\033[0m，剩余swap容量:\033[31m$swap_free （不满足性能要求）\033[0m"
 Perform_flag=1
-#elif [ $(echo "$swap_total < 4095"|bc) = 1 ] && [ $(echo "$swap_leftpert >= 80"|bc) = 1 ];then
-elif [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') = 0 ] && [ $(awk -v x=$swap_leftpert -v y=80 'BEGIN {printf"%d",x/y}') = 1 ];then
+#elif [ $(echo "$swap_total < 2000"|bc) = 1 ] && [ $(echo "$swap_leftpert >= 80"|bc) = 1 ];then
+elif [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') = 0 ] && [ $(awk -v x=$swap_leftpert -v y=70 'BEGIN {printf"%d",x/y}') = 1 ];then
 echo -e "本机swap总容量:\033[31m$swap_total\033[0m，剩余swap容量:\033[32m$swap_free （不满足性能要求）\033[0m"
 Perform_flag=1
-#elif [ $(echo "$swap_total >= 4095"|bc) = 1 ] && [ $(echo "$swap_leftpert >= 80"|bc) = 1 ];then
-elif [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') -ge 1 ] && [ $(awk -v x=$swap_leftpert -v y=80 'BEGIN {printf"%d",x/y}') = 1 ];then
+#elif [ $(echo "$swap_total >= 2000"|bc) = 1 ] && [ $(echo "$swap_leftpert >= 80"|bc) = 1 ];then
+elif [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') -ge 1 ] && [ $(awk -v x=$swap_leftpert -v y=70 'BEGIN {printf"%d",x/y}') = 1 ];then
 echo -e "本机swap总容量:\033[32m$swap_total\033[0m，剩余swap容量:\033[32m$swap_free （满足性能要求）\033[0m"
-#elif [ $(echo "$swap_total >= 4095"|bc) = 1 ] && [ $(echo "$swap_leftpert < 80"|bc) = 1 ];then
-elif [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') -ge 1 ] && [ $(awk -v x=$swap_leftpert -v y=80 'BEGIN {printf"%d",x/y}') = 0 ];then
+#elif [ $(echo "$swap_total >= 2000"|bc) = 1 ] && [ $(echo "$swap_leftpert < 80"|bc) = 1 ];then
+elif [ $(awk -v x=$swap_total -v y=4095 'BEGIN {printf"%d",x/y}') -ge 1 ] && [ $(awk -v x=$swap_leftpert -v y=70 'BEGIN {printf"%d",x/y}') = 0 ];then
 echo -e "本机swap总容量:\033[32m$swap_total\033[0m，剩余swap容量:\033[31m$swap_free （不满足性能要求）\033[0m"
 Perform_flag=1
 fi
@@ -142,7 +142,7 @@ fi
 disk=$(df -h)
 disk_npu=$(df -h | grep "$disk_path" | awk '{print $5}' | tr -cd "[0-9]")
 #if [ $(echo "$disk_npu >= 80"|bc) = 1 ];then
-if [ $(awk -v x=$disk_npu -v y=80 'BEGIN {printf"%d",x/y}') = 1 ];then
+if [ $(awk -v x=$disk_npu -v y=95 'BEGIN {printf"%d",x/y}') = 1 ];then
 echo -e "磁盘信息如下：\033[31m（$disk_path不满足性能要求）\033[0m"
 echo -e "\033[31m$disk\033[0m"
 Perform_flag=1

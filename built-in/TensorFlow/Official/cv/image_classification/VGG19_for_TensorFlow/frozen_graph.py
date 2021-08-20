@@ -14,14 +14,13 @@
 # ============================================================================
 import tensorflow as tf
 from tensorflow.python.tools import freeze_graph
-from vgg import vgg
-from npu_bridge.estimator import npu_ops
+from tensorflow.python.framework import graph_util
+from nets import nets_factory
 import argparse
-
 
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--ckpt_path', default=1,
+    parser.add_argument('--ckpt_path', default="",
                         help="""set checkpoint path""")
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
@@ -35,19 +34,21 @@ def main():
     tf.reset_default_graph()
     # set inputs node
     inputs = tf.placeholder(tf.float32, shape=[None, 224, 224, 3], name="input")
-    top_layer = vgg.vgg_19(inputs, 1000, False)
     # create inference graph
+    network_fn = nets_factory.get_network_fn('mobilenet_v1', num_classes=1001, weight_decay=0.0, is_training=False)
+    logits, end_points = network_fn(inputs, reuse=tf.AUTO_REUSE)
+
     with tf.Session() as sess:
         tf.train.write_graph(sess.graph_def, './', 'model.pb')
         freeze_graph.freeze_graph(
-		        input_graph='./model.pb',
+		        input_graph='model.pb',
 		        input_saver='',
 		        input_binary=False, 
 		        input_checkpoint=args.ckpt_path,
-		        output_node_names='dense_2/BiasAdd',  #graph outputs node
+		        output_node_names='MobilenetV2/Logits/output',  # graph outputs node
 		        restore_op_name='save/restore_all',
 		        filename_tensor_name='save/Const:0',
-		        output_graph='./vgg19_tf_910.pb',   #graph outputs name
+		        output_graph='mobileNetv2.pb',   # graph outputs name
 		        clear_devices=False,
 		        initializer_nodes='')
     print("done")

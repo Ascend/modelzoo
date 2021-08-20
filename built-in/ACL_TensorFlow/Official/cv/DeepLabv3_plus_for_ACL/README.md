@@ -80,8 +80,3 @@ Our result was obtained by running the applicable inference script. To achieve t
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 2913 images | 74.3% |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |Platform |
-| :---------------: | :--------: | :-------------------: |:-------------------: 
-| offline Inference |     1      |       3.4 imgs/s       |  Ascend310*1        |

@@ -6,7 +6,7 @@ cur_path=`pwd`
 #集合通信参数,不需要修改
 
 export RANK_SIZE=1
-export RANK_TABLE_FILE=${cur_path}/../r1/resnet/configs/1p.json
+#export RANK_TABLE_FILE=${cur_path}/../r1/resnet/configs/1p.json
 export JOB_ID=10087
 RANK_ID_START=0
 

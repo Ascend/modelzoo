@@ -20,26 +20,34 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-SPARSE_FEATURES_NUM = 27
-DENSE_FEATURES_NUM = 14
 
-sparse_features = ['C' + str(i) for i in range(1, SPARSE_FEATURES_NUM)]
-dense_features = ['I' + str(i) for i in range(1, DENSE_FEATURES_NUM)]
-target = ['label']
 
-name_column = target + dense_features + sparse_features
+if __name__ == '__main__':
+    data_path = os.path.abspath(sys.argv[1])
 
-csv_path = os.path.abspath(sys.argv[1])
-data = pd.read_csv(csv_path, names=name_column, sep='\t')
-data[sparse_features] = data[sparse_features].fillna('-1', )
-data[dense_features] = data[dense_features].fillna(0, )
+    SPARSE_FEATURES_NUM = 27
+    DENSE_FEATURES_NUM = 14
 
-for feat in sparse_features:
-    print(feat)
-    lbe = LabelEncoder()
-    data[feat] = lbe.fit_transform(data[feat])
-mms = MinMaxScaler(feature_range=(0, 1))
-data[dense_features] = mms.fit_transform(data[dense_features])
-train, test = train_test_split(data, test_size=0.1, random_state=2020)
-pd.DataFrame(train, columns=name_column).to_csv(os.path.dirname(csv_path) + '/wdl_trainval.txt', index=False, sep='\t')
-pd.DataFrame(test, columns=name_column).to_csv(os.path.dirname(csv_path) + '/wdl_test.txt', index=False, sep='\t')
+    sparse_features = ['C' + str(i) for i in range(1, SPARSE_FEATURES_NUM)]
+    dense_features = ['I' + str(i) for i in range(1, DENSE_FEATURES_NUM)]
+    target = ['label']
+
+    name_column = target + dense_features + sparse_features
+
+    data = pd.read_csv(data_path, names=name_column, sep='\t')
+    data[sparse_features] = data[sparse_features].fillna('-1', )
+    data[dense_features] = data[dense_features].fillna(0, )
+
+    for feat in sparse_features:
+        print(feat)
+        lbe = LabelEncoder()
+        data[feat] = lbe.fit_transform(data[feat])
+    mms = MinMaxScaler(feature_range=(0, 1))
+    data[dense_features] = mms.fit_transform(data[dense_features])
+    train, test = train_test_split(data, test_size=0.1, random_state=2020)
+
+    pd.DataFrame(train, columns=name_column).to_pickle(os.path.dirname(data_path) + '/wdl_trainval.pkl', index=False)
+    pd.DataFrame(test, columns=name_column).to_pickle(os.path.dirname(data_path) + '/wdl_test.pkl', index=False)
+
+    # the val dataset for inferring
+    pd.DataFrame(test, columns=name_column).to_csv(os.path.dirname(data_path) + '/wdl_test.txt', index=False)

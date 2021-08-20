@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-source pt_set_env.sh
+source env_npu.sh
 
 python3.7 pthtar2onnx.py

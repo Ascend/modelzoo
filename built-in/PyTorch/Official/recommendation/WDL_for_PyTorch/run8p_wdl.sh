@@ -10,8 +10,11 @@ then
 	let p_end=23+24*i
 	taskset -c $p_start-$p_end $CMD python3.7 -u run_classification_criteo_wdl.py \
         --device_id $i \
-        --data_path /home/criteo \
-        --lr=0.0008 \
+        --data_path ../data/criteo/origin_data \
+        --lr=0.0001 \
+	      --sparse_embed_dim 4 \
+	      --batch_size 1024 \
+	      --epochs 3 \
         --amp \
         --device_num 8 \
         --dist > train_$i.log 2>&1 &
@@ -21,8 +24,11 @@ else
     do
     python3.7 -u run_classification_criteo_wdl.py \
         --device_id $i \
-        --data_path /home/criteo \
-        --lr=0.0008 \
+        --data_path ../data/criteo/origin_data \
+        --lr=0.0001 \
+	      --sparse_embed_dim 4 \
+	      --batch_size 1024 \
+	      --epochs 3 \
         --amp \
         --device_num 8 \
         --dist > train_$i.log 2>&1 &

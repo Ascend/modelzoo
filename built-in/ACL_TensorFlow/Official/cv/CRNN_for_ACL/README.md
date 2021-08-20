@@ -90,10 +90,3 @@ Our result were obtained by running the applicable training script. To achieve t
 | SVT          | 88.9%             | 77.2%             |
 | ICDAR2013    | 93.5%             | 87.3%             |
 | IIIT5K       | 91.4%             | 79.6%             |
-
-
-#### Inference performance:
-
-|       model       | batch size | Inference performance | Platform Information |
-| :---------------: | :--------: | :-------------------: |:-------------------: |
-| offline Inference |     64      |       1070 img/s       | Ascend310*1        |

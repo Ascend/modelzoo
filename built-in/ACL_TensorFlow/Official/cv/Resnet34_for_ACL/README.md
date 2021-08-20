@@ -1,8 +1,8 @@
 
 
-# InceptionV3 Inference for Tensorflow 
+# Resnet34 Inference for Tensorflow 
 
-This repository provides a script and recipe to Inference of the InceptionV3 model.
+This repository provides a script and recipe to Inference of the Resnet34 model.
 
 ## Quick Start Guide
 
@@ -81,11 +81,6 @@ Our result was obtained by running the applicable inference script. To achieve t
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 10000 images | 51.8 %/ 76.2% |
 
-#### Inference performance results
-
-|       model       | batch size | Inference performance |Platform |
-| :---------------: | :--------: | :-------------------: |:-------------------: 
-| offline Inference |     1      |       164 imgs/s       |  Ascend310*1        |
 
 ## Reference
 https://github.com/taki0112/ResNet-Tensorflow

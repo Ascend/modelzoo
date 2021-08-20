@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+source ./env.sh
 taskset -c 0-19 python3.7 trainval_net.py \
     --net=res101 \
     --bs=4 \

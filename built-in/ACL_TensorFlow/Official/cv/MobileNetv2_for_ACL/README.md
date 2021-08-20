@@ -64,9 +64,3 @@ Our result were obtained by running the applicable inference script. To achieve 
 |       model       | **data**  |    Top1/Top5    |
 | :---------------: | :-------: | :-------------: |
 | offline Inference | 5W images | 71.75 %/ 90.48% |
-
-#### Inference performance results
-
-|       model       | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |       505 img/s       |

@@ -76,11 +76,6 @@ Our result were obtained by running the applicable inference script. To achieve 
 | :---------------: | :-------:  | :--------: | 
 | offline Inference | 500 images |    77%     | 
 
-#### Without flip Inference perfoemance results
-
-|        model      | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |       2.55 img/s      |
 
 ### flip  Inference accuracy results
 
@@ -88,8 +83,3 @@ Our result were obtained by running the applicable inference script. To achieve 
 | :---------------: | :-------:  | :--------: | 
 | offline Inference | 500 images |   77.24%   | 
 
-#### flip  Inference performance results
-
-|       model       | batch size | Inference performance |
-| :---------------: | :--------: | :-------------------: |
-| offline Inference |     1      |       2.54 img/s      |

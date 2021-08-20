@@ -88,7 +88,7 @@ class OnlineInference(object):
 
         # 配置2：在线推理场景下建议保持默认值force_fp16，使用float16精度推理，以获得较优的性能
         # custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("force_fp16")
-        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_fp32_to_fp16")
         #custom_op.parameter_map["mix_compile_mode"].b = True  # 开启混合计算
         #custom_op.parameter_map["dynamic_input"].b = True
         #custom_op.parameter_map["dynamic_graph_execute_mode"].s = tf.compat.as_bytes("lazy_recompile")
@@ -214,7 +214,7 @@ if __name__ == '__main__':
     args = parse_args()
     data_dir = args.data_dir
     output_dir = args.output_dir
-    infer_source_path = output_dir + "/transformer"
+    infer_source_path = output_dir
     real_file = data_dir + "/newstest2014.tok.bpe.32000.de"
     infer_out_dir = "./result_Files"
     vocab_file = data_dir + "/vocab.share"

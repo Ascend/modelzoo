@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source pt_set_env.sh
+source env_npu.sh
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`

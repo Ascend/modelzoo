@@ -43,7 +43,7 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
 - 适配昇腾 AI 处理器的实现：
     
         
-  https://gitee.com/zhou-biao-biao/modelzoo/edit/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/
+  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet169_ID1580_for_TensorFlow
         
 
 

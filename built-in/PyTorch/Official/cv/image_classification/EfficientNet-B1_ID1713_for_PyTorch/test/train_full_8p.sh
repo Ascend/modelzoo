@@ -1,5 +1,5 @@
 #!/bin/bash
-#source env.sh
+#source env_npu.sh
 #当前路径,不需要修改
 cur_path=`pwd`
 
@@ -100,7 +100,7 @@ fi
 start_time=$(date +%s)
 # source 环境变量
 #source ${test_path_dir}/env.sh
-taskset -c 0-95 python3 ${test_path_dir}/../examples/imagenet/main.py \
+python3 ${test_path_dir}/../examples/imagenet/main.py \
         --data=${data_path} \
         --arch=efficientnet-b1 \
         --batch-size=${batch_size} \

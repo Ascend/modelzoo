@@ -9,10 +9,10 @@
 
 ## 基本信息
 -   发布者（Publisher）：Huawei
--   应用领域（Application Domain）： NLP 
--   版本（Version）：1.2
+-   应用领域（Application Domain）： Natural Language
+-   版本（Version）：1.1
 -   修改时间（Modified） ：2021.7.19
--   大小（Size）：19.6M
+-   大小（Size）：888K
 -   框架（Framework）：TensorFlow 1.15.0
 -   模型格式（Model Format）：ckpt
 -   精度（Precision）：Mixed
@@ -22,8 +22,8 @@
 
 <h2 id="概述">概述</h2>
 
-Textcnn_ID0123_For_Tensorflow是一个文本分类网络，主要特点是从过滤器中提取特征，这些特征形成倒数第二层并传递到全连接softmax层，其输出是概率标签上的分布。
-在其中一种模型变体中进行了实验，实验中有两个词向量“通道”--一个在整个训练过程中保持静止，并且通过反向传播进行微调。在多通道架构中，如每个过滤器应用于两个通道并将结果相加以计算。该模型在其他方面等效于单个渠道架构。
+使用卷积神经网络以及循环神经网络进行中文文本分类。
+本文是基于TensorFlow在中文数据集上的简化实现，使用了字符级CNN对中文文本进行分类，达到了较好的效果。
 
 
 - 参考论文：

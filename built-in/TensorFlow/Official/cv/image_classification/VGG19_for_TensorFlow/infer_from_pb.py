@@ -28,15 +28,15 @@ def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--batchsize', default=1,
                         help="""batchsize""")
-    parser.add_argument('--model_path', default='pb/vgg19_tf_910.pb',
+    parser.add_argument('--model_path', default='pb/mobileNetv2.pb',
                         help="""pb path""")
-    parser.add_argument('--image_path', default = '../../image-test/',
+    parser.add_argument('--image_path', default = '../../image-1024/',
                         help = """the data path""")
     parser.add_argument('--label_file', default='val_lable.txt',
                         help="""label file""")
     parser.add_argument('--input_tensor_name', default = 'input:0',
                         help = """input_tensor_name""")
-    parser.add_argument('--output_tensor_name', default='dense_2/BiasAdd:0',
+    parser.add_argument('--output_tensor_name', default='MobilenetV2/Logits/output:0',
                         help="""output_tensor_name""")
     args, unknown_args = parser.parse_known_args()
     if len(unknown_args) > 0:
@@ -53,7 +53,7 @@ def read_file(image_name, path):
             if image_name in str(name):
                 num = str(name).split(" ")[1]
                 break
-    return int(num)
+    return int(num) + 1
 
 class Classifier(object):
     # set batch_size
@@ -61,11 +61,14 @@ class Classifier(object):
     batch_size = int(args.batchsize)
 
     def __init__(self):
+        # 定义模型的路径
+
+        # NPU模型编译和优化配置
         # --------------------------------------------------------------------------------
         config = tf.ConfigProto()
         custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name = "NpuOptimizer"
-        #  1）run on Ascend NPU
+        # 1）run on Ascend NPU
         custom_op.parameter_map["use_off_line"].b = True
 
         # 2）recommended use fp16 datatype to obtain better performance
@@ -74,11 +77,11 @@ class Classifier(object):
         # 3）disable remapping
         config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
 
-        #4）set graph_run_mode=0，obtain better performance
+        # 4）set graph_run_mode=0，obtain better performance
         custom_op.parameter_map["graph_run_mode"].i = 0
         # --------------------------------------------------------------------------------
 
-        #  load model， set graph input nodes and output nodes
+        # load model， set graph input nodes and output nodes
         args = parse_args()
         self.graph = self.__load_model(args.model_path)
         self.input_tensor = self.graph.get_tensor_by_name(args.input_tensor_name)
@@ -104,7 +107,7 @@ class Classifier(object):
 
     def do_infer(self, batch_data):
         """
-        do infer
+        do inference
         :param image_data:
         :return:
         """
@@ -122,10 +125,10 @@ class Classifier(object):
 
     def batch_process(self, image_data, label_data):
         """
-        batch process
+        images preprocess
         :return:
         """
-        #  Get the batch information of the current input data, and automatically adjust the data to the fixed batch
+        # Get the batch information of the current input data, and automatically adjust the data to the fixed batch
         n_dim = image_data.shape[0]
         batch_size = self.batch_size
 
@@ -136,27 +139,29 @@ class Classifier(object):
             pad = np.zeros((batch_size - m, 224, 224, 3)).astype(np.float32)
             image_data = np.concatenate((image_data, pad), axis=0)
 
-        #  Define the Minis that can be divided into several batches
+        # Define the Minis that can be divided into several batches
         mini_batch = []
         mini_label = []
         i = 0
         while i < n_dim:
-            #  Define the Minis that can be divided into several batches
+            # Define the Minis that can be divided into several batches
             mini_batch.append(image_data[i: i + batch_size, :, :, :])
             mini_label.append(label_data[i: i + batch_size])
             i += batch_size
 
         return mini_batch, mini_label
 
+
 def normalize(inputs):
     imagenet_mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     imagenet_std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
     imagenet_mean = tf.expand_dims(tf.expand_dims(imagenet_mean, 0), 0)
     imagenet_std = tf.expand_dims(tf.expand_dims(imagenet_std, 0), 0)
-    inputs = inputs - imagenet_mean
+    inputs = inputs - imagenet_mean  # tf.subtract(inputs, imagenet_mean)
     inputs = inputs * (1.0 / imagenet_std)
 
     return inputs
+
 
 def image_process(image_path, label_file):
     ###image process
@@ -168,11 +173,18 @@ def image_process(image_path, label_file):
             image_file = os.path.join(image_path, file)
             image_name = image_file.split('/')[-1].split('.')[0]
             image = tf.gfile.FastGFile(image_file, 'rb').read()
-            img = tf.image.decode_jpeg(image, channels=3,fancy_upscaling=False,dct_method='INTEGER_FAST')
-            img = tf.image.resize_images(img, [256, 256])
-            img = tf.image.central_crop(img, 224.0/256)
-            img = normalize(img)
+            image = tf.image.decode_jpeg(image, channels=3)
+            if image.dtype != tf.float32:
+                image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+            image = tf.image.central_crop(image, central_fraction=0.875)
+            image = tf.expand_dims(image, 0)
+            image = tf.image.resize_bilinear(image, [224, 224],align_corners=False)
+            image = tf.squeeze(image, [0])
+            image = tf.subtract(image, 0.5)
+            img = tf.multiply(image, 2.0)
             images_count = images_count + 1
+            if tf.shape(img)[2].eval() == 1:
+                img = tf.image.grayscale_to_rgb(img)
             img = img.eval()
             imagelist.append(img)
             tf.reset_default_graph()

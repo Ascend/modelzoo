@@ -154,8 +154,9 @@ def create_infer_input_data(inputFile, vocabFile, outputFile, max_seq_length, cl
         vocab_file=vocabFile)
 
     input_files = []
-    for input_pattern in inputFile.split(","):
-        input_files.extend(tf.gfile.Glob(input_pattern))
+    input_files.append(inputFile)
+    #for input_pattern in inputFile.split(","):
+    #    input_files.extend(tf.gfile.Glob(input_pattern))
 
     tf.logging.info("*** Reading from input files ***")
     for input_file in input_files:

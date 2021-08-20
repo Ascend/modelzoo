@@ -29,7 +29,7 @@ index 6af75a7..4055a68 100644
 +            input,
 +            weight,
 +            offset,
-+            bias_i=bias,
++            bias=None,
 +            strides_i=stride,
 +            pads_i=padding,
 +            dilations_i=dilation,

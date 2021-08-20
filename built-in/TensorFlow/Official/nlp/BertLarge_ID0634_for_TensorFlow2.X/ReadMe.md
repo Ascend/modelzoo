@@ -6,21 +6,21 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Natural Language Processing**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
-**修改时间（Modified） ：2021.5.25**
+**修改时间（Modified） ：2021.8.15**
 
-**大小（Size）：471M**
+**大小（Size）：210KB**
 
-**框架（Framework）：TensorFlow 2.4.1**
+**框架（Framework）：TensorFlow_2.4.1**
 
 **模型格式（Model Format）：ckpt**
 
-**精度（Precision）：FP32**
+**精度（Precision）：Mixed**
 
 **处理器（Processor）：昇腾910**
 
@@ -32,9 +32,11 @@
 
 ## 简述
 
-BERT is a method of pre-training language representations, meaning that we traina general-purpose "language understanding" model on a large text corpus (likeWikipedia), and then use that model for downstream NLP tasks that we care about(like question answering). BERT outperforms previous methods because it is the first *unsupervised*, *deeply bidirectional* system for pre-training NLP.
+BERT模型的全称是：BidirectionalEncoder **Representations** from Transformer。BERT模型的目标是利用大规模无标注语料训练、获得文本的包含丰富语义信息的Representation，即：文本的语义表示，然后将文本的语义表示在特定NLP任务中作微调，最终应用于该NLP任务。
 
-*Unsupervised* means that BERT was trained using only a plain text corpus, which is important because an enormous amount of plain text data is publicly available on the web in many languages.    
+- 论文路径
+
+  https://arxiv.org/abs/1810.04805
 
 - 开源代码路径
 
@@ -42,7 +44,7 @@ BERT is a method of pre-training language representations, meaning that we train
 
 -   适配昇腾 AI 处理器的实现：
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertLarge_TF2.x_for_Tensorflow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/BertLarge_ID0634_for_TensorFlow2.X
 
 -   通过Git获取对应commit\_id的代码方法如下：
     
@@ -82,7 +84,22 @@ BERT is a method of pre-training language representations, meaning that we train
 昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
 ## 开启混合精度<a name="section20779114113713"></a>
-相关代码示例。
+拉起脚本中，传入--precision_mode='allow_mix_precision'
+
+```
+ ./train_performance_1p_16bs.sh --help
+
+parameter explain:
+    --precision_mode         precision mode(allow_fp32_to_fp16/force_fp16/must_keep_origin_dtype/allow_mix_precision)
+    --over_dump                  if or not over detection, default is False
+    --data_dump_flag         data dump flag, default is False
+    --data_dump_step             data dump step, default is 10
+    --profiling                  if or not profiling for performance debug, default is False
+    --data_path                  source data of training
+    -h/--help                    show help message
+```
+
+相关代码示例:
 
 ```
 flags.DEFINE_string(name='precision_mode', default= 'allow_fp32_to_fp16',
@@ -102,6 +119,7 @@ npu_device.global_options().precision_mode=FLAGS.precision_mode
     **表 1** 镜像列表
 
     <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
+    
     <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
     </th>
     <th class="cellrowborder" valign="top" width="25.52%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074498056_p75071327115313"><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><em id="i1522994919122"><a name="i1522994919122"></a><a name="i1522994919122"></a>镜像版本</em></p>
@@ -125,9 +143,26 @@ npu_device.global_options().precision_mode=FLAGS.precision_mode
 
 ## 数据集准备<a name="section361114841316"></a>
 
-参考：
+1、用户自行准备好数据集，包括训练数据集和验证数据集。使用的数据集是wikipedia
 
-https://github.com/sgpyc/training/tree/bert_tf2_input/language_model/tensorflow/bert
+2、训练的数据集放在train目录，验证的数据集放在eval目录
+
+3、bert 预训练的模型及数据集可以参考"简述->开源代码路径处理"
+
+数据集目录参考如下：
+
+```
+├── tfrecord
+│    ├──train   ├──part-00XXX.tfrecord
+│    │          │ ......         
+│    │          ├──part-00XXX.tfrecord
+│    ├──tf2_ckpt├──model.ckpt-28252.data-000000-of-000001
+│    |          ├──model.ckpt-28252.index
+│    ├──val     ├──eval.tfrecord
+                ├──eval_10k.tfrecord
+```
+
+
 
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。
@@ -212,42 +247,11 @@ https://github.com/sgpyc/training/tree/bert_tf2_input/language_model/tensorflow/
 
 
 
-<h2 id="迁移学习指导.md">迁移学习指导</h2>
+<h2 id="迁移学习指导.md">高级参考</h2>
 
-- 数据集准备。
+## 脚本和事例代码
 
-    1.  获取数据。
-        请参见“快速上手”中的数据集准备。
-    2.  数据集每个类别所占比例大致相同。
-    3.  数据目录结构如下：
-        
-        ```
-        |--eval
-        |   |--eval_10K.tfrecord 
-        |   |--eval.tfrecord
-        |--tf2_ckpt
-        |   |--model.ckpt-28252.data-00000-of-00001
-        |   |--model.ckpt-28252.index
-        |--train
-        |	|--part-00000-of-00500.tfrecord
-        |	|--part-00001-of-00500.tfrecord
-        |   |--......
-        ```
 ```
-
--  模型训练。
-
-    请参考“快速上手”章节。
-
--  模型评估。
-   
-    可以参考“模型训练”中训练步骤。
-
-<h2 id="高级参考.md">高级参考</h2>
-
-## 脚本和示例代码<a name="section08421615141513"></a>
-
-​```shell
 |--bert			#网络代码目录
 |   |--tf2_common
 |   |--modeling
@@ -259,7 +263,6 @@ https://github.com/sgpyc/training/tree/bert_tf2_input/language_model/tensorflow/
 |	|--train_full_1p_16bs.sh
 |	|--train_full_8p_64bs.sh
 |   |--......
-
 ```
 
 ## 脚本参数<a name="section6669162441511"></a>

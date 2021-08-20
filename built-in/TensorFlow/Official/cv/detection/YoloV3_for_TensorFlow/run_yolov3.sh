@@ -30,17 +30,18 @@ done
 
 export DEVICE_ID=$RANK_ID
 export DEVICE_INDEX=$RANK_ID
-export RANK_TABLE_FILE=rank_table.json
+#export RANK_TABLE_FILE=rank_table.json
 export JOB_ID=123678
 export FUSION_TENSOR_SIZE=1000000000
 
-KERNEL_NUM=$(($(nproc)/8))
-PID_START=$((KERNEL_NUM * RANK_ID))
-PID_END=$((PID_START + KERNEL_NUM - 1))
+corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+let a=RANK_ID*${corenum}/${RANK_SIZE}
+let b=RANK_ID+1
+let c=b*${corenum}/${RANK_SIZE}-1
 
 #sleep 5
-taskset -c  $PID_START-$PID_END python3 $MAIN_PATH/train.py \
---mode $MODE --train_file $data_path --save_dir $save_dir --batch_size $batch_size $5
+taskset -c  $a-$c python3 $MAIN_PATH/train.py \
+--mode $MODE --train_file $data_path --save_dir $save_dir --batch_size $batch_size
 
 mkdir graph
 mv *.txt graph

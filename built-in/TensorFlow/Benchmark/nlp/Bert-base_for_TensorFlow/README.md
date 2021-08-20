@@ -207,6 +207,7 @@
         bash scripts/run_8p.sh
         ```
 
+- 注意说明：当前Bert-base网络的下游任务（src/downstream）暂未调测
 
 <h2 id="高级参考.md">高级参考</h2>
 

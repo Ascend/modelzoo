@@ -16,7 +16,7 @@ from pathlib import Path
 import json
 import random
 import os
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 import torch
 import apex
@@ -384,14 +384,15 @@ def main_worker(index, opt):
 
     model, optimizer = make_data_parallel(model, optimizer, opt)
 
-    if opt.tensorboard and opt.is_master_node:
-        if opt.begin_epoch == 1:
-            tb_writer = SummaryWriter(log_dir=opt.result_path)
-        else:
-            tb_writer = SummaryWriter(log_dir=opt.result_path,
-                                      purge_step=opt.begin_epoch)
-    else:
-        tb_writer = None
+    #if opt.tensorboard and opt.is_master_node:
+    #    if opt.begin_epoch == 1:
+    #        tb_writer = SummaryWriter(log_dir=opt.result_path)
+    #    else:
+    #        tb_writer = SummaryWriter(log_dir=opt.result_path,
+    #                                  purge_step=opt.begin_epoch)
+    #else:
+    #    tb_writer = None
+    tb_writer = None
 
     prev_val_loss = None
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
