@@ -1,4 +1,21 @@
 #!/bin/bash
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# less required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# 设置环境变量
+source ./env.sh
 
 #当前路径,不需要修改
 cur_path=`pwd`
@@ -14,7 +31,7 @@ data_path=""
 Network="WDL_for_Pytorch"
 
 #训练batch_size,,需要模型审视修改
-batch_size=8192
+batch_size=32768
 
 #参数校验，不需要修改
 for para in $*
@@ -66,18 +83,22 @@ do
            --steps 1000 \
            --device_id $RANK_ID \
            --device_num 8 \
+           --sparse_embed_dim 4 \
+           --batch_size 4096 \
            --data_path=$data_path \
            --dist \
-           --lr=0.0008 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+           --lr=0.0009 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     else
 	    python3 -u run_classification_criteo_wdl.py \
            --amp \
            --steps 1000 \
            --device_id $RANK_ID \
            --device_num 8 \
+           --sparse_embed_dim 4 \
+           --batch_size 4096 \
            --data_path=$data_path \
            --dist \
-           --lr=0.0008 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+           --lr=0.0009 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     fi
 done
 wait
@@ -109,9 +130,7 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 #吞吐量
 ActualFPS=`awk -v x="$FPS" -v y="$RANK_SIZE" 'BEGIN{printf "%.3f\n", x*y}'`
 #单迭代训练时长
-TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${
-    
-}'}'`
+TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要模型审视修改
 grep Epoch $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep avg_sample_per_sec|awk -F "loss: " '{print $NF}'  >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt

@@ -1,4 +1,21 @@
 #!/bin/bash
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# less required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# 设置环境变量
+source ./env.sh
 
 #当前路径,不需要修改
 cur_path=`pwd`
@@ -14,7 +31,7 @@ data_path=""
 Network="WDL_for_Pytorch"
 
 #训练batch_size,,需要模型审视修改
-batch_size=8192
+batch_size=32768
 
 #参数校验，不需要修改
 for para in $*
@@ -65,17 +82,23 @@ do
            --amp \
            --device_id $RANK_ID \
            --device_num 8 \
+           --sparse_embed_dim 4 \
+           --batch_size 4096 \
+           --epochs 3 \
            --data_path=$data_path \
            --dist \
-           --lr=0.0008 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+           --lr=0.0009 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     else
 	    python3 -u run_classification_criteo_wdl.py \
            --amp \
            --device_id $RANK_ID \
            --device_num 8 \
+           --sparse_embed_dim 4 \
+           --batch_size 4096 \
+           --epochs 3 \
            --data_path=$data_path \
            --dist \
-           --lr=0.0008 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+           --lr=0.0009 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     fi
 done
 wait

@@ -19,7 +19,7 @@ export JOB_ID=9999001
 export RANK_TABLE_FILE=${currentDir}/8p.json
 export RANK_SIZE=8
 export RANK_ID=ascend8p
-export SLOG_PRINT_TO_STDOUT=0
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 
 device_group="0 1 2 3 4 5 6 7"
 

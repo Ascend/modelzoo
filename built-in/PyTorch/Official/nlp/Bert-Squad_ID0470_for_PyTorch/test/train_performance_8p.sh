@@ -145,7 +145,7 @@ echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
 step_time=`grep 'step_time : ' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $13}'`
 
-FPS=`awk 'BEGIN{printf "%d\n", '$batch_size'/'$step_time'}'`
+FPS=`awk 'BEGIN{printf "%d\n", '$batch_size'/'$step_time'*'$RANK_SIZE'}'`
 
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"

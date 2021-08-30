@@ -1,7 +1,6 @@
-# BSD 3-Clause License
+# -*- coding: utf-8 -*-
 
-# Copyright (c) Soumith Chintala 2016,
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -9,11 +8,12 @@
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# less required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ============================================================================
 
 import sys
 import os
@@ -46,8 +46,9 @@ if __name__ == '__main__':
     data[dense_features] = mms.fit_transform(data[dense_features])
     train, test = train_test_split(data, test_size=0.1, random_state=2020)
 
-    pd.DataFrame(train, columns=name_column).to_pickle(os.path.dirname(data_path) + '/wdl_trainval.pkl', index=False)
-    pd.DataFrame(test, columns=name_column).to_pickle(os.path.dirname(data_path) + '/wdl_test.pkl', index=False)
+    pd.DataFrame(train, columns=name_column).to_pickle(os.path.dirname(data_path) + '/wdl_trainval.pkl')
+    pd.DataFrame(test, columns=name_column).to_pickle(os.path.dirname(data_path) + '/wdl_test.pkl')
 
     # the val dataset for inferring
-    pd.DataFrame(test, columns=name_column).to_csv(os.path.dirname(data_path) + '/wdl_test.txt', index=False)
+    infer_column = target + sparse_features + dense_features
+    pd.DataFrame(test, columns=infer_column).to_csv(os.path.dirname(data_path) + '/wdl_infer.txt', index=False)

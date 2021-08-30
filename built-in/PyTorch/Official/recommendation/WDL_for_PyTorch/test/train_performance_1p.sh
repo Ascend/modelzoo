@@ -1,4 +1,21 @@
 #!/bin/bash
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# less required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# 设置环境变量
+source ./env.sh
 
 #当前路径,不需要修改
 cur_path=`pwd`
@@ -13,7 +30,7 @@ data_path=""
 Network="WDL_for_PyTorch"
 
 #训练batch_size,,需要模型审视修改
-batch_size=1024
+batch_size=4096
 
 #参数校验，不需要修改
 for para in $*
@@ -47,7 +64,10 @@ python3.7 run_classification_criteo_wdl.py  \
     --data_path=$data_path \
     --amp \
     --steps 1000 \
-    --device_id $ASCEND_DEVICE_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    --sparse_embed_dim 4 \
+    --batch_size 4096 \
+    --lr 0.0009 \
+    --device_id=$ASCEND_DEVICE_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 

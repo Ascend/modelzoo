@@ -26,6 +26,8 @@ do
         device_id=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --more_path1* ]];then
+        more_path1=`echo ${para#*=}`
     fi
 done
 
@@ -77,6 +79,8 @@ check_etp_flag=`env | grep etp_running_flag`
 etp_flag=`echo ${check_etp_flag#*=}`
 if [ x"${etp_flag}" != x"true" ];then
     source ${test_path_dir}/env_npu.sh
+else
+    data_path=${more_path1}
 fi
 python3.7 ./main.py \
     ${data_path} \

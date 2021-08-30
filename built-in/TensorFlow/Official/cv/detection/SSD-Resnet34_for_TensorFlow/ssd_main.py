@@ -94,6 +94,7 @@ def construct_run_config():
     )
 
     return NPURunConfig(
+        hcom_parallel=True,
         model_dir=FLAGS.model_dir,
         session_config=tf.ConfigProto(),
         keep_checkpoint_max=FLAGS.keep_checkpoint_max,
@@ -143,7 +144,7 @@ def init_npu():
    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
    custom_op.name = "NpuOptimizer"
    custom_op.parameter_map["use_off_line"].b = True
-
+   custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
    init_sess = tf.Session(config=config)
    return init_sess,npu_init
 

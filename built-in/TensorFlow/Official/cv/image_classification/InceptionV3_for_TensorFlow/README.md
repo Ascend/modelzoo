@@ -6,9 +6,9 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Classification**
+**应用领域（Application Domain）：Image Classification**
 
 **版本（Version）：1.1**
 
@@ -26,7 +26,7 @@
 
 **应用级别（Categories）：Official**
 
-**描述（Description）：基于TensorFlow框架的InceptionV4网络图像分类网络训练代码**
+**描述（Description）：基于TensorFlow框架的InceptionV3网络图像分类网络训练代码**
 
 <h2 id="概述.md">概述</h2>
 
@@ -40,7 +40,7 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 -   适配昇腾 AI 处理器的实现：
     
         
-     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV4_for_TensorFlow
+     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV3_for_TensorFlow
         
 
 -   通过Git获取对应commit\_id的代码方法如下：
@@ -152,7 +152,7 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
     
     2. 单卡训练 
 
-        2.1 配置run_1p.sh脚本中`data_dir`（脚本路径InceptionV4_for_TensorFlow/script/run_1p.sh）,请用户根据实际路径配置，数据集参数如下所示：
+        2.1 配置run_1p.sh脚本中`data_dir`（脚本路径InceptionV3_for_TensorFlow/script/run_1p.sh）,请用户根据实际路径配置，数据集参数如下所示：
 
             --data_dir=/opt/npu/imagenet_data
 
@@ -162,7 +162,7 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 
     3. 8卡训练  
     
-        3.1 配置run_8p.sh脚本中`data_dir`（脚本路径InceptionV4_for_TensorFlow/script/run_8p.sh）,请用户根据实际路径配置，数据集参数如下所示：
+        3.1 配置run_8p.sh脚本中`data_dir`（脚本路径InceptionV3_for_TensorFlow/script/run_8p.sh）,请用户根据实际路径配置，数据集参数如下所示：
             
             --data_dir=/opt/npu/imagenet_data
 

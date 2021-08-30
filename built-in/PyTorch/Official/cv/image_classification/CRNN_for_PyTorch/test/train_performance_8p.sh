@@ -12,7 +12,7 @@ data_path=""
 Network="CRNN_for_PyTorch"
 
 #训练batch_size,,需要模型审视修改
-batch_size=20560
+batch_size=20480
 
 #训练epoch，不需要修改
 epoch=2

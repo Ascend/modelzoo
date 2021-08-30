@@ -3,7 +3,7 @@
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE WORLD_SIZE MASTER_ADDR MASTER_PORT
 # 网络名称，同目录名称
-Network="db"
+Network="DB_ID0706_for_Pytorch"
 
 # 训练batch_size
 batch_size=16
@@ -80,7 +80,7 @@ start_time=$(date +%s)
 # source 环境变量
 source ${test_path_dir}/env.sh
 
-taskset -c 0-23 python -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
+taskset -c 0-23 python3 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
         --data_path ${data_path} \
         --resume ${ckpt_path} \
         --seed=515 \

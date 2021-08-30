@@ -6,7 +6,7 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
 **应用领域（Application Domain）： Image Classification**
 

@@ -159,6 +159,7 @@ Thank You!
     - [ResNext50_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/ResNext50_for_ACL/)
     - [PSPnet101_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/PSPnet101_for_ACL/)
     - [Resnet34_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Resnet34_for_ACL/)
+    - [ResCNN_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/ResCNN_for_ACL)
     - [SSD-Resnet34_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/SSD-Resnet34_for_ACL/)
     - [Inceptionv4_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Inceptionv4_for_ACL/)
     - [ShuffleNetv2_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/ShuffleNetv2_for_ACL/)
@@ -168,6 +169,8 @@ Thank You!
     - [SSDResnet34_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/SSDResnet34_for_ACL/)
     - [YOLOv3_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/YOLOv3_for_ACL/)
     - [Inceptionv3_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/Inceptionv3_for_ACL/)
+    - [KGAT_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/recommendation/KGAT_for_ACL/)
+    - [YOLOv2_for_ACL](https://github.com/Ascend/modelzoo/tree/master/built-in/ACL_TensorFlow/Official/cv/YOLOv2_for_ACL/)
 
 		
 

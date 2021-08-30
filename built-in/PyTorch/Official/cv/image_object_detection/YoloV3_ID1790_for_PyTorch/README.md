@@ -105,5 +105,11 @@ hipcc = subprocess.check_output(['which', 'hipcc'], stderr=subporcess.DEVNULL).d
 在PORT=29500 ./tools/dist_train.sh configs/yolo/yolov3_d53_320_273e_coco.py 1 --cfg-options optimizer.lr=0.001 --seed 0 --local_rank 0 后增加一个配置参数
 --npu_ids k （k即为指定的第几张卡）
 
+## 报No module named 'mmcv._ext'问题
+在宿主机上训练模型，有时会报No module named 'mmcv._ext'问题，或者别的带有mmcv的报错。
+解决方法：这一般是因为宿主机上安装了多个版本的mmcv，而训练脚本调用到了不匹配yolov3模型使用的mmcv，因此报mmcv的错误。
+为了解决这个问题，建议在启动训练脚本前，先导入已经安装的符合yolov3模型需要的mmcv路径的环境变量。
+export PYTHONPATH=mmcv的路径:$PYTHONPATH
+
 
 

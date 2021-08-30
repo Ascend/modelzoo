@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 Huawei Technologies Co., Ltd
-# 
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at# 
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0# 
-# 
-# Unless required by applicable law or agreed to in writing, software
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# less required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ============================================================================
 
 
 import os
 import time
 import random
 import argparse
-import configparser
 
 import numpy as np
 import pandas as pd
@@ -30,31 +30,39 @@ import torch
 from sklearn.metrics import log_loss, roc_auc_score
 
 from deepctr_torch.inputs import SparseFeat, DenseFeat, get_feature_names
-from deepctr_torch.models import *
+from deepctr_torch.models import WDL
 
-parser = argparse.ArgumentParser(description='Wide&Deep')
-parser.add_argument('--seed', default=1234, type=int,
-                    help='seed for initializing training.')
-parser.add_argument('--device_id', default=0, type=int, help='device id')
-parser.add_argument('--dist', default=False, action='store_true', help='8p distributed training')
-parser.add_argument('--device_num', default=1, type=int,
-                    help='num of npu device for training')
-parser.add_argument('--amp', default=False, action='store_true',
-                    help='use amp to train the model')
-parser.add_argument('--loss-scale', default=1024, type=float,
-                    help='loss scale using in amp, default -1 means dynamic')
-parser.add_argument('--opt_level', default='O1', type=str,
-                    help='apex opt level')
-parser.add_argument('--data_path', required=True, type=str, help='train data, and is to be')
-parser.add_argument('--lr', default=0.0001, type=float, help='learning rate for training')
-parser.add_argument('--batch_size', default=1024, type=int, help='batch size for training')
-parser.add_argument('--test_batch_size', default=16000, type=int, help='batch size for testing')
-parser.add_argument('--epochs', default=3, type=int, help='epochs for training')
-parser.add_argument('--sparse_embed_dim', default=4, type=int, help='The embedding dims for sparse features')
-parser.add_argument('--steps', default=0, type=int, help='steps for training')
 
-TOTAL_TRAIN_VAL_SAMPLE = int(45840616 * 0.9)
-TOTAL_TEST_SAMPLE = int(45840616 * 0.1)
+def args_parser():
+    parser = argparse.ArgumentParser(description='Wide&Deep')
+    parser.add_argument('--seed', default=1234, type=int,
+                        help='seed for initializing training.')
+    parser.add_argument('--device_id', default=0, type=int, help='device id')
+    parser.add_argument('--rank', default=0, type=int, help='node rank for distributed training')
+    parser.add_argument('--dist', default=False, action='store_true', help='8p distributed training')
+    parser.add_argument('--device_num', default=1, type=int,
+                        help='num of npu device for training')
+    parser.add_argument('--amp', default=False, action='store_true',
+                        help='use amp to train the model')
+    parser.add_argument('--loss_scale', default=1024, type=float,
+                        help='loss scale using in amp, default -1 means dynamic')
+    parser.add_argument('--opt_level', default='O1', type=str,
+                        help='apex opt level')
+    parser.add_argument('--data_path', required=True, type=str, help='train data, and is to be')
+    parser.add_argument('--resume', default='', type=str, metavar='PATH',
+                        help='path to latest checkpoint (default: none)')
+    parser.add_argument('--checkpoint_save_path', default='./', type=str, metavar='PATH',
+                        help='path to save latest checkpoint')
+    parser.add_argument('--lr', default=0.0001, type=float, help='learning rate for training')
+    parser.add_argument('--batch_size', default=1024, type=int, help='batch size for training')
+    parser.add_argument('--eval_batch_size', default=16000, type=int, help='batch size for testing')
+    parser.add_argument('--epochs', default=3, type=int, help='epochs for training')
+    parser.add_argument('--start_epoch', default=0, type=int, metavar='N', help='record of the start epoch to run')
+    parser.add_argument('--sparse_embed_dim', default=4, type=int, help='The embedding dims for sparse features')
+    parser.add_argument('--steps', default=0, type=int, help='steps for training')
+
+    parser_args, _ = parser.parse_known_args()
+    return parser_args
 
 
 def fix_random(seed):
@@ -66,7 +74,7 @@ def fix_random(seed):
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
+    args = args_parser()
     print(args)
 
     fix_random(args.seed)
@@ -75,11 +83,11 @@ if __name__ == "__main__":
     dense_features = ['I' + str(i) for i in range(1, 14)]
     target = ['label']
 
-    # 2.count #unique features for each sparse field,and record dense feature field name
+    # count #unique features for each sparse field,and record dense feature field name
     start_time = time.time()
 
-    data_trainval = pd.read_pickle(args.data_path + '/wdl_trainval.pkl')
-    data_test = pd.read_pickle(args.data_path + '/wdl_test.pkl')
+    data_trainval = pd.read_pickle(os.path.join(args.data_path, 'wdl_trainval.pkl'))
+    data_test = pd.read_pickle(os.path.join(args.data_path, 'wdl_test.pkl'))
 
     print('Data loaded in {}s'.format(time.time() - start_time))
 
@@ -88,7 +96,6 @@ if __name__ == "__main__":
     fixlen_feature_columns = [SparseFeat(feat, sparse_nunique[idx], embedding_dim=args.sparse_embed_dim)
                               for idx, feat in enumerate(sparse_features)] + [DenseFeat(feat, 1, )
                                                                               for feat in dense_features]
-
     print(fixlen_feature_columns)
 
     dnn_feature_columns = fixlen_feature_columns
@@ -97,19 +104,21 @@ if __name__ == "__main__":
     feature_names = get_feature_names(
         linear_feature_columns + dnn_feature_columns)
 
-    # 3.generate input data for model
+    # generate input data for model
     print('Generating input data for model...')
     start_time = time.time()
-    train, test = data_trainval, data_test
-    train_model_input = {name: train[name].astype(float) for name in feature_names}
-    test_model_input = {name: test[name].astype(float) for name in feature_names}
+    train_model_input = {name: data_trainval[name].astype(float) for name in feature_names}
+    test_model_input = {name: data_test[name].astype(float) for name in feature_names}
     print('Input data generated in {}s'.format(time.time() - start_time))
 
-    # 4.Define Model,train,predict and evaluate
+    # Define Model,train,predict and evaluate
+    args.device_num = torch.npu.device_count()
     if args.dist:
         os.environ['MASTER_ADDR'] = '127.0.0.1'
         os.environ['MASTER_PORT'] = '29680'
-        torch.distributed.init_process_group(backend='hccl', world_size=args.device_num, rank=args.device_id)
+
+        args.rank = args.device_id
+        torch.distributed.init_process_group(backend='hccl', world_size=args.device_num, rank=args.rank)
         print('distributed train enabled')
 
     device = 'npu:' + str(args.device_id)
@@ -120,14 +129,13 @@ if __name__ == "__main__":
                 task='binary', dnn_hidden_units=(512, 256, 128), dnn_dropout=0.5, device=device, l2_reg_linear=1e-4,
                 l2_reg_embedding=1e-4, dist=args.dist)
 
-    model.compile("adagrad", "binary_crossentropy",
-                  metrics=["binary_crossentropy", "auc"], lr=args.lr)
+    model.compile("adam", "binary_crossentropy",
+                  metrics=["binary_crossentropy", "auc"], lr=args.lr, args=args)
 
-    history = model.fit(train_model_input, train[target].values, batch_size=args.batch_size, epochs=args.epochs,
+    history = model.fit(train_model_input, data_trainval[target].values, batch_size=args.batch_size, epochs=args.epochs,
                         verbose=2,
                         validation_split=0.3, args=args)
-    pred_ans = model.predict(test_model_input, 16000)
 
-    print("")
-    print("test LogLoss", round(log_loss(test[target].values, pred_ans), 4))
-    print("test AUC", round(roc_auc_score(test[target].values, pred_ans), 4))
+    pred_ans = model.predict(test_model_input, args.eval_batch_size)
+    print("test LogLoss", round(log_loss(data_test[target].values, pred_ans), 4))
+    print("test AUC", round(roc_auc_score(data_test[target].values, pred_ans), 4))

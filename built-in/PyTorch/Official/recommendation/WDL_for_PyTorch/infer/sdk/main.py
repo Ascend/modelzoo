@@ -1,21 +1,20 @@
 #!/usr/bin/env python
-# coding=utf-8
+# -*- coding: utf-8 -*-
 
-"""
-Copyright 2020 Huawei Technologies Co., Ltd
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# less required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
 
 import os
 import sys
@@ -32,9 +31,7 @@ def send_protobuf(next_batch_inputs, f_ground_truth_out):
     for batch_input in next_batch_inputs:
         batch_input = np.array(batch_input.strip().split(','))
         dummy_input = batch_input[1:].astype("float32").reshape([1, -1])
-        sparse_dummy_input = dummy_input[:, 13:]
-        dense_dummy_input = dummy_input[:, :13]
-        tensors.append(np.concatenate((sparse_dummy_input, dense_dummy_input), axis=-1))
+        tensors.append(dummy_input)
 
         f_ground_truth_out.write(str(batch_input[0]) + '\n')
 
@@ -70,7 +67,7 @@ def send_protobuf(next_batch_inputs, f_ground_truth_out):
 
 if __name__ == '__main__':
     try:
-        # annotation files path, "./wdl_input"
+        # annotation files path, "./wdl_input/wdl_infer.txt"
         data_file_path = sys.argv[1]
         # stream pipeline file path, "./pipeline/Wdl.pipeline"
         pipeline_path = sys.argv[2]
@@ -78,7 +75,7 @@ if __name__ == '__main__':
         result_path = sys.argv[3]
     except IndexError:
         print("Please enter data files folder | pipeline file path | store result files folder "
-              "Such as: python3.7 main.py ./wdl_input/wdl_test.txt ./pipeline/Wdl.pipeline ./result")
+              "Such as: python3.7 main.py ./wdl_input/wdl_infer.txt ./pipeline/Wdl.pipeline ./result")
         exit(1)
 
     # init stream manager

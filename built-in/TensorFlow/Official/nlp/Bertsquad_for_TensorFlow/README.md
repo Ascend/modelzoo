@@ -8,7 +8,7 @@
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Natural Language Processing**
 
 **版本（Version）：1.2**
 
@@ -126,7 +126,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 
 <h2 id="快速上手.md">快速上手</h2>
 
-- 数据集和预处理模型准备
+- 数据集准备及预训练模型准备
 1. 模型训练使用Squad v1.1数据集，参考源代码提供路径下载。
 2. 预处理模型使用BERT-Base，Uncased，参考源代码提供路径下载。下载的文件夹中应该含有预处理模型，vocab.txt和bert_config.json。
 3. 数据集和预处理模型下载完成后，放入模型目录下，在训练脚本中指定数据集和模型路径，可正常使用。
@@ -141,7 +141,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 
      [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-  将环境变量配置到scrpts/run_*.sh中
+  将环境变量配置到scripts/run_*.sh中
 
 - 单卡训练 
 
@@ -150,7 +150,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
   修改scripts/run_1p.sh中的BERT_BASE_DIR和SQUAD_DIR，BERT_BASE_DIR为预处理模型路径，SQUAD_DIR为squad v1.1数据集的路径
   
   ```
-  cd test
+  cd scripts
   bash run_1p.sh
   ```
   
@@ -161,7 +161,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
   修改scripts/run_8p.sh中的BERT_BASE_DIR和SQUAD_DIR，BERT_BASE_DIR为预处理模型路径，SQUAD_DIR为squad v1.1数据集的路径
   
   ```
-  cd test
+  cd scripts
   bash run_8p.sh
   ```
   
@@ -172,7 +172,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 ## 脚本和示例代码<a name="section08421615141513"></a>
 
 ```
-└─BertMRPC_for_TensorFlow
+└─Bertsquad_for_TensorFlow
     ├─scripts
     |     ├─8p.json
     |     ├─docker_start.sh

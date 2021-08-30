@@ -11,7 +11,7 @@
 
 - 发布者（Publisher）：huawei
 - 应用领域（Application Domain）：Natural Language Processing
-- 版本（Version）：1.2
+- 版本（Version）：1.1
 - 修改时间（Modified） ：2021.07.17
 - 大小（Size）：1.3G
 - 框架（Framework）：TensorFlow 1.15.0
@@ -23,7 +23,7 @@
 
 ## 概述
 
-BERT是一种与训练语言表示的方法，这意味着我们在大型文本语料库（如维基百科）上训练一个通用的”语言理解“模型，然后将该模型用于我们关心的下游NLP任务（如问答）。该工程提供了BERT BASE的训练代码
+BERT模型的全称是Bidirectional Encoder Representation from Transformers，即双向Transformer的Encoder，其中“双向”表示模型在处理某一个词时，它能同时利用前面的词和后面的词两部分信息。该工程提供了BERT BASE的训练代码
 
 - 参考论文：
 
@@ -122,7 +122,7 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 
   模型训练使用wikipedia数据集，参考源代码提供路径下载。
 
-  预训练模型使用BERT-Base，Uncased，参考源代码提供路径下载。下载的文件夹中应该含有预处理模型，vocab.txt和bert_config.json。
+  预训练模型请参考源代码提供的链接下载，例如BERT-Base，Uncased。下载的文件夹中应该含有预处理模型，vocab.txt和bert_config.json。
 
   数据集和预训练模型下载完成后，放入模型目录下，在训练脚本中指定数据集和模型路径，可正常使用。
 

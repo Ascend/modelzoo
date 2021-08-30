@@ -407,30 +407,30 @@ class SSDInputReader(object):
             _prefetch_dataset, cycle_length=32, sloppy=self._is_training))
 
     # Parse the fetched records to input tensors for model function.
-    dataset = dataset.map(example_decoder.decode, num_parallel_calls=64)
+    dataset = dataset.map(example_decoder.decode, num_parallel_calls=256)
 
     if self._is_training:
       dataset = dataset.map(
           # pylint: disable=g-long-lambda
           lambda data: (data,
                         tf.greater(tf.shape(data['groundtruth_boxes'])[0], 0)),
-          num_parallel_calls=64)
+          num_parallel_calls=256)
       dataset = dataset.filter(lambda data, pred: pred)
 
       dataset = dataset.shuffle(64).repeat()
 
       dataset = dataset.map(lambda data, pred: data) # use the first value
-      dataset = dataset.map(_parse_example, num_parallel_calls=64)
+      dataset = dataset.map(_parse_example, num_parallel_calls=256)
       dataset = dataset.batch(batch_size=batch_size, drop_remainder=True)
     else:
-      dataset = dataset.prefetch(batch_size * 64)
-      dataset = dataset.map(_parse_example, num_parallel_calls=64)
+      dataset = dataset.prefetch(batch_size * 256)
+      dataset = dataset.map(_parse_example, num_parallel_calls=256)
       dataset = dataset.batch(batch_size=batch_size, drop_remainder=True)
 
     dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
     options = tf.data.Options()
     options.experimental_threading.max_intra_op_parallelism = 1
-    options.experimental_threading.private_threadpool_size = 48
+    options.experimental_threading.private_threadpool_size = 32
     dataset = dataset.with_options(options)
 
     return dataset

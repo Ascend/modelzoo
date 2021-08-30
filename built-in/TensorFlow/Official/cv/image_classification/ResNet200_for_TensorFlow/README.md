@@ -1,381 +1,266 @@
-# ResNet in TensorFlow On NPU
----
+-   [基本信息](#基本信息.md)
+-   [概述](#概述.md)
+-   [训练环境准备](#训练环境准备.md)
+-   [快速上手](#快速上手.md)
+-   [迁移学习指导](#迁移学习指导.md)
+-   [高级参考](#高级参考.md)
+<h2 id="基本信息.md">基本信息</h2>
 
-# Classification Model
+**发布者（Publisher）：Huawei**
 
-## Table Of Contents
+**应用领域（Application Domain）：** Image Classification 
 
-* [Description](#Description)
-* [Requirements](#Requirements)
-* [Default configuration](#Default-configuration)
-  * [Optimizer](#Optimizer)
-* [Quick start guide](#quick-start-guide)
-  * [Prepare the dataset](#Prepare-the-dataset)
-  * [Docker container scene](#Docker-container-scene)
-  * [Check json](#Check-json)
-  * [Key configuration changes](#Key-configuration-changes)
-  * [Running the example](#Running-the-example)
-    * [Training](#Training)    
-    * [Evaluation](#Evaluation)
-* [Advanced](#advanced)
-  * [Command-line options](#Command-line-options) 
+**版本（Version）：1.2**
 
-## Description
+**修改时间（Modified） ：2021.7.20**
 
-1. ResNet is a relatively good network for classification problems in the ImageNet competition. It introduces the concept of residual learning. It protects the integrity of information by adding direct connection channels, solves problems such as information loss, gradient disappearance, and gradient explosion. The network can also be trained. ResNet has different network layers, commonly used are 18-layer, 34-layer, 50-layer, 101-layer, 152-layer. 
+**大小（Size）：90.1M**
 
-2. Ascend provides the V1.5 version of the 50-layer ResNet network this time. The difference between the V1.5 version of the ResNet network and the V1 version is that in the bottleneck module, the V1 version is set stride=2 in the first 1x1 convolutional layer, and V1.5 sets stride=2 in the 3x3 convolutional layer.
+**框架（Framework）：TensorFlow 1.15.0**
 
+**模型格式（Model Format）：ckpt**
 
-- This is an implementation of the ResNet200 model as described in the [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf) paper.
- 
-- Current implementation is based on the code from the TensorFlow Official implementation in the [tensorflow/models Repo](https://github.com/tensorflow/models).
+**精度（Precision）：Mixed**
 
-## Requirements
+**处理器（Processor）：昇腾910**
 
-- Download and preprocess ImageNet2012，CIFAR10 or Flower dataset for training and evaluation.
+**应用级别（Categories）：Official**
+
+**描述（Description）：基于TensorFlow框架的ResNet200图像分类网络训练代码** 
+
+<h2 id="概述.md">概述</h2>
+
+1. ResNet在ImageNet竞赛中是一个比较好的分类问题网络。介绍了剩余学习的概念。通过增加直接连接通道来保护信息的完整性，解决了信息丢失、梯度消失、梯度爆炸等问题。这个网络也可以训练。ResNet有不同的网络层，常用的有18层、34层、50层、101层、152层。
 
 
-## Default configuration
+- 参考论文：
 
-The following sections introduce the default configurations and hyperparameters for ResNet101 model.
+    [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf)
+	
+- 参考实现：
 
-### Optimizer
+  https://github.com/tensorflow/models/tree/r2.1.0/official/r1/resnet
+  
+- 适配昇腾 AI 处理器的实现：
+          
+  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNet200_for_TensorFlow
+  
+- 通过Git获取对应commit\_id的代码方法如下： 
+    ```
+    git clone {repository_url}    # 克隆仓库的代码
+    cd {repository_name}    # 切换到模型的代码仓目录
+    git checkout  {branch}    # 切换到对应分支
+    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    ```
+## 默认配置<a name="section91661242121611"></a>
+- 训练数据集预处理
 
-This model uses Momentum optimizer from Tensorflow with the following hyperparameters:
+  请参考"概述"->"参考实现"。
 
-- Batch size: 128
+- 训练超参
 
-- Momentum: 0.9
+    - resnet_size: 200
+    - batch_size: 512
+    - num_gpus: 1 
+    - cosine_lr: True 
+    - dtype: fp16 
+    - label_smoothing: 0.1 
+    - loss_scale: 512 
+    - max_train_steps: 2000 
+    - train_epochs: 1
+    - eval_only: False 
+    - hooks: ExamplesPerSecondHook,loggingtensorhook,loggingmetrichook 
+	- data_format: "channels_last" 
 
-- LR scheduler: cosine
+## 支持特性<a name="section1899153513554"></a>
 
-- Learning rate(LR): 0.05
+| 特性列表  | 是否支持 |
+|-------|------|
+| 分布式训练 | 是    |
+| 混合精度  | 是    |
+| 并行数据  | 是    |
 
-- loss scale: 512
+## 混合精度训练<a name="section168064817164"></a>
 
-- Weight decay: 0.0001
+昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
-- Label smoothing: 0.1
+## 开启混合精度<a name="section20779114113713"></a>
 
-- train epoch: 90
+脚本已默认开启混合精度，设置precision_mode参数的脚本参考如下。
 
-## Quick start guide
+  ```
+  run_config = NPURunConfig(        
+  		model_dir=flags_obj.model_dir,        
+  		session_config=session_config,        
+  		keep_checkpoint_max=5,        
+  		save_checkpoints_steps=5000,        
+  		enable_data_pre_proc=True,        
+  		iterations_per_loop=iterations_per_loop,        			
+  		log_step_count_steps=iterations_per_loop,        
+  		precision_mode='allow_mix_precision',        
+  		hcom_parallel=True      
+        )
+  ```
 
-### Prepare the dataset
 
-- Please prepare the data set by yourself, including training set and validation set. The available data sets include ImageNet2012, CIFAR10, Flower, etc.
+<h2 id="训练环境准备.md">训练环境准备</h2>
 
-- The training set and validation set pictures are located in the "train/" and "val/" folder paths, and all pictures in the same directory have the same label.
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
-- The currently provided training script takes the ImageNet2012 data set as an example. Data preprocessing is performed during the training process. Users are requested to modify the data set loading and preprocessing methods in the training script before using the script.
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
+
+    **表 1** 镜像列表
+
+    <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
+    <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="25.52%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074498056_p75071327115313"><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><em id="i1522994919122"><a name="i1522994919122"></a><a name="i1522994919122"></a>镜像版本</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="27.16%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000001074498056_p1024411406234"><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><em id="i723012493123"><a name="i723012493123"></a><a name="i723012493123"></a>配套CANN版本</em></p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-arm" target="_blank" rel="noopener noreferrer">ascend-tensorflow-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-x86" target="_blank" rel="noopener noreferrer">ascend-tensorflow-x86</a></em></li></ul>
+    </td>
+    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>21.0.1</em></p>
+    </td>
+    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373/software" target="_blank" rel="noopener noreferrer">20.2</a></em></p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 
-### Docker container scene
+<h2 id="快速上手.md">快速上手</h2>
 
-- Compile image
-```bash
-docker build -t ascend-resnet200 .
+- 数据集准备
+1. 模型训练使用ImageNet2012数据集，数据集请用户自行获取。
+
+2. 数据集训练前需要做预处理操作，请用户参考[Tensorflow-Slim](https://github.com/tensorflow/models/tree/master/research/slim),将数据集封装为tfrecord格式。
+
+3. 数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
+   
+
+## 模型训练<a name="section715881518135"></a>
+
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+
+- 启动训练之前，首先要配置程序运行相关环境变量。
+
+  环境变量配置信息参见：
+
+     [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+- 单卡训练 
+
+  1. 配置训练参数。
+
+     首先在脚本test/train_performance_1p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
+
+     ```
+      --data_dir=/npu/traindata/imagemat_TF
+     ```
+
+  2. 启动训练。
+
+     启动单卡性能训练 （脚本为ResNet200_for_TensorFlow/test/train_performance_1p.sh） 
+
+     ```
+     bash train_performance_1p.sh
+     ```
+
+	 启动单卡精度训练 （脚本为ResNet200_for_TensorFlow/test/train_full_1p.sh） 
+	
+	 ```
+	 bash train_full_1p.sh
+	 ```
+- 8卡训练 
+
+  1. 配置训练参数。
+
+     首先在脚本test/train_full_8p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
+
+     ```
+      --data_dir=/npu/traindata/imagemat_TF
+     ```
+
+  2. 启动训练。
+
+     启动8卡性能训练 （脚本为ResNet200_for_TensorFlow/test/train_performance_8p.sh） 
+
+     ```
+     bash train_performance_8p.sh
+     ```
+		
+     启动8卡精度训练 （脚本为ResNet200_for_TensorFlow/test/train_full_8p.sh） 
+
+     ```
+     bash train_full_8p.sh
+     ```
+
+<h2 id="高级参考.md">高级参考</h2>
+
+## 脚本和示例代码<a name="section08421615141513"></a>
+
+```                                
+├── README.md  
+├── r1                   
+│	├── resnet
+│		├──cifar10_download_and_extract.py
+│		├──cifar10_main.py
+│		├──cifar10_test.py
+│		├──estimator_benchmark.py
+│		├──frozen_graph.py
+│		├──imagenet_main.py
+│		├──imagenet_preprocessing.py
+│		├──imagenet_test.py
+│		├──infer_from_pb.py
+│		├──resnet_model.py
+│		├──resnet_run_loop.py
+│		├──run_imagenet.sh           
+├── test
+│    ├──train_performance_1p.sh              
+│    ├──train_performance_8p.sh             
+│    ├──train_full_1p.sh                     
+│    ├──train_full_8p.sh                     
+│    ├──env.sh                                  
 ```
 
-- Start the container instance
-```bash
-bash docker_start.sh
-```
-
-Parameter Description:
-
-```bash
-#!/usr/bin/env bash
-docker_image=$1 \   #Accept the first parameter as docker_image
-data_dir=$2 \       #Accept the second parameter as the training data set path
-model_dir=$3 \      #Accept the third parameter as the model execution path
-docker run -it --ipc=host \
-        --device=/dev/davinci0 --device=/dev/davinci1 --device=/dev/davinci2 --device=/dev/davinci3 --device=/dev/davinci4 --device=/dev/davinci5 --device=/dev/davinci6 --device=/dev/davinci7 \  #The number of cards used by docker, currently using 0~7 cards
-        --device=/dev/davinci_manager --device=/dev/devmm_svm --device=/dev/hisi_hdc \
-        -v /usr/local/Ascend/driver:/usr/local/Ascend/driver -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
-        -v ${data_dir}:${data_dir} \    #Training data set path
-        -v ${model_dir}:${model_dir} \  #Model execution path
-        -v /var/log/npu/conf/slog/slog.conf:/var/log/npu/conf/slog/slog.conf \
-        -v /var/log/npu/slog/:/var/log/npu/slog -v /var/log/npu/profiling/:/var/log/npu/profiling \
-        -v /var/log/npu/dump/:/var/log/npu/dump -v /var/log/npu/:/usr/slog ${docker_image} \     #docker_image is the image name
-        /bin/bash
-```
-
-After executing docker_start.sh with three parameters:
-  - The generated docker_image
-  - Dataset path
-  - Model execution path
-```bash
-./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
-```
-
-
-
-### Check json
-
-Modify the `*.json` configuration file in the `config` directory, modify the corresponding IP to the current IP, and change the board_id to the ID of the motherboard of the machine.
-
-1P rank_table json configuration file:
+## 脚本参数<a name="section6669162441511"></a>
 
 ```
-{
-    "board_id": "0x0000",
-    "chip_info": "910",
-    "deploy_mode": "lab",
-    "group_count": "1",
-    "group_list": [
-        {
-            "device_num": "1",
-            "server_num": "1",
-            "group_name": "",
-            "instance_count": "1",
-            "instance_list": [
-                {
-                    "devices": [
-                        {
-                            "device_id": "0",
-                            "device_ip": "192.168.100.101"
-                        }
-                    ],
-                    "rank_id": "0",
-                    "server_id": "0.0.0.0"
-                }
-           ]
-        }
-    ],
-    "para_plane_nic_location": "device",
-    "para_plane_nic_name": [
-        "eth0"
-    ],
-    "para_plane_nic_num": "1",
-    "status": "completed"
-}
+--resnet_size		      		 # resnet的系列的模型类别 
+--batch_size			 		 # batchsize
+--num_gpus						 # NPU设备数量
+--cosine_lr						 # 是否使用余弦的学习率策略
+--dtype=						 # fp16 为设置为半精度训练，可与mixed精度配合使用
+--label_smoothing				 # label smooth的参数
+--loss_scale					 # 用于混合精度训练的loss scale
+--max_train_steps				 # 最大训练步数
+--train_epochs					 # 总训练epoch数
+--eval_only						 # 是否只做评估，训练时需要设置为False
+--hooks                          # hook对象
+--data_dir						 # 数据集路径
+--data_format	  				 # channel表示在前
+--model_dir                      # 模型、log等保存路径
 ```
 
-8P rank_table json configuration file:
+## 训练过程<a name="section1589455252218"></a>
 
-```
-{
-    "board_id": "0x0000",
-    "chip_info": "910",
-    "deploy_mode": "lab",
-    "group_count": "1",
-    "group_list": [
-        {
-            "device_num": "8",
-            "server_num": "1",
-            "group_name": "",
-            "instance_count": "8",
-            "instance_list": [
-                {
-                    "devices": [
-                        {
-                            "device_id": "0",
-                            "device_ip": "192.168.100.101"
-                        }
-                    ],
-                    "rank_id": "0",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "1",
-                            "device_ip": "192.168.101.101"
-                        }
-                    ],
-                    "rank_id": "1",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "2",
-                            "device_ip": "192.168.102.101"
-                        }
-                    ],
-                    "rank_id": "2",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "3",
-                            "device_ip": "192.168.103.101"
-                        }
-                    ],
-                    "rank_id": "3",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "4",
-                            "device_ip": "192.168.100.100"
-                        }
-                    ],
-                    "rank_id": "4",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "5",
-                            "device_ip": "192.168.101.100"
-                        }
-                    ],
-                    "rank_id": "5",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "6",
-                            "device_ip": "192.168.102.100"
-                        }
-                    ],
-                    "rank_id": "6",
-                    "server_id": "0.0.0.0"
-                },
-                {
-                    "devices": [
-                        {
-                            "device_id": "7",
-                            "device_ip": "192.168.103.100"
-                        }
-                    ],
-                    "rank_id": "7",
-                    "server_id": "0.0.0.0"
-                }
-            ]
-        }
-    ],
-    "para_plane_nic_location": "device",
-    "para_plane_nic_name": [
-        "eth0",
-        "eth1",
-        "eth2",
-        "eth3",
-        "eth4",
-        "eth5",
-        "eth6",
-        "eth7"
-    ],
-    "para_plane_nic_num": "8",
-    "status": "completed"
-}
-```
+1.  通过“模型训练”中的训练指令启动性能或者精度训练。单卡和多卡通过运行不同脚本，支持单卡、8卡网络训练。
 
-### Key configuration changes
+2.  参考脚本的模型存储路径为test/output/*。
 
-Before starting the training, first configure the environment variables related to the program running. For environment variable configuration information, see:
-- [Ascend 910 environment variable settings](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+## 推理/验证过程<a name="section1465595372416"></a>
 
-check if path '/usr/local/HiAI' or ''/usr/local/Ascend' is existed or not.
-modify '/usr/local/HiAI' to the actual path in scripts/run.sh
+1.  通过“模型训练”中的测试指令启动测试。
 
-Before starting training, add the `ModelZoo_Resnet200_TF_Atlas` folder to the environment variable
-```
-export PYTHONPATH=/path/to/ModelZoo_Resnet200_TF_Atlas/:$PYTHONPATH
-```
+2.  当前只能针对该工程训练出的checkpoint进行推理测试。
+
+3.  推理脚本的参数eval_dir可以配置为checkpoint所在的文件夹路径，则该路径下所有.ckpt文件都会根据进行推理。
+
+4.  测试结束后会打印验证集的top1 accuracy和top5 accuracy，打印在train_*.log中
 
 
-### Running the example
-
-#### Training
-
-During training, you need to modify the script startup parameters (the script is located in `official/r1/resnet/run_imagenet.sh` ) and set `eval_only` to `False`.Make sure that the "--data_dir" modify the path of the user generated tfrecord.
-
-```
-python3 $3/imagenet_main.py \
---resnet_size=200 \          # resnet的系列的模型类别，本例为resnet200，所以固定设置为200
---batch_size=128 \           # batchsize 
---num_gpus=1 \               # NPU设备数量，1P设置为1， 8P设置为8
---cosine_lr=True \           # 是否使用余弦的学习率策略
---dtype=fp16 \               # fp16 为设置为半精度训练，可与mixed精度配合使用
---label_smoothing=0.1 \      # label smooth的参数
---loss_scale=512 \           # 用于混合精度训练的loss scale
---train_epochs=90 \          # 总训练epoch数
---eval_only=True \         # 是否只做评估，训练时需要设置为False
---epochs_between_evals=10 \  # 每隔多少epoch做一次评估
---hooks=ExamplesPerSecondHook,loggingtensorhook,loggingmetrichook \  # hook对象
---data_dir=/opt/npu/dataset/imagenet_TF_record \         # 数据集路径
---model_dir=./model_dir                                  # 模型、log等保存路径
-```
-
-`imagenet_main.py` is the Entry Python script.
-`resnet_run_loop.py` is the Main Python script.
-
-1P training instruction (the script is located in `official/r1/resnet/npu_train_1p.sh`)
-
-```
-bash npu_train_1p.sh
-```
-
-8P training instructions (the script is located in `official/r1/resnet/npu_train_8p.sh`)
-
-```
-bash npu_train_8p.sh
-```
-
-There are other arguments about models and training process. Use the `--help` or `-h` flag to get a full list of possible arguments with detailed descriptions.
-
-
-#### Evaluation
-
-
-When testing, you need to modify the script startup parameters (the script is located in `official/r1/resnet/run_imagenet.sh`) and set `eval_only` to `True`.Make sure that the "--data_dir" modify the path of the user generated tfrecord.
-
-```
-python3 $3/imagenet_main.py \
---resnet_size=200 \          # resnet的系列的模型类别，本例为resnet200，所以固定设置为200
---batch_size=128 \           # batchsize 
---num_gpus=1 \               # NPU设备数量，1P设置为1， 8P设置为8
---cosine_lr=True \           # 是否使用余弦的学习率策略
---dtype=fp16 \               # fp16 为设置为半精度训练，可与mixed精度配合使用
---label_smoothing=0.1 \      # label smooth的参数
---loss_scale=512 \           # 用于混合精度训练的loss scale
---train_epochs=90 \          # 总训练epoch数
---eval_only=True \         # 是否只做评估，训练时需要设置为False
---epochs_between_evals=10 \  # 每隔多少epoch做一次评估
---hooks=ExamplesPerSecondHook,loggingtensorhook,loggingmetrichook \  # hook对象
---data_dir=/opt/npu/dataset/imagenet_TF_record \         # 数据集路径
---model_dir=./model_dir                                  # 模型、log等保存路径
-```
-
-1P test instruction (the script is located in `official/r1/resnet/npu_train_1p.sh`)
-
-```
-bash npu_train.1p.sh
-```
-
-8P test instruction (the script is located in `official/r1/resnet/npu_train_8p.sh`)
-
-```
-bash npu_train.8p.sh
-```
- 
-## Advanced
-
-### Command-line options
-
-```
---resnet_size=200 \          # resnet的系列的模型类别，本例为resnet200，所以固定设置为200
---batch_size=128 \           # batchsize 
---num_gpus=1 \               # NPU设备数量，1P设置为1， 8P设置为8
---cosine_lr=True \           # 是否使用余弦的学习率策略
---dtype=fp16 \               # fp16 为设置为半精度训练,可与mixed精度配合使用
---label_smoothing=0.1 \      # label smooth的参数
---loss_scale=512 \           # 用于混合精度训练的loss scale
---train_epochs=90 \          # 总训练epoch数
---eval_only=True \         # 是否只做评估，训练时需要设置为False
---epochs_between_evals=10 \  # 每隔多少epoch做一次评估
---hooks=ExamplesPerSecondHook,loggingtensorhook,loggingmetrichook \  # hook对象
---data_dir=/opt/npu/dataset/imagenet_TF_record \         # 数据集路径
---model_dir=./model_dir                                  # 模型、log等保存路径
-```
-
-
-
-    

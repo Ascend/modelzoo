@@ -265,7 +265,7 @@ PrecisionStatus:OK/POK/NOK
 AutoTune:OK/POK/NOK 
 PerfStatus:PERFECT/OK/POK/NOK
 ```
-
+5、网络名称命名规范：*_for_框架，注：*代表任意内容，如网络名称或网络名称+网络ID；
 
  **六、编程规范**
 

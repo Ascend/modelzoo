@@ -1,21 +1,23 @@
 # -*- coding:utf-8 -*-
 
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at#
+# You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0#
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# less required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ============================================================================
 
 from __future__ import print_function
 
+import os
 import time
 
 import sklearn
@@ -192,36 +194,54 @@ class BaseModel(nn.Module):
 
         model = model.to(torch.device(self.device))
 
-        from apex import amp
-        model, optim = amp.initialize(model, optim, opt_level='O1', loss_scale=1024, combine_grad=True)
+        if args.amp:
+            from apex import amp
+            model, optim = amp.initialize(model, optim, opt_level=args.opt_level,
+                                          loss_scale=args.loss_scale, combine_grad=True)
+
+        # optionally resume from a checkpoint
+        if args.resume:
+            if os.path.isfile(args.resume):
+                print("=> loading checkpoint '{}'".format(args.resume))
+                checkpoint = torch.load(args.resume, map_location=self.device)
+                args.start_epoch = checkpoint['epoch']
+                model.load_state_dict(checkpoint['state_dict'])
+                optim.load_state_dict(checkpoint['optimizer'])
+                if args.amp:
+                    amp.load_state_dict(checkpoint['amp'])
+                print("=> loaded checkpoint '{}' (epoch {})"
+                      .format(args.resume, checkpoint['epoch']))
+            else:
+                print("=> no checkpoint found at '{}'".format(args.resume))
 
         num_rank = 1
         if self.dist:
             model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[torch.device(self.device)],
                                                               broadcast_buffers=False)
             num_rank = torch.distributed.get_world_size()
-
             train_sampler = torch.utils.data.distributed.DistributedSampler(train_tensor_data, shuffle=True)
         else:
             train_sampler = None
 
-        train_loader = train_loader = DataLoader(dataset=train_tensor_data,
-                                                 shuffle=(train_sampler is None),
-                                                 batch_size=batch_size,
-                                                 num_workers=8,
-                                                 drop_last=True,
-                                                 pin_memory=True,
-                                                 sampler=train_sampler)
+        train_loader = DataLoader(dataset=train_tensor_data,
+                                  shuffle=(train_sampler is None),
+                                  batch_size=batch_size,
+                                  num_workers=8,
+                                  drop_last=True,
+                                  pin_memory=True,
+                                  sampler=train_sampler)
 
         sample_num = len(train_tensor_data)
         steps_per_epoch = len(train_loader)
+
+        checkpoint_save_path = os.path.join(args.checkpoint_save_path, 'checkpoint.pth.tar')
 
         # Train
         print("Train on {0} samples, validate on {1} samples, {2} steps per epoch".format(
             len(train_tensor_data), len(val_y), steps_per_epoch))
         total_time = 0
         total_step = 0
-        for epoch in range(initial_epoch, epochs):
+        for epoch in range(args.start_epoch, epochs):
             if self.dist:
                 train_sampler.set_epoch(epoch)
             epoch_logs = {}
@@ -279,8 +299,21 @@ class BaseModel(nn.Module):
                     exit(0)
                 end = time.time()
 
-            if args.device_id % args.device_num == 0:  # remember transfer device_id to name rank
-                torch.save(model.state_dict(), 'wdl-model.pth.tar')
+            if not args.dist or (args.dist and args.rank % args.device_num == 0
+                                 and epoch == args.epochs - 1):
+                if args.amp:
+                    torch.save({
+                        'epoch': epoch + 1,
+                        'state_dict': model.state_dict(),
+                        'optimizer': optim.state_dict(),
+                        'amp': amp.state_dict(),
+                    }, checkpoint_save_path)
+                else:
+                    torch.save({
+                        'epoch': epoch + 1,
+                        'state_dict': model.state_dict(),
+                        'optimizer': optim.state_dict(),
+                    }, checkpoint_save_path)
 
             # Add epoch_logs
             epoch_logs["loss"] = total_loss_epoch / sample_num
@@ -435,6 +468,7 @@ class BaseModel(nn.Module):
                 loss=None,
                 metrics=None,
                 lr=0.0001,
+                args=None
                 ):
         """
         :param optimizer: String (name of optimizer) or optimizer instance. See [optimizers](https://pytorch.org/docs/stable/optim.html).
@@ -442,18 +476,20 @@ class BaseModel(nn.Module):
         :param metrics: List of metrics to be evaluated by the model during training and testing. Typically you will use `metrics=['accuracy']`.
         """
         self.metrics_names = ["loss"]
-        self.optim = self._get_optim(optimizer, lr)
+        self.optim = self._get_optim(optimizer, lr, args)
         self.loss_func = self._get_loss_func(loss)
         self.metrics = self._get_metrics(metrics)
 
-    def _get_optim(self, optimizer, lr):
+    def _get_optim(self, optimizer, lr, args):
         if isinstance(optimizer, str):
             if optimizer == "sgd":
                 optim = torch.optim.SGD(self.parameters(), lr=0.01)
             elif optimizer == "adam":
-                # optim = torch.optim.Adam(self.parameters())  # 0.001
-                import apex
-                optim = apex.optimizers.NpuFusedAdam(self.parameters(), lr=lr, weight_decay=1e-5)
+                if args.amp:
+                    import apex
+                    optim = apex.optimizers.NpuFusedAdam(self.parameters(), lr=lr, weight_decay=1e-5)
+                else:
+                    optim = torch.optim.Adam(self.parameters())  # 0.001
             elif optimizer == "adagrad":
                 optim = torch.optim.Adagrad(self.parameters())  # 0.01
             elif optimizer == "rmsprop":

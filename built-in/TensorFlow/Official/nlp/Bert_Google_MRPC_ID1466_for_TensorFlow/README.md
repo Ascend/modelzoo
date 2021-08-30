@@ -12,7 +12,7 @@
 
 **版本（Version）：1.1**
 
-**修改时间（Modified） ：2021.8.15**
+**修改时间（Modified） ：2021.8.28**
 
 **大小（Size）：108KB**
 
@@ -30,7 +30,7 @@
 
 <h2 id="概述.md">概述</h2>
 
-BERT是一种与训练语言表示的方法，这意味着我们在大型文本语料库（如维基百科）上训练一个通用的”语言理解“模型，然后将该模型用于我们关心的下游NLP任务（如问答）。该工程提供了在MRPC数据集上finetune的方法。
+BERT模型的全称是Bidirectional Encoder Representation from Transformers，即双向Transformer的Encoder，其中“双向”表示模型在处理某一个词时，它能同时利用前面的词和后面的词两部分信息。该工程提供了在MRPC数据集上finetune的方法。
 
 - 参考论文：
 
@@ -84,7 +84,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 脚本已默认开启混合精度，设置precision_mode参数的脚本参考如下。
 
   ```
-  run_config = NPURunConfig(
+run_config = NPURunConfig(
         model_dir=FLAGS.output_dir,
         save_checkpoints_steps=FLAGS.save_checkpoints_steps,
         iterations_per_loop=FLAGS.iterations_per_loop,
@@ -92,7 +92,6 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
         precision_mode="allow_mix_precision",
         keep_checkpoint_max=5)
   ```
-
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
@@ -123,15 +122,15 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
     </tbody>
     </table>
 
-
 <h2 id="快速上手.md">快速上手</h2>
 
-- 数据集和预处理模型准备
-1. 模型训练使用CLUE数据集的子数据集MRPC，参考源代码提供路径下载。
-2. 预处理模型使用BERT-Base，Uncased，参考源代码提供路径下载。下载的文件夹中应该含有预处理模型，vocab.txt和bert_config.json。
-3. 数据集和预处理模型下载完成后，放入模型目录下，在训练脚本中指定数据集和模型路径，可正常使用。
+### 数据集准备
 
-## 模型训练
+1. 模型训练使用CLUE数据集的子数据集MRPC，参考源代码提供路径下载。
+2. 预训练模型请参考源码提供的链接下载，例如BERT-Base，Uncased。下载的文件夹中应该含有预处理模型，vocab.txt和bert_config.json。
+3. 数据集和预训练模型下载完成后，放入模型目录下，在训练脚本中指定数据集和模型路径，可正常使用。
+
+### 模型训练
 
 - 单击“立即下载”，并选择合适的下载方式下载源码包。
 
@@ -154,7 +153,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 
 <h2 id="高级参考.md">高级参考</h2>
 
-## 脚本和示例代码<a name="section08421615141513"></a>
+### 脚本和示例代码<a name="section08421615141513"></a>
 
 ```
 └─BertMRPC_for_TensorFlow
@@ -188,7 +187,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
     └─tokenization_test.py
 ```
 
-## 脚本参数<a name="section6669162441511"></a>
+### 脚本参数<a name="section6669162441511"></a>
 
 ```
 --task_name           finetune dataset
@@ -200,6 +199,18 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 --output_dir          output dir
 ```
 
-## 训练过程<a name="section1589455252218"></a>
+### 训练过程<a name="section1589455252218"></a>
 
-通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡网络训练。模型存储路径为curpath/output/ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。loss信息在文件curpath/output/{ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
+1.  通过“模型训练”中的训练指令启动单卡训练。
+
+2.  若不指定output_dir，训练日志及结果见test/output/${ASCEND_DEVICE_ID}的train_${ASCEND_DEVICE_ID}.log
+
+### 推理/验证过程<a name="section1465595372416"></a>
+
+执行训练脚本默认执行验证过程，验证结果在test/output/${ASCEND_DEVICE_ID}的*_acc.log中打印
+
+```
+ActualFPS = 540
+TrainAccuracy = 0.84
+```
+

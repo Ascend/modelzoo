@@ -5,7 +5,7 @@ cur_path=`pwd`
 
 #集合通信参数,不需要修改
 
-export RANK_SIZE=1
+export RANK_SIZE=8
 export JOB_ID=10087
 RANK_ID_START=0
 
@@ -93,6 +93,7 @@ do
     #设置环境变量，不需要修改
     echo "Device ID: $ASCEND_DEVICE_ID"
     export RANK_ID=$RANK_ID
+    export ASCEND_DEVICE_ID=$RANK_ID
 
 
 
@@ -142,7 +143,7 @@ echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
 step_time=`grep 'step_time : ' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $13}'`
 
-FPS=`awk 'BEGIN{printf "%d\n", '$batch_size'/'$step_time'}'`
+FPS=`awk 'BEGIN{printf "%d\n", '$batch_size'/'$step_time'*'$RANK_SIZE'}'`
 
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
