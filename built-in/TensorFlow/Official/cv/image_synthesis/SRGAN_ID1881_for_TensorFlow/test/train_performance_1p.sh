@@ -1,8 +1,10 @@
 #!/bin/bash
 
-# ʹcondaҪ
+# 使用conda环境，用于网络需要特殊包的情况
 #export PATH=/usr/local/python3.7.5/bin:/home/anaconda3/bin:$PATH
 #export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:/usr/local/Ascend/fwkacllib/lib64/:/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:/usr/local/Ascend/add-ons/:/usr/lib/x86_64-linux-gnu:/usr/local/python3.7.5/lib/:/home/anaconda3/lib
+export PATH=$PATH:/autotest/anaconda3/bin
+source activate python3.7.5
 export install_path=/usr/local/Ascend
 export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:/home/anaconda3/bin:$PATH
 export LD_LIBRARY_PATH=${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver:${install_path}/fwkacllib/lib64/plugin/opskernel/:${install_path}/aoe/lib64:${install_path}/fwkacllib/lib64:/home/anaconda3/lib:$LD_LIBRARY_PATH
@@ -12,27 +14,27 @@ source activate py2
 # pip3 install easydict==1.9
 # pip3 install numpy==1.16.2
 
-# ǰ·Ҫ޸
+# 当前路径，不需要修改
 cur_path=`pwd`/../
 
-#Ĭ־,Ҫ޸
+#设置默认日志级别,不需要修改
 #export ASCEND_GLOBAL_LOG_LEVEL=3
 
-#Ҫģ޸
+#基础参数，需要模型审视修改
 #Batch Size
 batch_size=16
-#ƣͬĿ¼
+#网络名称，同目录名称
 Network="SRGAN_ID1881_for_TensorFlow"
-#DeviceĬΪ1
+#Device数量，单卡默认为1
 RANK_SIZE=1
-#ѵepochѡ
+#训练epoch，可选
 train_epochs=10
-#ѵstep
+#训练step
 train_steps=50000
-#ѧϰ
+#学习率
 learning_rate=1e-5
 
-#
+#参数配置
 data_path=""
 
 if [[ $1 == --help || $1 == --h ]];then
@@ -52,14 +54,14 @@ if [[ $data_path  == "" ]];then
    exit 1
 fi
 
-##############ִѵ##########
+##############执行训练##########
 cd $cur_path
 
-##############׼ļ##########
+##############准备所需文件##########
 cp -r /npu/traindata/ID1881_CarPeting_TF_SRGAN/checkpoint/ ${cur_path}
 cp /npu/traindata/ID1881_CarPeting_TF_SRGAN/vgg19.npy ${cur_path}
 
-#޸
+#参数修改
 n_iteration=55
 sed -i "s|config.TRAIN.n_epoch_init = 100|config.TRAIN.n_epoch_init = 10|g" ${cur_path}/config.py
 sed -i "s|config.TRAIN.n_epoch = 2000|config.TRAIN.n_epoch = 10|g" ${cur_path}/config.py
@@ -89,7 +91,7 @@ e2e_time=$(( $end - $start ))
 #echo "Final Performance ms/step : $average_perf"
 echo "Final Training Duration sec : $e2e_time"
 
-# ɾļ
+# 删除数据文件
 if [ -d $cur_path/checkpoint/ ];then
 	rm -rf ${cur_path}/checkpoint/
 fi
@@ -98,7 +100,7 @@ if [ -e $cur_path/vgg19.npy ];then
 	rm -rf ${cur_path}/vgg19.npy 
 fi
 
-#ظ
+#参数回改
 sed -i "s|config.TRAIN.n_epoch_init = 10|config.TRAIN.n_epoch_init = 100|g" ${cur_path}/config.py
 sed -i "s|config.TRAIN.n_epoch = 10|config.TRAIN.n_epoch = 2000|g" ${cur_path}/config.py
 
@@ -107,40 +109,40 @@ sed -i "s|config.TRAIN.lr_img_path = '${data_path}/|config.TRAIN.lr_img_path = '
 sed -i "s|config.VALID.hr_img_path = '${data_path}/|config.VALID.hr_img_path = '|g" ${cur_path}/config.py
 sed -i "s|config.VALID.lr_img_path = '${data_path}/|config.VALID.lr_img_path = '|g" ${cur_path}/config.py
 
-#ӡҪ޸
+#结果打印，不需要修改
 echo "------------------ Final result ------------------"
-#FPSҪģ޸
+#输出性能FPS，需要模型审视修改
 TrainingTime=`grep "final_time" $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $5}' | sed 's|s,||g'`
 wait
 FPS=`awk 'BEGIN{printf "%.2f\n",'${n_iteration}'*'${batch_size}'/'${TrainingTime}'}'`
-#ӡҪ޸
+#打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
-#ѵ,Ҫģ޸
+#输出训练精度,需要模型审视修改
 #train_accuracy=`grep "train_acc " $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $12}'|sed 's/,//g'`
-#ӡҪ޸
+#打印，不需要修改
 #echo "Final Train Accuracy : ${train_accuracy}"
 
 
-#ܿ
-#ѵϢҪ޸
+#性能看护结果汇总
+#训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
 CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 
-##ȡݣҪ޸
-#
+##获取性能数据，不需要修改
+#吞吐量
 ActualFPS=${FPS}
-#ѵʱ
+#单迭代训练时长
 TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'/'${FPS}'}'`
 
-#train_$ASCEND_DEVICE_ID.logȡLosstrain_${CaseName}_loss.txtУҪģ
+#从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
 grep "mse" $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk -F ',' '{print $2}'|awk '{print $2}' >> $cur_path/test/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
-#һlossֵҪ޸
+#最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print $1}' $cur_path/test/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
-#ؼϢӡ${CaseName}.logУҪ޸
+#关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "BatchSize = ${BatchSize}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
@@ -152,5 +154,5 @@ echo "TrainAccuracy = None" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseNam
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 
-# ˳anaconda
+# 退出anaconda环境
 conda deactivate

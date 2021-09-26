@@ -33,7 +33,7 @@ def main():
     torch.onnx.export(model,
                       (feats, feat_lens),
                       'jasper_dynamic.onnx',
-                      input_names=['feats', 'output'],
+                      input_names=['feats', 'feat_lens'],
                       output_names=['output'],
                       dynamic_axes=dynamic_axes,
                       verbose=True,

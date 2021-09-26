@@ -17,7 +17,7 @@ data_path=""
 #网络名称，同目录名称
 Network="DCGAN_ID0260_for_TensorFlow"
 #训练epoch
-train_epochs=20
+train_epochs=10
 #训练batch_size
 batch_size=100
 #训练step

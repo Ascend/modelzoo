@@ -2,7 +2,13 @@
 source npu_set_env.sh
 
 /usr/local/Ascend/driver/tools/msnpureport -d 0 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 1 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 2 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 3 -g error
 /usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 5 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 6 -g error
+/usr/local/Ascend/driver/tools/msnpureport -d 7 -g error
 
 currentDir=$(cd "$(dirname "$0")";pwd)
 currtime=`date +%Y%m%d%H%M%S`
@@ -16,18 +22,18 @@ if [ $(uname -m) = "aarch64" ]
 then
     for i in $(seq 0 7)
     do
-    let p_start=0+24*i
-    let p_end=23+24*i
+    let p_start=0+20*i
+    let p_end=19+20*i
     taskset -c $p_start-$p_end python3.7 ${currentDir}/gru_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed 123456 \
-        --workers 160 \
+        --workers 20 \
         --print-freq 1 \
         --dist-url 'tcp://127.0.0.1:50000' \
         --dist-backend 'hccl' \
         --multiprocessing-distributed \
         --world-size 1 \
-        --batch-size 4096 \
+        --batch-size 12288 \
         --epoch 10 \
         --rank 0 \
         --npu $i \
@@ -40,13 +46,13 @@ else
     python3.7 ${currentDir}/gru_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed 123456 \
-        --workers 160 \
+        --workers 80 \
         --print-freq 1 \
         --dist-url 'tcp://127.0.0.1:50000' \
         --dist-backend 'hccl' \
         --multiprocessing-distributed \
         --world-size 1 \
-        --batch-size 4096 \
+        --batch-size 12288 \
         --epoch 10 \
         --rank 0 \
         --npu $i \

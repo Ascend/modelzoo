@@ -1,0 +1,8 @@
+{
+	"black-list":{
+		"to-add":[
+		"ReduceSumD",
+		"Mul"
+		]
+	}
+}

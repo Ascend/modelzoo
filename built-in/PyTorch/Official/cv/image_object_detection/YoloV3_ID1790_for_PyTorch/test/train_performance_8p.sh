@@ -59,10 +59,31 @@ fi
 chmod +x ${cur_path}/../tools/dist_train.sh
 
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
-PORT=29500 ./tools/dist_train.sh configs/yolo/yolov3_d53_320_273e_coco.py 8 \
-    --cfg-options optimizer.lr=0.0032  \
-    --seed 0  \
-    --local_rank 0  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+export RANK_SIZE=8
+
+for((RANK_ID=0;RANK_ID<RANK_SIZE;RANK_ID++))
+do
+    export RANK=$RANK_ID
+
+    if [ $(uname -m) = "aarch64" ]
+    then
+        let a=0+RANK_ID*24
+        let b=23+RANK_ID*24
+        taskset -c $a-$b python3.7 ./tools/train.py configs/yolo/yolov3_d53_320_273e_coco.py \
+            --launcher pytorch \
+            --cfg-options \
+            optimizer.lr=0.0032 \
+            --seed 0 \
+            --local_rank 0 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    else
+        python3.7 ./tools/train.py configs/yolo/yolov3_d53_320_273e_coco.py \
+            --launcher pytorch \
+            --cfg-options \
+            optimizer.lr=0.0032 \
+            --seed 0 \
+            --local_rank 0 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    fi
+done
 
 wait
 

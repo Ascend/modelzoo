@@ -9,7 +9,7 @@ export JOB_ID=10087
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="Bert-CLUE_for_TensorFlow"
+Network="Bert-TNEWS_for_TensorFlow"
 
 
 # 帮助信息，不需要修改

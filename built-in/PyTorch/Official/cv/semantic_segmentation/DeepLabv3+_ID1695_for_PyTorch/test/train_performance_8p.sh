@@ -13,7 +13,7 @@ RANK_ID_START=0
 data_path=""
 
 # 训练epoch
-train_epochs=10
+train_epochs=3
 # 学习率
 learning_rate=0.008
 

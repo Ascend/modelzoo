@@ -74,7 +74,7 @@ class DataLoader:
         img_result = np.maximum(np.minimum(img_result, 255), 0).reshape(227, 227, 3)
         return img_result
 
-    def next_train(self, batch_size):
+    def next_train(self, batch_size, lock):
         batch_img = np.empty((
             batch_size,
             227,
@@ -94,11 +94,13 @@ class DataLoader:
             batch_img[idx] = self.color_augment(cv2.imread(pathname))
             batch_label[idx, class_idx] = 1
 
+        lock.acquire()
         self.cursor_train += batch_size
         if self.cursor_train + batch_size > len(self.idx_train):
             self.cursor_train = 0
             np.random.shuffle(self.idx_train)
-
+        lock.release()
+        
         return batch_img, batch_label
 
     def next_val(self, batch_size):

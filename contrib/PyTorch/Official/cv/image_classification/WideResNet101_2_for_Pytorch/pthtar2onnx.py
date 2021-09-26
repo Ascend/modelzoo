@@ -15,6 +15,7 @@ import torch
 import models.resnet_0_6_0 as resnet_0_6_0
 import torch.onnx
 from collections import OrderedDict
+import os
 
 
 def proc_node_module(checkpoint, AttrName):
@@ -28,21 +29,24 @@ def proc_node_module(checkpoint, AttrName):
     return new_state_dict
 
 
-def convert():
-    checkpoint = torch.load("./scripts/model_best.pth.tar", map_location='cpu')
+def convert(model_path, onnx_save):
+    checkpoint = torch.load(model_path, map_location='cpu')
     checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
-    model = resnet_0_6_0.wide_resnet101_2()
+    model = resnet_0_6_0.wide_resnet101_2(num_classes=1000)
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
-    print(model)
-
     input_names = ["actual_input_1"]
     output_names = ["output1"]
-    dummy_input = torch.randn(16, 3, 224, 224)
-    torch.onnx.export(model, dummy_input, "wide_resnet101_2_npu_16.onnx"
+    dummy_input = torch.randn(1, 3, 224, 224)
+    if len(onnx_save) > 0:
+        save_path = os.path.join(onnx_save, "wide_resnet101_2_npu_16.onnx")
+    else:
+        save_path = "wide_resnet101_2_npu_16.onnx"
+    print(save_path)
+    torch.onnx.export(model, dummy_input, save_path
                      , input_names=input_names, output_names=output_names
                      , opset_version=11)
 
+if __name__ == '__main__':
+    convert('./model_best.pth.tar', '')
 
-if __name__ == "__main__":
-    convert()

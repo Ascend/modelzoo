@@ -24,7 +24,7 @@ train_epochs=1
 #训练batch_size
 batch_size=256
 #训练step
-train_steps=`expr 1281167 / ${batch_size}`
+train_steps=`expr 12811 / ${batch_size}`
 #学习率
 learning_rate=
 

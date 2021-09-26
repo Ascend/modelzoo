@@ -5,6 +5,11 @@
 export RANK_SIZE=8
 RANK_ID_START=0
 
+#规避环境变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
@@ -52,42 +57,71 @@ check_etp_flag=`env | grep etp_running_flag`
 etp_flag=`echo ${check_etp_flag#*=}`
 if [ x"${etp_flag}" != x"true" ];then
     source ${test_path_dir}/env_npu.sh
-fi  
 
-for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
-do
-    #设置环境变量，不需要修改
-    echo "Device ID: $RANK_ID"
-    export RANK_ID=$RANK_ID
-    export ASCEND_DEVICE_ID=$RANK_ID
-    ASCEND_DEVICE_ID=$RANK_ID
+    for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
+    do
+        #设置环境变量，不需要修改
+        echo "Device ID: $RANK_ID"
+        export RANK_ID=$RANK_ID
+        export ASCEND_DEVICE_ID=$RANK_ID
+        ASCEND_DEVICE_ID=$RANK_ID
 
-    #创建DeviceID输出目录，不需要修改
-    if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
-        rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
-        mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-    else
-        mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-    fi
+        #创建DeviceID输出目录，不需要修改
+        if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
+            rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
+            mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+        else
+            mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+        fi  
+        python3.7 train.py  \
+            --model densenet169 \
+            --epochs 2 \
+            --data-path=$data_path \
+            --distributed \
+            --batch-size=$batch_size \
+            --workers 128 \
+            --lr 0.8 \
+            --momentum 0.9 \
+            --weight-decay 1e-4 \
+            --apex \
+            --apex-opt-level O2 \
+            --loss_scale_value 1024 \
+            --seed 1234 \
+            --print-freq 1 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    done
+else
+    for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
+    do
+        #设置环境变量，不需要修改
+        echo "Device ID: $RANK_ID"
+        export RANK_ID=$RANK_ID
+        export ASCEND_DEVICE_ID=$RANK_ID
+        ASCEND_DEVICE_ID=$RANK_ID
 
-
-  
-    python3.7 train.py  \
-        --model densenet169 \
-        --epochs 2 \
-        --data-path=$data_path \
-        --distributed \
-        --batch-size=$batch_size \
-        --workers 128 \
-        --lr 0.8 \
-        --momentum 0.9 \
-        --weight-decay 1e-4 \
-        --apex \
-        --apex-opt-level O2 \
-        --loss_scale_value 1024 \
-        --seed 1234 \
-        --print-freq 1 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-done
+        #创建DeviceID输出目录，不需要修改
+        if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
+            rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
+            mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+        else
+            mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+        fi  
+        python3.7 train_mp.py  \
+            --model densenet169 \
+            --epochs 1 \
+            --data-path=$data_path \
+            --distributed \
+            --batch-size=$batch_size \
+            --workers 128 \
+            --lr 0.8 \
+            --momentum 0.9 \
+            --weight-decay 1e-4 \
+            --apex \
+            --apex-opt-level O2 \
+            --loss_scale_value 1024 \
+            --seed 1234 \
+            --print-freq 1 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    done
+fi
 wait
 ASCEND_DEVICE_ID=0
 ##################获取训练数据################
@@ -99,8 +133,6 @@ e2e_time=$(( $end_time - $start_time ))
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
 FPS=`grep -a 'Epoch:'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|grep eta:|awk -F "img/s: " '{print $NF}'|awk 'NR==1{max=$1;next}{max=max>$1?max:$1}END{print max}'`
-#打印，不需要修改
-echo "Final Performance images/sec : $FPS"
 
 #打印，不需要修改
 echo "E2E Training Duration sec : $e2e_time"
@@ -116,6 +148,9 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 ActualFPS=`awk -v x="$FPS" -v y="$RANK_SIZE" 'BEGIN{printf "%.3f\n", x*y}'`
 #单迭代训练时长
 TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
+
+#打印，不需要修改
+echo "Final Performance images/sec : $ActualFPS"
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要模型审视修改
 grep Epoch: ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep eta:|awk -F "loss: " '{print $NF}' | awk -F " " '{print $1}' >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt

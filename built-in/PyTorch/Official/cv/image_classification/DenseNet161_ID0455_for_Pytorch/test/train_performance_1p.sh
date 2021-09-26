@@ -6,6 +6,11 @@ cur_path=`pwd`
 #集合通信参数,不需要修改
 export RANK_SIZE=1
 
+#规避环境变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 # 数据集路径,保持为空,不需要修改
 data_path=""
 

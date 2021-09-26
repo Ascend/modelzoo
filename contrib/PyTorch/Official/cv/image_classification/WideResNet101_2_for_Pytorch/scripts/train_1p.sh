@@ -11,3 +11,5 @@ nohup python3.7.5 -u main_npu_1p.py \
         --device='npu' \
         --world-size=1 \
         --batch-size=256 > ./wide_resnet101_2_npu_1p.log 2>&1 &
+
+

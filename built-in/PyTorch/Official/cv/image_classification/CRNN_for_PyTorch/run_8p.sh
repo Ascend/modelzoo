@@ -17,5 +17,16 @@ echo "train log path is ${train_log_dir}"
 
 for i in $(seq 0 7)
 do
-python3.7 ${currentDir}/main_8p.py --cfg ${currentDir}/LMDB_8p_config.yaml --npu ${i} > ./crnn_8p_${i}_npu.log 2>&1 &
+    if [ $(uname -m) = "aarch64" ]
+    then
+        let p_start=0+24*$i
+        let p_end=23+24*$i
+        taskset -c $p_start-$p_end python3.7 ${currentDir}/main_8p.py \
+            --cfg ${currentDir}/LMDB_8p_config.yaml \
+            --npu ${i} > ./crnn_8p_${i}_npu.log 2>&1 &
+    else
+        python3.7 ${currentDir}/main_8p.py \
+            --cfg ${currentDir}/LMDB_8p_config.yaml \
+            --npu ${i} > ./crnn_8p_${i}_npu.log 2>&1 &
+    fi
 done

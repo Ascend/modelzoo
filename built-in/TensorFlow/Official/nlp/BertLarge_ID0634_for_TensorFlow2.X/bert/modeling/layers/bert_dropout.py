@@ -17,10 +17,15 @@
 from tensorflow.python.framework import ops
 from tensorflow.python.keras.engine.base_layer import Layer
 from tensorflow.python.ops import array_ops
+from tensorflow.python.ops import nn
 from tensorflow.python.eager import monitoring
 from tensorflow.python.keras import backend as K
 from tensorflow.python.keras.utils import control_flow_util
 from . import npu_ops
+from absl import flags
+from absl import logging
+
+FLAGS=flags.FLAGS
 
 
 # TODO(b/168039935): track dropout rate to decide whether/how to make a
@@ -104,7 +109,7 @@ class Dropout(Layer):
       training = K.learning_phase()
 
     def dropped_inputs():
-      if True:
+      if FLAGS.use_npu_dropout:
         #output = npu_ops.dropout(inputs,1.0 - self.rate)
         output = npu_ops.dropout_v3(inputs,1.0 - self.rate)
         return output

@@ -67,7 +67,7 @@ nohup python3.7 tools/train_net.py \
         DATALOADER.NUM_WORKERS 4 \
         SOLVER.BASE_LR 0.0025 &
 ```
-若将以上的--config-file参数指定为：configs/COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml，则可训练对应的faster_rcnn模型。其他参数含义一致。
+训练结束后，执行 bash eval.sh可获得模型精度。若将以上的--config-file参数指定为：configs/COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml，则可训练对应的faster_rcnn模型。其他参数含义一致。
 
 ## 8P
 1. 编辑并运行run8p.sh
@@ -119,7 +119,7 @@ nohup python3.7 tools/train_net.py \
         SOLVER.BASE_LR 0.02 &
 
 ```
-若将以上的--config-file参数指定为：configs/COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml，则可训练对应的faster_rcnn模型。其他参数含义一致。
+训练结束后，执行 bash eval.sh可获得模型精度。若将以上的--config-file参数指定为：configs/COCO-Detection/faster_rcnn_R_101_FPN_3x.yaml，则可训练对应的faster_rcnn模型。其他参数含义一致。
 
 ## Docker容器训练：
 

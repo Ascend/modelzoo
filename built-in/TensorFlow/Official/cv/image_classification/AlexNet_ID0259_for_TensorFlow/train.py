@@ -37,6 +37,8 @@ import matplotlib.pyplot as plt
 
 from npu_bridge.estimator import npu_ops
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+import queue
+import threading
 
 class AlexNet:
     def __init__(self, input_size, lr=0.01, momentum=0.9, decaying_factor=0.0005,
@@ -79,6 +81,14 @@ class AlexNet:
         ##### but we need to watch Cross Entropy Error
         ##### to watch how well our model does converge.
         return train_op, prediction, CEE
+    
+    def queue_thread(self, loader, max_step, q, lock):
+        for i in range(max_step):
+            input_batch, label_batch = loader.next_train(self.input_size, lock)
+            inputs = []
+            inputs.append(input_batch)
+            inputs.append(label_batch)
+            q.put(inputs)
 
     def run(self, max_epoch, loss_sampling_step, acc_sampling_step, max_step=0,data_path=""):
         self.loss_sampling_step = loss_sampling_step
@@ -103,9 +113,9 @@ class AlexNet:
             config = tf.ConfigProto()
             custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
             custom_op.name = "NpuOptimizer"
-            custom_op.parameter_map["use_off_line"].b = True # ʾڕNAIִѵ
+            custom_op.parameter_map["use_off_line"].b = True # ������ʾ�������ڕN��AI������ִ��ѵ��
             custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
-            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # ʾرremap
+            config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # ������ʾ�ر�remap
 
             sess = tf.Session(config=config)
 
@@ -119,11 +129,23 @@ class AlexNet:
             start_time = time.time()
             if max_step == 0:
                 max_step = len(loader.idx_train)//self.input_size
+            
+            lock = threading.Lock()
+            q = queue.Queue(40)
+            preThread_num = 24
+            for i in range(preThread_num):
+                threading.Thread(target=self.queue_thread, args=(loader, (max_step*max_epoch), q, lock), daemon=True).start()
+            time.sleep(20)
+
             for epoch in range(max_epoch):
                 train_accuracy = 0
                 for itr in range(max_step):
                     time1 = time.time()
-                    input_batch, label_batch = loader.next_train(self.input_size)
+                    #input_batch, label_batch = loader.next_train(self.input_size)
+                    inputs = q.get()
+                    input_batch = inputs[0]
+                    label_batch = inputs[1]
+
                     _, loss, tmpacc = sess.run([train_op, loss_, accuracy],
                                                feed_dict={X: input_batch, Y: label_batch,
                                                           keep_prob: self.keep_prob, learning_rate: self.lr})

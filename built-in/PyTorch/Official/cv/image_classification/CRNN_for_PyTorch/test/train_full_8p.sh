@@ -84,9 +84,18 @@ else
     mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
 fi
 
-python3.7 main_8p.py \
---cfg LMDB_8p_config.yaml \
---npu ${i} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+if [ $(uname -m) = "aarch64" ]
+then
+    let p_start=0+24*$i
+    let p_end=23+24*$i
+    taskset -c $p_start-$p_end python3.7 main_8p.py \
+        --cfg LMDB_8p_config.yaml \
+        --npu ${i} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+else
+    python3.7 main_8p.py \
+        --cfg LMDB_8p_config.yaml \
+        --npu ${i} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+fi
 done
     
 wait

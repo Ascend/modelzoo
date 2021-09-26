@@ -4,3 +4,5 @@ AutoTune:OK
 PerfStatus:OK
 GPUStatus:OK
 NPUMigrationStatus:OK
+ModelConvert:OK
+QuantStatus:OK

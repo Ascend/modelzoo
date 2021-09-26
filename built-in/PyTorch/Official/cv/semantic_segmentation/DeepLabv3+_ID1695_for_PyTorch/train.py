@@ -62,7 +62,9 @@ class Trainer(object):
         
         # Define Dataloader
         kwargs = {'num_workers': args.workers, 'pin_memory': True}
+        kwargs['drop_last'] = False if args.multiprocessing_distributed else True
         self.train_loader, self.val_loader, self.test_loader, self.nclass, self.train_sampler = make_data_loader(args, **kwargs)
+        self.nclass = args.num_classes if args.num_classes else self.nclass
 
         # Define network
         model = DeepLab(num_classes=self.nclass,
@@ -112,7 +114,7 @@ class Trainer(object):
         model_dict = self.model.state_dict()
         # Resuming checkpoint
         self.best_pred = 0.0
-        if args.resume is not None:
+        if args.resume:
             if not os.path.isfile(args.resume):
                 raise RuntimeError("=> no checkpoint found at '{}'" .format(args.resume))
             checkpoint = torch.load(args.resume,lambda storage, loc: storage)
@@ -126,6 +128,7 @@ class Trainer(object):
 
         # Clear start epoch if fine-tuning
         if args.ft:
+            self.best_pred = 0
             args.start_epoch = 0
 
     def training(self, epoch):
@@ -220,6 +223,8 @@ class Trainer(object):
 
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeeplabV3Plus Training")
+    parser.add_argument('--num_classes', type=int, default=0,
+                        help='dataset num classes')
     parser.add_argument('--backbone', type=str, default='resnet',
                         choices=['resnet', 'xception', 'drn', 'mobilenet'],
                         help='backbone name (default: resnet)')
@@ -277,7 +282,7 @@ def main():
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
     # checking point
-    parser.add_argument('--resume', type=str, default=None,
+    parser.add_argument('--resume', type=str, default='',
                         help='put the path to resuming file if needed')
     parser.add_argument('--checkname', type=str, default=None,
                         help='set the checkpoint name')

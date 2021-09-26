@@ -10,7 +10,7 @@ Instructions
 
 ======Operation mode: bash envcheck.sh param1
 
-======Parameter Description: param1 means training dataset archive directory, used to check whether the directory is a high-speed disk. If it is not specified, it is /npu by default.For example,if the training dataset archive directory is in /dataset, then you can use "bash envcheck.sh /dataset" to check whether /dataset directory is a high-speed disk.
+======Parameter Description: param1 means training dataset archive directory, used to check whether the directory is a high-speed disk. If it is not specified, it is /npu by default.For example,if the training dataset archive directory is in /dataset, then you can use "bash envcheck.sh /dataset" to check whether /dataset directory is a high-speed disk.If it is not a high-speed disk, may cause insufficient data reading and writing speed, which will affect the training performance.
 
 Matters needing attention
 

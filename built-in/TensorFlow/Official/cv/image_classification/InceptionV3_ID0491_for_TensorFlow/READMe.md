@@ -139,7 +139,9 @@ echo "parameter explain:
 
 ## 数据集准备<a name="section361114841316"></a>
 
-数据集下载地址：https://www.kaggle.com/c/cifar-10 or http://www.cs.toronto.edu/~kriz/cifar.html
+1、用户自行准备好数据集，包括训练数据集和验证数据集。使用的数据集是CIFAR10
+
+3、数据集的处理可以参考"简述->开源代码路径处理"
 
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。

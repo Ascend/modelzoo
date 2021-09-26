@@ -7,6 +7,11 @@ export RANK_SIZE=1
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
+#规避环境变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 #网络名称,同目录名称,需要模型审视修改
 Network="DenseNet169_ID0454_for_Pytorch"
 
@@ -71,23 +76,38 @@ check_etp_flag=`env | grep etp_running_flag`
 etp_flag=`echo ${check_etp_flag#*=}`
 if [ x"${etp_flag}" != x"true" ];then
     source ${test_path_dir}/env_npu.sh
+    python3.7 train.py  \
+        --model densenet169 \
+        --epochs 1 \
+        --data-path=$data_path \
+        --batch-size=$batch_size \
+        --workers 16 \
+        --lr 0.1 \
+        --momentum 0.9 \
+        --weight-decay 1e-4 \
+        --apex \
+        --apex-opt-level O2 \
+        --loss_scale_value 1024 \
+        --seed 1234 \
+        --device_id=$ASCEND_DEVICE_ID \
+        --print-freq 1 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+else
+    python3.7 train_mp.py  \
+        --model densenet169 \
+        --epochs 1 \
+        --data-path=$data_path \
+        --batch-size=$batch_size \
+        --workers 16 \
+        --lr 0.1 \
+        --momentum 0.9 \
+        --weight-decay 1e-4 \
+        --apex \
+        --apex-opt-level O2 \
+        --loss_scale_value 1024 \
+        --seed 1234 \
+        --device_id=$ASCEND_DEVICE_ID \
+        --print-freq 1 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 fi
-python3.7 train.py  \
-    --model densenet169 \
-    --epochs 2 \
-    --data-path=$data_path \
-    --batch-size=$batch_size \
-    --workers 16 \
-    --lr 0.1 \
-    --momentum 0.9 \
-    --weight-decay 1e-4 \
-    --apex \
-    --apex-opt-level O2 \
-    --loss_scale_value 1024 \
-    --seed 1234 \
-    --device_id=$ASCEND_DEVICE_ID \
-    --print-freq 1 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-
 wait
 
 ##################获取训练数据################

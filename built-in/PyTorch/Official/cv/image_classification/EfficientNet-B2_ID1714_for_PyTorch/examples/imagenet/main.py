@@ -418,6 +418,9 @@ def validate(val_loader, model, criterion, args, nnpus_per_node):
             batch_time.update(time.time() - end)
             end = time.time()
 
+            if i > len(val_loader):
+                pass
+
             if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                         and args.rank % nnpus_per_node == 0):
                 progress.print(i)

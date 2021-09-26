@@ -187,7 +187,7 @@ def main_worker(npu, ngpus_per_node, args):
     model.apply(init_weights)
     model = model.to(CALCULATE_DEVICE)
     print(f'The model has {count_parameters(model):,} trainable parameters')
-    optimizer = optim.Adam(model.parameters())
+    optimizer = optim.Adam(model.parameters(), lr=0.003)
     if args.amp:
         model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
 

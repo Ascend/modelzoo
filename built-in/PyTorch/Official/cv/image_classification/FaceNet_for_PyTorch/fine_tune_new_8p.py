@@ -153,7 +153,8 @@ def main():
     if args.multiprocessing_distributed:
         # world_size means nums of all devices or nums of processes
         args.world_size = npus_per_node * args.world_size
-        mp.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, args))
+        npu = int(os.environ['RANK_ID'])
+        main_worker(npu, npus_per_node, args)
 
 
 def main_worker(npu, npus_per_node, args):

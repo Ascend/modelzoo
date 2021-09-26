@@ -11,7 +11,7 @@ export RANK_SIZE=8
 # 数据集路径,保持为空,不需要修改
 data_path=""
 # 训练epoch
-train_epochs=1
+train_epochs=3
 # 指定训练所使用的npu device卡id
 device_id=0
 # 学习率

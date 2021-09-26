@@ -26,6 +26,15 @@ export PYTHONPATH=$cur_path/../WDL_for_PyTorch:$PYTHONPATH
 
 DATA_PATH=$1
 
+start_time=$(date +%s)
+output_dir=${cur_path}/output_8p_${start_time}
+if [ -d ${output_dir}/ ];then
+    rm -rf ${output_dir}
+    mkdir -p ${output_dir}
+else
+    mkdir -p ${output_dir}
+fi
+
 if [ $(uname -m) = "aarch64" ]
 then
     for i in $(seq 0 7)
@@ -35,13 +44,14 @@ then
     taskset -c $p_start-$p_end $CMD python3.7 -u run_classification_criteo_wdl.py \
         --device_id $i \
         --data_path $DATA_PATH \
+        --checkpoint_save_path=${output_dir} \
         --lr=0.0009 \
 	      --sparse_embed_dim 4 \
 	      --batch_size 4096 \
 	      --epochs 3 \
         --amp \
         --device_num 8 \
-        --dist > train_$i.log 2>&1 &
+        --dist > ${output_dir}/train_$i.log 2>&1 &
     done
 else
     for i in $(seq 0 7)
@@ -49,12 +59,13 @@ else
     python3.7 -u run_classification_criteo_wdl.py \
         --device_id $i \
         --data_path $DATA_PATH \
+        --checkpoint_save_path=${output_dir} \
         --lr=0.0009 \
 	      --sparse_embed_dim 4 \
 	      --batch_size 4096 \
 	      --epochs 3 \
         --amp \
         --device_num 8 \
-        --dist > train_$i.log 2>&1 &
+        --dist > ${output_dir}/train_$i.log 2>&1 &
     done
 fi

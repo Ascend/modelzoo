@@ -3,6 +3,11 @@
 #当前路径,不需要修改
 cur_path=`pwd`
 
+#规避环境变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 #集合通信参数,不需要修改
 export RANK_SIZE=8
 RANK_ID_START=0
@@ -35,6 +40,10 @@ start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/../references/classification
+
+#修改参数
+sed -i "s|pass|break|g"  $cur_path/../references/classification/utils.py
+wait
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
     #设置环境变量，不需要修改
@@ -66,7 +75,7 @@ do
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     python3 train.py  \
         --model densenet161 \
-        --epochs 2 \
+        --epochs 1 \
         --data-path=$data_path \
         --distributed \
         --batch-size=$batch_size \
@@ -89,12 +98,14 @@ ASCEND_DEVICE_ID=0
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
+#参数回改
+sed -i "s|break|pass|g"  $cur_path/../references/classification/utils.py
+wait
+
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
 FPS=`grep -a 'Epoch:'  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|grep eta:|awk -F "img/s: " '{print $NF}'|awk 'NR==1{max=$1;next}{max=max>$1?max:$1}END{print max}'`
-#打印，不需要修改
-echo "Final Performance images/sec : $FPS"
 
 #打印，不需要修改
 echo "E2E Training Duration sec : $e2e_time"
@@ -111,8 +122,11 @@ ActualFPS=`awk -v x="$FPS" -v y="$RANK_SIZE" 'BEGIN{printf "%.3f\n", x*y}'`
 #单迭代训练时长
 TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
+#打印，不需要修改
+echo "Final Performance images/sec : $ActualFPS"
+
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要模型审视修改
-grep Epoch: $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep eta:|awk -F "loss: " '{print $NF}' | awk -F " " '{print $1}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep Epoch: $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep eta:|awk -F "loss: " '{print $NF}' | awk -F " " '{print $1}' > $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`

@@ -47,7 +47,7 @@ def _init_dist_pytorch(backend, **kwargs):
     offset = 0 if os.getenv('NPUID', None) is None else int(os.environ['NPUID'])
     num_gpus = torch.npu.device_count()
     torch.npu.set_device((rank + offset) % num_gpus)
-    dist.init_process_group(backend=backend, **kwargs)
+    dist.init_process_group(backend=backend, world_size=num_gpus, rank=rank)
 
 
 def _init_dist_mpi(backend, **kwargs):

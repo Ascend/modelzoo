@@ -58,7 +58,7 @@ Ascend ModelZoo，欢迎各位开发者
     # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     # See the License for the specific language governing permissions and
     # limitations under the License.
-     ```
+    ```
    开发场景
 
     1、基于TensorFlow框架开发模型，需在模型项目顶层目录下添加TensorFlow Apache 2.0 License [TensorFlow License链接](https://github.com/tensorflow/tensorflow/blob/master/LICENSE)
@@ -139,7 +139,7 @@ Ascend ModelZoo，欢迎各位开发者
     # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     # See the License for the specific language governing permissions and
     # limitations under the License.
-    ```
+     ```
 
 * MindSpore/ACL
 
@@ -160,7 +160,7 @@ Ascend ModelZoo，欢迎各位开发者
     # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     # See the License for the specific language governing permissions and
     # limitations under the License.
-    ```
+     ```
 
 > 关于License声明时间，应注意： 2021年新建的文件，应该是Copyright 2021 Huawei Technologies Co., Ltd 2020年创建年份，2020年修改年份，应该是Copyright 2020 Huawei Technologies Co., Ltd
 
@@ -184,9 +184,21 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 4、精度和性能达成要求：尽量达到原始模型水平；
 
-5、数据集、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
+5、预训练checkpoint、结果checkpoint请提供归档OBS、网盘链接，如来自开源需明确来源地址
 
-参考：[Readme](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README.md)
+6、数据集说明
+
+- [ ] 不允许直接提供数据集的下载链接，可使用词汇：用户自行准备好数据集，可选用“XXX”，“XXX”，“XXX”
+
+  例如：请用户自行准备好数据集，包含训练集和验证集两部分，可选用的数据集包括ImageNet2012，CIFAR10、Flower等，包含train和val两部分。
+
+- [ ] 脚本中不允许提供链接下载数据集，如果开源脚本上存在对应的链接，请修改或者删除对应的脚本
+
+ReadMe写作可参考下面两个链接：
+
+[Readme example1](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README.md)
+
+[Readme example2](https://www.hiascend.com/zh/software/modelzoo/detail/C/093ed0219cb14f068af33784c62cf7ec)
 
  **四、自测试用例**
 

@@ -66,7 +66,7 @@ fi
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 python3 train.py  \
     --model densenet201 \
-     --epochs 2 \
+     --epochs 1 \
      --data-path=$data_path \
      --batch-size=$batch_size \
      --workers 16 \

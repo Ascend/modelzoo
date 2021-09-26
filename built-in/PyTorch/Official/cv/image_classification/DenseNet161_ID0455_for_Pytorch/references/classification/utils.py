@@ -168,9 +168,16 @@ class MetricLogger(object):
             ])
         MB = 1024.0 * 1024.0
         for obj in iterable:
+            #print("obj-----",obj)
             data_time.update(time.time() - end)
             yield obj
             iter_time.update(time.time() - end)
+            if header == "Test:":
+                if i > 10:
+                    pass
+            else:
+                if i > 50:
+                    pass
             if args.is_master_node and i % args.print_freq == 0:
                 eta_seconds = iter_time.global_avg * (len(iterable) - i)
                 eta_string = str(datetime.timedelta(seconds=int(eta_seconds)))

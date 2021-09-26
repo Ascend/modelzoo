@@ -47,3 +47,34 @@ bash ./test/train_eval_8p.sh --data_path=real_data_path
 | -        | 386       | 1        | 1        | O2       |
 | 78.627   | 3109      | 8        | 90       | O2       |
 
+```
+
+## Inference
+Download the mindx SDK development kit(https://www.hiascend.com/software/mindx-sdk/sdk-detail), version:2.0.2
+then Compile inference image, start the docker
+```
+docker build -t infer_image --build-arg FROM_IMAGE_NAME=base_image:tag --build-arg SDK_PKG=sdk_pkg
+bash docker_start_infer.sh docker_image model_dir
+```
+
+# mxbase
+configure environment variables and modify label_file and offline_inference model path in opencv.cpp.
+then, Execute the program and start inference, 
+```
+bash build.sh
+./wideresnet [val_image_path]
+```
+calculate the inference accuracy
+```
+python3.7 classification_task_metric.py result/ ../../data/config/val_label.txt . ./result.json
+cat result.json
+```
+
+# sdk
+run ''' python main.py --help ''' to view the parameter details and modify them accordingly.
+then, start inference and calculate the inference accuracy
+```
+bash run.sh ../../data/input/result
+python3.7 classification_task_metric.py result/ ../../data/config/val_label.txt . ./result.json
+cat result.json
+```

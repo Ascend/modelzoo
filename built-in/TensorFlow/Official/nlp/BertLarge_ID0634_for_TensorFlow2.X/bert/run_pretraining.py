@@ -76,6 +76,10 @@ flags.DEFINE_boolean(name='use_fastgelu', default=True,
                     help='whether to enable fastgelu, default is True')
 flags.DEFINE_boolean(name='use_mixlist', default=True,
                     help='whether to enable mixlist, default is True')
+flags.DEFINE_string(name='mixlist_file', default='ops_info.json',
+                    help='mixlist file name, default is ops_info.json')
+flags.DEFINE_boolean(name='use_npu_dropout', default=True,
+                    help='whether to enable npu_dropout, default is True')
 
 flags.DEFINE_string('train_files', None,
                     'File path to retrieve training data for pre-training.')
@@ -149,8 +153,9 @@ def npu_config():
   npu_device.global_options().variable_memory_max_size=4*1024*1024*1024
   #npu_device.global_options().graph_memory_max_size=str("27*1024*1024*1024")
   npu_device.global_options().graph_memory_max_size=29205777612
-  if FLAGS.use_mixlist:
-    npu_device.global_options().modify_mixlist="../configs/ops_info.json"
+  if FLAGS.use_mixlist and FLAGS.precision_mode=='allow_mix_precision':
+    logging.info('start to set op blacklist according to %s',FLAGS.mixlist_file)
+    npu_device.global_options().modify_mixlist="../configs/"+FLAGS.mixlist_file
   npu_device.open().as_default()
 
 
@@ -342,7 +347,14 @@ def run_bert_pretrain(strategy, custom_callbacks=None):
                'strategy.')
 
   performance.set_mixed_precision_policy(common_flags.dtype())
-  set_split_strategy_by_idx([49,113,177,241,305,353,385,397])
+  if(bert_config.num_hidden_layers==24):
+    logging.info('Bert Large split strategy')
+    set_split_strategy_by_idx([49,113,177,241,305,353,385,397])
+  elif(bert_config.num_hidden_layers==12):
+    logging.info('Bert Base split strategy')
+    set_split_strategy_by_idx([8,56,104,152,200,205])
+  else:
+    logging.info("There is not split strategy")
   _, masked_lm_accuracy, run_steps = run_customized_training(
       strategy=strategy,
       optimizer_type=FLAGS.optimizer_type,

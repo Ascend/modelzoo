@@ -24,7 +24,7 @@ train_epochs=1
 #训练batch_size
 batch_size=2048
 #训练step
-#train_steps=`expr 1281167 / ${batch_size}`
+train_steps=20
 #学习率
 learning_rate=1.6
 
@@ -94,7 +94,10 @@ if [ -d ${test_path_dir}/output/$ASCEND_DEVICE_ID ];then
 else
     mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
 fi
-
+#修改参数
+sed -i "422s|pass|break|g" ${test_path_dir}/../examples/imagenet/main.py
+sed -i "s|i > len(val_loader)|i > $train_steps|g" ${test_path_dir}/../examples/imagenet/main.py
+wait
 ##################启动训练脚本##################
 #训练开始时间，不需要修改
 start_time=$(date +%s)
@@ -117,7 +120,7 @@ python3 ${test_path_dir}/../examples/imagenet/main.py \
 		--multiprocessing-distributed \
         --world-size 1 \
         --rank 0 \
-		--stop-step-num=128 \
+		--stop-step-num=$train_steps \
 		--device_list '0,1,2,3,4,5,6,7' > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 & 
 wait
 
@@ -125,6 +128,10 @@ wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
+#参数改回
+sed -i "422s|break|pass|g" ${test_path_dir}/../examples/imagenet/main.py
+sed -i "s|i > $train_steps|i > len(val_loader)|g" ${test_path_dir}/../examples/imagenet/main.py
+wait
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改

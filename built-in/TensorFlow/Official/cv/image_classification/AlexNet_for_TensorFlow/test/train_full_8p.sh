@@ -58,6 +58,9 @@ do
         cp -rf $install_path/fwkacllib/data/rl/Ascend910/custom ${autotune_dump_path}/RL/
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --bind_core* ]]; then
+        bind_core=`echo ${para#*=}`
+        name_bind="_bindcore"
     fi
 done
 
@@ -124,7 +127,14 @@ num_cpus_per_device=$((num_cpus/8))
 start_id=$((num_cpus_per_device*ASCEND_DEVICE_ID))	
 end_id=$((num_cpus_per_device*ASCEND_DEVICE_ID+num_cpus_per_device-1))
 
-nohup taskset -c ${start_id}-${end_id} python3.7 ${EXEC_DIR}/../train.py --rank_size=8 \
+    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
+    let a=RANK_ID*${corenum}/8
+    let b=RANK_ID+1
+    let c=b*${corenum}/8-1
+    if [ "x${bind_core}" != x ];then
+        bind_core="taskset -c $a-$c"
+    fi
+nohup ${bind_core} python3.7 ${EXEC_DIR}/../train.py --rank_size=8 \
                       --epochs_between_evals=1 \
                       --mode=train \
         	            --max_epochs=150 \
@@ -165,7 +175,7 @@ echo "E2E training Duration sec: $e2e_time"
 #训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
-CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
+CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据
 #吞吐量，不需要修改

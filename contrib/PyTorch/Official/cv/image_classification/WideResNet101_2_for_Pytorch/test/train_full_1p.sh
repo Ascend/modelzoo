@@ -89,17 +89,17 @@ fi
 
 
 ##################创建日志输出目录，不需要修改##################
+#训练开始时间，不需要修改
+start_time=$(date +%s)
 ASCEND_DEVICE_ID=${device_id}
-if [ -d ${test_path_dir}/output/$ASCEND_DEVICE_ID ];then
-    rm -rf ${test_path_dir}/output/$ASCEND_DEVICE_ID
-    mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+if [ -d ${test_path_dir}/train_1p_${start_time} ];then
+    rm -rf ${test_path_dir}/train_1p_${start_time}
+    mkdir -p ${test_path_dir}/train_1p_${start_time}
 else
-    mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
+    mkdir -p ${test_path_dir}/train_1p_${start_time}
 fi
 
 ##################启动训练脚本##################
-#训练开始时间，不需要修改
-start_time=$(date +%s)
 # 非平台场景时source 环境变量
 check_etp_flag=`env | grep etp_running_flag`
 etp_flag=`echo ${check_etp_flag#*=}`
@@ -117,7 +117,9 @@ python3.7 -u ./main_npu_1p.py \
     --opt-level='O2' \
     --device='npu' \
     --world-size=1 \
-    --batch-size=${batch_size} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    --npu=${ASCEND_DEVICE_ID} \
+    --save_path=${test_path_dir}/train_1p_${start_time} \
+    --batch-size=${batch_size} > ${test_path_dir}/train_1p_${start_time}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 
@@ -129,12 +131,12 @@ e2e_time=$(( $end_time - $start_time ))
 # 终端结果打印，不需要修改
 echo "------------------ Final result ------------------"
 # 输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
+FPS=`grep -a 'FPS'  ${test_path_dir}/train_1p_${start_time}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 # 输出训练精度,需要模型审视修改
-train_accuracy=`grep -a '* Acc@1' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print}'|awk -F "Acc@1" '{print $NF}'|awk -F " " '{print $1}'`
+train_accuracy=`grep -a '* Acc@1' ${test_path_dir}/train_1p_${start_time}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print}'|awk -F "Acc@1" '{print $NF}'|awk -F " " '{print $1}'`
 # 打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
@@ -152,21 +154,21 @@ ActualFPS=${FPS}
 TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 # 从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep Epoch: ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v Test|awk -F "Loss" '{print $NF}' | awk -F " " '{print $1}' >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep Epoch: ${test_path_dir}/train_1p_${start_time}/train_$ASCEND_DEVICE_ID.log|grep -v Test|awk -F "Loss" '{print $NF}' | awk -F " " '{print $1}' >> ${test_path_dir}/train_1p_${start_time}/train_${CaseName}_loss.txt
 
 # 最后一个迭代loss值，不需要修改
-ActualLoss=`awk 'END {print}' ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
+ActualLoss=`awk 'END {print}' ${test_path_dir}/train_1p_${start_time}/train_${CaseName}_loss.txt`
 
 
 ##################将训练数据存入文件##################
 # 关键信息打印到${CaseName}.log中，不需要修改
-echo "Network = ${Network}" > ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "RankSize = ${RANK_SIZE}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "BatchSize = ${BatchSize}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "DeviceType = ${DeviceType}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "CaseName = ${CaseName}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualFPS = ${ActualFPS}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "Network = ${Network}" > ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "RankSize = ${RANK_SIZE}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "BatchSize = ${BatchSize}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "DeviceType = ${DeviceType}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "CaseName = ${CaseName}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "ActualFPS = ${ActualFPS}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log
+echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/train_1p_${start_time}/${CaseName}.log

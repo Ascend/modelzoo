@@ -11,7 +11,7 @@
 2. Ascend provides the V1.5 version of the 50-layer ResNet network this time. The difference between the V1.5 version of the ResNet network and the V1 version is that in the bottleneck module, the V1 version is set stride=2 in the first 1x1 convolutional layer, and V1.5 sets stride=2 in the 3x3 convolutional layer.
 
 ## Dataset
-We have used the [ImageNet](http://www.image-net.org/)dataset as an example here, you can use mnist or your own dataset to modify and adapt.
+We have used the ImageNet dataset as an example here, you can use mnist or your own dataset to modify and adapt.
 We use [build_imagenet_data](https://github.com/tensorflow/models/blob/1af55e018eebce03fb61bba9959a04672536107d/research/slim/datasets/build_imagenet_data.py) to build record for training.
 
 ## Running Code
@@ -55,7 +55,7 @@ There are other arguments about models and training process. Use the `--help` or
 - best result
     - Accuracy(Top1): 79.03 
     - Accuracy(Top5): 94.53
- 
+
 ### More 
 
 #### modify file

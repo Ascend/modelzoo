@@ -34,7 +34,7 @@ import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
-
+from pthtar2onnx import convert
 import models
 from models import resnet_0_6_0
 
@@ -90,6 +90,8 @@ parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training. ')
 parser.add_argument('--gpu', default=None, type=int,
                     help='GPU id to use.')
+parser.add_argument('--npu', default=None, type=int,
+                    help='NPU id to use.')
 parser.add_argument('--multiprocessing-distributed', action='store_true',
                     help='Use multi-processing distributed training to launch '
                          'N processes per node, which has N GPUs. This is the '
@@ -109,13 +111,42 @@ parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--prof', default=False, action='store_true',
                     help='use profiling to evaluate the performance of model')
+parser.add_argument('--save_path', default='', type=str,
+                    help='path to save models')
+# modelarts modification
+parser.add_argument('--train_url',
+                    default='',
+                    type=str,
+                    help="setting dir of training output")
+parser.add_argument('--data_url',
+                    metavar='DIR',
+                    default='',
+                    help='path to dataset')
+
+parser.add_argument('--model_url',
+                    metavar='DIR',
+                    default='',
+                    help='path to pretrained model')
+parser.add_argument('--onnx', default=True, action='store_true',
+                    help="convert pth model to onnx")
+
+
+cur_step = 0
+CACHE_TRAINING_URL = "/cache/training/"
+CACHE_DATA_URL = "/cache/data_url"
+CACHE_MODEL_URL = "/cache/model"
 
 best_acc1 = 0
 
 
 def main():
     args = parser.parse_args()
-
+    global CALCULATE_DEVICE
+    CALCULATE_DEVICE = "npu:{}".format(args.npu)
+    if 'npu' in CALCULATE_DEVICE:
+        torch.npu.set_device(CALCULATE_DEVICE)
+    if args.data_url:
+        import moxing as mox
     if args.seed is not None:
         random.seed(args.seed)
         torch.manual_seed(args.seed)
@@ -176,12 +207,22 @@ def main_worker(gpu, ngpus_per_node, args):
         print("=> using pre-trained model wide_resnet101_2")
         model = resnet_0_6_0.wide_resnet101_2()
         print("loading model of yours...")
-        pretrained_dict = torch.load("./model_best.pth.tar", map_location="cpu")["state_dict"]
+        model_path = "./checkpoint.pth.tar"
+        if args.model_url:
+            real_path = CACHE_MODEL_URL
+            if not os.path.exists(real_path):
+                os.makedirs(real_path)
+            mox.file.copy_parallel(args.model_url, real_path)
+            print("training data finish copy to %s." % real_path)
+            model_path = os.path.join(CACHE_MODEL_URL, 'checkpoint.pth.tar')
+        pretrained_dict = torch.load(model_path, map_location="cpu")["state_dict"]
         model.load_state_dict({k.replace('module.', ''): v for k, v in pretrained_dict.items()})
         if "fc.weight" in pretrained_dict:
             pretrained_dict.pop('fc.weight')
             pretrained_dict.pop('fc.bias')
-        model.load_state_dict(pretrained_dict, strict=False)
+        for param in model.parameters():
+            param.requires_grad = False
+        model.fc = nn.Linear(2048,1000)
     else:
         print("=> creating model wide_resnet101_2")
         model = resnet_0_6_0.wide_resnet101_2()
@@ -226,7 +267,7 @@ def main_worker(gpu, ngpus_per_node, args):
     # define loss function (criterion) and optimizer
     # criterion = nn.CrossEntropyLoss().cuda(args.gpu)
     ############## npu modify 4 begin #############
-    # 将损失函数迁移到NPU上进行计算。
+    # tranfer the dataset to NPU to compute
     criterion = nn.CrossEntropyLoss().to(CALCULATE_DEVICE)
     ############## npu modify 4 end #############
     optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
@@ -261,6 +302,13 @@ def main_worker(gpu, ngpus_per_node, args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     cudnn.benchmark = True
+    if args.data_url:
+        real_path = CACHE_DATA_URL
+        if not os.path.exists(real_path):
+            os.makedirs(real_path)
+        mox.file.copy_parallel(args.data_url, real_path)
+        print("training data finish copy to %s." % real_path)
+        args.data = real_path
 
     # Data loading code
     traindir = os.path.join(args.data, 'train')
@@ -328,8 +376,10 @@ def main_worker(gpu, ngpus_per_node, args):
                 'arch': args.arch,
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
-                'optimizer' : optimizer.state_dict(),
+                'optimizer': optimizer.state_dict(),
             }, is_best)
+    if args.train_url:
+        mox.file.copy_parallel(CACHE_TRAINING_URL, args.train_url)
 
 
 def profiling(data_loader, model, criterion, optimizer, args):
@@ -383,7 +433,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
 
     # switch to train mode
     model.train()
-
     end = time.time()
     for i, (images, target) in enumerate(train_loader):
         # measure data loading time
@@ -394,7 +443,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
         # if torch.cuda.is_available():
         #     target = target.cuda(args.gpu, non_blocking=True)
         ############## npu modify  5 begin #############
-        # 将数据集迁移到NPU上进行计算并修改target数据类型
+        # transfer the dataset to NPU to compute and modify the type of target
         if 'npu' in CALCULATE_DEVICE:
             target = target.to(torch.int32)
         images, target = images.to(CALCULATE_DEVICE, non_blocking=True), target.to(CALCULATE_DEVICE, non_blocking=True)
@@ -405,7 +454,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
         loss = criterion(output, target)
 
         # measure accuracy and record loss
-        acc1, acc5 = accuracy(output, target, topk=(1, 5))
+        acc1, acc5 = accuracy(output, target, topk=(1, 5))# pylint: disable=unbalanced-tuple-unpacking
         losses.update(loss.item(), images.size(0))
         top1.update(acc1[0], images.size(0))
         top5.update(acc5[0], images.size(0))
@@ -429,7 +478,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, ngpus_per_node
     ###### modify 4 ######
         if i % args.print_freq == 0:
             if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                                                        and args.rank % ngpus_per_node == 0):
+                                                          and args.rank % ngpus_per_node == 0):
                 progress.display(i)
 
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed
@@ -474,7 +523,7 @@ def validate(val_loader, model, criterion, args):
             loss = criterion(output, target)
 
             # measure accuracy and record loss
-            acc1, acc5 = accuracy(output, target, topk=(1, 5))
+            acc1, acc5 = accuracy(output, target, topk=(1, 5))# pylint: disable=unbalanced-tuple-unpacking
             losses.update(loss.item(), images.size(0))
             top1.update(acc1[0], images.size(0))
             top5.update(acc5[0], images.size(0))
@@ -494,15 +543,21 @@ def validate(val_loader, model, criterion, args):
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+    args = parser.parse_args()
+    filename = os.path.join(args.save_path, filename)
     torch.save(state, filename)
+    path_best = os.path.join(args.save_path, 'model_best.pth.tar')
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        shutil.copyfile(filename, path_best)
 
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
     def __init__(self, name, fmt=':f', start_count_index=2):
+        self.val = None
+        self.N = None
+        self.avg = None
         self.name = name
         self.fmt = fmt
         self.reset()
@@ -583,6 +638,6 @@ def accuracy(output, target, topk=(1,)):
 if __name__ == '__main__':
     ############## npu modify 6 begin #############
     if 'npu' in CALCULATE_DEVICE:
-       torch.npu.set_device(CALCULATE_DEVICE)
+        torch.npu.set_device(CALCULATE_DEVICE)
     ############## npu modify 6 begin #############
     main()

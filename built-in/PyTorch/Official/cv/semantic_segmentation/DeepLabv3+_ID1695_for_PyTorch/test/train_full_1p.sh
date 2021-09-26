@@ -10,6 +10,11 @@ batch_size=8
 export RANK_SIZE=1
 # 数据集路径,保持为空,不需要修改
 data_path=""
+dataset="pascal"
+num_classes=21
+
+resume=""
+ft=""
 
 # 训练epoch
 train_epochs=100
@@ -29,6 +34,15 @@ do
         more_path1=`echo ${para#*=}`
     elif [[ $para == --precision_mode* ]];then
         precision_mode=`echo ${para#*=}`
+    elif [[ $para == --train_epochs* ]];then
+        train_epochs=`echo ${para#*=}`
+    elif [[ $para == --dataset* ]];then
+        dataset=`echo ${para#*=}`
+    elif [[ $para == --num_classes* ]];then
+        num_classes=`echo ${para#*=}`
+    elif [[ $para == --resume* ]];then
+        resume=`echo ${para#*=}`
+        ft='--ft'
     fi
 done
 
@@ -69,8 +83,8 @@ sed -i 's#dataset_path=.*$#dataset_path='$data_path'#' ./mypath.py
 # cp pth文件
 if [ -f ${more_path1}/resnet101-5d3b4d8f.pth ]; then
     echo "pth file exists"
-    mkdir -p /root/.cache/torch/checkpoints
-    cp ${more_path1}/resnet101-5d3b4d8f.pth /root/.cache/torch/checkpoints/resnet101-5d3b4d8f.pth
+    mkdir -p ~/.cache/torch/checkpoints
+    cp ${more_path1}/resnet101-5d3b4d8f.pth ~/.cache/torch/checkpoints/resnet101-5d3b4d8f.pth
 fi
 
 #################创建日志输出目录，不需要修改#################
@@ -102,7 +116,10 @@ python3 train.py \
     --device_id ${ASCEND_DEVICE_ID} \
     --checkname deeplab-resnet \
     --eval-interval 1 \
-    --dataset pascal > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    --num_classes ${num_classes} \
+    --resume "${resume}" \
+    ${ft} \
+    --dataset ${dataset} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 
@@ -123,7 +140,7 @@ FPS=`cat ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_fps.txt | a
 echo "Final Performance images/sec : $FPS"
 
 # 输出训练精度,需要模型审视修改
-train_accuracy=`grep 'val_mIoU' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "," '{print $3}' | awk -F ":" '{print $2}'|awk 'END {print}'`
+train_accuracy=`grep 'val_mIoU' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "," '{print $3}' | awk -F ":" '{print $2}'| sort | awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

@@ -11,6 +11,10 @@ export RANK_SIZE=8
 RANK_ID_START=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
+dataset="pascal"
+num_classes=21
+resume=""
+ft=""
 
 # 训练epoch
 train_epochs=100
@@ -28,6 +32,13 @@ do
         more_path1=`echo ${para#*=}`
     elif [[ $para == --precision_mode* ]];then
         precision_mode=`echo ${para#*=}`
+    elif [[ $para == --dataset* ]];then
+        dataset=`echo ${para#*=}`
+    elif [[ $para == --num_classes* ]];then
+        num_classes=`echo ${para#*=}`
+    elif [[ $para == --resume* ]];then
+        resume=`echo ${para#*=}`
+        ft='--ft'
     fi
 done
 
@@ -93,7 +104,10 @@ do
         --batch-size ${batch_size} \
         --checkname deeplab-resnet \
         --eval-interval 1 \
-        --dataset pascal \
+        --dataset ${dataset} \
+        --num_classes ${num_classes} \
+        --resume "${resume}" \
+        ${ft} \
         --multiprocessing_distributed > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done
 wait
@@ -118,7 +132,7 @@ FPS=`cat ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_fps.txt | a
 echo "Final Performance images/sec : $FPS"
 
 # 输出训练精度,需要模型审视修改
-train_accuracy=`grep 'val_mIoU' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "," '{print $3}' | awk -F ":" '{print $2}'|awk 'END {print}'`
+train_accuracy=`grep 'val_mIoU' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "," '{print $3}' | awk -F ":" '{print $2}'| sort | awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

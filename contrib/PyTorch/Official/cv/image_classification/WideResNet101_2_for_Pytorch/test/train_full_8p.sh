@@ -16,7 +16,7 @@ learning_rate=0.4
 export RANK_SIZE=8
 # 数据集路径,保持为空,不需要修改
 data_path=""
-
+RANK_ID_START=0
 #TF2.X独有，需要模型审视修改
 #export NPU_LOOP_SIZE=${train_steps}
 
@@ -76,22 +76,28 @@ fi
 ##################创建日志输出目录，根据模型审视##################
 # 模型采用非循环方式启动多卡训练，创建日志输出目录如下；采用循环方式启动多卡训练的模型，在循环中创建日志输出目录，可参考CRNN模型
 # 非循环方式下8卡训练日志输出路径中的ASCEND_DEVICE_ID默认为0，只是人为指定文件夹名称， 不涉及训练业务
-ASCEND_DEVICE_ID=0
-if [ -d ${test_path_dir}/output/$ASCEND_DEVICE_ID ];then
-    rm -rf ${test_path_dir}/output/$ASCEND_DEVICE_ID
-    mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-else
-    mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-fi
+export ASCEND_DEVICE_ID=0
+export RANK_ID=$RANK_ID_START
+start_time=$(date + %s)
+
+
 
 ##################启动训练脚本##################
 #训练开始时间，不需要修改
 start_time=$(date +%s)
+# corenum=`cat /proc/cpuinfo|grep "processor" | wc -l`
 # 非平台场景时source 环境变量
 check_etp_flag=`env | grep etp_running_flag`
 etp_flag=`echo ${check_etp_flag#*=}`
 if [ x"${etp_flag}" != x"true" ];then
     source ${test_path_dir}/env_npu.sh
+fi
+
+if [ -d ${test_path_dir}/train_8p_${start_time} ];then
+    rm -rf ${test_path_dir}/train_8p_${start_time}
+    mkdir -p ${test_path_dir}/train_8p_${start_time}
+else
+    mkdir -p ${test_path_dir}/train_8p_${start_time}
 fi
 
 python3.7 -u ./main_npu_8p.py \
@@ -111,8 +117,8 @@ python3.7 -u ./main_npu_8p.py \
     --device='npu' \
     --rank=0 \
     --warm_up_epochs=5 \
-    --batch-size=${batch_size} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-
+    --save_path=${test_path_dir}/train_8p_${start_time} \
+    --batch-size=${batch_size} > ${test_path_dir}/train_8p_${start_time}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 wait
 
 ##################获取训练数据##################
@@ -123,12 +129,12 @@ e2e_time=$(( $end_time - $start_time ))
 # 结果打印，不需要修改
 echo "------------------ Final result ------------------"
 # 输出性能FPS，需要模型审视修改
-FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
+FPS=`grep -a 'FPS'  ${test_path_dir}/train_8p_${start_time}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $NF}'|awk 'END {print}'`
 # 打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 # 输出训练精度,需要模型审视修改
-train_accuracy=`grep -a '* Acc@1' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print}'|awk -F "Acc@1" '{print $NF}'|awk -F " " '{print $1}'`
+train_accuracy=`grep -a '* Acc@1' ${test_path_dir}/train_8p_${start_time}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print}'|awk -F "Acc@1" '{print $NF}'|awk -F " " '{print $1}'`
 # 打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
@@ -146,19 +152,19 @@ ActualFPS=${FPS}
 TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 # 从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep Epoch: ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v Test|awk -F "Loss" '{print $NF}' | awk -F " " '{print $1}' >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep Epoch: ${test_path_dir}/train_8p_${start_time}/train_$ASCEND_DEVICE_ID.log|grep -v Test|awk -F "Loss" '{print $NF}' | awk -F " " '{print $1}' >> ${test_path_dir}/train_8p_${start_time}/train_${CaseName}_loss.txt
 
 # 最后一个迭代loss值，不需要修改
-ActualLoss=`awk 'END {print}' ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
+ActualLoss=`awk 'END {print}' ${test_path_dir}/train_8p_${start_time}/train_${CaseName}_loss.txt`
 
 # 关键信息打印到${CaseName}.log中，不需要修改
-echo "Network = ${Network}" > ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "RankSize = ${RANK_SIZE}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "BatchSize = ${BatchSize}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "DeviceType = ${DeviceType}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "CaseName = ${CaseName}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualFPS = ${ActualFPS}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "Network = ${Network}" > ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "RankSize = ${RANK_SIZE}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "BatchSize = ${BatchSize}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "DeviceType = ${DeviceType}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "CaseName = ${CaseName}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "ActualFPS = ${ActualFPS}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log
+echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/train_8p_${start_time}/${CaseName}.log

@@ -27,9 +27,20 @@ export PYTHONPATH=$cur_path/../WDL_for_PyTorch:$PYTHONPATH
 DEVICE_ID=$1
 DATA_PATH=$2
 
+start_time=$(date +%s)
+output_dir=${cur_path}/output_1p_${start_time}
+if [ -d ${output_dir}/ ];then
+    rm -rf ${output_dir}
+    mkdir -p ${output_dir}
+else
+    mkdir -p ${output_dir}
+fi
+
 python3 run_classification_criteo_wdl.py  \
     --amp \
+    --epochs 3 \
+    --checkpoint_save_path=${output_dir} \
     --device_id=$DEVICE_ID \
     --data_path=$DATA_PATH \
     --batch_size 4096 \
-    --lr 0.0009 > ./train_1p.log 2>&1 &
+    --lr 0.0009 > ${output_dir}/train_1p.log 2>&1 &

@@ -11,12 +11,12 @@ cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 ln -s ${currentDir}/.data ${train_log_dir}/.data
 
-taskset -c 0-24 python3.7 ${currentDir}/gru_1p.py \
-    --workers 40 \
+taskset -c 0-32 python3.7 ${currentDir}/gru_1p.py \
+    --workers 32 \
     --dist-url 'tcp://127.0.0.1:50000' \
     --world-size 1 \
     --npu 0 \
-    --batch-size 512 \
+    --batch-size 1536 \
     --epochs 10 \
     --rank 0 \
     --amp  > ./gru_1p.log 2>&1 &

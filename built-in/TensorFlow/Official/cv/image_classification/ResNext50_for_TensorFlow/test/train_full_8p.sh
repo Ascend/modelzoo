@@ -91,6 +91,9 @@ do
         cp -rf $install_path/fwkacllib/data/rl/Ascend910/custom ${autotune_dump_path}/RL/
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --bind_core* ]]; then
+        bind_core=`echo ${para#*=}`
+        name_bind="_bindcore"
     fi
 done
 
@@ -133,7 +136,14 @@ do
 
     #执行训练脚本，需要模型审视修改
 	cd ${cur_path}/../code/resnext50_train/mains
-	python3.7 res50.py \
+    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
+    let a=RANK_ID*${corenum}/8
+    let b=RANK_ID+1
+    let c=b*${corenum}/8-1
+    if [ "x${bind_core}" != x ];then
+        bind_core="taskset -c $a-$c"
+    fi
+	${bind_core} python3.7 res50.py \
 	    --config_file=$config_file \
         --max_train_steps=$max_train_steps \
 	    --iterations_per_loop=$iterations_per_loop \
@@ -175,7 +185,7 @@ echo "E2E training Duration sec: $e2e_time"
 #训练用例信息，不需要修改
 #BatchSize=${batch_size}
 #DeviceType=`uname -m`
-#CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
+#CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据，不需要修改
 #吞吐量

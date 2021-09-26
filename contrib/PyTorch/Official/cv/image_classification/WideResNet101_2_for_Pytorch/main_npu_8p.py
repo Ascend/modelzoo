@@ -109,6 +109,8 @@ parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--prof', default=False, action='store_true',
                     help='use profiling to evaluate the performance of model')
+parser.add_argument('--save_path', default='', type=str,
+                    help='path to save models')
 
 best_acc1 = 0
 
@@ -194,12 +196,16 @@ def main_worker(gpu, ngpus_per_node, args):
         print("=> using pre-trained model wide_resnet101_2")
         model = resnet_0_6_0.wide_resnet101_2()
         print("loading model of yours...")
-        pretrained_dict = torch.load("./npu_8p_2048_checkpoint/model_best.pth.tar", map_location="cpu")["state_dict"]
+        model_path = "./checkpoint.pth.tar"
+        pretrained_dict = torch.load(model_path, map_location="cpu")["state_dict"]
         model.load_state_dict({k.replace('module.', ''): v for k, v in pretrained_dict.items()})
         if "fc.weight" in pretrained_dict:
             pretrained_dict.pop('fc.weight')
             pretrained_dict.pop('fc.bias')
         model.load_state_dict(pretrained_dict, strict=False)
+        for param in model.parameters():
+            param.requires_grad = False
+        model.fc = nn.Linear(2048,1000)
     else:
         print("=> creating model wide_resnet101_2")
         model = resnet_0_6_0.wide_resnet101_2()
@@ -476,9 +482,12 @@ def validate(val_loader, model, criterion, args, ngpus_per_node):
 
 
 def save_checkpoint(state, is_best, filename='./checkpoint.pth.tar'):
+    args = parser.parse_args()
+    filename = os.path.join(args.save_path, filename)
     torch.save(state, filename)
+    path_best = os.path.join(args.save_path, 'model_best.pth.tar')
     if is_best:
-        shutil.copyfile(filename, './model_best.pth.tar')
+        shutil.copyfile(filename, path_best)
 
 
 class AverageMeter(object):

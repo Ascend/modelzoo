@@ -19,7 +19,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #网络名称，同目录名称
 Network="AlexNet_ID0259_for_TensorFlow"
 #训练epoch
-train_epochs=1
+train_epochs=2
 #训练step
 train_steps=600
 #训练batch_size
@@ -135,7 +135,7 @@ do
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_path, --model_dir, --precision_mode, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path，--autotune
-    nohup taskset -c $a-$c python3 main.py --step=600 --data_path=$data_path > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    nohup python3 main.py --step=600 --data_path=$data_path > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 if [ $? -ne 0 ];then
   exit 1
 fi

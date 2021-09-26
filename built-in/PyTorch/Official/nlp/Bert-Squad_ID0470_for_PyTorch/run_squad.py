@@ -1022,7 +1022,7 @@ def main():
 
     global_step = 0
     if args.do_train:
-
+        print("Doing train...")
         if args.cache_dir is None:
             cached_train_features_file = args.train_file + '_{0}_{1}_{2}_{3}'.format(
                 list(filter(None, args.bert_model.split('/'))).pop(), str(args.max_seq_length), str(args.doc_stride),
@@ -1150,7 +1150,7 @@ def main():
             f.write(model_to_save.config.to_json_string())
 
     if args.do_predict and (args.local_rank == -1 or is_main_process()):
-
+        print("Doing predict...")
         if not args.do_train and args.fp16:
             model.half()
 

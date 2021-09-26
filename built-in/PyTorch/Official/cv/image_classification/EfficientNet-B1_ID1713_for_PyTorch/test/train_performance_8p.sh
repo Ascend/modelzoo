@@ -27,6 +27,10 @@ batch_size=2048
 #train_steps=`expr 1281167 / ${batch_size}`
 #学习率
 learning_rate=1.6
+#训练步数
+train_steps=20
+#test步数
+test_steps=20
 
 #TF2.X独有，需要模型审视修改
 #export NPU_LOOP_SIZE=${train_steps}
@@ -83,6 +87,10 @@ else
     test_path_dir=${cur_path}/test
 fi
 
+#修改参数
+sed -i "422s|pass|break|g"  ${test_path_dir}/../examples/imagenet/main.py
+sed -i "s|i > len(val_loader)|i > $test_steps|g"  ${test_path_dir}/../examples/imagenet/main.py
+wait
 
 ##################创建日志输出目录，根据模型审视##################
 # 模型采用非循环方式启动多卡训练，创建日志输出目录如下；采用循环方式启动多卡训练的模型，在循环中创建日志输出目录，可参考CRNN模型
@@ -117,7 +125,7 @@ python3 ${test_path_dir}/../examples/imagenet/main.py \
 		--multiprocessing-distributed \
         --world-size 1 \
         --rank 0 \
-		--stop-step-num=256 \
+		--stop-step-num=$train_steps \
 		--device_list '0,1,2,3,4,5,6,7' > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 & 
 wait
 
@@ -125,6 +133,10 @@ wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
+#参数回改
+sed -i "422s|break|pass|g"  ${test_path_dir}/../examples/imagenet/main.py
+sed -i "s|i > $test_steps|i > len(val_loader)|g"  ${test_path_dir}/../examples/imagenet/main.py
+wait
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改

@@ -74,6 +74,9 @@ do
         mkdir -p ${profiling_dump_path}
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --bind_core* ]]; then
+        bind_core=`echo ${para#*=}`
+        name_bind="_bindcore"
     fi
 done
 
@@ -108,7 +111,10 @@ do
     let b=RANK_ID+1
     let c=b*$cpustep-1
 
-    nohup taskset -c $a-$c python3 resnet_ctl_imagenet_main.py \
+    if [ "x${bind_core}" != x ];then
+        bind_core="taskset -c $a-$c"
+    fi
+    nohup ${bind_core} python3 resnet_ctl_imagenet_main.py \
         --data_dir=${data_path} \
         --train_steps=${train_steps} \
         --num_accumulation_steps=1 \
@@ -162,7 +168,7 @@ BatchSize=${batch_size}
 #设备类型
 DeviceType=`uname -m`
 #用例名称
-CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
+CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据
 #吞吐量

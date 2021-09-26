@@ -52,7 +52,7 @@ def get_parser():
                         help='Relative path to evaluation dataset manifest files')
     parser.add_argument('--model', default=None, type=str,
                         help='Path to om model')
-    parser.add_argument('--model_config', default=None, type=str,
+    parser.add_argument('--model_config', type=str, required=True,
                         help='Relative model config path given dataset floder')
     parser.add_argument("--max_duration", default=None, type=float,
                         help='maximum duration of sequences. if None uses attribute from model configuration file')
@@ -123,7 +123,7 @@ def main():
         batch = [t.to(torch.device('cpu'), non_blocking=True) for t in batch]
         audio, audio_lens, txt, txt_lens = batch
         feats, feat_lens = feat_proc(audio, audio_lens)
-        feats = feats.half().numpy()
+        feats = feats.numpy()
         feat_lens = feat_lens.numpy()
 
         # om infer
@@ -131,7 +131,12 @@ def main():
         inputs = [feats, feat_lens]
         dims = [args.batch_size, 64, batch_rank, args.batch_size]
         dims_info = {'dimCount': 4, 'name': '', 'dims': dims}
-        log_probs = om_model(inputs, dims_info)[1]
+        res = om_model(inputs, dims_info)
+        # because om has random order, so use if branch to get target result
+        for item in res:
+            if len(item.shape) == 3:
+                log_probs = item
+                break
 
         preds = greedy_decoder(torch.tensor(log_probs))
 
@@ -141,9 +146,8 @@ def main():
         agg['preds'] += helpers.gather_predictions([preds], symbols)
         agg['logits'].append(log_probs)
 
-        wer, _ = process_evaluation_epoch(agg)
-
-        print(f'eval_wer: {100 * wer}')
+    wer, _ = process_evaluation_epoch(agg)
+    print(f'eval_wer: {100 * wer}')
 
     if args.save_predictions:
         with open(args.save_predictions, 'w') as f:

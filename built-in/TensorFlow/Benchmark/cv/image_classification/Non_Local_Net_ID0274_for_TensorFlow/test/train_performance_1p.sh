@@ -22,6 +22,8 @@ batch_size=16
 epochs=1
 # case名称 少量epoch-train_performance_1p.sh传入perf，全量-train_full_1p.sh传入acc
 # file_name as your file name
+#训练步数
+steps=200
 
 
 #维测参数，precision_mode需要模型审视修改
@@ -86,7 +88,10 @@ fi
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 cd $cur_path/../
+#修改参数
 
+sed -i "s|range(num_batches)|range($steps)|g" $cur_path/../Non_local_Net.py
+wait
 # 该网络训练脚本需要的文件夹定义 需要修改
 
 #进入训练脚本目录，需要模型审视修改
@@ -114,6 +119,9 @@ wait
 #训练结束时间，不需要修改
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
+#参数回改
+sed -i "s|range($steps)|range(num_batches)|g" $cur_path/../Non_local_Net.py
+wait
 
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"

@@ -17,7 +17,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Face_Resnet50_for_ACL
 
 2. Executing the Preprocessing Script
    ```
-   python3 align/align_dataset_mtcnn_facereset.py Path_of_lfw_dataset Path_of_Data_after_face_alignment
+   python3 align/align_dataset_mtcnn_facereset.py $cur_dir/lfw $dataset
    python3 preprocess.py $cur_dir/config/basemodel.py Path_of_Data_after_processing
    
    ```
@@ -60,7 +60,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Face_Resnet50_for_ACL
 - Run the program:
 
   ```
-  ./benchmark_tf.sh --batchSize=1 --modelPath=/home/liukongyuan/ID1372_face_resnet50/pure/model/face_resnet50.om --dataPath=$dataset_bin --modelType=faceresnet50 --imgType=rgb
+  ./benchmark_tf.sh --batchSize=1 --modelPath=../../model/face_resnet50.om --dataPath=./dataset_bin --modelType=faceresnet50 --imgType=rgb
   ```
   
 ## Performance

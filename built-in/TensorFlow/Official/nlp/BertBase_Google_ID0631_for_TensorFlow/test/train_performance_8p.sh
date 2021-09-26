@@ -87,6 +87,9 @@ do
         mkdir -p ${profiling_dump_path}
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --bind_core* ]]; then
+        bind_core=`echo ${para#*=}`
+        name_bind="_bindcore"
     elif [[ $para == --type* ]];then
         type=`echo ${para#*=}`
     elif [[ $para == --num_warmup_steps* ]];then
@@ -143,7 +146,14 @@ do
     export RANK_ID=$i
     mkdir -p $cur_path/output/$ASCEND_DEVICE_ID
 
-    nohup python3 run_pretraining.py \
+    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
+    let a=RANK_ID*${corenum}/8
+    let b=RANK_ID+1
+    let c=b*${corenum}/8-1
+    if [ "x${bind_core}" != x ];then
+        bind_core="taskset -c $a-$c"
+    fi
+    nohup ${bind_core} python3 run_pretraining.py \
         --input_file=${data_path}* \
         --output_dir=${cur_path}/output/$ASCEND_DEVICE_ID/${output_dir} \
         --do_train=True \
@@ -188,7 +198,7 @@ echo "E2E Training Duration sec : $e2e_time"
 BatchSize=${train_batch_size}
 DeviceType=`uname -m`
 Network='BertBase_Google_ID0631_for_TensorFlow'_${type}
-CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 
 ##获取性能数据
 #吞吐量，不需要修改

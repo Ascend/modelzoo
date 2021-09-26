@@ -44,7 +44,7 @@
 ```
 
 ## 准备数据和Backbone模型
-Icdar2015、Icdar2013可以去官网下载，或者直接从百度网盘里面获取，Backbone使用Resnet50_v1 [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz) 
+Icdar2015、Icdar2013可以去官网下载，Backbone使用Resnet50_v1 [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz) 
 
 存放目录参考上面的解释
 
@@ -126,15 +126,15 @@ python3.7 evaluation/script.py -g=./evaluation/gt.zip -s=${output_dir}/results.z
 ```
 
 ### 精度、召回率、F1 Score比对（NPU vs GPU）:
-相同的训练集 icdar2015 (1000 images) 和测试集(500 images)([BaiduYun link，提取码1234](https://pan.baidu.com/s/12qlSPPZl2a8rAIqeMAMyUA) 
-) 和相同的超参，NPU的精度优于GPU（看Hmean，即为F1 Score）:
+训练集 icdar2015 (1000 images) 
+
+测试集icdar2015(500 images)
+和相同的超参，NPU的精度优于GPU（看Hmean，即为F1 Score）:
+
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | GPU T4 | 0.826     | 0.771  | 0.797 |
 | NPU | 0.834     | 0.767  | 0.799 |
-
-NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/19qRk67W3R4x_5wDbPwmWIA) )\
-GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1k77-11IJUBpXC90FpIoaqA) )
 
 ### 使用Icdar2013+Icdar2015训练
 需要注意到，原始的github实现中，使用的icdar2013+icdar2015数据集进行训练，所以尝试增加icdar2013训练集：
@@ -173,16 +173,16 @@ python3.7 npu_train.py \
 蓝色是NPU，红色是GPU.
 
 #### 精度、召回率和F1 Score对比:
-相同的数据集：训练集 （icdar2013+icdar2015: 229+1000 images) 和测试集(icdar2015: 500 images) ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1DsEqwvOagZRadPWAyZKhUw) 
-) 和相同的超参:
+相同的数据集：
+
+训练集 （icdar2013+icdar2015: 229+1000 images) 
+
+测试集(icdar2015: 500 images) 
 
 |     | Precision | Recall | Hmean |
 |-----|-----------|--------|-------|
 | GPU T4| 0.842     | 0.766  | 0.803 |
 | NPU | 0.853     | 0.773  | 0.811 |
-
-NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1jVMvmWgKrj2hOkvV2_0VOw) )\
-GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/10Fw-tYdXPGW-TfpvMxKVOg) )
 
 ### 精度、性能调优
 相同超参下：
@@ -234,8 +234,6 @@ NPU训练性能：\
 |----------|---|--------------|
 | NPU      | 20 |      47        |
 
-调优出来的json文件：([BaiduYun link，提取码1234](https://pan.baidu.com/s/1mSpVSTRx0Nw0sCSQxwGqgA) )
-
 #### 在线推理性能
 NPU：\
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/0531/232155_9aabb889_8432352.png "屏幕截图.png")
@@ -257,9 +255,6 @@ NPU新训练出来的模型+优化了NMS参数，训练20万步，F1精度由0.8
 |-----|-----------|--------|-------|
 | GPU T4| 0.842     | 0.766  | 0.803 |
 | NPU | 0.859     | 0.794  | 0.825 |
-
-NPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/1h_ryKgkG5RkX-z0wWVqHYg) )\
-GPU Checkpoints: ([BaiduYun link，提取码1234](https://pan.baidu.com/s/10Fw-tYdXPGW-TfpvMxKVOg) )
 
 在模型训练的过程中，可以执行**python3 get_best_ckpt.py**,脚本会以100s为间隔轮询，取最新的ckpt在NPU/CPU/GPU上面验证测试集精度，并保存最优者。
 

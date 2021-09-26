@@ -103,6 +103,9 @@ def parse_args():
 
 
 def main():
+    os.environ['MASTER_ADDR'] = '127.0.0.1'
+    os.environ['MASTER_PORT'] = '29688'
+    
     args = parse_args()
 
     cfg = Config.fromfile(args.config)

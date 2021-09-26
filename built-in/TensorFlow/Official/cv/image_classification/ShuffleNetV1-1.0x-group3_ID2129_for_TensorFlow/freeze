@@ -1,0 +1,2 @@
+python /home/zw/anaconda3/envs/tf110/lib/python3.6/site-packages/tensorflow/python/tools/freeze_graph.py --input_graph saved_model.pb --input_checkpoint model.ckpt-1862 --input_binary false --output_graph shufflenet2_deploy.pb --output_node_names Softmax
+

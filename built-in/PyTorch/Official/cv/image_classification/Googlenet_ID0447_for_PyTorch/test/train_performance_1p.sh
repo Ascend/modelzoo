@@ -2,6 +2,11 @@
 
 #当前路径,不需要修改
 cur_path=`pwd`
+#规避变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 
 #集合通信参数,不需要修改
 export RANK_SIZE=1
@@ -46,7 +51,7 @@ fi
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 python3.7 train.py  \
     --model googlenet \
-    --epochs 2 \
+    --epochs 1 \
     --data-path=$data_path \
     --batch-size=$batch_size \
     --lr 0.1 \

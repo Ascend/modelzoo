@@ -10,7 +10,7 @@ source pt_set_env.sh
 
 stage=0
 
-timit_dir='../data'
+timit_dir='../TIMIT'
 phoneme_map='60-39'
 feat_dir='data'                            #dir to save feature
 feat_type='fbank'                          #fbank, mfcc, spectrogram
@@ -28,12 +28,14 @@ fi
 
 if [ $stage -le 0 ]; then
     echo "Step 0: Data Preparation ..."
+    chmod +x local/timit_data_prep.sh
     local/timit_data_prep.sh $timit_dir $phoneme_map || exit 1;
     python3 steps/get_model_units.py $feat_dir/train/phn_text
 fi
 
 if [ $stage -le 1 ]; then
     echo "Step 1: Feature Extraction..."
+    chmod +x steps/make_feat.sh
     steps/make_feat.sh $feat_type $feat_dir || exit 1;
 fi
 

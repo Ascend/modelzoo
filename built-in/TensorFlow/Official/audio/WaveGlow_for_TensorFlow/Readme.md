@@ -71,11 +71,12 @@ After executing docker_start.sh with three parameters:
 ./docker_start.sh ${docker_image} ${data_dir} ${model_dir}
 ```
 
- 
+
 ## Train your own model
-1. Download [LJSpeech-1.1 Data](https://keithito.com/LJ-Speech-Dataset). unzip the data into LJSpeech-1.1 dir
+1. Download LJSpeech-1.1 Data. unzip the data into LJSpeech-1.1 dir
 2. use "ljspeech_to_tfrecords.py" preprocess and converts the data into tfrecords format
    modify the parameter and run the file as follow ("wave_dir" is raw dataset dir,"tfrecords_dir" is preprocessed tfrecord data dir ):
+   
    ```command
    python3 ljspeech_to_tfrecords.py --wave_dir ./LJSpeech-1.1/wavs   --tfrecords_dir  ./data/tfrecords 
    ```
@@ -105,4 +106,4 @@ After executing docker_start.sh with three parameters:
    epoch 99 - step 137797 - loss = -5.940, lr=0.00010000, time cost=0.646566, samples per second=148.476687
    epoch 99 - step 137798 - loss = -5.915, lr=0.00010000, time cost=0.647016, samples per second=148.373554
    epoch 99 - step 137799 - loss = -5.849, lr=0.00010000, time cost=0.645823, samples per second=148.647594
-  ```
+   ```

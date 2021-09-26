@@ -175,6 +175,8 @@ def main():
     )
 
     loss_fn = torch.nn.CrossEntropyLoss()
+    loss_fn.to(device)
+
     metrics = {
         'fps': training.BatchTimer(),
         'acc': training.accuracy

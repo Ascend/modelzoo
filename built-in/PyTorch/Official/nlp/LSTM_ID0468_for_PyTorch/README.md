@@ -1,108 +1,79 @@
-## Update:
-Update to pytorch1.2 and python3.
+# LSTM模型使用说明
 
-# CTC-based Automatic Speech Recogniton
-This is a CTC-based speech recognition system with pytorch.
+## Requirements
+* NPU配套的run包安装
+* Python 3.7.5
+* PyTorch(NPU版本)
+* apex(NPU版本)
+* (可选)参考《Pytorch 网络模型移植&训练指南》6.4.2章节，配置cpu为性能模式，以达到模型最佳性能；不开启不影响功能。
 
-At present, the system only supports phoneme recognition.  
+## 数据准备
+1. 请搜索并下载TIMIT语音数据集
+2. 将数据解压放置NPU目录下，数据集目录结构为
+    ```
+    LSTM
+      |--NPU
+          |--TIMIT
+              |--DOC
+              |--TEST
+              |--TRAIN
+    ```
+       
+## 安装依赖
+    1. 安装kaldi(可选，首次处理TIMIT原始数据集需安装)
+    
+        chmod +x install_kaldi.sh
+        ./install_kaldi.sh
+    
+    注意：install_kaldi.sh 根据所使用linux环境做适当修改。例如 centos 环境，将脚本中apt修改为yum;make -j 32, 数字32也可根据机器硬件条件相应修改
+         请确认服务器环境网络通畅，否则会导致安装失败
 
-You can also do it at word-level and may get a high error rate.
+    2. 安装依赖    
+       
+        pip3.7 install -r requirements.txt
+    
 
-Another way is to decode with a lexcion and word-level language model using WFST which is not included in this system.
 
-## Data
-English Corpus: Timit
-- Training set: 3696 sentences(exclude SA utterance)
-- Dev set: 400 sentences
-- Test set: 192 sentences
+## 训练模型
 
-Chinese Corpus: 863 Corpus
-- Training set:
-  
-|  Speaker |          UtterId         |   Utterances  |  
-|   :-:    |           :-:            |      :-:      |  
-| M50, F50 |   A1-A521, AW1-AW129     | 650 sentences |    
-| M54, F54 | B522-B1040,BW130-BW259   | 649 sentences |   
-| M60, F60 | C1041-C1560  CW260-CW388 | 649 sentences |   
-| M64, F64 |         D1-D625          | 625 sentences |  
-|   All    |                          |5146 sentences |   
+### 单卡训练流程：
+    
+    1. 进入NPU/1p 目录
+    2. 修改字段device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
+    3.a 首次训练需处理数据集，执行bash run_1p.sh （需安装kaldi, 即执行./install_kaldi.sh）
+        该过程会生成处理好的数据放置于NPU/1p/data 目录下，后续训练或迁移至其他环境，可直接拷贝该文件到相同目录  
+      b 非首次训练，将处理好的data数据拷贝到1p目录下，可减少数据处理时间开销
+        执行 bash run_1p.sh 2
+    
 
-- Test set:  
+### 8卡训练流程
+    
+    1. 进入NPU/8p 目录
+    2.a 首次训练需处理数据集，执行bash run_8p.sh （需安装kaldi, 即执行./install_kaldi.sh）
+        该过程会生成处理好的数据放置于NPU/8p/data 目录下，后续训练或迁移至其他环境，可直接拷贝该文件到相同目录
+      b 非首次训练，将处理好的data数据拷贝到8p目录下，可减少数据处理时间开销   
+        执行 bash run_8p.sh 2
+    
 
-|  Speaker |   UtterId   |   Utterances  |  
-|   :-:    |     :-:     |      :-:      |
-| M51, F51 |   A1-A100   | 100 sentences | 
-| M55, F55 |  B522-B521  | 100 sentences | 
-| M61, F61 | C1041-C1140 | 100 sentences | 
-| M63, F63 |   D1-D100   | 100 sentences | 
-|   All    |             | 800 sentences |
+## Docker容器训练
 
-## Install
-- Install [Pytorch](http://pytorch.org/)
-- ~~Install [warp-ctc](https://github.com/SeanNaren/warp-ctc) and bind it to pytorch.~~  
-    ~~Notice: If use python2, reinstall the pytorch with source code instead of pip.~~
-    Use pytorch1.2 built-in CTC function(nn.CTCLoss) Now.
-- Install [Kaldi](https://github.com/kaldi-asr/kaldi). We use kaldi to extract mfcc and fbank.
-- Install pytorch [torchaudio](https://github.com/pytorch/audio.git)(This is needed when using waveform as input).
-- ~~Install [KenLM](https://github.com/kpu/kenlm). Training n-gram Languange Model if needed~~.
-    Use Irstlm in kaldi tools instead.
-- Install and start visdom
-```
-pip3 install visdom
-python -m visdom.server
-```
-- Install other python packages
-```
-pip install -r requirements.txt
-```
+1.导入镜像二进制包docker import ubuntuarmpytorch.tar REPOSITORY:TAG, 比如:
 
-## Usage
-1. Install all the packages according to the Install part.  
-2. Revise the top script run.sh.  
-4. Open the config file to revise the super-parameters about everything.  
-5. Run the top script with four conditions
-```bash
-bash run.sh    data_prepare + AM training + LM training + testing
-bash run.sh 1  AM training + LM training + testing
-bash run.sh 2  LM training + testing
-bash run.sh 3  testing
-```
-RNN LM training is not implemented yet. They are added to the todo-list.  
+    docker import ubuntuarmpytorch.tar pytorch:b020
 
-## Data Prepare
-1. Extract 39dim mfcc and 40dim fbank feature from kaldi. 
-2. Use compute-cmvn-stats and apply-cmvn with training data to get the global mean and variance and normalize the feature. 
-3. Rewrite Dataset and dataLoader in torch.nn.dataset to prepare data for training. You can find them in the steps/dataloader.py.
 
-## Model
-- RNN + DNN + CTC 
-    RNN here can be replaced by nn.LSTM and nn.GRU
-- CNN + RNN + DNN + CTC  
-    CNN is use to reduce the variety of spectrum which can be caused by the speaker and environment difference.
-- How to choose  
-    Use add_cnn to choose one of two models. If add_cnn is True, then CNN+RNN+DNN+CTC will be chosen.
+2.执行docker_start.sh后带三个参数：步骤1生成的REPOSITORY:TAG；数据集路径；模型执行路径；比如：
 
-## Training:
-- initial-lr = 0.001
-- decay = 0.5
-- wight-decay = 0.005   
+    ./docker_start.sh pytorch:b020 /home/LSTM/NPU/data /home/LSTM
 
-Adjust the learning rate if the dev loss is around a specific loss for ten times.  
-Times of adjusting learning rate is 8 which can be alter in steps/train_ctc.py(line367).  
-Optimizer is nn.optimizer.Adam with weigth decay 0.005 
 
-## Decoder
-### Greedy decoder:
-Take the max prob of outputs as the result and get the path.  
-Calculate the WER and CER by used the function of the class.
-### Beam decoder:
-Implemented with python. [Original Code](https://github.com/githubharald/CTCDecoder)  
-I fix it to support phoneme for batch decode.    
-Beamsearch can improve about 0.2% of phonome accuracy.  
-Phoneme-level language model is inserted to beam search decoder now.  
+3.执行步骤一训练流程（环境安装除外）
 
-## ToDo
-- Combine with RNN-LM  
-- Beam search with RNN-LM  
-- The code in 863_corpus is a mess. Need arranged.
+## 训练结果
+
+训练日志路径：在训练脚本的同目录下result文件夹里，如：
+
+    ./result/training_1p_job_20201121023601
+    ./result/training_8p_job_20201121023601
+
 

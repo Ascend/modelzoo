@@ -9,7 +9,7 @@ data_path=""
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="Bert-CLUE_for_TensorFlow"
+Network="Bert-MSRANER_for_TensorFlow"
 
 
 # 帮助信息，不需要修改
@@ -94,7 +94,7 @@ FPS=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*'${step_sec}'}'`
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep -a 'accuracy:  ' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log | awk '{print $2}' | awk -F ";" '{print $1}'`
+train_accuracy=`grep -a 'accuracy:  ' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log | awk '{print $2}' | awk -F "%;" '{print $1}'`
 
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"

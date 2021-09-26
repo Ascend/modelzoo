@@ -109,10 +109,3 @@ Relu activation, Local Response Normalization, Overlapping pooling, Dropout, Wei
 상위 48개는 GPU1, 하위 48개는 GPU2라고 보면 된다. 의심했던 바와 같이, Kernel 역할의 양분화(Color-agnostic과 Color-specific)는 관찰할 수 없었다. 원본논문과의 차이는 Dataset과 Leaning Rate 초기값, 그리고 학습속도에 유의미한 영향을 주는 Minibatch size정도 밖에 없는데, 해당 변인들을 바꾸더라도 Kernel 역할이 논문에 설명된 것처럼 양분화 될 것 같지는 않다. 내 구현에 실수가 있지는 않았는지 좀 더 AlexNet 구현에 대해 자세히 알아보는 한편, 내가 가진 장비로 ImageNet 학습은 무리이므로 장비를 빌릴 곳을 알아 봐야겠다.
 
 
-
-
-
-**100-epoch checkpoint file link**
-
-
-[https://drive.google.com/drive/folders/1f-EFtzLIy4AJf12JY9EVWOlWoAQ3NXrM]

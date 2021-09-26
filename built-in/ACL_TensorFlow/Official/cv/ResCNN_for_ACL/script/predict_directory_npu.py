@@ -75,7 +75,7 @@ def predict(image_path):
         input_img = (np.expand_dims(images[p], 0))  # Add the image to a batch where it's the only member
         input_img.astype('float32').tofile(os.path.join("./input_bins","test.bin"))
         os.system("../Benchmark/out/benchmark --om ResCNN_{}_{}_1batch.om --dataDir ./input_bins --modelType ResCNN --outDir results --batchSize 1 --imgType bin --useDvpp 0".format(input_img.shape[1],input_img.shape[2]))
-        pred = np.fromfile("results/davinci_test_output0.bin",dtype='float32').reshape(input_img.shape[1]*4,input_img.shape[2]*4,3)
+        pred = np.fromfile("results/ResCNN/davinci_test_output0.bin",dtype='float32').reshape(input_img.shape[1]*4,input_img.shape[2]*4,3)
         #pred = model.predict(input_img)[0]          # returns a list of lists, one for each image in the batch
 
         # Cropping the useless parts of the overlapped predictions (to prevent the repeated erroneous edge-prediction)

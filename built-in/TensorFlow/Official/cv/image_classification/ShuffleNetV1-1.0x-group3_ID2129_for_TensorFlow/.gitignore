@@ -1,0 +1,12 @@
+.ipynb_checkpoints
+__pycache__
+
+models/
+export/
+*.csv
+*.npy
+test_images/
+images/
+run00/
+*.tar.gz
+*.tfrecords

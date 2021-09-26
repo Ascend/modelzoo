@@ -32,13 +32,13 @@
 
 ## 简述
 
-A Keras implementation of MobileNetV3 and Lite R-ASPP Semantic Segmentation (Under Development).
+MobileNetV3和Lite R-ASPP语义分割的Keras实现（正在开发中）。
 
-- 论文路径
+- 参考论文
 
   https://arxiv.org/abs/1905.02244?context=cs
 
-- 开源代码路径
+- 参考实现
 
   https://github.com/xiaochus/MobileNetV3
 
@@ -132,7 +132,7 @@ echo "parameter explain:
 
 ## 数据集准备<a name="section361114841316"></a>
 
-1、用户自行准备好数据集，包括训练数据集和验证数据集。
+1、用户自行准备好COCO数据集，包括训练数据集和验证数据集。
 
 2、训练的数据集放在train目录，验证的数据集放在eval目录
 
@@ -182,11 +182,28 @@ echo "parameter explain:
 ## 脚本和事例代码
 
 ```
-├-- README.md                            #说明文档
-├-- requirements.txt			 #依赖
-├-- test			         #训练脚本目录	
-├     |--train_full_1p.sh
-      |--train_full_8p.sh
+.
+├── configs
+│     ├── config.json                                   // 配置json文件
+└── model
+│     ├── layers
+│     │     └── bilinear_upsampling.py
+│     ├── LR_ASPP.py
+│     ├── mobilenet_base.py
+│     ├── mobilenet_v3_large.py
+│     └── mobilenet_v3_small.py
+├── test                                                //训练脚本目录
+│    ├── env.sh
+│    ├── train_full_1p.sh
+│    └── train_performance_1p.sh
+├──.gitignore
+├── LICENSE
+├── README.md                                           //说明文档
+├── modelzoo_level.txt
+├──requirements.txt                                     //依赖
+├──train_cls-npu.py                                     // 训练入口文件
+└──train_cls.py
+
 
 ```
 
