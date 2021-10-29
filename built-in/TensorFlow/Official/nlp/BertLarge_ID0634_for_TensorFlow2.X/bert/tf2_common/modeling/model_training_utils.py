@@ -126,7 +126,8 @@ def run_customized_training_loop(
     allreduce_bytes_per_pack=0,
     enable_checkpoint_and_summary=False,
     num_accumulation_steps=1,
-    stop_steps=None):
+    stop_steps=None,
+    bert_config=None):
   """Run BERT pretrain model training using low-level API.
 
   Arguments:
@@ -549,7 +550,11 @@ def run_customized_training_loop(
       logging.info(
           'Checkpoint file %s found and restoring from '
           'initial checkpoint for core model.', init_checkpoint)
-      checkpoint = tf.train.Checkpoint(model=sub_pretrain_model)
+      if(bert_config.num_hidden_layers==24):
+        checkpoint = tf.train.Checkpoint(model=sub_pretrain_model)
+      else:
+        checkpoint = tf.train.Checkpoint(model=model)
+      #checkpoint = tf.train.Checkpoint(model=sub_pretrain_model)
       checkpoint.restore(init_checkpoint).assert_existing_objects_matched()
       logging.info('Loading from checkpoint file completed')
 

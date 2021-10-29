@@ -154,7 +154,8 @@ def main_worker(pid_idx, device_nums_per_node, args):
 
     )
     # Load the latest checkpoint if one is available
-    load_checkpoint(args, trainer, epoch_itr)
+    if args.restore_file:
+        load_checkpoint(args, trainer, epoch_itr)
 
     # Train until the learning rate gets too small or model reaches target score
     max_epoch = args.max_epoch or math.inf

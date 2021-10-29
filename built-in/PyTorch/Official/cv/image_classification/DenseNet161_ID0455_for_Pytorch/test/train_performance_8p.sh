@@ -14,7 +14,8 @@ RANK_ID_START=0
 
 # 数据集路径,保持为空,不需要修改
 data_path=""
-
+# 训练周期
+epochs=1
 #网络名称,同目录名称,需要模型审视修改
 Network="DenseNet161_ID0455_for_Pytorch"
 
@@ -26,6 +27,8 @@ for para in $*
 do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -75,7 +78,7 @@ do
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     python3 train.py  \
         --model densenet161 \
-        --epochs 1 \
+        --epochs ${epochs} \
         --data-path=$data_path \
         --distributed \
         --batch-size=$batch_size \

@@ -51,7 +51,9 @@ def load_tiny() :
     i = 0
     j = 0
     annotations = {}
-    for sChild in os.listdir(trainPath):
+    annos = os.listdir(trainPath)
+    annos.sort()
+    for sChild in annos:
         sChildPath = os.path.join(os.path.join(trainPath, sChild), 'images')
         annotations[sChild] = j
         for c in os.listdir(sChildPath):
@@ -77,7 +79,9 @@ def load_tiny() :
 
     i = 0
     testPath = path + '/val/images'
-    for sChild in os.listdir(testPath):
+    testPics = os.listdir(testPath)
+    testPics.sort()
+    for sChild in testPics:
         if val_annotations_map[sChild] in annotations.keys():
             sChildPath = os.path.join(testPath, sChild)
             X = misc.imread(sChildPath, pilmode='RGB')

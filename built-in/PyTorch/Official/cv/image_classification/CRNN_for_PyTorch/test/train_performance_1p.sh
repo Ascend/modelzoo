@@ -14,7 +14,7 @@ Network="CRNN_for_PyTorch"
 batch_size=2560
 
 #训练epoch，不需要修改
-epoch=2
+epochs=2
 # 指定训练所使用的npu device卡id
 device_id=0
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
@@ -22,6 +22,8 @@ for para in $*
 do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -73,7 +75,7 @@ fi
 # 必要参数替换配置文件
 cur_path=`pwd`
 sed -i "0,/BATCH_SIZE_PER_GPU.*$/s//BATCH_SIZE_PER_GPU\: ${batch_size}/g" ${cur_path}/LMDB_config.yaml
-sed -i "s/END_EPOCH.*$/END_EPOCH\: ${epoch}/g" ${cur_path}/LMDB_config.yaml
+sed -i "s/END_EPOCH.*$/END_EPOCH\: ${epochs}/g" ${cur_path}/LMDB_config.yaml
 sed -i "s|TRAIN_ROOT.*$|TRAIN_ROOT\: ${data_path}/MJ_LMDB|g" ${cur_path}/LMDB_config.yaml
 sed -i "s|TEST_ROOT.*$|TEST_ROOT\: ${data_path}/IIIT5K_lmdb|g" ${cur_path}/LMDB_config.yaml
 sed -i "s/DEVICE_ID.*$/DEVICE_ID\: ${device_id}/g" ${cur_path}/LMDB_config.yaml

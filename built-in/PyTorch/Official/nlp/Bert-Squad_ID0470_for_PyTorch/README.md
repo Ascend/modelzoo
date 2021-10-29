@@ -147,16 +147,15 @@ NVLAMB adds the necessary tweaks to [LAMB version 1](https://arxiv.org/abs/1904.
  
 ### Mixed precision training
  
-Mixed precision is the combined use of different numerical precisions in a computational method. [Mixed precision](https://arxiv.org/abs/1710.03740) training offers significant computational speedup by performing operations in half-precision format, while storing minimal information in single-precision to retain as much information as possible in critical parts of the network. Since the introduction of [tensor cores](https://developer.nvidia.com/tensor-cores) in the Volta, and following with both the Turing and Ampere architectures, significant training speedups are experienced by switching to mixed precision -- up to 3x overall speedup on the most arithmetically intense model architectures. Using mixed precision training requires two steps:
- 
+Mixed precision is the combined use of different numerical precisions in a computational method. [Mixed precision](https://arxiv.org/abs/1710.03740) training offers significant computational speedup by performing operations in half-precision format, while storing minimal information in single-precision to retain as much information as possible in critical parts of the network. Since the introduction of [tensor cores](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) in the Volta, and following with both the Turing and Ampere architectures, significant training speedups are experienced by switching to mixed precision -- up to 3x overall speedup on the most arithmetically intense model architectures. Using mixed precision training requires two steps: 
 1.  Porting the model to use the FP16 data type where appropriate.
 2.  Adding loss scaling to preserve small gradient values.
  
 For information about:
--   How to train using mixed precision, see the [Mixed Precision Training](https://arxiv.org/abs/1710.03740) paper and [Training With Mixed Precision](https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html) documentation.
--   Techniques used for mixed precision training, see the [Mixed-Precision Training of Deep Neural Networks](https://devblogs.nvidia.com/mixed-precision-training-deep-neural-networks/) blog.
--   APEX tools for mixed precision training, see the [NVIDIA APEX: Tools for Easy Mixed-Precision Training in PyTorch](https://devblogs.nvidia.com/apex-pytorch-easy-mixed-precision-training/).
- 
+-   How to train using mixed precision, see the [Mixed Precision Training](https://arxiv.org/abs/1710.03740) paper and [Training With Mixed Precision](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) documentation.
+-   Techniques used for mixed precision training, see the [Mixed-Precision Training of Deep Neural Networks](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) blog.
+-   APEX tools for mixed precision training, see the [NVIDIA APEX: Tools for Easy Mixed-Precision Training in PyTorch](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT).
+
 #### Enabling mixed precision
  
 In this repository, mixed precision training is enabled by NVIDIA’s APEX library. The APEX library has an automatic mixed precision module that allows mixed precision to be enabled with minimal code changes.
@@ -178,12 +177,11 @@ Where `<opt_level>` is the optimization level. In the pretraining, `O2` is set a
 
 #### Enabling TF32
 
-TensorFloat-32 (TF32) is the new math mode in [NVIDIA A100](https://www.nvidia.com/en-us/data-center/a100/) GPUs for handling the matrix math also called tensor operations. TF32 running on Tensor Cores in A100 GPUs can provide up to 10x speedups compared to single-precision floating-point math (FP32) on Volta GPUs. 
+TensorFloat-32 (TF32) is the new math mode in [NVIDIA A100](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) GPUs for handling the matrix math also called tensor operations. TF32 running on Tensor Cores in A100 GPUs can provide up to 10x speedups compared to single-precision floating-point math (FP32) on Volta GPUs. 
 
 TF32 Tensor Cores can speed up networks using FP32, typically with no loss of accuracy. It is more robust than FP16 for models which require high dynamic range for weights or activations.
 
-For more information, refer to the [TensorFloat-32 in the A100 GPU Accelerates AI Training, HPC up to 20x](https://blogs.nvidia.com/blog/2020/05/14/tensorfloat-32-precision-format/) blog post.
-
+For more information, refer to the [TensorFloat-32 in the A100 GPU Accelerates AI Training, HPC up to 20x](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) blog post.
 TF32 is supported in the NVIDIA Ampere GPU architecture and is enabled by default.
 
 ### Glossary
@@ -215,23 +213,21 @@ The following section lists the requirements that you need to meet in order to s
 This repository contains Dockerfile which extends the PyTorch NGC container and encapsulates some dependencies. Aside from these dependencies, ensure you have the following components:
  
 -   [NVIDIA Docker](https://github.com/NVIDIA/nvidia-docker)
--   [PyTorch 20.06-py3 NGC container or later](https://ngc.nvidia.com/registry/nvidia-pytorch)
+-   [PyTorch 20.06-py3 NGC container or later](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
 -   Supported GPUs:
-- [NVIDIA Volta architecture](https://www.nvidia.com/en-us/data-center/volta-gpu-architecture/)
-- [NVIDIA Turing architecture](https://www.nvidia.com/en-us/geforce/turing/)
-- [NVIDIA Ampere architecture](https://www.nvidia.com/en-us/data-center/nvidia-ampere-gpu-architecture/)
+- [NVIDIA Volta architecture](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
+- [NVIDIA Turing architecture](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
+- [NVIDIA Ampere architecture](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
  
 For more information about how to get started with NGC containers, see the following sections from the NVIDIA GPU Cloud Documentation and the Deep Learning Documentation:
--   [Getting Started Using NVIDIA GPU Cloud](https://docs.nvidia.com/ngc/ngc-getting-started-guide/index.html)
--   [Accessing And Pulling From The NGC Container Registry](https://docs.nvidia.com/deeplearning/dgx/user-guide/index.html#accessing_registry)
--   [Running PyTorch](https://docs.nvidia.com/deeplearning/dgx/pytorch-release-notes/running.html#running)
+-   [Getting Started Using NVIDIA GPU Cloud](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
+-   [Accessing And Pulling From The NGC Container Registry](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
+-   [Running PyTorch](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT)
  
-For those unable to use the PyTorch NGC container, to set up the required environment or create your own container, see the versioned [NVIDIA Container Support Matrix](https://docs.nvidia.com/deeplearning/dgx/support-matrix/index.html).
- 
+For those unable to use the PyTorch NGC container, to set up the required environment or create your own container, see the versioned [NVIDIA Container Support Matrix](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT). 
 For multi-node, the sample provided in this repository requires [Enroot](https://github.com/NVIDIA/enroot) and [Pyxis](https://github.com/NVIDIA/pyxis) set up on a [SLURM](https://slurm.schedmd.com) cluster.
  
-More information on how to set up and launch can be found in the [Multi-node Documentation](https://docs.nvidia.com/ngc/multi-node-bert-user-guide).
- 
+More information on how to set up and launch can be found in the [Multi-node Documentation](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT). 
 ## Quick Start Guide
  
 To train your model using mixed or TF32 precision with Tensor Cores or using FP32, perform the following steps using the default parameters of the BERT model. Training configurations to run on 8 x A100 40G, 8 x V100 16G, 16 x V100 32G cards and examples of usage are provided at the end of this section. For the specifics concerning training and inference, see the [Advanced](#advanced) section.
@@ -243,9 +239,8 @@ To train your model using mixed or TF32 precision with Tensor Cores or using FP3
 `cd DeepLearningExamples/PyTorch/LanguageModeling/BERT`
  
 2. Download the NVIDIA pretrained checkpoint.
- 
-If you want to use a pre-trained checkpoint, visit [NGC](https://ngc.nvidia.com/catalog/models/nvidia:bert_pyt_ckpt_large_pretraining_amp_lamb/files). This downloaded checkpoint is used to fine-tune on SQuAD. Ensure you unzip the downloaded file and place the checkpoint in the `checkpoints/` folder. For a checkpoint already fine-tuned for QA on SQuAD v1.1 visit [NGC](https://ngc.nvidia.com/catalog/models/nvidia:bert_pyt_ckpt_large_qa_squad11_amp/files).
- 
+Please refer the https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT
+
 3. Build BERT on top of the  NGC container.
 `bash scripts/docker/build.sh`
  
@@ -260,7 +255,7 @@ Resultant logs and checkpoints of pretraining and fine-tuning routines are store
 
 This repository provides scripts to download, verify, and extract the following datasets:
  
--   [SQuAD](https://rajpurkar.github.io/SQuAD-explorer/) (fine-tuning for question answering)
+-   [SQuAD](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) (fine-tuning for question answering)
 -   Wikipedia (pre-training)
 -   BookCorpus (pre-training)
  
@@ -353,8 +348,8 @@ Descriptions of the key scripts and folders are provided below.
 -   `create_pretraining_data.py` - Creates `.hdf5` files from shared text files in the final step of dataset creation.
 -   `model.py` - Implements the BERT pre-training and fine-tuning model architectures with PyTorch.
 -   `optimization.py` - Implements the LAMB optimizer with PyTorch.
--   `run_squad.py` - Implements fine tuning training and evaluation for question answering on the [SQuAD](https://rajpurkar.github.io/SQuAD-explorer/) dataset.
--   `run_glue.py` - Implements fine tuning training and evaluation for [GLUE](https://gluebenchmark.com/) tasks.
+-   `run_squad.py` - Implements fine tuning training and evaluation for question answering on the [SQuAD](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) dataset.
+-   `run_glue.py` - Implements fine tuning training and evaluation for [GLUE](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT) tasks.
 -   `run_pretraining.py` - Implements BERT pre-training.
 -   `run_pretraining_inference.py` - Implements evaluation of a BERT pre-trained model.
  
@@ -536,8 +531,8 @@ The preparation of the pre-training dataset is described in the `bertPrep.py` sc
 The tools used for preparing the BookCorpus and Wikipedia datasets can be applied to prepare an arbitrary corpus. The `create_datasets_from_start.sh` script in the `data/` directory applies sentence segmentation, sharding, and `hdf5` file creation given an arbitrary text file containing a document-separated text corpus.
  
 For fine-tuning a pre-trained BERT model for specific tasks, by default this repository prepares the following dataset:
- 
--   [SQuAD](https://rajpurkar.github.io/SQuAD-explorer/): for question answering
+
+-   [SQuAD](https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT): for question answering
 -   [MRPC](https://www.microsoft.com/en-us/download/details.aspx?id=52398): for paraphrase detection.
 -   [SST-2](https://nlp.stanford.edu/sentiment/index.html): for sentiment analysis.
  

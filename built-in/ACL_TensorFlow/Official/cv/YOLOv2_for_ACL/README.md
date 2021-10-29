@@ -14,19 +14,31 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/YOLOv2_for_ACL
 
 ### 2. Download and preprocess the dataset
 
-1. Download the Voc2017 test dataset by yourself. 
+1. Download the VOC2007 test dataset by yourself, then extract **VOCtest_06-Nov-2007.tar**. 
 
-2. Put pictures to **'scripts/voc2017_test'**
+2. Move VOC2007 test dataset to **'scripts/VOC2007'** like this:
+```
+VOC2007
+|----Annotations
+|----ImageSets
+|----JPEGImages
+|----SegmentationClass
+|----SegmentationObject
+```
 
 3. Images Preprocess:
 ```
 cd scripts
 mkdir input_bins
-python3 preprocess.py ./voc2017_test/ ./input_bins/
+python3 preprocess.py ./VOC2007/JPEGImages/ ./input_bins/
 ```
    The pictures will be preprocessed to bin files.
 
 
+4. Convert Groundtruth labels to text format
+```
+python3 xml2txt.py ./VOC2007/Annotations/ ./yolov2_postprocess/groundtruths/
+```
 
 ### 3. Offline Inference
 
@@ -42,10 +54,12 @@ python3 preprocess.py ./voc2017_test/ ./input_bins/
   export ASCEND_OPP_PATH=${install_path}/opp
   ```
 
-- convert pb to om #1batcsize为例
+- convert pb to om 
+  
+  以batcsize=1为例：
 
   ```
-  atc --model=mk_pb/pb/YOLOV2.pb --input_shape='Placeholder:1,416,416,3'  --input_format=NHWC --output=./yolov2_tf_1batch --soc_version=Ascend310 --framework=3
+  atc --model=./yolov2.pb --input_shape='Placeholder:1,416,416,3'  --input_format=NHWC --output=./yolov2_tf_1batch --soc_version=Ascend310 --framework=3
   ```
 
 - Build the program
@@ -71,7 +85,7 @@ Our result was obtained by running the applicable inference script. To achieve t
 
 |       model       | **data**  |    mAP    |
 | :---------------: | :-------: | :-------------: |
-| offline Inference | 4953 images | 59.43% |
+| offline Inference | 4952 images | 59.43% |
 
 ## Reference
 [1] https://github.com/KOD-Chen/YOLOv2-Tensorflow

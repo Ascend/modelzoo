@@ -513,7 +513,7 @@ class YOLOV3Head(BaseDenseHead, BBoxTestMixin):
             # anchor_strides.append(
             #     torch.tensor(self.featmap_strides[i],
             #                  device=gt_bboxes.device).repeat(len(anchors[i])))
-            tmp = torch.tensor(self.featmap_strides[i]).repeat(len(anchors[i]))
+            tmp = torch.tensor(self.featmap_strides[i], dtype=torch.int32).repeat(len(anchors[i]))
             tmp = tmp.npu()
             anchor_strides.append(tmp)
 
@@ -543,7 +543,6 @@ class YOLOV3Head(BaseDenseHead, BBoxTestMixin):
 
         pos_assigned_gt_inds_int = pos_assigned_gt_inds.int()
         pos_gt_bboxes = gt_bboxes.index_select(0, pos_assigned_gt_inds_int)
-        anchor_strides = anchor_strides.int()
 
         # target_map[sampling_result.pos_inds, :4] = self.bbox_coder.encode(
         #     sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes,
@@ -557,8 +556,8 @@ class YOLOV3Head(BaseDenseHead, BBoxTestMixin):
 
         target_map[:, 4] = pos_inds_f
 
-        gt_labels_one_hot = F.one_hot(
-            gt_labels, num_classes=self.num_classes).float()
+        gt_labels_one_hot = torch.npu_one_hot(
+            gt_labels, -1, self.num_classes, 1, 0).float()
         if self.one_hot_smoother != 0:  # label smooth
             gt_labels_one_hot = gt_labels_one_hot * (
                 1 - self.one_hot_smoother

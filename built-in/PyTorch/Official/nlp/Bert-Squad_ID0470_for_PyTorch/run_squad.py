@@ -42,6 +42,7 @@ from optimization import BertAdam, warmup_linear
 from tokenization import (BasicTokenizer, BertTokenizer, whitespace_tokenize)
 from utils import is_main_process, format_step
 import dllogger, time
+from apex.optimizers import npu_fused_bert_adam, NpuFusedBertAdam
 
 # torch._C._jit_set_profiling_mode(False)
 # torch._C._jit_set_profiling_executor(False)
@@ -55,6 +56,36 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+class NpuFusedBertAdamV2(NpuFusedBertAdam):
+    def _group_step(self, group_index):
+        group = self.param_groups[group_index]
+
+        beta1, beta2 = group['b1'], group['b2']
+
+        stash = self._amp_stash
+        combined_group_params = stash.combined_params_indexed_by_group[group_index]
+        combined_group_grads = stash.combined_grads_indexed_by_group[group_index]
+        combined_group_param_states = stash.combined_param_states_indexed_by_group[group_index]
+
+        for combined_param, combined_grad, combined_param_state in zip(combined_group_params, combined_group_grads,
+                                                                       combined_group_param_states):
+            if combined_param is None or combined_grad is None:
+                continue
+            exp_avg, exp_avg_sq = combined_param_state['exp_avg'], combined_param_state['exp_avg_sq']
+            if group['t_total'] != -1:
+                scheduler_fct = npu_fused_bert_adam.SCHEDULES[group['schedule']]
+                lr_scheduled = group['lr'] * scheduler_fct(combined_param_state['step'] / group['t_total'],
+                                                           group['warmup'])
+            else:
+                lr_scheduled = group['lr']
+            combined_param.data, exp_avg, exp_avg_sq = torch.npu_bert_apply_adam(combined_param.data, exp_avg,
+                                                                                 exp_avg_sq, lr_scheduled, beta1, beta2,
+                                                                                 group['e'], combined_grad.data,
+                                                                                 group['max_grad_norm'], 0,
+                                                                                 group['weight_decay'])
+            combined_param_state['step'] += 1
 
 
 class SquadExample(object):
@@ -986,9 +1017,8 @@ def main():
             #         "Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
             # optimizer = NpuFusedAdam(optimizer_grouped_parameters,
             #                       lr=args.learning_rate)
-            from apex.optimizers import NpuFusedBertAdam
 
-            optimizer = NpuFusedBertAdam(optimizer_grouped_parameters,
+            optimizer = NpuFusedBertAdamV2(optimizer_grouped_parameters,
                                          lr=args.learning_rate,
                                          warmup=args.warmup_proportion,
                                          t_total=num_train_optimization_steps)
@@ -1248,5 +1278,9 @@ def main():
         dllogger.log(step=tuple(), data={"exact_match": exact_match, "F1": f1})
 
 if __name__ == "__main__":
+    option = {}
+    option["ACL_OP_SELECT_IMPL_MODE"] = "high_performance"
+    option["ACL_OPTYPELIST_FOR_IMPLMODE"] = "LayerNorm"
+    torch.npu.set_option(option)
     main()
     dllogger.flush()

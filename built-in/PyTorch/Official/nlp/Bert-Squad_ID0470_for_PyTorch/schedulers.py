@@ -114,8 +114,8 @@ class PolyWarmUpScheduler(LRScheduler):
         super(PolyWarmUpScheduler, self).__init__(optimizer, last_epoch)
 
     def step(self, epoch=None):
-        #param_group = self.optimizer.param_groups[0]
-        param_group = self.optimizer.state[self.optimizer.param_groups[0]['params'][0]]
+        param_group = self.optimizer.param_groups[0]
+        # param_group = self.optimizer.state[self.optimizer.param_groups[0]['params'][0]]
         if 'step' in param_group:
             self.last_epoch = param_group['step'] + 1
         else:

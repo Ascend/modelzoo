@@ -6,7 +6,7 @@ output_model_name=$3
 --model=$model_path \
 --framework=$framework \
 --output=$output_model_name \
---input_format=NCHW --input_shape="actual_input_1:1,3,304,304" \
+--input_format=NCHW --input_shape="actual_input_1:1,3,336,336" \
 --enable_small_channel=1 \
 --log=error \
 --soc_version=Ascend310 \

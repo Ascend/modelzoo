@@ -15,7 +15,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/DeepLabv3_plus_for_ACL
 
 ### 2. Download and preprocess the dataset
 
-1. Download the PascalVoc2012 test dataset by yourself. 
+1. Download the PascalVoc2012 dataset by yourself. 
 
 2. Put the dataset files to **'scripts/PascalVoc2012'** like this:
 ```
@@ -23,7 +23,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/DeepLabv3_plus_for_ACL
 |----Annotations
 |----ImageSets
 |----JPEGImages
-|----SegmenttationClass
+|----SegmentationClass
 |----SegmentationObject
 ```
 
@@ -52,7 +52,7 @@ The jpegs pictures will be preprocessed to bin fils.
 - convert pb to om
 
   ```
-  atc --model=deeplabv3_plus_tf.pb --framework=3 --output=deeplabv3_plus_tf_1batch --output_type=FP32 --soc_version=Ascend310 --input_shape="ImageTensor:1,375,500,3" --log=info
+  atc --model=deeplabv3_plus_tf.pb --framework=3 --output=deeplabv3_plus_tf_1batch --output_type=FP32 --soc_version=Ascend310 --input_shape="ImageTensor:1,513,513,3" --out_nodes=SemanticPredictions:0 --log=info
   ```
 
 - Build the program
@@ -74,9 +74,11 @@ The jpegs pictures will be preprocessed to bin fils.
 
 Our result was obtained by running the applicable inference script. To achieve the same results, follow the steps in the Quick Start Guide.
 
-#### Inference accuracy results
+#### Inference accuracy results of Validation testset
 
 |       model       | **data**  |    MeanIOU    |
 | :---------------: | :-------: | :-------------: |
-| offline Inference | 2913 images | 74.3% |
+| offline Inference | 1449 images | 93.6% |
 
+## Reference
+[1] https://github.com/tensorflow/models/tree/master/research/deeplab

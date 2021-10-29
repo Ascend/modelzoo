@@ -1,19 +1,25 @@
 # Contents
 
+- [Contents](#contents)
 - [MobileNetV2 Description](#mobilenetv2-description)
-- [Model Architecture](#model-architecture)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-  - [Mixed Precision](#mixed-precision(ascend))
+  - [Mixed Precision(Ascend)](#mixed-precisionascend)
 - [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-  - [Script and Sample Code](#script-and-sample-code)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#eval-process)
-- [Model Description](#model-description)
-  - [Performance](#performance)  
+- [Script description](#script-description)
+  - [Script and sample code](#script-and-sample-code)
+  - [Training process](#training-process)
+    - [Usage](#usage)
+    - [Launch](#launch)
+    - [Result](#result)
+  - [Evaluation process](#evaluation-process)
+    - [Usage](#usage-1)
+    - [Launch](#launch-1)
+    - [Result](#result-1)
+- [Model description](#model-description)
+  - [Performance](#performance)
     - [Training Performance](#training-performance)
-    - [Evaluation Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -31,7 +37,7 @@ The overall network architecture of MobileNetV2 is show below:
 
 # [Dataset](#contents)
 
-Dataset used: [imagenet](http://www.image-net.org/)
+Dataset used: `imagenet`
 
 - Dataset size: ~125G, 1.2W colorful images in 1000 classes
   - Train: 120G, 1.2W images

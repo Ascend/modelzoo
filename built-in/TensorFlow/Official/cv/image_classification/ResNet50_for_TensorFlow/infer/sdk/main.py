@@ -26,6 +26,7 @@ import numpy as np
 import datetime
 import sys
 
+
 def save_infer_result(result, result_name, image_name):
     """
     save the infer result to name_1.txt
@@ -53,7 +54,7 @@ def main():
         exit()
 
     # create streams by pipeline config file
-    with open("../pipeline/Resnet50.pipeline", 'rb') as f:
+    with open("./Resnet50.pipeline", 'rb') as f:
         pipeline_str = f.read()
     ret = stream_manager_api.CreateMultipleStreams(pipeline_str)
 
@@ -63,7 +64,7 @@ def main():
 
     # Construct the input of the stream
     data_input = MxDataInput()
-    
+
     dir_name = sys.argv[1]
     res_dir_name = sys.argv[2]
     file_list = os.listdir(dir_name)
@@ -78,7 +79,7 @@ def main():
                 data_input.data = f.read()
         else:
             continue
-        
+
         empty_data = []
 
         stream_name = b'resnet50_classification'
@@ -99,11 +100,12 @@ def main():
         # print the infer result
         infer_res = infer_result.data.decode()
         print("process img: {}, infer result: {}".format(file_name, infer_res))
-            
+
         save_infer_result(infer_result.data.decode(), res_dir_name, file_name)
 
     # destroy streams
     stream_manager_api.DestroyAllStreams()
+
 
 if __name__ == '__main__':
     main()

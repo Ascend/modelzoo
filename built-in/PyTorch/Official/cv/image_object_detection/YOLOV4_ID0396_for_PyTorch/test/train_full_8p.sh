@@ -1,5 +1,9 @@
 #!/bin/bash
-
+cur_path=`pwd`
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+ls /npu/traindata/coco_txl >1.txt
+ls /npu/traindata/coco_txt/images >2.txt
+ls /npu/traindata/coco_txl/images/train2017 >3.txt
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
@@ -53,7 +57,6 @@ else
     test_path_dir=${cur_path}/test
 fi
 
-
 #################创建日志输出目录，不需要修改#################
 ASCEND_DEVICE_ID=0
 if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
@@ -63,36 +66,79 @@ else
     mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
 fi
 
+if [ -d $data_path/../coco_txl/COCO2017/images/train2017/000000000009.jpg ];then
+        echo "NO NEED UNTAR"
+else
+    mkdir -p $data_path/../coco_txl
+        tar -zxvf $data_path/COCO2017.tar.gz -C  $data_path/../coco_txl/
+rm -rf $data_path/../coco_txl/COCO2017/labels/*.cache
+fi
+wait
+
+sed -i "s|./coco/train2017.txt|$data_path/../coco_txl/COCO2017/train2017.txt|g" data/coco.yaml
+sed -i "s|./coco/val2017.txt|$data_path/../coco_txl/COCO2017/val2017.txt|g" data/coco.yaml
+sed -i "s|./coco/testdev2017.txt|$data_path/../coco_txl/COCO2017/testdev2017.txt|g" data/coco.yaml
 
 #################启动训练脚本#################
 # 训练开始时间，不需要修改
 start_time=$(date +%s)
-
-taskset -c 0-95 python3.7 train_8p.py --img $image_size $image_size \
-                                      --data coco.yaml \
-                                      --cfg cfg/yolov4_8p.cfg \
-	                                  --weights '' \
-	                                  --name yolov4 \
-                                      --batch-size ${batch_size} \
-                                      --epochs=${train_epochs} \
-                                      --amp \
-                                      --opt-level O1 \
-                                      --loss_scale 128 \
-                                      --multiprocessing_distributed \
-                                      --device 'npu' \
-                                      --global_rank 0 \
-                                      --device_list 0,1,2,3,4,5,6,7 \
-                                      --world_size 1 \
-                                      --addr $(hostname -I |awk '{print $1}') \
-                                      --dist_url 'tcp://127.0.0.1:41111' \
-                                      --dist_backend 'hccl' \
-                                      --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+for i in $(seq 0 7)
+do
+    if [ $(uname -m) = "aarch64" ]
+    then
+    let p_start=0+24*i
+    let p_end=23+24*i
+    taskset -c $p_start-$p_end python3.7 train_8p.py --img $image_size $image_size \
+                                          --data coco.yaml \
+                                          --cfg cfg/yolov4_8p.cfg \
+                                          --weights '' \
+                                          --name yolov4 \
+                                          --batch-size ${batch_size} \
+                                          --epochs=${train_epochs} \
+                                          --amp \
+                                          --opt-level O1 \
+                                          --loss_scale 128 \
+                                          --multiprocessing_distributed \
+                                          --device 'npu' \
+                                          --global_rank $i \
+                                          --device_list 0,1,2,3,4,5,6,7 \
+                                          --world_size 1 \
+                                          --addr $(hostname -I |awk '{print $1}') \
+                                          --dist_url 'tcp://127.0.0.1:41111' \
+                                          --dist_backend 'hccl' \
+                                          --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    else
+        python3.7 train_8p.py --img $image_size $image_size \
+                   --data coco.yaml \
+                   --cfg cfg/yolov4_8p.cfg \
+                   --weights '' \
+                   --name yolov4 \
+                   --batch-size ${batch_size} \
+                   --epochs=${train_epochs} \
+                   --amp \
+                   --opt-level O1 \
+                   --loss_scale 128 \
+                   --multiprocessing_distributed \
+                   --device 'npu' \
+                   --global_rank $i \
+                   --device_list 0,1,2,3,4,5,6,7 \
+                   --world_size 1 \
+                   --addr $(hostname -I |awk '{print $1}') \
+                   --dist_url 'tcp://127.0.0.1:41111' \
+                   --dist_backend 'hccl' \
+                   --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    fi
+done
 
 wait
 
 # 训练结束时间，不需要修改
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
+
+sed -i "s|./coco/train2017.txt|$data_path/../coco_txl/COCO2017/train2017.txt|g" data/coco.yaml
+sed -i "s|./coco/val2017.txt|$data_path/../coco_txl/COCO2017/val2017.txt|g" data/coco.yaml
+sed -i "s|./coco/testdev2017.txt|$data_path/../coco_txl/COCO2017/testdev2017.txt|g" data/coco.yaml
 
 # 结果打印，不需要修改
 echo "------------------ Final result ------------------"

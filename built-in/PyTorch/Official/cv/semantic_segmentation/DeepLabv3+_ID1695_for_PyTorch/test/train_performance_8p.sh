@@ -13,15 +13,15 @@ RANK_ID_START=0
 data_path=""
 
 # 训练epoch
-train_epochs=3
+epochs=3
 # 学习率
 learning_rate=0.008
 
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
 do
-    if [[ $para == --train_epochs* ]];then
-        train_epochs=`echo ${para#*=}`
+    if [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
     elif [[ $para == --more_path1* ]];then
@@ -89,7 +89,7 @@ do
         --backbone resnet \
         --lr ${learning_rate} \
         --workers 64 \
-        --epochs ${train_epochs} \
+        --epochs ${epochs} \
         --batch-size ${batch_size} \
         --checkname deeplab-resnet \
         --eval-interval 1 \

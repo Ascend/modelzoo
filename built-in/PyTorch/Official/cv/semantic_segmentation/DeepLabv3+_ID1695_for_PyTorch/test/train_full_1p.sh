@@ -17,7 +17,7 @@ resume=""
 ft=""
 
 # 训练epoch
-train_epochs=100
+epochs=100
 # 指定训练所使用的npu device卡id
 device_id=0
 # 学习率
@@ -40,6 +40,8 @@ do
         dataset=`echo ${para#*=}`
     elif [[ $para == --num_classes* ]];then
         num_classes=`echo ${para#*=}`
+	elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`	
     elif [[ $para == --resume* ]];then
         resume=`echo ${para#*=}`
         ft='--ft'
@@ -111,7 +113,7 @@ python3 train.py \
     --backbone resnet \
     --lr ${learning_rate} \
     --workers 64 \
-    --epochs ${train_epochs} \
+    --epochs ${epochs} \
     --batch-size ${batch_size} \
     --device_id ${ASCEND_DEVICE_ID} \
     --checkname deeplab-resnet \

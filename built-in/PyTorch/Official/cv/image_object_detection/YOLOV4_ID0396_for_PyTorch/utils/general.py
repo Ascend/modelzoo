@@ -452,6 +452,20 @@ class BCEBlurWithLogitsLoss(nn.Module):
         loss *= alpha_factor
         return loss.mean()
 
+class DeterministicIndex(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x, indices_list):
+        ctx.x = x
+        ctx.indices_list = indices_list
+        return x[indices_list[0], indices_list[1], indices_list[2], indices_list[3]]
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        tmp = torch.zeros_like(ctx.x)
+        ind0, ind1, ind2, ind3 = ctx.indices_list
+        tmp[ind0, ind1, ind2, ind3] = grad_output
+        return tmp, None
+
 
 def compute_loss(p, targets, model):  # predictions, targets, model
     device = targets.device
@@ -489,11 +503,7 @@ def compute_loss(p, targets, model):  # predictions, targets, model
         if mask_sum:
             nt += n  # cumulative targets
             # ps = pi[b, a, gj, gi]  # prediction subset corresponding to targets
-            k = pi.shape[3]
-            jk = pi.shape[2] * k
-            ijk = pi.shape[1] * jk
-            indice = b.float() * ijk + a.float() * jk + gj.float() * k + gi.float()
-            ps = torch.index_select(pi.view(-1, pi.shape[4]), 0, indice.long())
+            ps = DeterministicIndex.apply(pi, (b, a, gj, gi))
 
             # Regression
             pxy = ps[:, :2].sigmoid() * 2. - 0.5
@@ -502,6 +512,7 @@ def compute_loss(p, targets, model):  # predictions, targets, model
             #pwh = torch.exp(ps[:, 2:4]).clamp(max=1E3) * anchors[i]
             pbox = torch.cat((pxy, pwh), 1).to(device)  # predicted box
             giou = bbox_iou(pbox.T, tbox[i], x1y1x2y2=False, CIoU=True)  # giou(prediction, target)
+            # giou = torch.npu_giou(pbox.T, tbox[i].T, trans=True, is_cross=False).squeeze()
             giou = giou.mul(mask)
             lbox += (1.0 * mask - giou).sum() / mask_sum
             #lbox += (1.0 - giou).mean()  # giou loss
@@ -533,11 +544,11 @@ def compute_loss(p, targets, model):  # predictions, targets, model
 
 def build_targets(p, targets, model):
     #nt = targets.shape[0]  # number of anchors, targets
-    nt = (targets[:, 5]!=0).sum()
+    nt = (targets[:, 5] != 0).sum()
     nt_all = targets.shape[0]
     tcls, tbox, indices, anch = [], [], [], []
     gain = torch.ones(6, device=targets.device)  # normalized to gridspace gain
-    off = torch.tensor([[1, 0], [0, 1], [-1, 0], [0, -1]], device=targets.device).float()  # overlap offsets
+    off = torch.tensor([[1, 0], [0, 1], [-1, 0], [0, -1]], device=targets.device, dtype=torch.float)  # overlap offsets
 
     g = 0.5  # offset
     multi_gpu = is_parallel(model)
@@ -553,6 +564,7 @@ def build_targets(p, targets, model):
             na = anchors.shape[0]  # number of anchors
             at = torch.arange(na, device=targets.device).view(na, 1).repeat(1, nt_all)  # anchor tensor, same as .repeat_interleave(nt)
             r = t[None, :, 4:6] / anchors[:, None]  # wh ratio
+            # mask = torch.npu_max(torch.max(r, 1. / r), dim=2)[0] < model.hyp['anchor_t']  # compare
             mask = torch.max(r, 1. / r).max(2)[0] < model.hyp['anchor_t']  # compare
             # j = wh_iou(anchors, t[:, 4:6]) > model.hyp['iou_t']  # iou(3,n) = wh_iou(anchors(3,2), gwh(n,2))
             a, t = (at * mask).view(-1), (t.repeat(na, 1, 1) * mask.unsqueeze(2)).view(-1, 6)

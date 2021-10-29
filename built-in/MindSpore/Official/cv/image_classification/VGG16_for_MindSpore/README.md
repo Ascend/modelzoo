@@ -1,24 +1,32 @@
 # Contents
 
+- [Contents](#contents)
 - [VGG Description](#vgg-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
+      - [Dataset used: `CIFAR-10h](#dataset-used-cifar-10h)
+      - [Dataset used: `ImageNet2012`](#dataset-used-imagenet2012)
+      - [Dataset organize way](#dataset-organize-way)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+  - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Parameter configuration](#parameter-configuration)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+    - [Training](#training)
+    - [Evaluation](#evaluation)
+  - [Parameter configuration](#parameter-configuration)
+  - [Training Process](#training-process)
+    - [Training](#training-1)
+      - [Run vgg16 on Ascend](#run-vgg16-on-ascend)
+      - [Run vgg16 on GPU](#run-vgg16-on-gpu)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation-1)
 - [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Training Performance](#training-performance)
-        - [Evaluation Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Training Performance](#training-performance)
+    - [Evaluation Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -36,7 +44,7 @@ here basic modules mainly include basic operation like:  **3×3 conv** and **2×
 
 # [Dataset](#contents)
 
-#### Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
+#### Dataset used: `CIFAR-10h
 
 - CIFAR-10 Dataset size：175M，60,000 32*32 colorful images in 10 classes
     - Train：146M，50,000 images
@@ -44,7 +52,7 @@ here basic modules mainly include basic operation like:  **3×3 conv** and **2×
  - Data format: binary files
     - Note: Data will be processed in src/dataset.py
 
-#### Dataset used: [ImageNet2012](http://www.image-net.org/) 
+#### Dataset used: `ImageNet2012`
 - Dataset size: ~146G, 1.28 million colorful images in 1000 classes
 	- Train: 140G, 1,281,167 images
 	- Test: 6.4G, 50, 000 images

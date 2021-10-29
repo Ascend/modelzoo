@@ -112,7 +112,7 @@ if __name__ == "__main__":
     print('Input data generated in {}s'.format(time.time() - start_time))
 
     # Define Model,train,predict and evaluate
-    args.device_num = torch.npu.device_count()
+    args.device_num = int(os.environ["RANK_SIZE"])
     if args.dist:
         os.environ['MASTER_ADDR'] = '127.0.0.1'
         os.environ['MASTER_PORT'] = '29680'

@@ -12,7 +12,7 @@ DeepFM 网络的基本结构如下图。
 
 ### 2.1. 数据介绍
 
-以[Criteo 数据集](https://www.kaggle.com/c/criteo-display-ad-challenge/data)为例。
+以`Criteo 数据集`为例。
 
 Criteo 原始训练数据集为 train.txt, 测试集为 test.txt。 样例如下。
 

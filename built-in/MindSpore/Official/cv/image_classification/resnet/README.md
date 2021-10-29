@@ -1,6 +1,9 @@
 # Contents
 
+- [Contents](#contents)
 - [ResNet Description](#resnet-description)
+    - [Description](#description)
+    - [Paper](#paper)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
@@ -11,11 +14,28 @@
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
+        - [Usage](#usage)
+            - [Running on Ascend](#running-on-ascend)
+            - [Running on GPU](#running-on-gpu)
+            - [Running parameter server mode training](#running-parameter-server-mode-training)
+        - [Result](#result)
     - [Evaluation Process](#evaluation-process)
+        - [Usage](#usage-1)
+            - [Running on Ascend](#running-on-ascend-1)
+            - [Running on GPU](#running-on-gpu-1)
+        - [Result](#result-1)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
+            - [ResNet50 on CIFAR-10](#resnet50-on-cifar-10)
+            - [ResNet50 on ImageNet2012](#resnet50-on-imagenet2012)
+            - [ResNet101 on ImageNet2012](#resnet101-on-imagenet2012)
+            - [SE-ResNet50 on ImageNet2012](#se-resnet50-on-imagenet2012)
         - [Inference Performance](#inference-performance)
+            - [ResNet50 on CIFAR-10](#resnet50-on-cifar-10-1)
+            - [ResNet50 on ImageNet2012](#resnet50-on-imagenet2012-1)
+            - [ResNet101 on ImageNet2012](#resnet101-on-imagenet2012-1)
+            - [SE-ResNet50 on ImageNet2012](#se-resnet50-on-imagenet2012-1)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -42,7 +62,7 @@ The overall network architecture of ResNet is show below:
 
 # [Dataset](#contents)
 
-Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
+Dataset used: `CIFAR-10`
 
 - Dataset size：60,000 32*32 colorful images in 10 classes
     - Train：50,000 images
@@ -57,7 +77,7 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 └─cifar-10-verify-bin
 ```
 
-Dataset used: [ImageNet2012](http://www.image-net.org/)
+Dataset used: `ImageNet2012`
 
 - Dataset size 224*224 colorful images in 1000 classes
     - Train：1,281,167 images  

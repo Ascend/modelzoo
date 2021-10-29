@@ -2,7 +2,11 @@
 
 #当前路径,不需要修改
 cur_path=`pwd`
-
+#规避环境变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 #集合通信参数,不需要修改
 export RANK_SIZE=8
 RANK_ID_START=0

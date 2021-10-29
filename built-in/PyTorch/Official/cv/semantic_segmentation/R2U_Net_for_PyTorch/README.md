@@ -27,16 +27,16 @@ https://github.com/LeeJunHyun/Image_Segmentation
     1.安装环境
     2.修改参数device_id（单卡训练所使用的device id），为训练配置device_id，比如device_id=0
     3.开始训练
-        bash ./test/train_full_1p.sh  --data_path=数据集路径         # 精度训练
-        bash ./test/train_performance_1p.sh  --data_path=数据集路径  # 性能训练
+        bash ./test/train_full_1p.sh  --data_path=数据集路径  --epoch=训练次数      # 精度训练
+        bash ./test/train_performance_1p.sh  --data_path=数据集路径 --epoch=训练次数 # 性能训练
 
 
 多卡训练流程
 
     1.安装环境
     2.开始训练
-        bash ./test/train_full_8p.sh  --data_path=数据集路径         # 精度训练
-        bash ./test/train_performance_8p.sh  --data_path=数据集路径  # 性能训练
+        bash ./test/train_full_8p.sh  --data_path=数据集路径  --epochs=训练次数       # 精度训练
+        bash ./test/train_performance_8p.sh  --data_path=数据集路径 --epochs=训练次数 # 性能训练
 
 ### Step 4: Training Results
 

@@ -118,7 +118,9 @@ class GridAssigner(BaseAssigner):
         # for each anchor, which gt best overlaps with it
         # for each anchor, the max iou of all gts
         # shape of max_overlaps == argmax_overlaps == num_bboxes
-        max_overlaps, argmax_overlaps = overlaps.max(dim=0)
+
+        # torch.npu_max returns index as int32
+        max_overlaps, argmax_overlaps = torch.npu_max(overlaps, dim=0)
 
         if isinstance(self.neg_iou_thr, float):
             # assigned_gt_inds[(max_overlaps >= 0)
@@ -139,25 +141,26 @@ class GridAssigner(BaseAssigner):
         # the prior condition of comparision is to filter out all
         # unrelated anchors, i.e. not box_responsible_flags
         # overlaps[:, ~box_responsible_flags.type(torch.bool)] = -1.
-        flag = ~box_responsible_flags.type(torch.bool)
+
+        # cast unint8 to bool through int32, avoiding calling aicpu 'Cast',
+        # while aicore 'Cast' not supporting unint8 to bool
+        flag = box_responsible_flags.int().type(torch.bool)
         flag = flag[None, :]
         if GridAssigner.g_neg_one is None:
             GridAssigner.g_neg_one = -1. * torch.ones_like(overlaps)
         assert GridAssigner.g_neg_one.shape == overlaps.shape
-        overlaps = torch.where(flag, GridAssigner.g_neg_one, overlaps)
+        overlaps = torch.where(flag, overlaps, GridAssigner.g_neg_one)
 
 
         # calculate max_overlaps again, but this time we only consider IOUs
         # for anchors responsible for prediction
-        max_overlaps, argmax_overlaps = overlaps.max(dim=0)
+        max_overlaps, argmax_overlaps = torch.npu_max(overlaps, dim=0)
 
         # for each gt, which anchor best overlaps with it
         # for each gt, the max iou of all proposals
         # shape of gt_max_overlaps == gt_argmax_overlaps == num_gts
-        gt_max_overlaps, gt_argmax_overlaps = overlaps.max(dim=1)
+        gt_max_overlaps, gt_argmax_overlaps = torch.npu_max(overlaps, dim=1)
 
-        argmax_overlaps = argmax_overlaps.int()
-        gt_argmax_overlaps = gt_argmax_overlaps.int()
         assigned_gt_inds = torch.npu_grid_assign_positive(
             assigned_gt_inds, overlaps, box_responsible_flags,
             max_overlaps, argmax_overlaps, gt_max_overlaps, gt_argmax_overlaps,

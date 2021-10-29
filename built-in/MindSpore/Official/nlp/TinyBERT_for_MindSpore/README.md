@@ -15,6 +15,10 @@
     - [Options:](#options)
     - [Parameters:](#parameters)
   - [Training Process](#training-process)
+    - [Notice](#notice)
+      - [Weight transforming of teacher](#weight-transforming-of-teacher)
+      - [The difference of training of task distill](#the-difference-of-training-of-task-distill)
+      - [Places to be modified when finetuning bert model](#places-to-be-modified-when-finetuning-bert-model)
     - [Training](#training)
       - [running on Ascend](#running-on-ascend)
       - [running on GPU](#running-on-gpu)
@@ -30,6 +34,7 @@
   - [Performance](#performance)
     - [training Performance](#training-performance)
       - [Inference Performance](#inference-performance)
+    - [TinyBert Eval in device](#tinybert-eval-in-device)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -76,7 +81,7 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
 
 - Download glue dataset for task distillation. Convert dataset files from json format to tfrecord format, please refer to run_classifier.py which in [BERT](https://github.com/google-research/bert) repository.
 
-  - Notice（processing of SST-2）: This is the standard dataset of glue benchmark, the address is https://dl.fbaipublicfiles.com/glue/data/SST-2.zip. Add the following code in run_classifier.py. **The script is in tools/gluebenchmark_convert_record.**
+  - Notice（processing of SST-2）: This is the standard dataset of glue benchmark. Add the following code in run_classifier.py. **The script is in tools/gluebenchmark_convert_record.**
 
     ```
     class Sst2Processor(DataProcessor):

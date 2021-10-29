@@ -1,29 +1,33 @@
 # Contents
 
 - [Contents](#contents)
-    - [SSD Description](#ssd-description)
-    - [Model Architecture](#model-architecture)
-    - [Dataset](#dataset)
-    - [Environment Requirements](#environment-requirements)
-    - [Quick Start](#quick-start)
-        - [Prepare the model](#prepare-the-model)
-        - [Run the scripts](#run-the-scripts)
-    - [Script Description](#script-description)
-        - [Script and Sample Code](#script-and-sample-code)
-        - [Script Parameters](#script-parameters)
-        - [Training Process](#training-process)
-            - [Training on Ascend](#training-on-ascend)
-            - [Training on GPU](#training-on-gpu)
-        - [Evaluation Process](#evaluation-process)
-            - [Evaluation on Ascend](#evaluation-on-ascend)
-            - [Evaluation on GPU](#evaluation-on-gpu)
-        - [Export MindIR](#export-mindir)
-    - [Model Description](#model-description)
-        - [Performance](#performance)
-            - [Evaluation Performance](#evaluation-performance)
-            - [Inference Performance](#inference-performance)
-    - [Description of Random Situation](#description-of-random-situation)
-    - [ModelZoo Homepage](#modelzoo-homepage)
+  - [SSD Description](#ssd-description)
+  - [Model Architecture](#model-architecture)
+  - [Dataset](#dataset)
+  - [Environment Requirements](#environment-requirements)
+  - [Quick Start](#quick-start)
+    - [Prepare the model](#prepare-the-model)
+    - [Run the scripts](#run-the-scripts)
+  - [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
+    - [Script Parameters](#script-parameters)
+    - [Training Process](#training-process)
+      - [Training on Ascend](#training-on-ascend)
+      - [Training on GPU](#training-on-gpu)
+      - [Evaluation while training](#evaluation-while-training)
+    - [Evaluation Process](#evaluation-process)
+      - [Evaluation on Ascend](#evaluation-on-ascend)
+      - [Evaluation on GPU](#evaluation-on-gpu)
+    - [Export MindIR](#export-mindir)
+  - [Inference Process](#inference-process)
+    - [Usage](#usage)
+    - [result](#result)
+  - [Model Description](#model-description)
+    - [Performance](#performance)
+      - [Evaluation Performance](#evaluation-performance)
+      - [Inference Performance](#inference-performance)
+  - [Description of Random Situation](#description-of-random-situation)
+  - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [SSD Description](#contents)
 
@@ -44,7 +48,7 @@ We present two different base architecture.
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [COCO2017](<http://images.cocodataset.org/>)
+Dataset supported: `COCO2017`
 
 - Dataset size：19G
     - Train：18G，118000 images  

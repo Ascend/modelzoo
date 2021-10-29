@@ -98,7 +98,7 @@ do
     fi
 done 
 ####改写参数####
-sed -i "s| datapath = './data/'| datapath =  '${data_path}/'|g" $cur_path/../dsrc_main.py
+sed -i "s| datapath = './data/'| datapath =  '${data_path}/data/'|g" $cur_path/../dsrc_main.py
 
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 nohup python3 dsrc_main.py --epoch 30 --pretrain_step 10 --display_step 10 --mat umd > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
@@ -109,7 +109,7 @@ end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
 ####参数回改####
-sed -i "s| datapath =  '${data_path}/'| datapath = './data/'|g" $cur_path/../dsrc_main.py
+sed -i "s| datapath =  '${data_path}/data/'| datapath = './data/'|g" $cur_path/../dsrc_main.py
 
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"

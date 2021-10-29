@@ -331,7 +331,8 @@ def run_customized_training(strategy,
       enable_checkpoint_and_summary=enable_checkpoint_and_summary,
       num_accumulation_steps=FLAGS.num_accumulation_steps,
       stop_steps=FLAGS.stop_steps,
-      stop_threshold=stop_threshold)
+      stop_threshold=stop_threshold,
+      bert_config=bert_config)
 
   return trained_model, masked_lm_accuracy, run_steps
 

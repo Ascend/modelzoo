@@ -1,28 +1,33 @@
 # Contents
 
+- [Contents](#contents)
 - [GoogleNet Description](#googlenet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+  - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+    - [Distributed Training](#distributed-training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
-    - [How to use](#how-to-use)
-        - [Inference](#inference) 
-        - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
-       - [Transfer Learning](#transfer-learning)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+      - [GoogleNet on CIFAR-10](#googlenet-on-cifar-10)
+      - [GoogleNet on 1200k images](#googlenet-on-1200k-images)
+    - [Inference Performance](#inference-performance)
+      - [GoogleNet on CIFAR-10](#googlenet-on-cifar-10-1)
+      - [GoogleNet on 1200k images](#googlenet-on-1200k-images-1)
+  - [How to use](#how-to-use)
+    - [Inference](#inference)
+    - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
+    - [Transfer Learning](#transfer-learning)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -42,7 +47,7 @@ Specifically, the GoogleNet contains numerous inception modules, which are conne
 
 # [Dataset](#contents)
 
-Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>) 
+Dataset used: `CIFAR-10`
 
 - Dataset size：175M，60,000 32*32 colorful images in 10 classes
   - Train：146M，50,000 images  

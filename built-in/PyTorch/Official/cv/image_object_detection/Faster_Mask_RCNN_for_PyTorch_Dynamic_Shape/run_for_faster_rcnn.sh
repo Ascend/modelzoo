@@ -10,11 +10,12 @@ export DYNAMIC_OP="ADD"
 /usr/local/Ascend/driver/tools/msnpureport -d 4 -g error
 /usr/local/Ascend/driver/tools/msnpureport -e disable
 
+cp disable.conf /home/disable.txt
 
 export DYNAMIC_COMPILE_ENABLE=1
 export EXPERIMENTAL_DYNAMIC_PARTITION=1
 
-export DISABLE_DYNAMIC_PATH=./disable.conf
+export DISABLE_DYNAMIC_PATH=/home/disable.txt
 
 export DYNAMIC_LOG_ENABLE=0
 export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/latest/

@@ -13,6 +13,9 @@ Network="AttU_Net_for_PyTorch"
 #训练batch_size,,需要模型审视修改
 batch_size=16
 
+# 训练epoch
+epochs=5
+
 # 指定训练所使用的npu device卡id
 device_id=0
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
@@ -22,6 +25,8 @@ do
         device_id=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -76,7 +81,7 @@ rm -rf ./models
 python3.7 main.py  \
         --model_type AttU_Net \
         --data_path=$data_path\
-        --num_epochs 5 \
+        --num_epochs=$epochs \
         --npu_idx $ASCEND_DEVICE_ID\
         --batch_size=$batch_size \
         --num_worker 32 \

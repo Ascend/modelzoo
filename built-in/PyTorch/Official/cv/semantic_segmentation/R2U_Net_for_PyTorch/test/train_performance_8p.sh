@@ -14,11 +14,16 @@ Network="R2U_Net_for_PyTorch"
 #训练batch_size,,需要模型审视修改
 batch_size=128
 
+# 训练epoch
+epochs=5
+
 #参数校验，不需要修改
 for para in $*
 do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+	elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`		
     fi
 done
 
@@ -88,7 +93,7 @@ do
         --loss_scale_value 1024 \
         --distributed \
         --npu_idx ${ASCEND_DEVICE_ID}\
-        --num_epochs 5 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+        --num_epochs $epochs > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done
 wait
 

@@ -1,28 +1,30 @@
 # Contents
 
-- [NCF Description](#NCF-description)
+- [Contents](#contents)
+- [NCF Description](#ncf-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
+    - [ml-1m](#ml-1m)
+    - [ml-20m](#ml-20m)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+  - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
-    - [How to use](#how-to-use)
-        - [Inference](#inference) 
-        - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
-       - [Transfer Learning](#transfer-learning)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+    - [Inference Performance](#inference-performance)
+  - [How to use](#how-to-use)
+    - [Inference](#inference)
+    - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
+    - [Transfer Learning](#transfer-learning)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -42,7 +44,7 @@ Two instantiations of NCF are Generalized Matrix Factorization (GMF) and Multi-L
 
 # [Dataset](#contents)
 
-The [MovieLens datasets](http://files.grouplens.org/datasets/movielens/) are used for model training and evaluation. Specifically, we use two datasets: **ml-1m** (short for MovieLens 1 million) and **ml-20m** (short for MovieLens 20 million).
+The `MovieLens datasets` are used for model training and evaluation. Specifically, we use two datasets: **ml-1m** (short for MovieLens 1 million) and **ml-20m** (short for MovieLens 20 million).
 
 ### ml-1m
 ml-1m dataset contains 1,000,209 anonymous ratings of approximately 3,706 movies made by 6,040 users who joined MovieLens in 2000. All ratings are contained in the file "ratings.dat" without header row, and are in the following format:

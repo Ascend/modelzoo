@@ -131,6 +131,10 @@ def parse_args():
     parser.add_argument('--opt_level', dest='opt_level', default='O2', type=str,
                         help='opt level using in amp, default O2 means FP16')
 
+    # ETP
+    parser.add_argument('--etp_performance_mode', dest='etp_performance_mode', default=False, action='store_true',
+                        help='specify trianing steps on ETP performance mode')
+
     args = parser.parse_args()
     return args
 
@@ -245,8 +249,10 @@ if __name__ == '__main__':
     print('{:d} roidb entries'.format(len(roidb)))
 
     output_dir = os.path.join(args.save_dir, args.arch, args.net, args.dataset)
-    if not os.path.exists(output_dir):
+    try:
         os.makedirs(output_dir)
+    except FileExistsError:
+        pass
 
     sampler_batch = sampler(train_size, args.batch_size)
 
@@ -356,6 +362,8 @@ if __name__ == '__main__':
         print("=> Using amp mode.")
 
     iters_per_epoch = int(train_size / args.batch_size)
+    if args.etp_performance_mode:
+        iters_per_epoch = 100
 
     for epoch in range(args.start_epoch, args.max_epochs + 1):
         dataset.resize_batch()

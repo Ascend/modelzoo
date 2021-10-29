@@ -106,8 +106,5 @@ OpenPose Inference ：
 
 [1] https://github.com/ildoonet/tf-pose-estimation/tree/master/tf_pose/pafprocess/
 
-[2] https://cocodataset.org/
-
-[3] https://arvrjourney.com/human-pose-estimation-using-openpose-with-tensorflow-part-2-e78ab9104fc8
 
 # </font>

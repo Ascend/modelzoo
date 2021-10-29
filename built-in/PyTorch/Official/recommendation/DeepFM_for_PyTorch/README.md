@@ -21,13 +21,15 @@
 - 进入test目录，路径下脚本包括：
 ```
 env.sh                       # NPU环境变量
-train_full_1p.sh             # 单卡训练脚本
-train_full_8p.sh             # 8卡训练脚本
+train_full_1p.sh             # 单卡训练脚本,默认训练3个epoch
+train_full_8p.sh             # 8卡训练脚本，默认训练3个epoch
 train_performance_1p.sh      # 单卡训练脚本，默认训练1000个step
 train_performance_8p.sh      # 8卡训练脚本，默认训练1000个step
 ```
 - 修改对应训练脚本中的 `data_path` 为数据集目录路径如 `data_path=/data/criteo/`
   
 ## 6. 执行训练脚本
-- 单卡训练执行 `bash train_full_1p.sh`
-- 8卡训练执行 `bash train_full_8p.sh`
+- 单卡性能训练执行 `bash train_performance_1p.sh --data_path=real_path --steps=step_numper`
+- 单卡精度训练执行 `bash train_full_1p.sh --data_path=real_path --epochs=epoch_numper`
+- 8卡性能训练执行 `bash train_performance_8p.sh --data_path=real_path --steps=step_numper`
+- 8卡精度训练执行 `bash train_full_8p.sh --data_path=real_path --epochs=epoch_numper`

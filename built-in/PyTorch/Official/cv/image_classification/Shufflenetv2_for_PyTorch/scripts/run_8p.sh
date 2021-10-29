@@ -2,6 +2,7 @@
 source scripts/env_npu.sh
 
 device_id_list=0,1,2,3,4,5,6,7
+export RANK_SIZE=8
 currentDir=$(cd "$(dirname "$0")";pwd)/..
 currtime=`date +%Y%m%d%H%M%S`
 train_log_dir=${currentDir}/result/training_8p_job_${currtime}

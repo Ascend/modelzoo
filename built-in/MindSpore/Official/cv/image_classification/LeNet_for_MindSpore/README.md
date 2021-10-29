@@ -1,20 +1,22 @@
 # Contents
 
+- [Contents](#contents)
 - [LeNet Description](#lenet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
-        - [Training](#training)  
+        - [Training](#training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
+    - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
+- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 
@@ -30,7 +32,7 @@ LeNet is very simple, which contains 5 layers. The layer composition consists of
 
 # [Dataset](#contents)
 
-Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>) 
+Dataset supported: `MNIST`
 
 - Dataset size：52.4M，60,000 28*28 in 10 classes
   - Train：60,000 images  

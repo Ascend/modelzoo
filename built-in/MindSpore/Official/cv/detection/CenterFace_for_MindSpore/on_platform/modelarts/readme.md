@@ -38,7 +38,7 @@ CenterFace 网络的基本结构如下图。
                   └─wider_medium_val.mat
   ```
 
-我们建议用户使用 WiderFace 数据集来使用我们的模型，其他数据集则需要使用与 WiderFace 相同的格式。在我们的模型中，训练集标注文件格式是 coco 格式，图像是 widerface 数据集，验证集真实标签是.mat 文件。训练集标注可以从[Baidu](https://pan.baidu.com/s/1j_2wggZ3bvCuOAfZvjWqTg)下载，密码：f9hh。图像可以从[Widerface](http://shuoyang1213.me/WIDERFACE/index.html)下载。验证集标注可以从 [ground_truth](https://github.com/chenjun2hao/CenterFace.pytorch/tree/master/evaluate/ground_truth)下载。
+我们建议用户使用 WiderFace 数据集来使用我们的模型，其他数据集则需要使用与 WiderFace 相同的格式。在我们的模型中，训练集标注文件格式是 coco 格式，图像是 widerface 数据集，验证集真实标签是.mat 文件。训练集标注可以参考这里的[介绍](https://github.com/chenjun2hao/CenterFace.pytorch#train)。图像可以从[Widerface](http://shuoyang1213.me/WIDERFACE/index.html)下载。验证集标注可以从 [ground_truth](https://github.com/chenjun2hao/CenterFace.pytorch/tree/master/evaluate/ground_truth)下载。
 
 ## 3. 训练
 

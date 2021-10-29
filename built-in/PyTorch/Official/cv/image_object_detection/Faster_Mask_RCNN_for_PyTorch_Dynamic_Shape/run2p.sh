@@ -8,11 +8,11 @@ export ASCEND_GLOBAL_EVENT_ENABLE=0
 export TASK_QUEUE_ENABLE=1
 export PTCOPY_ENABLE=1
 export DYNAMIC_OP="ADD"
-
+cp disable.conf /home/disable.txt
 export DYNAMIC_COMPILE_ENABLE=1
 export EXPERIMENTAL_DYNAMIC_PARTITION=1
 
-export DISABLE_DYNAMIC_PATH=./disable.conf
+export DISABLE_DYNAMIC_PATH=/home/disable.txt
 
 export DYNAMIC_LOG_ENABLE=0
 export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/latest/

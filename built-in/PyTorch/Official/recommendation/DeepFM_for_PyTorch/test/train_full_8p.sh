@@ -10,6 +10,8 @@ RANK_ID_START=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
+# 训练周期数
+epochs=3
 #网络名称,同目录名称,需要模型审视修改
 Network="DeepFM_for_Pytorch"
 
@@ -21,6 +23,8 @@ for para in $*
 do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -35,6 +39,7 @@ start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/../
+KERNEL_NUM=$(($(nproc)/8))
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
     #设置环境变量，不需要修改
@@ -66,24 +71,26 @@ do
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     if [ $(uname -m) = "aarch64" ]
     then
-	    let p_start=0+24*$RANK_ID
-	    let p_end=23+24*$RANK_ID
-	    taskset -c $p_start-$p_end python3 -u run_classification_criteo_deepfm.py \
+        PID_START=$((KERNEL_NUM * RANK_ID))
+        PID_END=$((PID_START + KERNEL_NUM - 1))
+        taskset -c $PID_START-$PID_END python3 -u run_classification_criteo_deepfm.py \
            --amp \
            --use_npu \
            --optim='npu_fused_adam' \
            --device_id $RANK_ID \
            --device_num 8 \
+           --epochs ${epochs} \
            --data_path=$data_path \
            --dist \
            --lr=0.0008 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     else
-	    python3 -u run_classification_criteo_deepfm.py \
+        python3 -u run_classification_criteo_deepfm.py \
            --amp \
            --use_npu \
            --optim='npu_fused_adam' \
            --device_id $RANK_ID \
            --device_num 8 \
+           --epochs ${epochs} \
            --data_path=$data_path \
            --dist \
            --lr=0.0008 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &

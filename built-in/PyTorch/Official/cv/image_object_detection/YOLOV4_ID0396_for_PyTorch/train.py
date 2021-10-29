@@ -254,6 +254,8 @@ def train(hyp, opt, device, tb_writer=None):
         optimizer.zero_grad()
         start_time = time.time()
         for i, (imgs, targets, paths, _) in pbar:  # batch -------------------------------------------------------------
+            if i == 5:
+                start_time = time.time()
             ni = i + nb * epoch  # number integrated batches (since train start)
             imgs = imgs.to(device, non_blocking=True).float() / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
 
@@ -329,7 +331,10 @@ def train(hyp, opt, device, tb_writer=None):
             # end batch ------------------------------------------------------------------------------------------------
         if rank in [-1, 0]:
             epoch_time = time.time() - start_time
-            print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
+            if len(pbar) > 5:
+                print('Training speed is {} FPS'.format(total_batch_size * (len(pbar) - 5) / (epoch_time)))
+            else:
+                print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
         # Scheduler
         scheduler.step()
 
@@ -448,9 +453,9 @@ def main(opt):
     # Train
     if not opt.evolve:
         tb_writer = None
-        if opt.global_rank in [-1, 0]:
-            print('Start Tensorboard with "tensorboard --logdir %s", view at http://localhost:6006/' % opt.logdir)
-            tb_writer = SummaryWriter(log_dir=increment_dir(Path(opt.logdir) / 'exp', opt.name))  # runs/exp
+        # if opt.global_rank in [-1, 0]:
+        #     print('Start Tensorboard with "tensorboard --logdir %s", view at http://localhost:6006/' % opt.logdir)
+        #     tb_writer = SummaryWriter(log_dir=increment_dir(Path(opt.logdir) / 'exp', opt.name))  # runs/exp
 
         train(hyp, opt, device, tb_writer)
 

@@ -19,28 +19,23 @@ from PIL import Image
 import shutil
 
 def preprocessInputData(img):
-    img = img.reshape(1,375,500,3)
+    img = img.reshape(1,513,513,3)
     return img
 
 if __name__ == "__main__":
     voc_dir = sys.argv[1]
     output_dir = sys.argv[2]
-    png_dir = './postprocess/labeledSegCls'
     if not os.path.isdir(output_dir):
         os.mkdir(output_dir)
 
-    if not os.path.isdir(png_dir):
-        os.mkdir(png_dir)
-
-    seg_trainval_txt = os.path.join(voc_dir,"ImageSets/Segmentation/trainval.txt")
+    seg_trainval_txt = os.path.join(voc_dir,"ImageSets/Segmentation/val.txt")
     with open(seg_trainval_txt,"r") as f:
         lines = f.readlines()
         for line in lines:
             pic_name = line.replace('\n','')
             pic_path = os.path.join(voc_dir,'JPEGImages/{}.jpg'.format(pic_name))
             print("Start to process image {}".format(pic_name))
-            origImg = np.array(Image.open(pic_path).resize((500,375)),np.uint8)
+            origImg = np.array(Image.open(pic_path).resize((513,513)),np.uint8)
             inputValue = preprocessInputData(origImg)
             inputValue.tofile(os.path.join(output_dir,'{}.png.bin'.format(pic_name)))
-            shutil.copy(os.path.join(voc_dir,'SegmentationClass/{}.png'.format(pic_name)),png_dir)
 

@@ -1,23 +1,23 @@
 # Contents
 
-- [Openpose Description](#googlenet-description)
+- [Contents](#contents)
+- [Openpose Description](#openpose-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+  - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Evaluation Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
 
     
 
@@ -43,11 +43,6 @@ In the currently provided training script, the coco2017 data set is used as an e
 
 
  - Download data from coco2017 data official website and unzip.
- ````
-    wget http://images.cocodataset.org/zips/train2017.zip
-    wget http://images.cocodataset.org/zips/val2017.zip
-    wget http://images.cocodataset.org/annotations/annotations2017.zip
-````
 - Create the mask dataset.
 
     Run python gen_ignore_mask.py
@@ -84,12 +79,10 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 - Framework
   - [MindSpore](https://www.mindspore.cn/install/en)
 - Download the VGG19 model of the MindSpore version: 
-  - [vgg19-0-97_5004.ckpt](http://10.154.33.38:51203/tutorials/image_classification.html)   
+  - [vgg19-0-97_5004.ckpt](https://download.mindspore.cn/model_zoo/r1.3/temp/vgg19_ascend_v130_imagenet2012_research_cv_bs64_top1acc74__top5acc91.97/)
 - For more information, please check the resources below：
   - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
   - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
-
-
 
 # [Quick Start](#contents)
 

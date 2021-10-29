@@ -23,7 +23,7 @@
 		"mxpi_tensorinfer0": {
 			"props": {
 				"dataSource": "mxpi_imageresize0",
-				"modelPath": "./models/mobilenet.om",
+				"modelPath": "../../convert/mobilenetv2.om",
 				"waitingTime": "2000",
 				"outputDeviceId": "-1"
 			},
@@ -33,9 +33,9 @@
         "mxpi_classpostprocessor0": {
             "props": {
                 "dataSource": "mxpi_tensorinfer0",
-                "postProcessConfigPath": "./models/mobilenet/efficientnet.cfg",
-                "labelPath": "./models/mobilenet/imagenet1000_clsidx_to_labels.names",
-                "postProcessLibPath": "../../../lib/modelpostprocessors/libresnet50postprocess.so"
+                "postProcessConfigPath": "../models/mobilenet/mobilenet.cfg",
+                "labelPath": "../models/mobilenet/imagenet1000_clsidx_to_labels.names",
+                "postProcessLibPath": "libresnet50postprocess.so"
             },
             "factory": "mxpi_classpostprocessor",
             "next": "mxpi_dataserialize0"

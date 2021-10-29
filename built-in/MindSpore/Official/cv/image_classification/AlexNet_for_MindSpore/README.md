@@ -1,20 +1,22 @@
 # Contents
 
+- [Contents](#contents)
 - [AlexNet Description](#alexnet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 
@@ -30,7 +32,7 @@ AlexNet composition consists of 5 convolutional layers and 3 fully connected lay
 
 # [Dataset](#contents)
 
-Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
+Dataset used: `CIFAR-10`
 
 - Dataset size：175M，60,000 32*32 colorful images in 10 classes
   - Train：146M，50,000 images

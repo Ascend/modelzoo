@@ -40,7 +40,7 @@ TinyBERT 模型的主干结构是转换器，转换器包含四个编码器模�
 - 下载 GLUE 数据集进行任务蒸馏。将数据集由 JSON 格式转化为 TFRecord 格式。详见[BERT](https://github.com/google-research/bert)代码库中的 run_classifier.py 文件。
 
   - SST-2 数据集处理  
-     该数据集为 glue benchmark 中的标准数据集，地址为：https://dl.fbaipublicfiles.com/glue/data/SST-2.zip  
+     该数据集为 glue benchmark 中的标准数据集
      在 run_classifier.py 文件中补充如下代码。
 
     ```

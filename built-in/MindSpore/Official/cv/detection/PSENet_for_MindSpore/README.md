@@ -1,28 +1,28 @@
 # Contents
 
-- [PSENet Description](#PSENet-description)
+- [Contents](#contents)
+- [PSENet Description](#psenet-description)
+- [PSENet Example](#psenet-example)
+    - [Description](#description)
 - [Dataset](#dataset)
-- [Features](#features)
-    - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
+        - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+        - [run test code](#run-test-code)
+        - [Eval Script for ICDAR2015](#eval-script-for-icdar2015)
+            - [Usage](#usage)
+            - [Result](#result)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
+    - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+        - [Inference Performance](#inference-performance)
     - [How to use](#how-to-use)
-        - [Inference](#inference) 
-        - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
-       - [Transfer Learning](#transfer-learning)
-
+        - [Inference](#inference)
 
 # [PSENet Description](#contents)
 With the development of convolutional neural network, scene text detection technology has been developed rapidly. However, there are still two problems in this algorithm, which hinders its application in industry. On the one hand, most of the existing algorithms require quadrilateral bounding boxes to accurately locate arbitrary shape text. On the other hand, two adjacent instances of text can cause error detection overwriting both instances. Traditionally, a segmentation-based approach can solve the first problem, but usually not the second. To solve these two problems, a new PSENet (PSENet) is proposed, which can accurately detect arbitrary shape text instances. More specifically, PSENet generates different scale kernels for each text instance and gradually expands the minimum scale kernel to a text instance with full shape. Because of the large geometric margins between the minimum scale kernels, our method can effectively segment closed text instances, making it easier to detect arbitrary shape text instances. The effectiveness of PSENet has been verified by numerous experiments on CTW1500, full text, ICDAR 2015, and ICDAR 2017 MLT. 
@@ -35,8 +35,8 @@ With the development of convolutional neural network, scene text detection techn
 Progressive Scale Expansion Network (PSENet) is a text detector which is able to well detect the arbitrary-shape text in natural scene.
 
 # [Dataset](#contents)
-Dataset used: [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalization)
-A training set of 1000 images containing about 4500 readable words 
+Dataset supported: `ICDAR2015`
+A training set of 1000 images containing about 4500 readable words
 A testing set containing about 2000 readable words
 
 # [Environment Requirements](#contents)
@@ -70,9 +70,9 @@ cd ./src/ETSNET/pse/;make
 #run test.py
 python test.py --ckpt=pretrained_model.ckpt
 
-#download eval method from [here](https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalization).
-#click "My Methods" button,then download Evaluation Scripts
-download script.py
+# download eval method from websit of ICDAR2015
+# click "My Methods" button,then download Evaluation Scripts
+# download script.py
 # run evaluation example
 sh scripts/run_eval_ascend.sh
 ```
@@ -149,7 +149,7 @@ python test.py --ckpt=./device*/ckpt*/ETSNet-*.ckpt
 
 ### Eval Script for ICDAR2015
 #### Usage
-+ step 1: download eval method from [here](https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalization).  
++ step 1: download eval method from website of ICDAR2015 of rcc.
 + step 2: click "My Methods" button,then download Evaluation Scripts.
 + step 3: it is recommended to symlink the eval method root to $MINDSPORE/model_zoo/psenet/eval_ic15/. if your folder structure is different,you may need to change the corresponding paths in eval script files.  
 ```

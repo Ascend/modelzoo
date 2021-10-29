@@ -1,21 +1,24 @@
 # Contents
 
+- [Contents](#contents)
 - [SSD Description](#ssd-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training on Ascend](#training-on-ascend)
+    - [Training on GPU](#training-on-gpu)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation on Ascend](#evaluation-on-ascend)
+    - [Evaluation on GPU](#evaluation-on-gpu)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -31,7 +34,8 @@ SSD discretizes the output space of bounding boxes into a set of default boxes o
 The SSD approach is based on a feed-forward convolutional network that produces a fixed-size collection of bounding boxes and scores for the presence of object class instances in those boxes, followed by a non-maximum suppression step to produce the final detections. The early network layers are based on a standard architecture used for high quality image classification, which is called the base network. Then add auxiliary structure to the network to produce detections.
 
 # [Dataset](#contents)
-Dataset used: [COCO2017](<http://images.cocodataset.org/>) 
+
+Dataset supported: `COCO2017`
 
 - Dataset size：19G
   - Train：18G，118000 images  

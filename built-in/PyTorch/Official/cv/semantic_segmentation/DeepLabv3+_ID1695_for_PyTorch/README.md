@@ -24,11 +24,11 @@ For testing, use "train_NPU.py" or "train_NPU_8p.py" (have to modify env.sh).
 You can also directly use the scripts for training:
 
 ```
-bash ./test/train_performance_1p.sh --data_path=`data path`    # 1-board training for performance
-bash ./test/train_performance_8p.sh --data_path=`data path`    # 8-board training for performance
+bash ./test/train_performance_1p.sh --data_path=`data path`  --epochs='train epochs'  # 1-board training for performance
+bash ./test/train_performance_8p.sh --data_path=`data path`  --epochs='train epochs'   # 8-board training for performance
 
-bash ./test/train_full_1p.sh --data_path=`data path`           # 1-board training for accuracy
-bash ./test/train_full_8p.sh --data_path=`data path`           # 8-board training for accuracy
+bash ./test/train_full_1p.sh --data_path=`data path` --epochs='train epochs'          # 1-board training for accuracy
+bash ./test/train_full_8p.sh --data_path=`data path` --epochs='train epochs'          # 8-board training for accuracy
 
 ```
 

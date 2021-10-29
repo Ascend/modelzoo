@@ -143,8 +143,26 @@ FPS=`grep Fps $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
+python3 main.py \
+    --video_path ${data_path}/hmdb51_jpg \
+    --annotation_path ${data_path}/hmdb51_json/hmdb51_1.json \
+    --result_path outputs \
+    --dataset hmdb51 \
+    --resume_path outputs/save_200.pth \
+    --model_depth 18 \
+    --n_classes 51 \
+    --n_threads 4 \
+    --no_train \
+    --no_val \
+    --inference \
+    --output_topk 5 \
+    --inference_batch_size 1 \
+    --device_list ${ASCEND_DEVICE_ID}
+
+python3 -m util_scripts.eval_accuracy ${data_path}/hmdb51_json/hmdb51_1.json outputs/val.json   -k 1 --save  --ignore >> ${cur_path}/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+wait
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep "Fps" $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "Acc" '{print$2}' | awk '{print$1}' | awk 'NR==1{max=$1;next}{max=max>$1?max:$1}END{print max}'`
+train_accuracy=`grep "top-1 accuracy:" $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print$3}' `
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

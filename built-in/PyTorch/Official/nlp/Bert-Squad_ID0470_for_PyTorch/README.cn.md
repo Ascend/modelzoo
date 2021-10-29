@@ -11,9 +11,8 @@
 cd data/squad
 mkdir v1.1
 cd v1.1
-wget https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json --no-check-certificate
-wget https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json --no-check-certificate
-wget https://worksheets.codalab.org/rest/bundles/0xbcd57bee090b421c982906709c8c27e1/contents/blob/ -O evaluate-v1.1.py --no-check-certificate
+下载数据集，参照：https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT
+将数据集放到v1.1目录下
 ```
 
 2. 确认数据集路径
@@ -32,8 +31,7 @@ wget https://worksheets.codalab.org/rest/bundles/0xbcd57bee090b421c982906709c8c2
 ​     
 
 #### 预训练模型准备
-1. 从以下链接下载预训练模型，新建checkpoints目录，并将预训练模型置于checkpoints目录下
-https://ngc.nvidia.com/catalog/models/nvidia:bert_pyt_ckpt_large_pretraining_amp_lamb/files
+1. 下载预训练模型，新建checkpoints目录，并将预训练模型置于checkpoints目录下，参照：https://github.com/NVIDIA/DeepLearningExamples/tree/master/PyTorch/LanguageModeling/BERT
 2. 确认预训练模型路径
 请确保如下路径：  
 

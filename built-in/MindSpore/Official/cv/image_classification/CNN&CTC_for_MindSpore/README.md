@@ -1,6 +1,7 @@
 # Contents
 
-- [CNNCTC Description](#CNNCTC-description)
+- [Contents](#contents)
+- [CNNCTC Description](#cnnctc-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
@@ -12,18 +13,16 @@
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
         - [Training](#training)
-        - [Distributed Training](#distributed-training)
+        - [Training Result](#training-result)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
+        - [Training Performance](#training-performance)
         - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
     - [How to use](#how-to-use)
         - [Inference](#inference)
         - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
-       - [Transfer Learning](#transfer-learning)
-- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 
@@ -47,7 +46,7 @@ This is an example of training CNN+CTC model for text recognition on MJSynth and
 The [MJSynth](https://www.robots.ox.ac.uk/~vgg/data/text/) and [SynthText](https://github.com/ankush-me/SynthText) dataset are used for model training. The [The IIIT 5K-word dataset](https://cvit.iiit.ac.in/research/projects/cvit-projects/the-iiit-5k-word-dataset) dataset is used for evaluation.
 
 - step 1:
-All the datasets have been preprocessed and stored in .lmdb format and can be downloaded [**HERE**](https://drive.google.com/drive/folders/192UfE9agQUMNq6AgU3_E05_FcPZK4hyt).
+All the datasets have been preprocessed and stored in .lmdb format and can be downloaded following this [introduction](https://github.com/ankush-me/SynthText#pre-generated-dataset)
 
 - step 2:
 Uncompress the downloaded file, rename the MJSynth dataset as MJ, the SynthText dataset as ST and the IIIT dataset as IIIT.

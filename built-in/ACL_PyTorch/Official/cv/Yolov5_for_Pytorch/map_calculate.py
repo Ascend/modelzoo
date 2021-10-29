@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ def eval(flags):
     cocoEval.evaluate()
     cocoEval.accumulate()
     cocoEval.summarize()
+
+    # copy-paste style
     eval_results = OrderedDict()
     metric = annType
     metric_items = [
@@ -64,7 +66,7 @@ def eval(flags):
     eval_results[f'{metric}_mAP_copypaste'] = (
         f'{ap[0]:.3f} {ap[1]:.3f} {ap[2]:.3f} {ap[3]:.3f} {ap[4]:.3f} {ap[5]:.3f}'
     )
-    print(eval_results)
+    print(dict(eval_results))
 
 
 if __name__ == '__main__':

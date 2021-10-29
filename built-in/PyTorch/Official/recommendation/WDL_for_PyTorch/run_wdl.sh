@@ -23,6 +23,7 @@ echo "After running the script, the network runs in the background, The log will
 source ./test/env.sh
 cur_path=`pwd`
 export PYTHONPATH=$cur_path/../WDL_for_PyTorch:$PYTHONPATH
+export RANK_SIZE=1
 
 DEVICE_ID=$1
 DATA_PATH=$2

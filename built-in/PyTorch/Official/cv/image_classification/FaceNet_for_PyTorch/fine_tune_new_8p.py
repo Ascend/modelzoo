@@ -148,7 +148,7 @@ def main():
     elif args.device_num > 0:
         npus_per_node = args.device_num
     else:
-        npus_per_node = torch.npu.device_count()
+        npus_per_node = int(os.environ["RANK_SIZE"])
 
     if args.multiprocessing_distributed:
         # world_size means nums of all devices or nums of processes

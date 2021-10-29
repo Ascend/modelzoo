@@ -1,26 +1,27 @@
 # Contents
 
+- [Contents](#contents)
 - [MaskRCNN Description](#maskrcnn-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-        - [Training Script Parameters](#training-script-parameters)
-        - [Parameters Configuration](#parameters-configuration)
-    - [Training Process](#training-process)
-      - [Training](#training)
-      - [Distributed Training](#distributed-training)
-      - [Training Result](#training-result)
-    - [Evaluation Process](#evaluation-process)
-      - [Evaluation](#evaluation)
-      - [Evaluation Result](#evaluation-result)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+    - [Training Script Parameters](#training-script-parameters)
+    - [Parameters Configuration](#parameters-configuration)
+  - [Training Process](#training-process)
+    - [Training](#training)
+    - [Distributed Training](#distributed-training)
+    - [Training Result](#training-result)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
+    - [Evaluation result](#evaluation-result)
 - [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Training Performance](#training-performance)
-        - [Evaluation Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Training Performance](#training-performance)
+    - [Evaluation Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -35,7 +36,7 @@ MaskRCNN is a two-stage target detection network. It extends FasterRCNN by addin
 [Paper](http://cn.arxiv.org/pdf/1703.06870v3): Kaiming He, Georgia Gkioxari, Piotr Dollar and Ross Girshick. "MaskRCNN"
 
 # [Dataset](#contents)
-- [COCO2017](https://cocodataset.org/) is a popular dataset with bounding-box and pixel-level stuff annotations. These annotations can be used for scene understanding tasks like semantic segmentation, object detection and image captioning. There are 118K/5K images for train/val. 
+- `COCO2017` is a popular dataset with bounding-box and pixel-level stuff annotations. These annotations can be used for scene understanding tasks like semantic segmentation, object detection and image captioning. There are 118K/5K images for train/val. 
 
 - Dataset size: 19G
   - Train: 18G, 118000 images

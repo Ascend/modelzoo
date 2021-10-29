@@ -148,9 +148,9 @@ do
   	--num_train_epochs=${train_epochs} \
   	--optimizer_type=lamb \
   	--scale_loss=False \
-  	--steps_between_eval=2000 \
+  	--steps_between_eval=10000 \
   	--steps_per_loop=${NPU_LOOP_SIZE} \
-  	--stop_steps=260000 \
+  	--stop_steps=100000 \
   	--train_batch_size=${batch_size} \
   	--verbosity=0 \
   	--warmup_steps=0 \

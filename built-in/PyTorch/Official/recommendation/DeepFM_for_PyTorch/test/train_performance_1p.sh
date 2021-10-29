@@ -9,6 +9,8 @@ export RANK_SIZE=1
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
+# 训练步数
+steps=1000
 #网络名称,同目录名称,需要模型审视修改
 Network="DeepFM_for_Pytorch"
 
@@ -20,6 +22,8 @@ for para in $*
 do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --steps* ]];then
+        steps=`echo ${para#*=}`
     fi
 done
 
@@ -54,7 +58,7 @@ fi
 python3 -u run_classification_criteo_deepfm.py \
      --amp \
      --use_npu \
-     --steps 1000 \
+     --steps ${steps} \
      --optim='npu_fused_adam' \
      --data_path=$data_path \
      --device_id $ASCEND_DEVICE_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &

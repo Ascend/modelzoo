@@ -4,7 +4,7 @@
 
 同时，该仓库也提供了 ChID 数据集 zero-shot setting 下测试代码。
 
-ChID 数据集来源于论文 [ChID: A Large-scale Chinese IDiom Dataset for Cloze Test](https://www.aclweb.org/anthology/P19-1075/). 本仓库中使用 [Json 格式](https://drive.google.com/file/d/1KkwLSLgrV9JknO8rxxfmU5Iql-D4O_-6/view).
+ChID 数据集来源于论文 [ChID: A Large-scale Chinese IDiom Dataset for Cloze Test](https://github.com/TsinghuaAI/CPM-1-Finetune). 本仓库中使用 Json 格式.
 
 ## 1 环境准备
 

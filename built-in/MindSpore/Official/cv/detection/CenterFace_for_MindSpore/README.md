@@ -70,7 +70,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
       ```
 
   we suggest user to use WiderFace dataset to experience our model,
-  other datasets need to use the same format as WiderFace. In our model, the annotation file is in coco format, the images file is widerface dataset, the ground_truth file format is .mat. The annotation file can download from [Baidu](https://pan.baidu.com/s/1j_2wggZ3bvCuOAfZvjWqTg) password: f9hh. The images file can download from [Widerface](http://shuoyang1213.me/WIDERFACE/index.html). The ground_truth file can download from [ground_truth](https://github.com/chenjun2hao/CenterFace.pytorch/tree/master/evaluate/ground_truth).
+  other datasets need to use the same format as WiderFace. In our model, the annotation file is in coco format, the images file is widerface dataset, the ground_truth file format is .mat. The annotation file can download following the introduction [here](https://github.com/chenjun2hao/CenterFace.pytorch#train). The images file can download from [Widerface](http://shuoyang1213.me/WIDERFACE/index.html). The ground_truth file can download from [ground_truth](https://github.com/chenjun2hao/CenterFace.pytorch/tree/master/evaluate/ground_truth.
 
 # [Environment Requirements](#contents)
 

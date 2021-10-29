@@ -138,6 +138,7 @@ def main():
     CALCULATE_DEVICE = "npu:{}".format(args.npu)
     torch.npu.set_device(CALCULATE_DEVICE)
 
+
     if args.seed is not None:
         random.seed(seed)
         os.environ['PYTHONHASHSEED'] = str(seed)
@@ -153,7 +154,7 @@ def main():
 
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
 
-    ngpus_per_node = torch.npu.device_count()
+    ngpus_per_node = int(os.environ["RANK_SIZE"])
     print('{} node found.'.format(ngpus_per_node))
     if args.multiprocessing_distributed:
         # Since we have ngpus_per_node processes per node, the total world_size

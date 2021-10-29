@@ -151,6 +151,10 @@ def parse_args():
                         help='node rank for distributed training')
     parser.add_argument('--dist_backend', default='hccl', type=str,
                             help='distributed backend')
+    
+    # ETP
+    parser.add_argument('--etp_performance_mode', dest='etp_performance_mode', default=False, action='store_true',
+                        help='specify trianing steps on ETP performance mode')
 
     args = parser.parse_args()
     return args
@@ -309,8 +313,10 @@ def main_worker(npu, npus_per_node, args):
     print('{:d} roidb entries'.format(len(roidb)))
 
     output_dir = os.path.join(args.save_dir, args.arch, args.net, args.dataset)
-    if not os.path.exists(output_dir):
+    try:
         os.makedirs(output_dir)
+    except FileExistsError:
+        pass
 
     sampler_batch = sampler(train_size, args.batch_size)
 
@@ -417,7 +423,7 @@ def main_worker(npu, npus_per_node, args):
             cfg.POOLING_MODE = checkpoint['pooling_mode']
         print("loaded checkpoint %s" % (load_name))
 
-    iters_per_epoch = int(train_size / args.batch_size)
+    iters_per_epoch = int(train_size / args.batch_size) / 8
 
     for epoch in range(args.start_epoch, args.max_epochs + 1):
         train_sampler.set_epoch(epoch)
@@ -440,8 +446,9 @@ def main_worker(npu, npus_per_node, args):
         batch_time_mean = 0
         data_iter = iter(dataloader)
         for step, (data0, data1, data2, data3) in enumerate(dataloader):
-        # for step in range(iters_per_epoch):
-            # print("=============== epoch:", epoch, "=step:", step, "===============")
+            if args.etp_performance_mode and step >= 100:
+                break
+
             torch.npu.synchronize()
             start = time.time()
             # data = next(data_iter)

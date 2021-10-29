@@ -14,11 +14,12 @@ rank: 0
 dist_backend: hccl
 seed: 49
 amp: true
-multiprocessing_distributed: true
+multiprocessing_distributed: false
 addr: 127.0.0.1
 dist_url: tcp://127.0.0.1:50000
-device_list: "0"
+device_list: ''
 warm_up_epochs: 5
+gpu: 0
 
 # 迁移学习需要启用以下两个参数
 #pretrained: true           # 预训练标识

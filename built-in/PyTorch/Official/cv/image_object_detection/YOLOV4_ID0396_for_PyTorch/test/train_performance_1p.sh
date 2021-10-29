@@ -1,5 +1,9 @@
 #!/bin/bash
-
+cur_path=`pwd`
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+ls /npu/traindata/coco_txl >1.txt
+ls /npu/traindata/coco_txt/images >2.txt
+ls /npu/traindata/coco_txl/images/train2017 >3.txt
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
@@ -11,7 +15,7 @@ export RANK_SIZE=1
 # 数据集路径,保持为空,不需要修改
 data_path=""
 # 训练epoch
-train_epochs=3
+train_epochs=1
 # 图片大小
 image_size=608
 # 指定训练所使用的npu device卡id
@@ -43,7 +47,7 @@ fi
 
 ###############指定训练脚本执行路径###############
 # cd到与test文件夹同层级目录下执行脚本，提高兼容性；test_path_dir为包含test文件夹的路径
-cur_path=`pwd`
+
 cur_path_last_dirname=${cur_path##*/}
 if [ x"${cur_path_last_dirname}" == x"test" ];then
     test_path_dir=${cur_path}
@@ -62,6 +66,18 @@ else
     mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
 fi
 
+if [ -d $data_path/../coco_txl/COCO2017/images/train2017/000000000009.jpg ];then
+        echo "NO NEED UNTAR"
+else
+    mkdir -p $data_path/../coco_txl
+        tar -zxvf $data_path/COCO2017.tar.gz -C  $data_path/../coco_txl/
+rm -rf $data_path/../coco_txl/COCO2017/labels/*.cache
+fi
+wait
+
+sed -i "s|./coco/train2017.txt|$data_path/../coco_txl/COCO2017/train2017.txt|g" data/coco.yaml
+sed -i "s|./coco/val2017.txt|$data_path/../coco_txl/COCO2017/val2017.txt|g" data/coco.yaml
+sed -i "s|./coco/testdev2017.txt|$data_path/../coco_txl/COCO2017/testdev2017.txt|g" data/coco.yaml
 
 #################启动训练脚本#################
 # 训练开始时间，不需要修改
@@ -87,6 +103,11 @@ wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
+#参数复原
+sed -i "s|$data_path/../coco_txl/COCO2017/train2017.txt|/coco/train2017.txt|g" data/coco.yaml
+sed -i "s|$data_path/../coco_txl/COCO2017/val2017.txt|/coco/val2017.txt|g" data/coco.yaml
+sed -i "s|$data_path/../coco_txl/COCO2017/testdev2017.txt|/coco/testdev2017.txt|g" data/coco.yaml
+
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
@@ -94,10 +115,6 @@ FPS=`grep -a 'FPS'  ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_D
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
-#输出训练精度,需要模型审视修改
-train_accuracy=`grep -a 'Precision' ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'NR==1{print}'|awk '{print $NF}'`
-#打印，不需要修改
-echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 # 性能看护结果汇总
@@ -126,6 +143,5 @@ echo "DeviceType = ${DeviceType}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/$
 echo "CaseName = ${CaseName}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log

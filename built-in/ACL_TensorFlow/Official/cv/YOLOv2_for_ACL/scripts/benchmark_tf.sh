@@ -13,5 +13,5 @@ $benchmark_dir/benchmark --om $om_name --dataDir $cur_dir/input_bins/ --modelTyp
 
 #post process
 cd yolov2_postprocess
-python3 yolov2_postprocess.py $cur_dir/$output_dir/$model_name ../voc2017_test/
+python3 yolov2_postprocess.py $cur_dir/$output_dir/$model_name ../VOC2007/JPEGImages/
 python3 pascalvoc.py --detfolder ./detections_npu/ -np

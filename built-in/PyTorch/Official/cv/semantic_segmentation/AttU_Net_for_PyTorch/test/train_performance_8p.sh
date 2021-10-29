@@ -14,11 +14,16 @@ Network="AttU_Net_for_PyTorch"
 #训练batch_size,,需要模型审视修改
 batch_size=128
 
+# 训练epoch
+epochs=5
+
 #参数校验，不需要修改
 for para in $*
 do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -75,7 +80,7 @@ do
     python3.7 main.py  \
         --model_type AttU_Net \
         --data_path=$data_path \
-        --num_epochs 5 \
+        --num_epochs=$epochs \
         --distributed \
         --npu_idx $RANK_ID\
         --batch_size=$batch_size \

@@ -183,7 +183,10 @@ def main():
         torch.npu.set_device(args.gpu_id)
         print("***Device ID:",args.gpu_id)
         args.world_size = 1
-        args.n_gpu = torch.npu.device_count()
+        if os.environ["RANK_SIZE"]:
+            args.n_gpu = int(os.environ["RANK_SIZE"])
+        else:
+            args.n_gpu = torch.npu.device_count()
     else:
         torch.npu.set_device(args.local_rank)
         device = torch.device('npu', args.local_rank)

@@ -33,7 +33,8 @@ from torch.utils.data import DataLoader, RandomSampler, Dataset
 from apex import amp
 
 import modeling
-from apex.optimizers import NpuFusedLamb
+# from apex.optimizers import NpuFusedLamb
+import nvlamb
 from schedulers import PolyWarmUpScheduler
 
 from utils import is_main_process, format_step, get_world_size, get_rank
@@ -112,6 +113,7 @@ class BertPretrainingCriterion(torch.nn.Module):
         self.loss_fn = torch.nn.CrossEntropyLoss(ignore_index=-1)
         self.vocab_size = vocab_size
     def forward(self, prediction_scores, seq_relationship_score, masked_lm_labels, next_sentence_labels):
+        prediction_scores = prediction_scores.npu_format_cast(2)
         masked_lm_loss = self.loss_fn(prediction_scores.view(-1, self.vocab_size), masked_lm_labels.view(-1))
         next_sentence_loss = self.loss_fn(seq_relationship_score.view(-1, 2), next_sentence_labels.view(-1))
         total_loss = masked_lm_loss + next_sentence_loss
@@ -377,8 +379,9 @@ def prepare_model_and_optimizer(args, device):
         {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
         {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}]
 
-    optimizer = NpuFusedLamb(optimizer_grouped_parameters, lr=args.learning_rate)
-    lr_scheduler = PolyWarmUpScheduler(optimizer, 
+    #optimizer = NpuFusedLamb(optimizer_grouped_parameters, lr=args.learning_rate)
+    optimizer = nvlamb.Nvlamb(optimizer_grouped_parameters, lr=args.learning_rate)
+    lr_scheduler = PolyWarmUpScheduler(optimizer,
                                        warmup=args.warmup_proportion, 
                                        total_steps=args.max_steps)
     if args.fp16:
@@ -429,6 +432,12 @@ def take_optimizer_step(args, optimizer, model, overflow_buf, global_step):
 
     global skipped_steps
     if args.allreduce_post_accumulation:
+        loss_scale = amp._amp_state.loss_scalers[0]._loss_scale if args.fp16 else 1
+        for p in amp.master_params(optimizer):
+            if p.grad is not None:
+                p.grad.mul_(loss_scale / (8 * args.gradient_accumulation_steps))
+                torch.distributed.all_reduce(p.grad)
+                p.grad.mul_(1 / loss_scale)
         optimizer.step()
         optimizer.zero_grad()
         global_step += 1
@@ -624,7 +633,10 @@ def main():
 
 
 if __name__ == "__main__":
-
+    option = {}
+    option["ACL_OP_SELECT_IMPL_MODE"] = "high_performance"
+    option["ACL_OPTYPELIST_FOR_IMPLMODE"] = "LayerNorm"
+    torch.npu.set_option(option)
     now = time.time()
     args, final_loss, train_time_raw, global_step = main()
     npu_count = args.n_npu

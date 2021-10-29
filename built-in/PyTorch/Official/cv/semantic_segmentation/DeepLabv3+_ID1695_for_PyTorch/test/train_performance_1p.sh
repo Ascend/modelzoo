@@ -12,7 +12,7 @@ export RANK_SIZE=1
 data_path=""
 
 # 训练epoch
-train_epochs=3
+epochs=3
 # 指定训练所使用的npu device卡id
 device_id=0
 # 学习率
@@ -27,6 +27,8 @@ do
         data_path=`echo ${para#*=}`
     elif [[ $para == --more_path1* ]];then
         more_path1=`echo ${para#*=}`
+	elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`	
     elif [[ $para == --precision_mode* ]];then
         precision_mode=`echo ${para#*=}`
     fi
@@ -97,7 +99,7 @@ python3 train.py \
     --backbone resnet \
     --lr ${learning_rate} \
     --workers 64 \
-    --epochs ${train_epochs} \
+    --epochs ${epochs} \
     --batch-size ${batch_size} \
     --device_id ${ASCEND_DEVICE_ID} \
     --checkname deeplab-resnet \

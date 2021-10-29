@@ -3,7 +3,7 @@
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
-Network="RFCN_for_PyTorch"
+Network="RFCN_ID0418_for_PyTorch"
 # 训练batch_size
 batch_size=4
 # 训练使用的npu卡数
@@ -80,15 +80,15 @@ fi
 pretrained_model_path="/npu/rfcn_pretrained_model/"
 mkdir data
 cd data
-ln -s ${data_path} VOCdevkit2007
-ln -s ${pretrained_model_path} pretrained_model
+ln -s ${data_path}/VOCdevkit2007 VOCdevkit2007
+ln -s ${data_path} pretrained_model
 cd ..
 
 #################启动训练脚本#################
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 
-python3.7 ./trainval_net.py \
+taskset -c 0-19 python3.7 ./trainval_net.py \
     --net=res101 \
     --nw=${workers} \
     --lr=${learning_rate} \
@@ -98,7 +98,8 @@ python3.7 ./trainval_net.py \
     --epochs=${train_epochs} \
     --bs=${batch_size} \
     --npu_id="npu:${ASCEND_DEVICE_ID}" \
-    $PREC \
+    --etp_performance_mode \
+    --amp \
     --opt_level=O1 \
     --loss_scale=1024.0 > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 wait
@@ -108,10 +109,11 @@ python3.7 ./test_net.py \
     --cfg=cfg/res101.yml \
     --checksession 1 \
     --checkepoch ${train_epochs} \
-    --checkpoint 2504 \
+    --checkpoint 100 \
     --device=npu \
     --npu_id="npu:${ASCEND_DEVICE_ID}" \
-    $PREC \
+    --etp_performance_mode \
+    --amp \
     --opt_level=O1 \
     --loss_scale=1024. > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/test_${ASCEND_DEVICE_ID}.log 2>&1 &
 wait

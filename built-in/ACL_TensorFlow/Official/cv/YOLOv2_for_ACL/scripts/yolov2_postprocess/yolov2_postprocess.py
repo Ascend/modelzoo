@@ -26,12 +26,8 @@ SCORETHRES = 0.2
 INPUTSIZE = 416
 IOU = 0.45
 SCORE = 0.25
-#from PIL import Image
 
-from script.model_darknet19 import darknet
-from script.decode import decode
-from script.utils import preprocess_image, postprocess, draw_detection
-from script.config import anchors, class_names
+from script.utils import postprocess
 
 labels_to_names = {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorbike', 4: 'aeroplane', 5: 'bus', 
                     6: 'train', 7: 'truck', 8: 'boat', 9: 'trafficlight', 10: 'firehydrant', 
@@ -50,27 +46,29 @@ labels_to_names = {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorbike', 4: 'aero
                     70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 
                     75: 'vase', 76: 'scissors', 77: 'teddybear', 78: 'hairdrier', 79: 'toothbrush'}
 
-npu_PATH = '../result_Files/'
+npu_PATH = sys.argv[1]
 
 class yolov2_npu:
  
     def run(self, npu_output):
-        bboxes = np.fromfile(npu_PATH+npu_output[:-5]+"2.bin", dtype="float32").reshape(1, 169, 5, 4)
-        obj_probs = np.fromfile(npu_PATH+npu_output, dtype="float32").reshape(1, 169, 5)
-        class_probs = np.fromfile(npu_PATH+npu_output[:-5]+"1.bin", dtype="float32").reshape(1, 169, 5, 80)
+        bboxes = np.fromfile(os.path.join(npu_PATH,npu_output[:-5]+"2.bin"), dtype="float32").reshape(1, 169, 5, 4)
+        obj_probs = np.fromfile(os.path.join(npu_PATH,npu_output), dtype="float32").reshape(1, 169, 5)
+        class_probs = np.fromfile(os.path.join(npu_PATH,npu_output[:-5]+"1.bin"), dtype="float32").reshape(1, 169, 5, 80)
         
-        image = cv2.imread("./JPEGImages/" + npu_output.split("_output")[0] + ".jpg")
+        image = cv2.imread(sys.argv[2] + npu_output.split("_output")[0].split("davinci_")[1] + ".jpg")
         image_shape = image.shape[:2]
                 
         boxes, scores, classes = postprocess(bboxes,obj_probs,class_probs,image_shape=image_shape)
         path = './detections_npu/'
-        with open(os.path.join(path + npu_output.split("_output")[0] + ".txt"),'a+') as f:
+        if not os.path.isdir(path):
+            os.mkdir(path)
+        with open(os.path.join(path + npu_output.split("_output")[0].split("davinci_")[1] + ".txt"),'w') as f:
             for i in range(len(scores)):
                 if ' ' in labels_to_names[classes[i]]:
                     labels_to_name = labels_to_names[classes[i]].split(' ')[0] + labels_to_names[classes[i]].split(' ')[1]
-                    f.write(labels_to_name + " " + str(scores[i]) + " " + str(boxes[i][0])+ " " + str(boxes[i][1])+ " " + str(boxes[i][2])+ " " + str(boxes[i][3]))
+                    f.write(labels_to_name + " " + str(scores[i]) + " " + str(boxes[i][0])+ " " + str(boxes[i][1])+ " " + str(boxes[i][2])+ " " + str(boxes[i][3])+'\n')
                 else:
-                    f.write(labels_to_names[classes[i]] + " " + str(scores[i]) + " " + str(boxes[i][0])+ " " + str(boxes[i][1])+ " " + str(boxes[i][2])+ " " + str(boxes[i][3]))
+                    f.write(labels_to_names[classes[i]] + " " + str(scores[i]) + " " + str(boxes[i][0])+ " " + str(boxes[i][1])+ " " + str(boxes[i][2])+ " " + str(boxes[i][3])+'\n')
 
 if __name__ == "__main__":
     all_result_NAME = os.listdir(npu_PATH)

@@ -1,5 +1,6 @@
 # Contents
 
+- [Contents](#contents)
 - [DeepFM Description](#deepfm-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -8,6 +9,9 @@
 - [Script Description](#script-description)
   - [Script and Sample Code](#script-and-sample-code)
   - [Script Parameters](#script-parameters)
+  - [Prepare data set](#prepare-data-set)
+    - [Processing real world data](#processing-real-world-data)
+    - [Generate and process synthetic data](#generate-and-process-synthetic-data)
   - [Training Process](#training-process)
     - [Training](#training)
     - [Distributed Training](#distributed-training)
@@ -15,8 +19,8 @@
     - [Evaluation](#evaluation)
 - [Model Description](#model-description)
   - [Performance](#performance)
-    - [Evaluation Performance](#evaluation-performance)
-    - [Inference Performance](#evaluation-performance)
+    - [Training Performance](#training-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -34,8 +38,6 @@ The FM and deep component share the same input raw feature vector, which enables
 # [Dataset](#contents)
 
 - [1] Criteo Dataset
-  - Official source: https://labs.criteo.com/2014/02/download-kaggle-display-advertising-challenge-dataset/
-  - kaggle source: https://www.kaggle.com/mrkmakr/criteo-dataset
 
 # [Environment Requirements](#contents)
 

@@ -157,7 +157,7 @@ def train(hyp, opt, device, tb_writer=None):
 
     # DDP mode
     if npu and rank != -1:
-        model = DDP(model, device_ids=[opt.local_rank], broadcast_buffers=False)
+        model = DDP(model, device_ids=[rank], broadcast_buffers=False)
 
     # Trainloader
     dataloader, dataset = create_dataloader(train_path, imgsz, batch_size, gs, opt, hyp=hyp, augment=True,
@@ -244,6 +244,8 @@ def train(hyp, opt, device, tb_writer=None):
         optimizer.zero_grad()
         start_time = time.time()
         for i, (imgs, targets, paths, _) in pbar:  # batch -------------------------------------------------------------
+            if i == 5:
+                start_time = time.time()
             ni = i + nb * epoch  # number integrated batches (since train start)
             imgs = imgs.to(device, non_blocking=True).float() / 255.0  # uint8 to float32, 0-255 to 0.0-1.0
 
@@ -319,7 +321,10 @@ def train(hyp, opt, device, tb_writer=None):
             # end batch ------------------------------------------------------------------------------------------------
         if rank in [-1, 0]:
             epoch_time = time.time() - start_time
-            print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
+            if len(pbar) > 5:
+                print('Training speed is {} FPS'.format(total_batch_size * (len(pbar) - 5) / (epoch_time)))
+            else:
+                print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
         # Scheduler
         scheduler.step()
 
@@ -407,8 +412,8 @@ def device_id_to_process_device_map(device_list):
         process_device_map[process_id] = device_id
 
     return process_device_map
-def main_worker(dev, npus_per_node, opt):
-    device_id = opt.process_device_map[dev]
+def main_worker(opt):
+    device_id = opt.global_rank
     loc = 'npu:{}'.format(device_id)
     if opt.device == 'npu':
         torch.npu.set_device(loc)
@@ -425,8 +430,6 @@ def main_worker(dev, npus_per_node, opt):
     if opt.multiprocessing_distributed:
         if opt.dist_url == "env://" and opt.global_rank == -1:
             opt.global_rank = int(os.environ["RANK"])
-        opt.global_rank = opt.global_rank * npus_per_node + dev
-
         dist.init_process_group(backend=opt.dist_backend,  # init_method=cfg.dist_url,
                                 world_size=opt.world_size, rank=opt.global_rank)
 
@@ -446,9 +449,9 @@ def main_worker(dev, npus_per_node, opt):
     # Train
     if not opt.evolve:
         tb_writer = None
-        if opt.global_rank in [-1, 0]:
-            print('Start Tensorboard with "tensorboard --logdir %s", view at http://localhost:6006/' % opt.logdir)
-            tb_writer = SummaryWriter(log_dir=increment_dir(Path(opt.logdir) / 'exp', opt.name))  # runs/exp
+        # if opt.global_rank in [-1, 0]:
+        #     print('Start Tensorboard with "tensorboard --logdir %s", view at http://localhost:6006/' % opt.logdir)
+        #     tb_writer = SummaryWriter(log_dir=increment_dir(Path(opt.logdir) / 'exp', opt.name))  # runs/exp
         train(hyp, opt, device, tb_writer)
 
     # Evolve hyperparameters (optional)
@@ -541,9 +544,9 @@ def main(opt):
     print('{} node found.'.format(npus_per_node))
     if opt.multiprocessing_distributed:
         opt.world_size = npus_per_node * opt.world_size
-        torch.multiprocessing.spawn(main_worker, nprocs=npus_per_node, args=(npus_per_node, opt))
+        main_worker(opt)
     else:
-        main_worker(0, npus_per_node, opt)
+        print('multi npu training failed to init...')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

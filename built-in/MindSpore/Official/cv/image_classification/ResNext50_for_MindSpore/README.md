@@ -1,21 +1,26 @@
 # Contents
 
+- [Contents](#contents)
 - [ResNeXt50 Description](#resnext50-description)
-- [Model Architecture](#model-architecture)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+  - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
-- [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Training Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+- [Script description](#script-description)
+  - [Script and sample code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+      - [Usage](#usage)
+      - [Launch](#launch)
+  - [Evaluation Process](#evaluation-process)
+    - [Usage](#usage-1)
+      - [Launch](#launch-1)
+      - [Result](#result)
+- [Model description](#model-description)
+  - [Performance](#performance)
+    - [Training Performance](#training-performance)
+      - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -34,7 +39,7 @@ The overall network architecture of ResNeXt is show below:
 
 # [Dataset](#contents)
 
-Dataset used: [imagenet](http://www.image-net.org/)
+Dataset used: `imagenet`
 
 - Dataset size: ~125G, 1.2W colorful images in 1000 classes
   - Train: 120G, 1.2W images

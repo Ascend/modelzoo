@@ -85,11 +85,12 @@ else
    mkdir -p $cur_path/test/output/$ASCEND_DEVICE_ID
 fi
 
-mv $data_path/train.txt $data_path/train_bak.txt
-mv $data_path/train_perf.txt $data_path/train.txt
 
 #执行训练
 cd $cur_path
+
+sed -i "s|train.txt|train_perf.txt|g" run_classifier.py
+
 start=$(date +%s)
 
 nohup python3 run_classifier.py \
@@ -114,9 +115,8 @@ e2e_time=$(( $end - $start ))
 # #echo "Final Precision MAP : $average_prec"
 # echo "Final Performance ms/step : $Performance"
 echo "Final Training Duration sec : $e2etime"  
-
-mv $data_path/train.txt $data_path/train_perf.txt
-mv $data_path/train_bak.txt $data_path/train.txt
+#参数回改
+sed -i "s|train_perf.txt|train.txt|g" run_classifier.py
 
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"

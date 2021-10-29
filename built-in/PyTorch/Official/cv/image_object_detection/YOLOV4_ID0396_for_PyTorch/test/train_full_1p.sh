@@ -1,5 +1,9 @@
 #!/bin/bash
-
+cur_path=`pwd`
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
+ls /npu/traindata/coco_txl >1.txt
+ls /npu/traindata/coco_txt/images >2.txt
+ls /npu/traindata/coco_txl/images/train2017 >3.txt
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
@@ -43,7 +47,6 @@ fi
 
 ###############指定训练脚本执行路径###############
 # cd到与test文件夹同层级目录下执行脚本，提高兼容性；test_path_dir为包含test文件夹的路径
-cur_path=`pwd`
 cur_path_last_dirname=${cur_path##*/}
 if [ x"${cur_path_last_dirname}" == x"test" ];then
     test_path_dir=${cur_path}
@@ -62,6 +65,18 @@ else
     mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
 fi
 
+if [ -d $data_path/../coco_txl/COCO2017/images/train2017/000000000009.jpg ];then
+        echo "NO NEED UNTAR"
+else
+    mkdir -p $data_path/../coco_txl
+        tar -zxvf $data_path/COCO2017.tar.gz -C  $data_path/../coco_txl/
+rm -rf $data_path/../coco_txl/COCO2017/labels/*.cache
+fi
+wait
+
+sed -i "s|./coco/train2017.txt|$data_path/../coco_txl/COCO2017/train2017.txt|g" data/coco.yaml
+sed -i "s|./coco/val2017.txt|$data_path/../coco_txl/COCO2017/val2017.txt|g" data/coco.yaml
+sed -i "s|./coco/testdev2017.txt|$data_path/../coco_txl/COCO2017/testdev2017.txt|g" data/coco.yaml
 
 #################启动训练脚本#################
 #训练开始时间，不需要修改
@@ -86,6 +101,10 @@ wait
 # 训练结束时间，不需要修改
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
+
+sed -i "s|./coco/train2017.txt|$data_path/../coco_txl/COCO2017/train2017.txt|g" data/coco.yaml
+sed -i "s|./coco/val2017.txt|$data_path/../coco_txl/COCO2017/val2017.txt|g" data/coco.yaml
+sed -i "s|./coco/testdev2017.txt|$data_path/../coco_txl/COCO2017/testdev2017.txt|g" data/coco.yaml
 
 # 结果打印，不需要修改
 echo "------------------ Final result ------------------"

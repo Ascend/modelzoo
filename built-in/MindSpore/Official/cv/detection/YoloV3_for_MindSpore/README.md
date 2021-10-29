@@ -1,22 +1,23 @@
 # Contents
 
+- [Contents](#contents)
 - [YOLOv3-DarkNet53 Description](#yolov3-darknet53-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+    - [Distributed Training](#distributed-training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -30,7 +31,7 @@ Prior detection systems repurpose classifiers or localizers to perform detection
 
 YOLOv3 uses a few tricks to improve training and increase performance, including: multi-scale predictions, a better backbone classifier, and more. The full details are in the paper!
 
-[Paper](https://pjreddie.com/media/files/papers/YOLOv3.pdf):  YOLOv3: An Incremental Improvement. Joseph Redmon, Ali Farhadi,
+[Paper](https://arxiv.org/pdf/1804.02767.pdf):  YOLOv3: An Incremental Improvement. Joseph Redmon, Ali Farhadi,
 University of Washington
 
 
@@ -41,7 +42,7 @@ YOLOv3 use DarkNet53 for performing feature extraction, which is a hybrid approa
 
 # [Dataset](#contents)
 
-Dataset used: [COCO2014](https://cocodataset.org/#download) 
+Dataset supported: `COCO2014`
 
 - Dataset size: 19G, 123,287 images, 80 object categories.
   - Train：13G, 82,783 images  
@@ -69,7 +70,7 @@ After installing MindSpore via the official website, you can start training and 
 
 ```
 # The darknet53_backbone.ckpt in the follow script is got from darknet53 training like paper. 
-# pretrained_backbone can use src/convert_weight.py, convert darknet53.conv.74 to mindspore ckpt, darknet53.conv.74 can get from `https://pjreddie.com/media/files/darknet53.conv.74` .
+# pretrained_backbone can use src/convert_weight.py, convert darknet53.conv.74 to mindspore ckpt, darknet53.conv.74 can get from `pjreddie`.
 # The parameter of training_shape define image shape for network, default is "".
 # It means use 10 kinds of shape as input shape, or it can be set some kind of shape.
 # run training example(1p) by python command.

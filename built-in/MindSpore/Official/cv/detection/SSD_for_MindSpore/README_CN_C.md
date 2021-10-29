@@ -585,7 +585,7 @@ epoch time: 345243.121 ms, per step time: 753.806 ms
 ### 4.4 迁移学习指导
 #### 4.4.1  数据集准备
 1.  获取数据<br/>
-    本文以从 kaggle上获取的 [Microcontroller](https://www.kaggle.com/tannergi/microcontroller-detection) 数据集为例进行迁移学习。
+    本文以从 kaggle上获取的`Microcontroller`数据集为例进行迁移学习。
     数据集的目录组织如下所示：
     
     ```text

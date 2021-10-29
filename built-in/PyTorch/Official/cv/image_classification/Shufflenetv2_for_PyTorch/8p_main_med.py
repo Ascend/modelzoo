@@ -166,7 +166,7 @@ def main():
     elif args.device_num != -1:
         ngpus_per_node = args.device_num
     elif args.device == 'npu':
-        ngpus_per_node = torch.npu.device_count()
+        ngpus_per_node = int(os.environ["RANK_SIZE"])
     else:
         ngpus_per_node = torch.cuda.device_count()
     if args.multiprocessing_distributed:

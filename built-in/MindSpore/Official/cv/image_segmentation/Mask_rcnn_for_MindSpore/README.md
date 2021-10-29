@@ -1,6 +1,6 @@
 # Try it
 
-Try to run our pre-trained COCO Mask R-CNN using [Colab](https://colab.sandbox.google.com/github/tensorflow/tpu/blob/master/models/official/mask_rcnn/mask_rcnn_demo.ipynb).
+Try to run our pre-trained COCO Mask R-CNN [ckpt](https://download.mindspore.cn/model_zoo/r1.3/temp/maskrcnn_ascend_v130_coco2017_official_cv_bs2_bbox37.4_nsegm32.9/).
 
 # Installing extra packages
 

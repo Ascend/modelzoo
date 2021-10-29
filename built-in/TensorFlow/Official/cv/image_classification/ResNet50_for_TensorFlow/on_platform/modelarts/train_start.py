@@ -91,6 +91,8 @@ def args_parser():
                         help='learning_rate_maximum')
     parser.add_argument('--do_eval', type=bool, default=True,
                         help='whether to do model evaluation')
+    parser.add_argument('--over_dump', type=bool, default=False,
+                        help='whether to do model evaluation')
     parser_args, _ = parser.parse_known_args()
     return parser_args
 
@@ -116,6 +118,7 @@ def set_config(args):
     config['num_epochs'] = args.num_epochs
     config['learning_rate_maximum'] = args.learning_rate_maximum
     config['eval'] = args.do_eval
+    config["over_dump"] = args.over_dump
 
     print("max_train_steps        :%d" % (config['max_train_steps']))
     print("batch_size             :%d" % (config['batch_size']))

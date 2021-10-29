@@ -10,6 +10,9 @@ data_path=""
 #网络名称,同目录名称,需要模型审视修改
 Network="R2U_Net_for_PyTorch"
 
+# 训练epoch
+epochs=150
+
 #训练batch_size,,需要模型审视修改
 batch_size=16
 
@@ -22,6 +25,8 @@ do
         device_id=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+	elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`	
     fi
 done
 
@@ -83,7 +88,7 @@ python3.7 main.py  \
         --apex-opt-level O2 \
         --loss_scale_value 1024 \
         --npu_idx $ASCEND_DEVICE_ID\
-        --num_epochs 150  > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+        --num_epochs $epochs\  > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 

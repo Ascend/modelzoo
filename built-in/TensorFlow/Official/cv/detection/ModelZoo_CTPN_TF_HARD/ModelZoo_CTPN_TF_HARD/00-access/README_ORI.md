@@ -32,8 +32,7 @@ python ./main/demo.py
 # training
 ## prepare data
 - First, download the pre-trained model of VGG net and put it in data/vgg_16.ckpt. you can download it from [tensorflow/models](https://github.com/tensorflow/models/tree/1af55e018eebce03fb61bba9959a04672536107d/research/slim)
-- Second, download the dataset we prepared from [google drive](https://drive.google.com/file/d/1npxA_pcEvIa4c42rho1HgnfJ7tamThSy/view?usp=sharing) or [baidu yun](https://pan.baidu.com/s/1nbbCZwlHdgAI20_P9uw9LQ). put the downloaded data in data/dataset/mlt, then start the training.
-- Also, you can prepare your own dataset according to the following steps. 
+- second, you can prepare your own dataset according to the following steps. 
 - Modify the DATA_FOLDER and OUTPUT in utils/prepare/split_label.py according to your dataset. And run split_label.py in the root
 ```shell
 python ./utils/prepare/split_label.py
@@ -60,4 +59,5 @@ python ./main/train.py
 - left figure is the result for DETECT_MODE H, right figure for DETECT_MODE O
 <img src="/data/res/007.jpg" width=320 height=240 /><img src="/data/res_oriented/007.jpg" width=320 height=240 />
 <img src="/data/res/008.jpg" width=320 height=480 /><img src="/data/res_oriented/008.jpg" width=320 height=480 />
+
 ***

@@ -1,3 +1,18 @@
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
 # coding=utf-8
 # Copyright 2018 The Google AI Language Team Authors.
 #
@@ -27,6 +42,7 @@ import optimization_finetuning as optimization
 import tokenization
 import tensorflow as tf
 # from loss import bi_tempered_logistic_loss
+import time
 
 flags = tf.flags
 
@@ -96,7 +112,7 @@ flags.DEFINE_float(
 flags.DEFINE_integer("save_checkpoints_steps", 1000,
                      "How often to save the model checkpoint.")
 
-flags.DEFINE_integer("iterations_per_loop", 1000,
+flags.DEFINE_integer("iterations_per_loop", 1,
                      "How many steps to make in each estimator call.")
 
 flags.DEFINE_bool("use_tpu", False, "Whether to use TPU or GPU/CPU.")
@@ -125,6 +141,28 @@ flags.DEFINE_integer(
     "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
 
+flags.DEFINE_string("precision_mode", "allow_mix_precision", "The precision mode of training")
+
+class ExamplesPerSecondHook(session_run_hook.SessionRunHook):
+    def __init__(self, batch_size, iterations_per_loop=1):
+        self._batch_size = batch_size
+        self._iter_per_loop = iterations_per_loop
+        self.start_time = 0
+        self.end_time = 0
+
+    def before_run(self, run_context):  # pylint: disable=unused-argument
+        self.start_time = time.time()
+        return tf.estimator.SessionRunArgs(fetches=[tf.compat.v1.train.get_global_step(), 'loss/total_loss:0'])
+
+    def after_run(self, run_context, run_values):
+        self.end_time = time.time()
+        elapsed_time = self.end_time - self.start_time
+        global_step, total_loss = run_values.results
+        global_step_per_sec = self._iter_per_loop / elapsed_time
+        examples_per_sec = self._batch_size * global_step_per_sec
+        tf.compat.v1.logging.info('loss = %.7f', total_loss)
+        tf.compat.v1.logging.info('global_step/sec: %g', global_step_per_sec)
+        tf.compat.v1.logging.info('examples/sec: %g', examples_per_sec)
 
 class InputExample(object):
   """A single training/test example for simple sequence classification."""
@@ -362,7 +400,7 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
 
   def input_fn(params):
     """The actual input function."""
-    batch_size = params["batch_size"]
+    batch_size = params["eval_batch_size"]
 
     # For training, we want a lot of parallel reading and shuffling.
     # For eval, we want no shuffling and parallel reading doesn't matter.
@@ -370,13 +408,14 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
     if is_training:
       d = d.repeat()
       d = d.shuffle(buffer_size=100)
+      batch_size = params["train_batch_size"]
 
     d = d.apply(
         tf.contrib.data.map_and_batch(
             lambda record: _decode_record(record, name_to_features),
             batch_size=batch_size,
             drop_remainder=True))
-
+    d = d.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
     return d
 
   return input_fn
@@ -454,7 +493,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
     #tf.logging.info("per_example_loss:"+str(per_example_loss.shape))
     ##############bi_tempered_logistic_loss#############################################################################
 
-    loss = tf.reduce_mean(per_example_loss)
+    loss = tf.reduce_mean(per_example_loss, name="total_loss")
 
     return (loss, per_example_loss, logits, probabilities)
 
@@ -490,6 +529,7 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
     (total_loss, per_example_loss, logits, probabilities) = create_model(
         bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
         num_labels, use_one_hot_embeddings)
+
     tvars = tf.trainable_variables()
     initialized_variable_names = {}
     scaffold_fn = None
@@ -519,13 +559,14 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
 
       train_op = optimization.create_optimizer(
           total_loss, learning_rate, num_train_steps, num_warmup_steps, use_tpu)
-      logging_hook = tf.train.LoggingTensorHook({"loss":total_loss,"global_step":tf.train.get_global_step()},every_n_iter=1)
-      output_spec = tf.contrib.tpu.TPUEstimatorSpec(
+      examples_hook = ExamplesPerSecondHook(
+          FLAGS.train_batch_size,
+          FLAGS.iterations_per_loop)
+      output_spec = tf.estimator.EstimatorSpec(
           mode=mode,
           loss=total_loss,
           train_op=train_op,
-          training_hooks=[logging_hook],
-          scaffold_fn=scaffold_fn)
+          training_hooks=[examples_hook])
     elif mode == tf.estimator.ModeKeys.EVAL:
 
       def metric_fn(per_example_loss, label_ids, logits, is_real_example):
@@ -538,18 +579,15 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
             "eval_loss": loss,
         }
 
-      eval_metrics = (metric_fn,
-                      [per_example_loss, label_ids, logits, is_real_example])
-      output_spec = tf.contrib.tpu.TPUEstimatorSpec(
+      eval_metric_ops = metric_fn(per_example_loss, label_ids, logits, is_real_example)
+      output_spec = tf.estimator.EstimatorSpec(
           mode=mode,
           loss=total_loss,
-          eval_metrics=eval_metrics,
-          scaffold_fn=scaffold_fn)
+          eval_metric_ops=eval_metric_ops)
     else:
-      output_spec = tf.contrib.tpu.TPUEstimatorSpec(
+      output_spec = tf.estimator.EstimatorSpec(
           mode=mode,
-          predictions={"probabilities": probabilities},
-          scaffold_fn=scaffold_fn)
+          predictions={"probabilities": probabilities})
     return output_spec
 
   return model_fn
@@ -573,7 +611,7 @@ def input_fn_builder(features, seq_length, is_training, drop_remainder):
 
   def input_fn(params):
     """The actual input function."""
-    batch_size = params["batch_size"]
+    batch_size = params["eval_batch_size"]
 
     num_examples = len(features)
 
@@ -602,6 +640,7 @@ def input_fn_builder(features, seq_length, is_training, drop_remainder):
     if is_training:
       d = d.repeat()
       d = d.shuffle(buffer_size=100)
+      batch_size = params["train_batch_size"]
 
     d = d.batch(batch_size=batch_size, drop_remainder=True)
     return d
@@ -715,7 +754,6 @@ def convert_examples_to_features(examples, label_list, max_seq_length,
     features.append(feature)
   return features
 
-
 def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -760,18 +798,28 @@ def main(_):
     tpu_cluster_resolver = tf.contrib.cluster_resolver.TPUClusterResolver(
         FLAGS.tpu_name, zone=FLAGS.tpu_zone, project=FLAGS.gcp_project)
 
-  is_per_host = tf.contrib.tpu.InputPipelineConfig.PER_HOST_V2
-  # Cloud TPU: Invalid TPU configuration, ensure ClusterResolver is passed to tpu.
-  print("###tpu_cluster_resolver:",tpu_cluster_resolver)
-  run_config = tf.contrib.tpu.RunConfig(
-      cluster=tpu_cluster_resolver,
-      master=FLAGS.master,
-      model_dir=FLAGS.output_dir,
-      save_checkpoints_steps=FLAGS.save_checkpoints_steps,
-      tpu_config=tf.contrib.tpu.TPUConfig(
-          iterations_per_loop=FLAGS.iterations_per_loop,
-          num_shards=FLAGS.num_tpu_cores,
-          per_host_input_for_training=is_per_host), save_summary_steps=0)
+  ###########npu modify start##########################
+  session_config = tf.ConfigProto()
+  run_config = NPURunConfig(session_config=session_config,
+                            model_dir=FLAGS.output_dir,
+                            precision_mode=FLAGS.precision_mode,
+                            iterations_per_loop=FLAGS.iterations_per_loop,
+                            log_step_count_steps=None,
+                            save_checkpoints_steps=FLAGS.save_checkpoints_steps)
+  ###########npu modidy end#############################
+
+  # is_per_host = tf.contrib.tpu.InputPipelineConfig.PER_HOST_V2
+  # # Cloud TPU: Invalid TPU configuration, ensure ClusterResolver is passed to tpu.
+  # print("###tpu_cluster_resolver:",tpu_cluster_resolver)
+  # run_config = tf.contrib.tpu.RunConfig(
+  #     cluster=tpu_cluster_resolver,
+  #     master=FLAGS.master,
+  #     model_dir=FLAGS.output_dir,
+  #     save_checkpoints_steps=FLAGS.save_checkpoints_steps,
+  #     tpu_config=tf.contrib.tpu.TPUConfig(
+  #         iterations_per_loop=FLAGS.iterations_per_loop,
+  #         num_shards=FLAGS.num_tpu_cores,
+  #         per_host_input_for_training=is_per_host))
 
   train_examples = None
   num_train_steps = None
@@ -794,13 +842,18 @@ def main(_):
 
   # If TPU is not available, this will fall back to normal Estimator on CPU
   # or GPU.
-  estimator = tf.contrib.tpu.TPUEstimator(
-      use_tpu=False,
+  # estimator = tf.contrib.tpu.TPUEstimator(
+  #     use_tpu=False,
+  #     model_fn=model_fn,
+  #     config=npu_run_config_init(run_config=run_config),
+  #     train_batch_size=FLAGS.train_batch_size,
+  #     eval_batch_size=FLAGS.eval_batch_size,
+  #     predict_batch_size=FLAGS.predict_batch_size, eval_on_tpu=False, export_to_tpu=False)
+  params = {"train_batch_size": FLAGS.train_batch_size, "eval_batch_size": FLAGS.eval_batch_size}
+  estimator = NPUEstimator(
       model_fn=model_fn,
-      config=npu_run_config_init(run_config=run_config),
-      train_batch_size=FLAGS.train_batch_size,
-      eval_batch_size=FLAGS.eval_batch_size,
-      predict_batch_size=FLAGS.predict_batch_size, eval_on_tpu=False, export_to_tpu=False)
+      config=run_config,
+      params=params)
 
   if FLAGS.do_train:
     train_file = os.path.join(FLAGS.output_dir, "train.tf_record")
@@ -817,7 +870,7 @@ def main(_):
         seq_length=FLAGS.max_seq_length,
         is_training=True,
         drop_remainder=True)
-    estimator.train(input_fn=train_input_fn, max_steps=num_train_steps)
+    estimator.train(input_fn=train_input_fn, max_steps=num_train_steps, hooks=npu_hooks_append())
 
   if FLAGS.do_eval:
     eval_examples = processor.get_dev_examples(FLAGS.data_dir)
@@ -946,4 +999,3 @@ if __name__ == "__main__":
   flags.mark_flag_as_required("bert_config_file")
   flags.mark_flag_as_required("output_dir")
   tf.app.run()
-

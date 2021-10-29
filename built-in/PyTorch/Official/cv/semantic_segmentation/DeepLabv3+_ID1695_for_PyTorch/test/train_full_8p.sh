@@ -17,7 +17,7 @@ resume=""
 ft=""
 
 # 训练epoch
-train_epochs=100
+epochs=100
 # 学习率
 learning_rate=0.008
 
@@ -34,6 +34,8 @@ do
         precision_mode=`echo ${para#*=}`
     elif [[ $para == --dataset* ]];then
         dataset=`echo ${para#*=}`
+	elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`	
     elif [[ $para == --num_classes* ]];then
         num_classes=`echo ${para#*=}`
     elif [[ $para == --resume* ]];then
@@ -100,7 +102,7 @@ do
         --backbone resnet \
         --lr ${learning_rate} \
         --workers 64 \
-        --epochs ${train_epochs} \
+        --epochs ${epochs} \
         --batch-size ${batch_size} \
         --checkname deeplab-resnet \
         --eval-interval 1 \

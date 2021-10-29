@@ -1,23 +1,23 @@
 # Contents
 
-- [Openpose Description](#googlenet-description)
+- [Contents](#contents)
+- [Openpose Description](#openpose-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+  - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)    
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)  
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+  - [Script and Sample Code](#script-and-sample-code)
+  - [Script Parameters](#script-parameters)
+  - [Training Process](#training-process)
+    - [Training](#training)
+  - [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Evaluation Performance](#evaluation-performance)
+  - [Performance](#performance)
+    - [Evaluation Performance](#evaluation-performance)
 
     
 
@@ -43,11 +43,6 @@ In the currently provided training script, the coco2017 data set is used as an e
 
 
  - Download data from coco2017 data official website and unzip.
- ````
-    wget http://images.cocodataset.org/zips/train2017.zip
-    wget http://images.cocodataset.org/zips/val2017.zip
-    wget http://images.cocodataset.org/annotations/annotations2017.zip
-````
 - Create the mask dataset.
 
     Run python gen_ignore_mask.py
@@ -83,8 +78,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
   - Prepare hardware environment with Ascend. If you want to try, please send the [application form](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx) to ascend@huawei.com. Once approved, you can get the resources. 
 - Framework
   - [MindSpore](https://www.mindspore.cn/install/en)
-- Download the VGG19 model of the MindSpore version: 
-  - [vgg19-0-97_5004.ckpt](http://10.154.33.38:51203/tutorials/image_classification.html)   
+- Download the VGG19 model of the MindSpore version:
+  - [vgg19-0-97_5004.ckpt](https://download.mindspore.cn/model_zoo/r1.3/temp/vgg19_ascend_v130_imagenet2012_research_cv_bs64_top1acc74__top5acc91.97/)   
 - For more information, please check the resources below：
   - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
   - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
@@ -208,9 +203,6 @@ For more configuration details, please refer the script `config.py`.
   {'AP': 0.40030956300341397, 'Ap .5': 0.6658941566481336, 'AP .75': 0.396047897339743, 'AP (M)': 0.3075356543635785, 'AP (L)': 0.533772768618845, 'AR': 0.4519836272040302, 'AR .5': 0.693639798488665, 'AR .75': 0.4570214105793451, 'AR (M)': 0.32155148866429945, 'AR (L)': 0.6330360460795242}
   
   ```
- 
-
- 
 
 
 # [Model Description](#contents)
@@ -231,9 +223,4 @@ For more configuration details, please refer the script `config.py`.
 | Speed                      | 1pc: 29imgs/s                            
 | Total time                 | 1pc: 30h                                                                                           
 | Checkpoint for Fine tuning | 602.33M (.ckpt file)                                     
-                                                            
  
-
-
-
-

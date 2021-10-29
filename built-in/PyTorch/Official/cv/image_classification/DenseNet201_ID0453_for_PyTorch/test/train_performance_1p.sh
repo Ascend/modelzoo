@@ -8,7 +8,8 @@ export RANK_SIZE=1
 
 # 数据集路径,保持为空,不需要修改
 data_path=""
-
+# 训练周期数
+epochs=1
 #网络名称,同目录名称,需要模型审视修改
 Network="DenseNet201_ID0453_for_Pytorch"
 
@@ -22,6 +23,8 @@ do
         device_id=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -66,7 +69,7 @@ fi
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 python3 train.py  \
     --model densenet201 \
-     --epochs 1 \
+     --epochs ${epochs} \
      --data-path=$data_path \
      --batch-size=$batch_size \
      --workers 16 \

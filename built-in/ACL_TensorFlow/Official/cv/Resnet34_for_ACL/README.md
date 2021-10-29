@@ -15,7 +15,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Resnet34_for_ACL
 
 ### 2. Download and preprocess the dataset
 
-1. Download the Tiny-ImageNet-200 dataset by yourself. [Download Link](https://tiny-imagenet.herokuapp.com/)
+1. Download the Tiny-ImageNet-200 dataset by yourself.
 
 2. Move **tiny-imagenet-200** to **'scripts/'**
 ```
@@ -79,7 +79,7 @@ Our result was obtained by running the applicable inference script. To achieve t
 
 |       model       | **data**  |    Top1/Top5    |
 | :---------------: | :-------: | :-------------: |
-| offline Inference | 10000 images | 51.8 %/ 76.2% |
+| offline Inference | 10000 images | 51.9 %/ 76.6% |
 
 
 ## Reference

@@ -105,6 +105,10 @@ def parse_args():
                         help='loss scale using in amp, default -1 means dynamic')
     parser.add_argument('--opt_level', dest='opt_level', default='O2', type=str,
                         help='opt level using in amp, default O2 means FP16')
+    
+    # ETP
+    parser.add_argument('--etp_performance_mode', dest='etp_performance_mode', default=False, action='store_true',
+                        help='specify trianing steps on ETP performance mode')
 
     args = parser.parse_args()
     return args
@@ -284,7 +288,10 @@ if __name__ == '__main__':
     fasterRCNN.eval()
     empty_array = np.transpose(np.array([[],[],[],[],[]]), (1,0))
     dataset.resize_batch()
-    for i in range(num_images):
+    iter_num = num_images
+    if args.etp_performance_mode:
+        iter_num = 1
+    for i in range(iter_num):
 
         data = next(data_iter)
         pad_value = 0

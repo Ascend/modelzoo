@@ -6,7 +6,13 @@ export RANK_SIZE=1
 
 # 数据集路径,保持为空,不需要修改
 data_path=""
-
+# 训练周期数
+epochs=90
+#规避环境变量冲突
+if [ -f /usr/local/Ascend/bin/setenv.bash ];then
+    unset PYTHONPATH
+    source /usr/local/Ascend/bin/setenv.bash  
+fi
 #网络名称,同目录名称,需要模型审视修改
 Network="DenseNet169_ID0454_for_Pytorch"
 
@@ -22,6 +28,8 @@ do
         device_id=`echo ${para#*=}`
     elif [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
+    elif [[ $para == --epochs* ]];then
+        epochs=`echo ${para#*=}`
     fi
 done
 
@@ -74,7 +82,7 @@ if [ x"${etp_flag}" != x"true" ];then
 fi
 python3.7 train.py  \
     --model densenet169 \
-    --epochs 90 \
+    --epochs ${epochs} \
     --data-path=$data_path \
     --batch-size=$batch_size \
     --workers 16 \

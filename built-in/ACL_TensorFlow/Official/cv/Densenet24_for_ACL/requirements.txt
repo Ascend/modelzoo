@@ -1,0 +1,6 @@
+numpy==1.20.1
+temsorflow==1.15.0
+nibabel==3.2.1
+sklearn==0.0
+matplotlib==3.1.1
+Keras==2.0.0
