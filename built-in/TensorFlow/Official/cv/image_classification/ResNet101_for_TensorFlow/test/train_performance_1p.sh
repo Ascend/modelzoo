@@ -1,8 +1,9 @@
 #!/bin/bash
-source env.sh
 #当前路径,不需要修改
 cur_path=`pwd`
-
+# 数据集路径,保持为空,不需要修改
+data_path=""
+#/autotest/CI_daily/ModelZoo_Resnet101_TF_Atlas/data/resnet50/imagenet_TF
 #集合通信参数,不需要修改
 
 export RANK_SIZE=1
@@ -11,11 +12,9 @@ export JOB_ID=10087
 RANK_ID_START=0
 
 
-# 数据集路径,保持为空,不需要修改
-data_path="/npu/traindata/imagenet_TF"
 
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
+export ASCEND_GLOBAL_LOG_LEVEL_ETP=3
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
@@ -138,7 +137,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep "hooks.py:141"  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log |awk -F "," 'END {print $4}' |awk -F ":" '{print $2}' | awk -F "." '{print $1}'`
+FPS=`grep FPS $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log| grep -v WARNING | awk -F ',' '{print $4}' | awk -F ':' '{print $2}'| awk '{sum+=$1} END {print  sum/NR}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
@@ -158,7 +157,7 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 #吞吐量，不需要修改
 ActualFPS=${FPS}
 #单迭代训练时长，不需要修改
-TrainingTime=`expr ${batch_size} \* 1000 \/ ${FPS}`
+TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${batch_size}'*1000/'${ActualFPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
 grep "INFO:tensorflow:loss" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk '{print $3}' | awk -F "," '{print $1}'>> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt

@@ -1,0 +1,6 @@
+cv2
+numpy
+python 3.5+
+tensorflow 1.15
+tqdm
+scipy

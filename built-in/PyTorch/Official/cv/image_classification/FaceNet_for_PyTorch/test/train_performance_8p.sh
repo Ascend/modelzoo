@@ -60,15 +60,16 @@ fi
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 rm -f nohup.out
 
+KERNEL_NUM=$(($(nproc)/8))
 for((RANK_ID=0;RANK_ID<RANK_SIZE;RANK_ID++))
 do
     export RANK_ID=$RANK_ID
 
     if [ $(uname -m) = "aarch64" ]
     then
-        let a=0+RANK_ID*24
-        let b=23+RANK_ID*24
-        taskset -c $a-$b python3.7 fine_tune_new_8p.py \
+        PID_START=$((KERNEL_NUM * RANK_ID))
+        PID_END=$((PID_START + KERNEL_NUM - 1))
+        taskset -c $PID_START-$PID_END python3.7 fine_tune_new_8p.py \
             --seed 12345 \
             --amp_cfg \
             --opt_level O2 \

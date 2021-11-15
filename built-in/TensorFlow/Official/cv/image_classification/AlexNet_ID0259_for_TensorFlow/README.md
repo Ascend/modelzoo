@@ -1,111 +1,237 @@
-##### AlexNet
-Implementation of AlexNet for Identifying that Wether first convolutional kernel's patterns are really bisected caused by it's parallel architecture
+-   [基本信息](#基本信息.md)
+-   [概述](#概述.md)
+-   [训练环境准备](#训练环境准备.md)
+-   [快速上手](#快速上手.md)
+-   [迁移学习指导](#迁移学习指导.md)
+-   [高级参考](#高级参考.md)
+<h2 id="基本信息.md">基本信息</h2>
+**发布者（Publisher）：Huawei**
 
-# 1.Intro
-![img](./images/img.jpg)
+**应用领域（Application Domain）：Image Classification**
 
+**版本（Version）：1.2**
 
+**修改时间（Modified） ：2021.9.22**
 
-이 구현의 Motivation은, [Alexnet paper](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)에서 figure3를 보면 각기 다른 GPU를 사용해서 학습시켰을때, 한 GPU에서 학습된 48개 커널은 Color-agnostic하고 다른 GPU에서 학습된 48개 커널은 Color-specific하다는 설명이 쓰여있는데, 실제로 Kernel 시각화가 저렇게 되는지 확인해보기 위함이다. 알렉스넷 특유의 갈래별 Inconnectivity 때문에 저런 현상이 발생할수도 있다고 생각은 하는데 실제로 저렇게 되는가는 좀 의문이 생겼다. 실제로 저러면(모델의 갈래별로 커널의 역할이 양분되면) 그것도 그거 나름대로 딥러닝 해석 연구하는 분들께는 연구거리일거고, 갈래수를 3갈래 이상으로 증가시키면 어떨지도 또 궁금하다. 그리고 실제로 안 저러면 질문거리가 또 생기게 될 것 같다.
+**大小（Size）：174KB**
 
+**框架（Framework）：TensorFlow_1.15.0**
 
-GPU 한대로도 모델을 두 갈래로 Parallel하게 나눠서 두 GPU가 이어지는 부분(3번째 Convolution layer와 전체 FC layer)만 Concat해주면 완전히 동일한 구현이 될 것이다. 
-구현에 앞서 Pretrained-on-ImageNet 오픈소스들을 몇 개 찾아보았지만 논문의 구현 그대로가 아니었다. 모델을 두 갈래로 쪼갰다가 갈래별로 Parallel하게 Convolution하고 중간중간 Concat하는게 GPU 리소스가 딸리던 시절 썼던 트릭이라 여기는 건지, 찾아본 3, 4개의 구현모두 그냥 처음부터 끝까지 한 갈래로 모든 채널이 연결되어 있는 식이었다. 이런 식으로 학습된 커널들이라면 당연히 논문처럼 Color-agnostic, Color-specific으로 나뉘진 않을 것이다.
+**模型格式（Model Format）：ckpt**
 
+**精度（Precision）：Mixed**
 
+**处理器（Processor）：昇腾910**
 
-# 2.Implementation
+**应用级别（Categories）：Official**
 
-분명 나와 비슷한 고민을 한 사람이 있을 것 같아서 구글링 계속해봤지만 결국 아무것도 찾지 못했으므로, 직접 구현을 시도해보기로 했다.
+**描述（Description）：基于TensorFlow框架的图片分类识别网络训练代码**
 
-## 2.1.Dataset
+<h2 id="概述.md">概述</h2>
+## 简述
 
-이미지넷은 내가 가지고 있는 자원으로는 학습시키는게 불가능하므로 적당히 Image Scale이 크면서 구하기 쉬운 'Cat vs Dog' Dataset을 사용해서 학습시키기로 했다. 데이터셋이 다르다면 분명 커널 시각화 결과도 다르겠지만 그래도 뭔가 힌트를 얻을 수 있지 않을까 싶었다. 25000장 중 24000장을 Training set으로, 1000장을 Test set으로 썼다.
+ AlexNet是2012年[ImageNet](https://baike.baidu.com/item/ImageNet/17752829)竞赛冠军获得者Hinton和他的学生Alex Krizhevsky设计的 深度卷积神经网络模型，可以算是LeNet的一种更深更宽的版本 学习网络。 AlexNet主要使用到的新技术点如下： 
 
-## 2.2.Data Augmentation
+（1）成功使用ReLU作为CNN的激活函数，并验证其效果在较深的网络超过了Sigmoid，成功解决了Sigmoid在网络较深时的梯度弥散问题。
 
-논문에 제안된 Augmentation 방법인 5-Part crop, Flip을 Runtime중 전처리시간을 최소화하기 위해 사전에 모두 적용하여 데이터를 10배 증강했으며, Color augmentation은 매 이미지마다 각각, 매번 Random하게 수행되어야 하므로 그 결과가 Epoch수 만큼 배가 될 것이므로 Runtime중 적용하였다.
-따라서 Crop, Flip augmentation은 data_preprocessor.py에, Color augmentation은 data_loader.py에 구현되어 있다.
+（2）训练时使用Dropout随机忽略一部分神经元，以避免模型过拟合。
 
-## 2.3.Parallel Architecture
-![img](./images/img2.png)
+（3）在CNN中使用重叠的最大池化。
 
+（4）提出了LRN层，对局部神经元的活动创建竞争机制，使得其中响应比较大的值变得相对更大，并抑制其他反馈较小的神经元，增强了模型的泛化能力。
 
+（5）使用CUDA加速深度卷积网络的训练，利用GPU强大的并行计算能力，处理神经网络训练时大量的矩阵运算。
 
-오픈소스에 흔한 AlexNet 구현체들과는 다르게 실제 논문에 나와있는 구조 그대로 모델을 Parallel하게 나눠서 3번째 Convolution layer에서 일시적으로 Concat, 이후 FC layer에 들어가기 이전 완전히 Concat되게 하였다. 모델의 깊이와 두께, 커널사이즈 등은 완전히 논문과 동일하다.
+（6）数据增强，随机地从256*256的原始图像中截取224*224大小的区域（以及水平翻转的镜像），相当于增加了2*(256-224)^2=2048倍的数据量。
 
 
 
-## 2.4.Hyperparameters
+- 论文路径
 
-Learning rate가 1/10 되었다는 점을 제외하고 아래와 같이 논문과 완전 동일하다.
+  https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf
 
+- 开源代码路径
 
+  https://github.com/demul/AlexNet
 
-Learning rate = 0.001
+-   适配昇腾 AI 处理器的实现：
+    
+     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_ID0259_for_TensorFlow
 
+-   通过Git获取对应commit\_id的代码方法如下：
+    
+        git clone {repository_url}    # 克隆仓库的代码
+        cd {repository_name}    # 切换到模型的代码仓目录
+        git checkout  {branch}    # 切换到对应分支
+        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    
 
+## 默认配置<a name="section91661242121611"></a>
+-   网络结构
+    -    5层卷积层和3层全连接层 
+    
+-   训练超参（单卡）：
+    -   Batch size: 100
+    -   epoch: 35
+    -   learning_rate: 0.001
+    -   momentum:0.9
+    -   LRN_depth=5
+    -   LRN_bias=2
+    -   lRN_alpha=0.0001
+    -   LRN_beta=0.75
+    -   keep_prob=0.5
 
-Momentum = 0.9
 
+## 支持特性<a name="section1899153513554"></a>
 
+| 特性列表  | 是否支持 |
+|-------|------|
+| 分布式训练 | 是    |
+| 混合精度  | 是    |
+| 数据并行  | 是    |
 
-Weight decay coefficient = 0.0005
 
+## 混合精度训练<a name="section168064817164"></a>
 
+昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
-LRN_depth = 5
+## 开启混合精度<a name="section20779114113713"></a>
+训练脚本增加“precision_mode” 配置项
 
+相关代码示例:
 
+```
+config = tf.ConfigProto()
+custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+```
 
-LRN_bias = 2
+<h2 id="训练环境准备.md">训练环境准备</h2>
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
 
+    **表 1** 镜像列表
 
-LRN_alpha = 0.0001
+    <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
+    
+    <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="25.52%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074498056_p75071327115313"><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><em id="i1522994919122"><a name="i1522994919122"></a><a name="i1522994919122"></a>镜像版本</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="27.16%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000001074498056_p1024411406234"><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><em id="i723012493123"><a name="i723012493123"></a><a name="i723012493123"></a>配套CANN版本</em></p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-arm" target="_blank" rel="noopener noreferrer">ascend-tensorflow-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-x86" target="_blank" rel="noopener noreferrer">ascend-tensorflow-x86</a></em></li></ul>
+    </td>
+    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>20.2.0</em></p>
+    </td>
+    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373/software" target="_blank" rel="noopener noreferrer">20.2</a></em></p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
 
+<h2 id="快速上手.md">快速上手</h2>
+## 数据集准备<a name="section361114841316"></a>
 
-LRN_beta = 0.75
+1、自行下载“Catvs Dog” Datasets，25000张中有24000张是Training set，1000张是Test set。
 
 
+## 模型训练<a name="section715881518135"></a>
+- 下载训练脚本。
+- 开始训练。
 
-Dropout rate = 0.5
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
 
+       环境变量配置信息参见：
 
+          [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-## 2.5.Other Methods
 
-Relu activation, Local Response Normalization, Overlapping pooling, Dropout, Weight decay등 모든 기법을 동일하게, 2.4에서 보이는 바와 같이 동일한 계수로 적용하였고, Weight와 Bias Initialization도 논문과 동일하게 Weight의 경우 평균 0 표준편차 0.01의 Gaussian Sampling으로, Bias의 경우 2, 4, 5번째 Convolution layer와 FC layer는 1로, 나머지 layer는 0으로 초기화했다. Learning rate scheduling은 10 에폭 동안 Training Accuracy 상향이 없을때, Learning rate를 1/10하도록 했는데, 논문처럼 세 번에 걸쳐 1/10해도 처음 한 번만 성능 향상이 일어났다.
+    2. 单卡训练
+       
+        2. 1单卡训练指令（脚本位于AlexNet_ID0259_for_TensorFlow/test/train_full_1p.sh）
+        
+            bash test/train_full_1p.sh --data_path=/home/Dog_Cats
+            
+    
 
+<h2 id="迁移学习指导.md">迁移学习指导</h2>
+- 数据集准备。
 
+  数据集要求如下：
 
-# 3.Result
-## 3.1.Metrics
-![img](./images/acc.png)
+  1. 获取数据。
 
+     如果要使用自己的数据集，需要将数据集放到脚本参数data_path对应目录下。参考代码中的数据集存放路径如下：
 
+     - 训练集： /home/data/data_preprocessed/train
+     - 测试集：  /home/data/data_preprocessed/train
 
-최종 Test Accuracy = 97.00%
+     数据集也可以放在其它目录，则修改对应的脚本入参data_path即可。
 
 
+  2.  数据集文件结构，目录参考：
 
-최종 Training Accuracy = 99.07%
+        ```
+            |  data_preprocessed
+            |  dog_and_cat_25000_split
+            |  first_kernel_visualization
+        ```
 
 
-![img](./images/loss.png)
+- 加载预训练模型。 
 
 
+    1. 模型加载修改，修改文件train.py，修改以下代码行。
+       
+    ```
+    saver = tf.train.Saver(tf.global_variables())
+    ckpt = tf.train.get_checkpoint_state('/autotest/CI_daily/CarPeting_AlexNet/code/model')
+    if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
+        saver.restore(sess, ckpt.model_checkpoint_path)
+    else:
+        sess.run(tf.global_variables_initializer())
+    ```
 
-최종 Cross Entropy Error = 0.044084
+-   模型训练。
 
+    参考“模型训练”中训练步骤。
 
+<h2 id="迁移学习指导.md">高级参考</h2>
 
-## 3.2.Kernel Visualization
-![img](./images/first_kernel_visualization.gif)
+## 脚本和事例代码
 
+```
+|--main.py                 #训练脚本入口
+|--train.py		           #执行训练主脚本
+|--model.py                #构建模型脚本
+|--test			           #训练脚本目录
+|	|--train_performance_1p.sh
+|	|--train_full_1p.sh
+|   |--......
+|--data_loader.py          #数据集加载脚本
+|--data_preprocessor.py    #数据集预处理脚本
+|--......
+```
 
+## 脚本参数<a name="section6669162441511"></a>
 
-상위 48개는 GPU1, 하위 48개는 GPU2라고 보면 된다. 의심했던 바와 같이, Kernel 역할의 양분화(Color-agnostic과 Color-specific)는 관찰할 수 없었다. 원본논문과의 차이는 Dataset과 Leaning Rate 초기값, 그리고 학습속도에 유의미한 영향을 주는 Minibatch size정도 밖에 없는데, 해당 변인들을 바꾸더라도 Kernel 역할이 논문에 설명된 것처럼 양분화 될 것 같지는 않다. 내 구현에 실수가 있지는 않았는지 좀 더 AlexNet 구현에 대해 자세히 알아보는 한편, 내가 가진 장비로 ImageNet 학습은 무리이므로 장비를 빌릴 곳을 알아 봐야겠다.
+```
+	--epoch		      		    Epoch to train,default:35
+    --learning_rate             Learning rate of for adam,default:0.001
+    --data_path                 dataset path
+    --batch_size                batch size，default：100
+```
+
+## 训练过程<a name="section1589455252218"></a>
+
+通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡训练。模型存储路径为${cur_path}/../model，包括训练的log以及checkpoints文件。loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
+
 
 

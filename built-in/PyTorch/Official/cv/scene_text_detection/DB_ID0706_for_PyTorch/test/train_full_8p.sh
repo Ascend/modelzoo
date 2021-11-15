@@ -67,7 +67,15 @@ fi
 start_time=$(date +%s)
 sed -i "s|./datasets|$data_path|g" experiments/seg_detector/base_ic15.yaml
 
-taskset -c 0-95 python3 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
+kernel_num=$(nproc)
+
+if [ ${kernel_num} -lt 95 ];then
+    cpu_number=${kernel_num}
+else
+    cpu_number=95
+fi
+
+taskset -c 0-${cpu_number} python3 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml \
     --data_path ${data_path}/icdar2015 \
     --resume ${data_path}/db_ckpt/MLT-Pretrain-ResNet50 \
     --seed=515 \

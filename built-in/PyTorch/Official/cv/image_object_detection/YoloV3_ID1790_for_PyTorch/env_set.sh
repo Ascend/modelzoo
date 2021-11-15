@@ -12,7 +12,7 @@ git clone -b v1.2.7 --depth=1 https://github.com/open-mmlab/mmcv.git
 export MMCV_WITH_OPS=1
 export MAX_JOBS=8
 
-source ./test/env.sh
+source ./test/env_npu.sh
 cd mmcv
 python3.7 setup.py build_ext
 python3.7 setup.py develop

@@ -168,6 +168,12 @@ class MetricLogger(object):
             ])
         MB = 1024.0 * 1024.0
         for obj in iterable:
+            if header == 'Test:':
+                if i > 10:
+                    pass
+            else:
+                if i == 100:
+                    pass
             data_time.update(time.time() - end)
             yield obj
             iter_time.update(time.time() - end)

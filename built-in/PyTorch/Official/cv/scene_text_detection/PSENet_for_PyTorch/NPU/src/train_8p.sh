@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 
 source ./env_npu.sh
-taskset -c 0-95 python3.7 -W ignore train_ic15_8p.py \
-  --lr 0.004\
+kernel_num=$(nproc)
+
+if [ ${kernel_num} -lt 95 ];then
+    cpu_number=${kernel_num}
+else
+    cpu_number=95
+fi
+
+taskset -c 0-${cpu_number} python3.7 -W ignore train_ic15_8p.py \
+    --lr 0.004\
 	--dist-backend 'hccl' \
 	--rank 0  \
 	--workers 32 \

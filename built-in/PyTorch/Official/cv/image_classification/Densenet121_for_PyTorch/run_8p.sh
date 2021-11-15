@@ -13,11 +13,12 @@ echo "train log path is ${train_log_dir}"
 
 if [ $(uname -m) = "aarch64" ]
 then
+    KERNEL_NUM=$(($(nproc)/8))
     for i in $(seq 0 7)
     do
-    let p_start=0+24*i
-    let p_end=23+24*i
-    taskset -c $p_start-$p_end python3.7 ${currentDir}/densenet121_8p_main.py \
+    PID_START=$((KERNEL_NUM * i))
+    PID_END=$((PID_START + KERNEL_NUM - 1))
+    taskset -c $PID_START-$PID_END python3.7 ${currentDir}/densenet121_8p_main.py \
         --addr=$(hostname -I|awk '{print $1}') \
         --seed 49 \
         --workers 160 \

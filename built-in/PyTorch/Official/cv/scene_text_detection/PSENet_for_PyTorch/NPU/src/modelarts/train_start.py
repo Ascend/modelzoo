@@ -1,5 +1,4 @@
-#     Copyright [yyyy] [name of copyright owner]
-#     Copyright 2020 Huawei Technologies Co., Ltd
+#     Copyright 2021 Huawei Technologies Co., Ltd
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -133,7 +132,7 @@ def cal_kernel_score(kernels, gt_kernels, gt_texts, training_masks, running_metr
     return score_kernel
 
 
-def train(train_loader, model, criterion, optimizer, epoch,  args, npu_per_node):
+def train(train_loader, model, criterion, optimizer, epoch, args, npu_per_node):
     model.train()
 
     losses = AverageMeter()
@@ -176,9 +175,6 @@ def train(train_loader, model, criterion, optimizer, epoch,  args, npu_per_node)
             loss_kernels.append(loss_kernel_i)
         # loss kernel
         loss_kernel = sum(loss_kernels) / len(loss_kernels)
-
-        # loss = lambda * loss_text + ( 1 - lambda) * loss_kernel
-        # lambda = 0.7
         loss = 0.7 * loss_text + 0.3 * loss_kernel
         # loss update
         losses.update(loss.item(), imgs.size(0))
@@ -284,7 +280,7 @@ def main(npu, npu_per_node, args):
     if not os.path.isdir(args.checkpoint):
         os.makedirs(args.checkpoint, 0o755)
 
-    # kernel_num 代表了什么
+    # kernel_num
     kernel_num = 7
     # m di中的ri
     min_scale = 0.4
@@ -332,7 +328,8 @@ def main(npu, npu_per_node, args):
                                       keep_batchnorm_fp32=args.keep_batchnorm_fp32,
                                       loss_scale=args.loss_scale,
                                       combine_grad=args.combine_grad)
-    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.npu], broadcast_buffers=False)
+    if args.distributed:
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.npu], broadcast_buffers=False)
 
     if args.pretrain:
         print('Using pretrained model.')
@@ -405,7 +402,6 @@ def device_id_to_process_device_map(device_list):
     process_device_map = dict()
     for process_id, device_id in enumerate(devices):
         process_device_map[process_id] = device_id
-
     return process_device_map
 
 
@@ -445,7 +441,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', default=16, type=int,
                         help='seed for initializing training. ')
     parser.add_argument('--device-list', default='0', type=str, help='device id list')
-    parser.add_argument('--multiprocessing-distributed', default=True, action='store_true',
+    parser.add_argument('--multiprocessing-distributed', action='store_true',
                         help='Use multi-processing distributed training to launch '
                              'N processes per node, which has N NPUs. This is the '
                              'fastest way to use PyTorch for either single node or '
@@ -461,19 +457,20 @@ if __name__ == '__main__':
     parser.add_argument('--dist-url', default='env://', type=str,
                         help='url used to set up distributed training')
     parser.add_argument('--port', default='8272', type=str)
-    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+    parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--remark', default='test', type=str,
                         help='remark. ')
-    parser.add_argument('--combine_grad', default=True, action='store_true',
+    parser.add_argument('--combine_grad', action='store_true',
                         help='whether to combine grad in apex')
-    parser.add_argument('--combine_sgd', default=False, action='store_true',
+    parser.add_argument('--combine_sgd',  action='store_true',
                         help='whether to use combined sgd instead of sgd')
     # modelarts
     parser.add_argument('--train_url',
                         default="/cache/training",
                         type=str,
                         help="setting dir of training output")
+
     parser.add_argument('--onnx', default=True, action='store_true',
                         help="convert pth model to onnx")
 

@@ -21,6 +21,13 @@ do
     if [[ $para == --data_path* ]];then
         data_path=`echo ${para#*=}`
     fi
+    if [[ $para == --conda_name* ]];then
+      conda_name=`echo ${para#*=}`
+      echo "PATH TRAIN BEFORE: $PATH"
+      source set_conda.sh --conda_name=$conda_name
+      source activate $conda_name
+      echo "PATH TRAIN AFTER: $PATH"
+    fi
 done
 
 #校验是否传入data_path,不需要修改
@@ -29,8 +36,12 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-#训练开始时间，不需要修改
-start_time=$(date +%s)
+# 非平台场景时source 环境变量
+check_etp_flag=`env | grep etp_running_flag`
+etp_flag=`echo ${check_etp_flag#*=}`
+if [ x"${etp_flag}" != x"true" ];then
+    source ${cur_path}/env_npu.sh
+fi
 
 #进入训练脚本目录，需要模型审视修改
 ASCEND_DEVICE_ID=0
@@ -44,6 +55,12 @@ else
     mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
 fi
 chmod +x ${cur_path}/../tools/dist_train.sh
+
+#训练开始时间，不需要修改
+start_time=$(date +%s)
+
+sed -i "s|total_epochs = 273|total_epochs = 1|g" configs/yolo/yolov3_d53_mstrain-608_273e_coco.py
+sed -i "s|data/coco/|$data_path/|g" configs/yolo/yolov3_d53_mstrain-608_273e_coco.py
 
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 PORT=29500 ./tools/dist_train.sh configs/yolo/yolov3_d53_320_273e_coco.py 1  \
@@ -96,3 +113,9 @@ echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#退出anaconda环境
+conda deactivate
+if [ -n "$conda_name" ];then
+    echo "conda $conda_name deactivate"
+    conda deactivate
+fi

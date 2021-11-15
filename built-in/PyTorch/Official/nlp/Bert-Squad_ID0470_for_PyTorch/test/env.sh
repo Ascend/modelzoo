@@ -12,3 +12,4 @@ export PYTHONPATH=$cur_path/models/research:$cur_path/models/research/slim:$PYTH
 export JOB_ID=10087
 export ASCEND_GLOBAL_LOG_LEVEL=3
 export ASCEND_DEVICE_ID=0
+export BMMV2_ENABLE=1

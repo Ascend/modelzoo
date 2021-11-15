@@ -12,7 +12,7 @@ data_file="/rsc15_train_1000.txt"
 export ASCEND_GLOBAL_LOG_LEVEL=3
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="GRU4Rec_for_TensorFlow"
+Network="GRU4Rec_ID0128_for_TensorFlow"
 #训练epoch
 train_epochs=10
 #TF2.X独有，不需要修改
@@ -123,7 +123,10 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $2}'`
+#FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $2}'`
+temp1=`grep "npu time is:" $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $6}'`
+TrainingTime=`echo "1000 * ${temp1}"|bc`
+FPS=`echo "scale=2;${BatchSize} / ${temp1}"|bc`
 #打印，不需要修改
 #echo "Final Performance images/sec : $FPS"
 #输出训练精度,需要模型审视修改
@@ -139,7 +142,7 @@ DeviceType=`uname -m`
 ActualFPS=${FPS}
 #单迭代训练时长，不需要修改
 grep Each $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $6}'>>$cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_time.txt
-TrainingTime=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_time.txt`
+#TrainingTime=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_time.txt`
 #TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'*1000/'${FPS}'}'`
 #TrainningTime=`grep Each $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $6}'`
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
@@ -158,3 +161,4 @@ echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${Ca
 #echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+sed -i -e '/ModuleNotFoundError/d' $cur_path/output/${ASCEND_DEVICE_ID}/train.log

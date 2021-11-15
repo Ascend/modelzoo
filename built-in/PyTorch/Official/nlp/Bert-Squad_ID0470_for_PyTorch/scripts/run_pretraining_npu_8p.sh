@@ -12,44 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-/usr/local/Ascend/driver/tools/msnpureport -g error -d 0
-/usr/local/Ascend/driver/tools/msnpureport -g error -d 4
-
-export LD_LIBRARY_PATH=/usr/include/hdf5/lib/:$LD_LIBRARY_PATH
-export install_path=/usr/local/Ascend
-if [ -d ${install_path}/toolkit ]; then
-    export LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib/:${install_path}/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons:${path_lib}:${LD_LIBRARY_PATH}
-    export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:$PATH
-    export PYTHONPATH=${install_path}/fwkacllib/python/site-packages:${install_path}/tfplugin/python/site-packages:${install_path}/toolkit/python/site-packages:$PYTHONPATH
-    export PYTHONPATH=/usr/local/python3.7.5/lib/python3.7/site-packages:$PYTHONPATH
-    export ASCEND_OPP_PATH=${install_path}/opp
-else
-    if [ -d ${install_path}/nnae/latest ];then
-        export LD_LIBRARY_PATH=/usr/local/:/usr/local/python3.7.5/lib/:/usr/local/openblas/lib:/usr/local/lib/:/usr/lib64/:/usr/lib/:${install_path}/nnae/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons/:/usr/lib/aarch64_64-linux-gnu:$LD_LIBRARY_PATH
-        export PATH=$PATH:${install_path}/nnae/latest/fwkacllib/ccec_compiler/bin/:${install_path}/nnae/latest/toolkit/tools/ide_daemon/bin/
-        export ASCEND_OPP_PATH=${install_path}/nnae/latest/opp/
-        export OPTION_EXEC_EXTERN_PLUGIN_PATH=${install_path}/nnae/latest/fwkacllib/lib64/plugin/opskernel/libfe.so:${install_path}/nnae/latest/fwkacllib/lib64/plugin/opskernel/libaicpu_engine.so:${install_path}/nnae/latest/fwkacllib/lib64/plugin/opskernel/libge_local_engine.so
-        export PYTHONPATH=${install_path}/nnae/latest/fwkacllib/python/site-packages/:${install_path}/nnae/latest/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:${install_path}/nnae/latest/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
-        export ASCEND_AICPU_PATH=${install_path}/nnae/latest
-    else
-        export LD_LIBRARY_PATH=/usr/local/:/usr/local/lib/:/usr/lib64/:/usr/lib/:/usr/local/python3.7.5/lib/:/usr/local/openblas/lib:${install_path}/ascend-toolkit/latest/fwkacllib/lib64/:${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver/:${install_path}/add-ons/:/usr/lib/aarch64-linux-gnu:$LD_LIBRARY_PATH
-        export PATH=$PATH:${install_path}/ascend-toolkit/latest/fwkacllib/ccec_compiler/bin/:${install_path}/ascend-toolkit/latest/toolkit/tools/ide_daemon/bin/
-        export ASCEND_OPP_PATH=${install_path}/ascend-toolkit/latest/opp/
-        export OPTION_EXEC_EXTERN_PLUGIN_PATH=${install_path}/ascend-toolkit/latest/fwkacllib/lib64/plugin/opskernel/libfe.so:${install_path}/ascend-toolkit/latest/fwkacllib/lib64/plugin/opskernel/libaicpu_engine.so:${install_path}/ascend-toolkit/latest/fwkacllib/lib64/plugin/opskernel/libge_local_engine.so
-        export PYTHONPATH=${install_path}/ascend-toolkit/latest/fwkacllib/python/site-packages/:${install_path}/ascend-toolkit/latest/fwkacllib/python/site-packages/auto_tune.egg/auto_tune:${install_path}/ascend-toolkit/latest/fwkacllib/python/site-packages/schedule_search.egg:$PYTHONPATH
-        export ASCEND_AICPU_PATH=${install_path}/ascend-toolkit/latest
-    fi
-fi
-
-source env_new.sh
-
-export HCCL_WHITELIST_DISABLE=1
-export TASK_QUEUE_ENABLE=1
-export PTCOPY_ENABLE=1
-export ASCEND_GLOBAL_LOG_LEVEL=3
-export DYNAMIC_OP="ADD#MUL" 
-export COMBINED_ENABLE=1
-export BMMV2_ENABLE=1
+source env_npu.sh
 
 echo "Container nvidia build = " $NVIDIA_BUILD_ID
 train_batch_size=${1:-8192}
@@ -75,7 +38,7 @@ gradient_accumulation_steps_phase2=${20:-512}
 DATASET=hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5/wikicorpus_en # change this for other datasets
 DATA_DIR_PHASE1=${21:-"./data/${DATASET}/"} # change this for your env
 BERT_CONFIG=bert_config.json
-DATASET2=hdf5_lower_case_1_seq_len_128_max_pred_20_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5/wikicorpus_en # change this for other datasets
+DATASET2=hdf5_lower_case_1_seq_len_512_max_pred_80_masked_lm_prob_0.15_random_seed_12345_dupe_factor_5/wikicorpus_en # change this for other datasets
 DATA_DIR_PHASE2=${22:-"./data/${DATASET2}/"} # change this for your env
 CODEDIR=${23:-"${PWD}"}
 init_checkpoint=${24:-"None"}
@@ -170,7 +133,7 @@ CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 CMD="python3.7 -u $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
-  export GBS=$(expr $train_batch_size \* $num_gpus)
+  export GBS=$(expr $train_batch_size \* $num_npu)
   printf -v TAG "pyt_bert_pretraining_phase1_%s_gbs%d" "$precision" $GBS
   DATESTAMP=`date +'%y%m%d%H%M%S'`
   LOGFILE=$RESULTS_DIR/$job_name.$TAG.$DATESTAMP.log
@@ -262,7 +225,7 @@ CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 CMD="python3.7 -u $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
-  export GBS=$(expr $train_batch_size_phase2 \* $num_gpus)
+  export GBS=$(expr $train_batch_size_phase2 \* $num_npu)
   printf -v TAG "pyt_bert_pretraining_phase2_%s_gbs%d" "$precision" $GBS
   DATESTAMP=`date +'%y%m%d%H%M%S'`
   LOGFILE=$RESULTS_DIR/$job_name.$TAG.$DATESTAMP.log

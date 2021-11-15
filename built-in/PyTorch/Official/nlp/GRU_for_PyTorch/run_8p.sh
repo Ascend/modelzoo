@@ -20,11 +20,12 @@ ln -s ${currentDir}/.data ${train_log_dir}/.data
 
 if [ $(uname -m) = "aarch64" ]
 then
+    KERNEL_NUM=$(($(nproc)/8))
     for i in $(seq 0 7)
     do
-    let p_start=0+20*i
-    let p_end=19+20*i
-    taskset -c $p_start-$p_end python3.7 ${currentDir}/gru_8p.py \
+    PID_START=$((KERNEL_NUM * i))
+    PID_END=$((PID_START + KERNEL_NUM - 1))
+    taskset -c $PID_START-$PID_END python3.7 ${currentDir}/gru_8p.py \
         --addr=$(hostname -I |awk '{print $1}') \
         --seed 123456 \
         --workers 20 \

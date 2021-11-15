@@ -1,12 +1,13 @@
 source ./test/env.sh
 
+KERNEL_NUM=$(($(nproc)/8))
 for i in $(seq 0 7)
 do
     if [ $(uname -m) = "aarch64" ]
     then
-    let p_start=0+24*i
-    let p_end=23+24*i
-    taskset -c $p_start-$p_end python3.7 train_8p.py --img 608 608 \
+    PID_START=$((KERNEL_NUM * i))
+    PID_END=$((PID_START + KERNEL_NUM - 1))
+    taskset -c $PID_START-$PID_END python3.7 train_8p.py --img 608 608 \
                                           --data coco.yaml \
                                           --cfg cfg/yolov4_8p.cfg \
                                           --weights '' \

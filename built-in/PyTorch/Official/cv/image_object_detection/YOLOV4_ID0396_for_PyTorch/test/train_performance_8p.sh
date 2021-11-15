@@ -84,13 +84,14 @@ sed -i "s|opt.notest or final_epoch:|opt.notest:|g" train_8p.py
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 
+KERNEL_NUM=$(($(nproc)/8))
 for i in $(seq 0 7)
 do
     if [ $(uname -m) = "aarch64" ]
     then
-    let p_start=0+24*i
-    let p_end=23+24*i
-    taskset -c $p_start-$p_end python3.7 train_8p.py --img $image_size $image_size \
+    PID_START=$((KERNEL_NUM * i))
+    PID_END=$((PID_START + KERNEL_NUM - 1))
+    taskset -c $PID_START-$PID_END python3.7 train_8p.py --img $image_size $image_size \
                                           --data coco.yaml \
                                           --cfg cfg/yolov4_8p.cfg \
                                           --weights '' \
@@ -108,6 +109,7 @@ do
                                           --addr $(hostname -I |awk '{print $1}') \
                                           --dist_url 'tcp://127.0.0.1:41111' \
                                           --dist_backend 'hccl' \
+                                          --stop_step_num 100 \
                                           --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     else
         python3.7 train_8p.py --img $image_size $image_size \
@@ -128,6 +130,7 @@ do
                    --addr $(hostname -I |awk '{print $1}') \
                    --dist_url 'tcp://127.0.0.1:41111' \
                    --dist_backend 'hccl' \
+                   --stop_step_num 100 \
                    --notest > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
     fi
 done
@@ -168,7 +171,7 @@ ActualFPS=${FPS}
 TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 # 从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-cat ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|tr '\r' '\n'|grep "${image_size}:"|awk -F " " '{print $3, $4, $5}' >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+cat ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|tr '\r' '\n'|grep "${image_size}:"|awk -F " " '{print $6}' >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 # 最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' ${test_path_dir}/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`

@@ -4,15 +4,16 @@ source env_npu.sh
 export RANK_SIZE=8
 rm -f nohup.out
 
+KERNEL_NUM=$(($(nproc)/8))
 for((RANK_ID=0;RANK_ID<RANK_SIZE;RANK_ID++))
 do
     export RANK_ID=$RANK_ID
 
     if [ $(uname -m) = "aarch64" ]
     then
-        let a=0+RANK_ID*24
-        let b=23+RANK_ID*24
-        taskset -c $a-$b python3.7 fine_tune_new_8p.py \
+        PID_START=$((KERNEL_NUM * RANK_ID))
+        PID_END=$((PID_START + KERNEL_NUM - 1))
+        taskset -c $PID_START-$PID_END python3.7 fine_tune_new_8p.py \
             --seed 12345 \
             --amp_cfg \
             --opt_level O2 \

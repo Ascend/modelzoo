@@ -2,7 +2,16 @@ source env.sh
 export PYTHONPATH=./:$PYTHONPATH
 export TASK_QUEUE_ENABLE=0
 export DYNAMIC_OP="ADD"
-taskset -c 0-95 python3.7 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml --resume path-to-model-directory/MLT-Pretrain-ResNet50 \
+
+kernel_num=$(nproc)
+
+if [ ${kernel_num} -lt 95 ];then
+    cpu_number=${kernel_num}
+else
+    cpu_number=95
+fi
+
+taskset -c 0-${cpu_number} python3.7 -W ignore train.py experiments/seg_detector/ic15_resnet50_deform_thre.yaml --resume path-to-model-directory/MLT-Pretrain-ResNet50 \
         --data_path datasets/icdar2015/ \
         --seed=515 \
         --distributed \

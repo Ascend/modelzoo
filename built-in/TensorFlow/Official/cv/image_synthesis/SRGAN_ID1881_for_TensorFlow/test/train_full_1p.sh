@@ -1,17 +1,4 @@
 #!/bin/bash
-
-# ʹcondaҪ
-#export PATH=/usr/local/python3.7.5/bin:/home/anaconda3/bin:$PATH
-#export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:/usr/local/Ascend/fwkacllib/lib64/:/usr/local/Ascend/driver/lib64/common/:/usr/local/Ascend/driver/lib64/driver/:/usr/local/Ascend/add-ons/:/usr/lib/x86_64-linux-gnu:/usr/local/python3.7.5/lib/:/home/anaconda3/lib
-export install_path=/usr/local/Ascend
-export PATH=${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:/home/anaconda3/bin:$PATH
-export LD_LIBRARY_PATH=${install_path}/driver/lib64/common/:${install_path}/driver/lib64/driver:${install_path}/fwkacllib/lib64/plugin/opskernel/:${install_path}/aoe/lib64:${install_path}/fwkacllib/lib64:/home/anaconda3/lib:$LD_LIBRARY_PATH
-
-source activate py2
-# pip3 install tensorlayer==1.11.1
-# pip3 install easydict==1.9
-# pip3 install numpy==1.16.2
-
 # ǰ·Ҫ޸
 cur_path=`pwd`/../
 
@@ -44,6 +31,12 @@ for para in $*
 do
    if [[ $para == --data_path* ]];then
       data_path=`echo ${para#*=}`
+   fi
+   
+   if [[ $para == --conda_name* ]];then
+      conda_name=`echo ${para#*=}`
+	  source set_conda.sh
+	  source activate $conda_name
    fi
 done
 
@@ -147,4 +140,6 @@ echo "ActualLoss = ${ActualLoss}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${C
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 
 # ˳anaconda
-conda deactivate
+if [ -n "$conda_name"];then
+   conda deactivate
+fi

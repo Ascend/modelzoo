@@ -4,14 +4,15 @@ export NNPU=8
 export WORLD_SIZE=$NNPU
 export MASTER_ADDR=$(hostname -I |awk '{print $1}')
 export MASTER_PORT=29500
+KERNEL_NUM=$(($(nproc)/8))
 for((RANK_ID=0;RANK_ID<NNPU;RANK_ID++))
 do
     export RANK=$RANK_ID
     if [ $(uname -m) = "aarch64" ]
     then
-        let a=0+RANK_ID*24
-        let b=23+RANK_ID*24
-        taskset -c $a-$b python3.7 train.py --exp_name xlm_en_zh \
+        PID_START=$((KERNEL_NUM * RANK_ID))
+        PID_END=$((PID_START + KERNEL_NUM - 1))
+        taskset -c $PID_START-$PID_END python3.7 train.py --exp_name xlm_en_zh \
             --dump_path ./dumped        \
             --data_path ./$OUTPATH      \
             --lgs 'en-zh'          \

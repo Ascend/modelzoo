@@ -45,11 +45,16 @@ else
     exit 1
 fi
 
+
+
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/../
+#修改参数
+sed -i "s|pass|break|g"  $cur_path/../utils.py
+wait
 
 #创建DeviceID输出目录，不需要修改
 if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
@@ -83,6 +88,10 @@ python3 train.py  \
      --device_id=$ASCEND_DEVICE_ID \
      --print-freq 1 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
+wait
+
+#参数回改
+sed -i "s|break|pass|g"  $cur_path/../utils.py
 wait
 
 #训练结束时间，不需要修改

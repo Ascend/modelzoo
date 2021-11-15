@@ -11,20 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
-import torch
-from xception import xception
-import torch.onnx
-import argparse
-from collections import OrderedDict
-parser = argparse.ArgumentParser(description='xception')
-parser.add_argument('--model-path', default='', type=str, metavar='PATH',
-                    help='model path')
 
-def proc_node_module(checkpoint, AttrName):
+
+import torch
+import torch.onnx
+
+from collections import OrderedDict
+from xception import xception
+
+
+def proc_nodes_module(checkpoint, AttrName):
     new_state_dict = OrderedDict()
     for k, v in checkpoint[AttrName].items():
-        if(k[0:7] == "module."):
+        if (k[0:7] == "module."):
             name = k[7:]
         else:
             name = k[0:]
@@ -32,12 +31,10 @@ def proc_node_module(checkpoint, AttrName):
     return new_state_dict
 
 
-def convert():
-    args = parser.parse_args()
-    model_path = args.model_path
-    checkpoint = torch.load(model_path, map_location='cpu')
-    checkpoint['state_dict'] = proc_node_module(checkpoint, 'state_dict')
-    model = xception()
+def convert(pth_file_path, onnx_file_path):
+    checkpoint = torch.load(pth_file_path, map_location='cpu')
+    checkpoint['state_dict'] = proc_nodes_module(checkpoint, 'state_dict')
+    model = xception(pretrained=False)
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     print(model)
@@ -45,8 +42,11 @@ def convert():
     input_names = ["actual_input_1"]
     output_names = ["output1"]
     dummy_input = torch.randn(16, 3, 299, 299)
-    torch.onnx.export(model, dummy_input, "xception_npu_16.onnx", input_names=input_names, output_names=output_names,
+    torch.onnx.export(model, dummy_input, onnx_file_path, input_names=input_names, output_names=output_names,
                       opset_version=11)
 
+
 if __name__ == "__main__":
-    convert()
+    src_file_path = "./checkpoint.pth.tar"
+    dst_file_path = "xception.onnx"
+    convert(src_file_path, dst_file_path)

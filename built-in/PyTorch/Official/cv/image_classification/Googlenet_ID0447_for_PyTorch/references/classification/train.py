@@ -214,7 +214,7 @@ def main(args):
 
     if args.is_master_node:
         print("Creating model")
-        print(torchvision.models.__dict__)
+        #print(torchvision.models.__dict__)
     model = torchvision.models.__dict__[args.model](pretrained=args.pretrained, aux_logits=False)
     model.to(device)
     if args.distributed and args.sync_bn:

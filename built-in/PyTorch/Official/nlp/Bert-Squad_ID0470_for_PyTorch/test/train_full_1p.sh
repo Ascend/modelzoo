@@ -20,11 +20,11 @@ Network="Bert-Squad_ID0470_for_PyTorch"
 #训练epoch
 train_epochs=2
 #训练batch_size
-batch_size=16
+batch_size=32
 #训练step
 train_steps=
 #学习率
-learning_rate=8e-5
+learning_rate=6e-5
 
 
 #维测参数，precision_mode需要模型审视修改

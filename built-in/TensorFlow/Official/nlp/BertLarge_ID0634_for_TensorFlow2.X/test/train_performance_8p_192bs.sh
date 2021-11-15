@@ -215,3 +215,9 @@ echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${Ca
 echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+
+for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
+do
+    sed -i "/AttributeError/d" $cur_path/output/${RANK_ID}/train_${RANK_ID}.log
+    sed -i "/ModuleNotFoundError/d" $cur_path/output/${RANK_ID}/train_${RANK_ID}.log 
+done

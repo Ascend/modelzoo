@@ -328,13 +328,16 @@ def train(hyp, opt, device, tb_writer=None):
                         tb_writer.add_image(f, result, dataformats='HWC', global_step=epoch)
                         # tb_writer.add_graph(model, imgs)  # add model to tensorboard
 
+            if opt.stop_step_num is not None and i >= opt.stop_step_num:
+                break
+
             # end batch ------------------------------------------------------------------------------------------------
         if rank in [-1, 0]:
             epoch_time = time.time() - start_time
-            if len(pbar) > 5:
-                print('Training speed is {} FPS'.format(total_batch_size * (len(pbar) - 5) / (epoch_time)))
+            if i >= 5:
+                print('Training speed is {} FPS'.format(total_batch_size * (i + 1 - 5) / (epoch_time)))
             else:
-                print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
+                print('Training speed is {} FPS'.format(total_batch_size * (i + 1) / (epoch_time)))
         # Scheduler
         scheduler.step()
 
@@ -567,5 +570,7 @@ if __name__ == '__main__':
                         help='loss scale using in amp, default means dynamic loss scale')
     parser.add_argument('--opt-level', default='O1', type=str,
                         help='loss scale using in amp, default O1')
+    parser.add_argument('--stop_step_num', default=None, type=int,
+                        help='after the stop_step, killing the training task')
     opt = parser.parse_args()
     main(opt)

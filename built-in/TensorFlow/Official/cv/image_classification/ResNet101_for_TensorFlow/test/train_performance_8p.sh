@@ -1,22 +1,23 @@
 #!/bin/bash
-source env.sh
 #当前路径,不需要修改
 cur_path=`pwd`
-
+# 数据集路径,保持为空,不需要修改
+data_path=""
+#/autotest/CI_daily/ModelZoo_Resnet101_TF_Atlas/data/resnet50/imagenet_TF
 #集合通信参数,不需要修改
-#保证rank table file 文件rank_table_8p.json存放在和test同级的configs目录下
+
 export RANK_SIZE=8
 export RANK_TABLE_FILE=${cur_path}/../r1/resnet/configs/8p.json
 export JOB_ID=10087
 RANK_ID_START=0
 
-# 数据集路径,保持为空,不需要修改
-data_path="/npu/traindata/imagenet_TF"
+
+
 
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
+export ASCEND_GLOBAL_LOG_LEVEL_ETP=3
 
-#基础参数 需要模型审视修改
+#基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="ResNet101_for_TensorFlow"
 #训练epoch
@@ -26,10 +27,7 @@ batch_size=128
 #训练step
 train_steps=`expr 1281167 / ${batch_size}`
 #学习率
-learning_rate=""
-
-#TF2.X独有，不需要修改
-export NPU_LOOP_SIZE=${train_steps}
+learning_rate=
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_mix_precision"
@@ -42,17 +40,17 @@ autotune=False
 
 # 帮助信息，不需要修改
 if [[ $1 == --help || $1 == -h ]];then
-    echo"usage:./train_full_8p.sh <args>"
+    echo"usage:./train_full_1p.sh <args>"
     echo " "
     echo "parameter explain:
-    --precision_mode           precision mode(allow_fp32_to_fp16/force_fp16/must_keep_origin_dtype/allow_mix_precision)
-    --over_dump		           if or not over detection, default is False
-    --data_dump_flag		   data dump flag, default is 0
-    --data_dump_step		   data dump step, default is 10
-    --profiling		           if or not profiling for performance debug, default is False
-    --autotune                 whether to enable autotune, default is False
-    --data_path		           source data of training
-    -h/--help		           show help message
+    --precision_mode         precision mode(allow_fp32_to_fp16/force_fp16/must_keep_origin_dtype/allow_mix_precision)
+    --over_dump		         if or not over detection, default is False
+    --data_dump_flag	     data dump flag, default is False
+    --data_dump_step		 data dump step, default is 10
+    --profiling		         if or not profiling for performance debug, default is False
+    --autotune               whether to enable autotune, default is False
+    --data_path		         source data of training
+    -h/--help		         show help message
     "
     exit 1
 fi
@@ -99,18 +97,10 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-#autotune时，先开启autotune执行单P训练，不需要修改
-if [[ $autotune == True ]]; then
-    train_full_1p.sh --autotune=$autotune --data_path=$data_path
-    wait
-    autotune=False
-fi
-
 #训练开始时间，不需要修改
 start_time=$(date +%s)
-
-#进入训练脚本目录，需要模型审视修改
 cd $cur_path/../
+#进入训练脚本目录，需要模型审视修改
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
     #设置环境变量，不需要修改
@@ -118,6 +108,9 @@ do
     export RANK_ID=$RANK_ID
     export ASCEND_DEVICE_ID=$RANK_ID
     ASCEND_DEVICE_ID=$RANK_ID
+    export DEVICE_ID=$RANK_ID
+    DEVICE_INDEX=$RANK_ID
+    export DEVICE_INDEX=${DEVICE_INDEX}
     
     #创建DeviceID输出目录，不需要修改
     if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
@@ -126,8 +119,6 @@ do
     else
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
-    
-     # 绑核，不需要的绑核的模型删除，需要模型审视修改
     corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
     let a=RANK_ID*${corenum}/${RANK_SIZE}
     let b=RANK_ID+1
@@ -162,7 +153,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep "hooks.py:141"  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log |awk -F "," 'END {print $4}' |awk -F ":" '{print $2}' | awk -F "." '{print $1}'`
+FPS=`grep FPS $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log| grep -v WARNING | awk -F ',' '{print $4}' | awk -F ':' '{print $2}'| awk '{sum+=$1} END {print  sum/NR}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
@@ -176,16 +167,16 @@ echo "E2E Training Duration sec : $e2e_time"
 #训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
-CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 
 ##获取性能数据
 #吞吐量，不需要修改
 ActualFPS=${FPS}
 #单迭代训练时长，不需要修改
-TrainingTime=`expr ${batch_size} \* ${RANK_SIZE} \* 1000 \/ ${FPS}`
+TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${batch_size}'*1000/'${ActualFPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep "INFO:tensorflow:loss" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk '{print $3}' | awk -F "," '{print $1}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep "INFO:tensorflow:loss" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk '{print $3}' | awk -F "," '{print $1}'>> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`

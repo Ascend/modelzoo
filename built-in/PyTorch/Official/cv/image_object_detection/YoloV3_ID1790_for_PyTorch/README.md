@@ -26,7 +26,7 @@ git clone -b v1.2.7 --depth=1 https://github.com/open-mmlab/mmcv.git
 
 export MMCV_WITH_OPS=1
 export MAX_JOBS=8
-source ./test/env.sh
+source ./test/env_npu.sh
 
 cd mmcv
 python3.7 setup.py build_ext
@@ -68,7 +68,7 @@ pip3.7 list | grep mm
 
 ### 导入环境变量(若安装mmcv时已导入，这步可跳过)
 ```
-source ./test/env.sh
+source ./test/env_npu.sh
 ```
 
 ### 单卡

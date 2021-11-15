@@ -30,9 +30,6 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-#训练开始时间，不需要修改
-start_time=$(date +%s)
-
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/../
 
@@ -52,6 +49,9 @@ else
     mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
 fi
 
+#训练开始时间，不需要修改
+start_time=$(date +%s)
+
 # 绑核，不需要的绑核的模型删除，需要的模型审视修改
 #let a=RANK_ID*12
 #let b=RANK_ID+1
@@ -65,14 +65,16 @@ export NNPU=8
 export WORLD_SIZE=$NNPU
 export MASTER_ADDR=$(hostname -I |awk '{print $1}')
 export MASTER_PORT=29500
+
+KERNEL_NUM=$(($(nproc)/8))
 for((RANK_ID=0;RANK_ID<NNPU;RANK_ID++))
 do
     export RANK=$RANK_ID
     if [ $(uname -m) = "aarch64" ]
     then
-        let a=0+RANK_ID*24
-        let b=23+RANK_ID*24
-        taskset -c $a-$b python3.7 train.py --exp_name xlm_en_zh \
+        PID_START=$((KERNEL_NUM * RANK_ID))
+        PID_END=$((PID_START + KERNEL_NUM - 1))
+        taskset -c $PID_START-$PID_END python3.7 train.py --exp_name xlm_en_zh \
             --dump_path ./dumped        \
             --data_path ./$OUTPATH      \
             --lgs 'en-zh'          \
@@ -94,7 +96,7 @@ do
             --fp16 true     \
             --amp 1 \
             --seed 1 \
-            --local_rank $RANK_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+            --local_rank $RANK_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${RANK_ID}.log 2>&1 &
     else
         python3.7 train.py --exp_name xlm_en_zh \
             --dump_path ./dumped        \
@@ -118,7 +120,7 @@ do
             --fp16 true     \
             --amp 1 \
             --seed 1 \
-            --local_rank $RANK_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+            --local_rank $RANK_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${RANK_ID}.log 2>&1 &
     fi
 done
 

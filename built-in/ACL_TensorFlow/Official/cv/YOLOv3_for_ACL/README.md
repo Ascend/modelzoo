@@ -64,6 +64,8 @@ opencv-python==4.2.0.34
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/yolov3_tf.pb)
+
   ```
   atc --model=yolov3_tf.pb --framework=3 --output=yolov3_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,416,416,3" --log=info --insert_op_conf=yolov3_tf_aipp.cfg
   ```

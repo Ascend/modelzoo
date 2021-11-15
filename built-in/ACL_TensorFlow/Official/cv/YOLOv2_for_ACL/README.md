@@ -56,6 +56,8 @@ python3 xml2txt.py ./VOC2007/Annotations/ ./yolov2_postprocess/groundtruths/
 
 - convert pb to om 
   
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/yolov2_tf.pb)
+
   以batcsize=1为例：
 
   ```

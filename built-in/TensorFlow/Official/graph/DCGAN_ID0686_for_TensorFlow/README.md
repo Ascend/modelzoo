@@ -5,10 +5,9 @@
 -   [迁移学习指导](#迁移学习指导.md)
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
-
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Graph**
+**应用领域（Application Domain）：Image Synthesis**
 
 **版本（Version）：1.1**
 
@@ -24,15 +23,16 @@
 
 **处理器（Processor）：昇腾910**
 
-**应用级别（Categories）：Research**
+**应用级别（Categories）：Official**
 
-**描述（Description）：基于TensorFlow框架的DCGAN网络训练代码**
+**描述（Description）：基于TensorFlow框架的深度卷积对抗网络训练代码**
 
 <h2 id="概述.md">概述</h2>
-
 ## 简述
 
-Tensorflow implementation of Deep Convolutional Generative Adversarial Networks which is a stabilize Generative Adversarial Networks. 
+DCGAN是将卷积神经网络和对抗网络结合起来的一个经典网络，并对网络结构进行了一些改变，以提高收敛速度。它取消所有pooling层、在D和G中均使用batch normalization、去掉FC层，使网络变为全卷积网络、G网络中使用ReLU作为激活函数，最后一层使用tank、D网络中使用LeakyReLU作为激活函数。
+
+
 
 - 论文路径
 
@@ -116,7 +116,6 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 ```
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
-
 1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
 2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
 
@@ -146,7 +145,6 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 
 
 <h2 id="快速上手.md">快速上手</h2>
-
 ## 数据集准备<a name="section361114841316"></a>
 
 1、下载数据集：python download.py mnist celebA
@@ -170,10 +168,9 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
         2. 1单卡训练指令（脚本位于DCGAN_ID0686_for_TensorFlow /test/train_full_1p.sh）
         
             bash test/train_full_1p.sh --data_path=mnist 
-    
+
 
 <h2 id="迁移学习指导.md">高级参考</h2>
-
 ## 脚本和事例代码
 
 ```
@@ -185,6 +182,9 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 |	|--train_performance_1p.sh
 |	|--train_full_1p.sh
 |   |--......
+|--model.py     #创建模型脚本
+|--ops.py       #算子脚本
+|--utils.py     #公共接口脚本
 ```
 
 ## 脚本参数<a name="section6669162441511"></a>

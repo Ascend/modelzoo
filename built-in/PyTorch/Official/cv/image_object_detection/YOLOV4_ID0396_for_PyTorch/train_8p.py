@@ -317,14 +317,16 @@ def train(hyp, opt, device, tb_writer=None):
                     if tb_writer and result is not None:
                         tb_writer.add_image(f, result, dataformats='HWC', global_step=epoch)
                         # tb_writer.add_graph(model, imgs)  # add model to tensorboard
+            if opt.stop_step_num is not None and i >= opt.stop_step_num:
+                break
 
             # end batch ------------------------------------------------------------------------------------------------
         if rank in [-1, 0]:
             epoch_time = time.time() - start_time
-            if len(pbar) > 5:
-                print('Training speed is {} FPS'.format(total_batch_size * (len(pbar) - 5) / (epoch_time)))
+            if i >= 5:
+                print('Training speed is {} FPS'.format(total_batch_size * (i + 1 - 5) / (epoch_time)))
             else:
-                print('Training speed is {} FPS'.format(total_batch_size * len(pbar) / (epoch_time)))
+                print('Training speed is {} FPS'.format(total_batch_size * (i + 1) / (epoch_time)))
         # Scheduler
         scheduler.step()
 
@@ -598,6 +600,8 @@ if __name__ == '__main__':
     parser.add_argument('--device_list', default='0,1,2,3,4,5,6,7', type=str,
                         help='device id list')
     parser.add_argument('--device', default='npu', type=str, help='npu or cpu')
+    parser.add_argument('--stop_step_num', default=None, type=int,
+                        help='after the stop_step, killing the training task')
     opt = parser.parse_args()
 
     main(opt)

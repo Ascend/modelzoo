@@ -38,11 +38,12 @@ fi
 
 if [ $(uname -m) = "aarch64" ]
 then
+    KERNEL_NUM=$(($(nproc)/8))
     for i in $(seq 0 7)
     do
-    let p_start=0+24*i
-    let p_end=23+24*i
-    taskset -c $p_start-$p_end $CMD python3.7 -u run_classification_criteo_wdl.py \
+    PID_START=$((KERNEL_NUM * i))
+    PID_END=$((PID_START + KERNEL_NUM - 1))
+    taskset -c $PID_START-$PID_END $CMD python3 -u run_classification_criteo_wdl.py \
         --device_id $i \
         --data_path $DATA_PATH \
         --checkpoint_save_path=${output_dir} \

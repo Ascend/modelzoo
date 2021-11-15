@@ -11,7 +11,15 @@ mkdir -p ${train_log_dir}
 cd ${train_log_dir}
 echo "train log path is ${train_log_dir}"
 
-taskset -c 0-95 python3.7 ${currentDir}/examples/imagenet/main.py \
+kernel_num=$(nproc)
+
+if [ ${kernel_num} -lt 95 ];then
+    cpu_number=${kernel_num}
+else
+    cpu_number=95
+fi
+
+taskset -c 0-${cpu_number} python3.7 ${currentDir}/examples/imagenet/main.py \
     --data=/data/imagenet \
     --arch=efficientnet-b0 \
     --batch-size=4096 \

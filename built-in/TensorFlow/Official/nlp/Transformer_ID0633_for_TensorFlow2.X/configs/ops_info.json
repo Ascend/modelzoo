@@ -1,0 +1,10 @@
+{
+  "black-list": {
+    "to-add": [
+      "SoftmaxCrossEntropyWithLogits",
+      "LayerNorm",
+      "LayerNormXBackpropV2",
+      "LayerNormBetaGammaBackpropV2"
+    ]
+  }
+}

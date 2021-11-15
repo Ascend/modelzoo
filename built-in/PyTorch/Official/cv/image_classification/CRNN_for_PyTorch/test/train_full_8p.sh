@@ -74,6 +74,7 @@ export SWITCH_MM_OUTPUT_ENABLE=1
 /usr/local/Ascend/driver/tools/msnpureport -g error -d 0
 /usr/local/Ascend/driver/tools/msnpureport -g error -d 4
 
+KERNEL_NUM=$(($(nproc)/8))
 for i in $(seq 0 7)
 do
 ASCEND_DEVICE_ID=$i
@@ -88,9 +89,9 @@ fi
 
 if [ $(uname -m) = "aarch64" ]
 then
-    let p_start=0+24*$i
-    let p_end=23+24*$i
-    taskset -c $p_start-$p_end python3.7 main_8p.py \
+    PID_START=$((KERNEL_NUM * i))
+    PID_END=$((PID_START + KERNEL_NUM - 1))
+    taskset -c $PID_START-$PID_END python3.7 main_8p.py \
         --cfg LMDB_8p_config.yaml \
         --npu ${i} > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 else

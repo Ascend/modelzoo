@@ -9,13 +9,13 @@
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Image Segmentation**
+**应用领域（Application Domain）：Instance Segmentation**
 
 **版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.09.28**
 
-**大小（Size）**_**：176K**
+**大小（Size）：176K**
 
 **框架（Framework）：TensorFlow_1.15.0**
 

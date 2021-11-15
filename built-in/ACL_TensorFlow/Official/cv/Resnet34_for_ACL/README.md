@@ -52,6 +52,8 @@ The jpegs pictures will be preprocessed to bin fils.
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/resnet34_tf.pb)
+
   ```
   atc --model=resnet34_tf.pb --framework=3 --output=resnet34_tf_1batch --output_type=FP32 --soc_version=Ascend310 --input_shape="test_inputs:1,64,64,3" --log=info
   ```
@@ -83,4 +85,4 @@ Our result was obtained by running the applicable inference script. To achieve t
 
 
 ## Reference
-https://github.com/taki0112/ResNet-Tensorflow
+[1] https://github.com/taki0112/ResNet-Tensorflow
