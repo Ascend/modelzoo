@@ -1,9 +1,9 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 
 <h2 id="基本信息.md">基本信息</h2>
 
@@ -30,22 +30,22 @@
 **描述（Description）：基于TensorFlow框架的ModelsGenesis网络训练代码**
 
 <h2 id="概述.md">概述</h2>
-- We have built a set of pre-trained models called <b>Generic Autodidactic Models</b>, nicknamed <b>Models Genesis</b>, because they are created <i>ex nihilo</i> (with no manual labeling), self-taught (learned by self-supervision), and generic (served as source models for generating application-specific target models). We envision that Models Genesis may serve as a primary source of transfer learning for 3D medical imaging applications, in particular, with limited annotated data.
+- “Generic Autodidactic Models” 是一组预先训练好的模型，简称 “Models Genesis”。它们是在 nihilo（无需手动标记）、self-taught（自我监督学习）和 generic（用于生成特定于应用程序的目标模型的源模型）之前创建的。在注释数据有限的情况下，“Models Genesis”可以作为3D医学成像应用的转移学习的主要来源。
 
-  -   参考论文
+- 参考论文：
 
       https://arxiv.org/pdf/2004.07882.pdf
 
-  -   参考实现
+- 参考实现：
 
       https://github.com/MrGiovanni/ModelsGenesis
 
-  -   适配昇腾 AI 处理器的实现：
+- 适配昇腾 AI 处理器的实现：
 
       https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_segmentation/ModelsGenesis_ID0902_for_TensorFlow
 
 
--   通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
     
     ```
     git clone {repository_url}    # 克隆仓库的代码
@@ -135,8 +135,8 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_prec
 2. 获取数据集后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
 
 ## 模型训练<a name="section715881518135"></a>
-- 下载训练脚本。
-- 开始训练。
+- 单击“立即下载”，并选择合适的下载方式下载源码包
+- 开始训练
   
     1. 启动训练之前，首先要配置程序运行相关环境变量。
 

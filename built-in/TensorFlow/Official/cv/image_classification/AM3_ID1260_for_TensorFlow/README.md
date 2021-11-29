@@ -1,8 +1,9 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
 **发布者（Publisher）：Huawei**
@@ -29,21 +30,21 @@
 
 <h2 id="概述.md">概述</h2>
 
-自适应跨模态小样本学习网络 (AW3)
+自适应跨模态小样本学习网络 (AM3)
 
--   参考论文：
+- 参考论文：
 
     https://arxiv.org/abs/1902.07104
 
--   参考实现：
+- 参考实现：
     https://github.com/ElementAI/am3
             
     
--   适配昇腾 AI 处理器的实现：
+- 适配昇腾 AI 处理器的实现：
     
     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AM3_ID1260_for_TensorFlow
 
--   通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
     
         git clone {repository_url}    # 克隆仓库的代码
         cd {repository_name}    # 切换到模型的代码仓目录
@@ -132,11 +133,16 @@ run_config = NPURunConfig(
 2. 数据集解压后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
    
 ## 模型训练<a name="section715881518135"></a>
-- 环境变量
- 
-  环境变量配置信息参见：[Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-- 单卡训练
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+- 开始训练   
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
+
+       环境变量配置信息参见：
+
+          [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
+    2. 单卡训练 
   
  单卡训练指令（脚本位于AM3_ID1260_for_TensorFlow/test/train_full_1p.sh,以数据目录为/trainingdata/data/mini-imagenet为例） 
         
@@ -144,6 +150,17 @@ run_config = NPURunConfig(
 	 cd test
 	 bash train_full_1p.sh --data_path=/trainingdata/
      ```   
+
+<h2 id="迁移学习指导.md">迁移学习指导</h2>
+
+- 数据集准备。
+
+      请参见“快速上手”中的数据集准备。
+    
+- 模型训练。
+
+      请参考“模型训练”中训练步骤。
+
 
 <h2 id="高级参考.md">高级参考</h2>
 

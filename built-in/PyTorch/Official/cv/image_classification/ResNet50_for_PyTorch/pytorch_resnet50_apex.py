@@ -36,7 +36,7 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 import torch.npu
 import DistributedResnet50.image_classification.resnet as nvmodels
-
+import apex
 from apex import amp
 
 BATCH_SIZE = 512
@@ -301,13 +301,13 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.label_smoothing > 0.0:
         loss = lambda: LabelSmoothing(args.label_smoothing)
     criterion = loss().to(CALCULATE_DEVICE)
-    optimizer = torch.optim.SGD([
+    optimizer = apex.optimizers.NpuFusedSGD([
         {'params': [param for name, param in model.named_parameters() if name[-4:] == 'bias'], 'weight_decay': 0.0},
         {'params': [param for name, param in model.named_parameters() if name[-4:] != 'bias'], 'weight_decay': args.weight_decay}],
                                 args.lr,
-                                momentum=args.momentum)
+                                momentum=args.momentum)  # torch.optim.
     
-    model, optimizer = amp.initialize(model, optimizer, opt_level="O2", loss_scale=1024, verbosity=1)
+    model, optimizer = amp.initialize(model, optimizer, opt_level="O2", loss_scale=1024, verbosity=1,combine_grad=True)
 
     # optionally resume from a checkpoint
     if args.resume:

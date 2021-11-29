@@ -1,14 +1,14 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Natural Language Processing**
 
 **版本（Version）：1.1**
 
@@ -32,19 +32,19 @@
 
 -    ALBERT是BERT的“精简版”版本，它是一种流行的无监督语言表示学习算法。ALBERT使用参数缩减技术，该技术可进行大规模配置，克服先前的内存限制并在模型降级方面实现更好的性能。
 
--   参考论文：
+- 参考论文：
 
     [https://arxiv.org/abs/1909.11942](https://arxiv.org/abs/1909.11942)
 
--   参考实现：
+- 参考实现：
         
     [https://github.com/google-research/albert](https://github.com/google-research/albert)
     
--   适配昇腾 AI 处理器的实现：
+- 适配昇腾 AI 处理器的实现：
     
     [https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Albert_ID0632_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Albert_ID0632_for_TensorFlow)
 
--   通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
 
     ```
     git clone {repository_url}    # 克隆仓库的代码
@@ -151,7 +151,7 @@ config_proto = tf.ConfigProto(allow_soft_placement=True)
 3. 这里是列表文本数据集处理后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
 
 ## 模型训练<a name="section715881518135"></a>
-- 下载训练脚本。
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
 - 开始训练。
   
     1. 启动训练之前，首先要配置程序运行相关环境变量。

@@ -20,7 +20,7 @@ data_path=""
 #网络名称，同目录名称
 Network="MobileNetV3-Large_ID1782_for_TensorFlow"
 #训练epoch
-train_epochs=90
+train_epochs=300
 #训练batch_size
 batch_size=256
 #训练step
@@ -140,7 +140,7 @@ do
     fi
     nohup ${bind_core} python3.7 $cur_path/../train.py \
         --dataset_dir=${data_path} \
-        --max_epoch=3 \
+        --max_epoch=${train_epochs} \
         --model_name="mobilenet_v3_large" \
         --moving_average_decay=0.9999 \
         --label_smoothing=0.1 \
@@ -173,7 +173,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|tail -n +2|awk '{print $7}' |awk -F ":" '{print $2}'| awk -F "." '{print $1}'| awk '{sum+=$1} END {print sum/NR}'`
+FPS=`grep 'logger.py:56' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|tail -n +2|awk '{print $7}' |awk -F ":" '{print $2}'| awk '{sum+=$1} END {print sum/NR}'| awk -F "." '{print $1}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 

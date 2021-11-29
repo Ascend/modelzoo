@@ -1,9 +1,9 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 **发布者（Publisher）：Huawei**
 
@@ -28,36 +28,41 @@
 **描述（Description）：基于TensorFlow框架的深度卷积对抗网络训练代码**
 
 <h2 id="概述.md">概述</h2>
-## 简述
-
-DCGAN是将卷积神经网络和对抗网络结合起来的一个经典网络，并对网络结构进行了一些改变，以提高收敛速度。它取消所有pooling层、在D和G中均使用batch normalization、去掉FC层，使网络变为全卷积网络、G网络中使用ReLU作为激活函数，最后一层使用tank、D网络中使用LeakyReLU作为激活函数。
+-     DCGAN是将卷积神经网络和对抗网络结合起来的一个经典网络，并对网络结构进行了一些改变，以提高收敛速度。它取消所有pooling层、在D和G中均使用batch normalization、去掉FC层，使网络变为全卷积网络、G网络中使用ReLU作为激活函数，最后一层使用tank、D网络中使用LeakyReLU作为激活函数。
 
 
 
-- 论文路径
+- 参考论文：
 
-  https://arxiv.org/abs/1511.06434
+    ```
+    https://arxiv.org/abs/1511.06434
 
-- 开源代码路径
+    ```
 
-  https://github.com/carpedm20/DCGAN-tensorflow
+- 参考实现：
+    ```
+    https://github.com/carpedm20/DCGAN-tensorflow
+    ```
 
--   适配昇腾 AI 处理器的实现：
-    
+- 适配昇腾 AI 处理器的实现：
+
+    ```
     https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Research/graph/DCGAN_ID0686_for_TensorFlow
+    ```
 
--   通过Git获取对应commit\_id的代码方法如下：
-    
-        git clone {repository_url}    # 克隆仓库的代码
-        cd {repository_name}    # 切换到模型的代码仓目录
-        git checkout  {branch}    # 切换到对应分支
-        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    
+- 通过Git获取对应commit_id的代码方法如下:
 
-## 默认配置<a name="section91661242121611"></a>
+    ```    
+    git clone {repository_url}    # 克隆仓库的代码
+    cd {repository_name}    # 切换到模型的代码仓目录
+    git checkout  {branch}    # 切换到对应分支
+    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    ```    
+
+## 默认配置 <a name="section91661242121611"></a>
 -   网络结构
-    -   108-hidden, 108-heads
+    108-hidden, 108-heads
     
 -   训练超参（单卡）：
     -   Batch size: 64
@@ -77,7 +82,7 @@ DCGAN是将卷积神经网络和对抗网络结合起来的一个经典网络，
     -   G_img_sum:  False
 
 
-## 支持特性<a name="section1899153513554"></a>
+## 支持特性 <a name="section1899153513554"></a>
 
 | 特性列表  | 是否支持 |
 |-------|------|
@@ -86,11 +91,11 @@ DCGAN是将卷积神经网络和对抗网络结合起来的一个经典网络，
 | 数据并行  | 是    |
 
 
-## 混合精度训练<a name="section168064817164"></a>
+## 混合精度训练 <a name="section168064817164"></a>
 
 昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
-## 开启混合精度<a name="section20779114113713"></a>
+## 开启混合精度 <a name="section20779114113713"></a>
 拉起脚本中，传入--precision_mode='allow_mix_precision'
 
 ```
@@ -145,15 +150,15 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 
 
 <h2 id="快速上手.md">快速上手</h2>
-## 数据集准备<a name="section361114841316"></a>
+## 数据集准备 <a name="section361114841316"></a>
 
 1、下载数据集：python download.py mnist celebA
 
 2、目前仅调测了MNIST数据集，下载数据集至./data/mnist路径，用gzip -d命令解压数据集
 
 
-## 模型训练<a name="section715881518135"></a>
-- 下载训练脚本。
+## 模型训练 <a name="section715881518135"></a>
+- 单击“立即下载”，并选择合适的下载方式下载源码包
 - 开始训练。
 
     1. 启动训练之前，首先要配置程序运行相关环境变量。
@@ -164,49 +169,48 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 
 
     2. 单卡训练
+
        
-        2. 1单卡训练指令（脚本位于DCGAN_ID0686_for_TensorFlow /test/train_full_1p.sh）
-        
-            bash test/train_full_1p.sh --data_path=mnist 
+        ``` 
+        bash test/train_full_1p.sh --data_path=/home/data/mnist 
+        ``` 
 
 
-<h2 id="迁移学习指导.md">高级参考</h2>
-## 脚本和事例代码
+<h2 id="高级参考.md">高级参考</h2>
+## 脚本和示例代码 <a name="section08421615141513"></a>
+
+    |--main.py       #训练脚本
+    |	|--......
+    |--configs		#黑名单算子文件
+    |   |--ops_info.json
+    |--test			#训练脚本目录
+    |	|--train_performance_1p.sh
+    |	|--train_full_1p.sh
+    |   |--......
+    |--model.py     #创建模型脚本
+    |--ops.py       #算子脚本
+    |--utils.py     #公共接口脚本
+
+
+## 脚本参数 <a name="section6669162441511"></a>
 
 ```
-|--main.py       #训练脚本
-|	|--......
-|--configs		#黑名单算子文件
-|   |--ops_info.json
-|--test			#训练脚本目录
-|	|--train_performance_1p.sh
-|	|--train_full_1p.sh
-|   |--......
-|--model.py     #创建模型脚本
-|--ops.py       #算子脚本
-|--utils.py     #公共接口脚本
-```
-
-## 脚本参数<a name="section6669162441511"></a>
-
-```
-	--epoch		      		    Epoch to train,default:25
+    --epoch		      		    Epoch to train,default:25
     --learning_rate             Learning rate of for adam,default:0.0002
     --beta1					    Momentum term of adam,default:0.5
     --train_size		        The size of train images,default:np.inf
     --batch_size				The size of batch images:64
     --input_height				The size of image to use (will be center cropped),default:108
-	--input_width				The size of image to use (will be center cropped). If None, same value as input_height [None],default:None
-	--output_height				The size of the output images to produce,default:64
-	--output_width				The size of the output images to produce. If None, same value as output_height,default:None
-	--dataset				    The name of dataset [celebA, mnist, lsun],default:celebA
-	--input_fname_pattern		Glob pattern of filename of input images [*],default:*.jpg
-	--data_dir					path to datasets [e.g. $HOME/data],default:./data
-	--out_dir					Root directory for outputs [e.g. $HOME/out],default:./out
-	--out_name					TFolder (under out_root_dir) for all outputs. Generated automatically if left blank [],default:""
-	--checkpoint_dir			Folder (under out_root_dir/out_name) to save checkpoints [checkpoint],default:checkpoint
-	--sample_dir				Folder (under out_root_dir/out_name) to save samples [samples],default:samples
-	--train         			True for training, False for testing [False],default:False
+    --input_width				The size of image to use (will be center cropped). If None, same value as input_height [None],default:None	--output_height				The size of the output images to produce,default:64
+    --output_width				The size of the output images to produce. If None, same value as output_height,default:None
+    --dataset				    The name of dataset [celebA, mnist, lsun],default:celebA
+    --input_fname_pattern		Glob pattern of filename of input images [*],default:*.jpg
+    --data_dir					path to datasets [e.g. $HOME/data],default:./data
+    --out_dir					Root directory for outputs [e.g. $HOME/out],default:./out
+    --out_name					TFolder (under out_root_dir) for all outputs. Generated automatically if left blank [],default:""
+    --checkpoint_dir			Folder (under out_root_dir/out_name) to save checkpoints [checkpoint],default:checkpoint
+    --sample_dir				Folder (under out_root_dir/out_name) to save samples [samples],default:samples
+    --train         			True for training, False for testing [False],default:False
     --crop		         		True for training, False for testing [False], default: False
     --visualize	     			True for visualizing, False for nothing [False], default is False
     --export		 			True for exporting with new batch size, default is False
@@ -223,7 +227,7 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
     --modify_mixlist            black_list_file,default:./ops_info.json
 ```
 
-## 训练过程<a name="section1589455252218"></a>
+## 训练过程 <a name="section1589455252218"></a>
 
 通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡训练。模型存储路径为${cur_path}/output/$ASCEND_DEVICE_ID，包括训练的log以及checkpoints文件。loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
 

@@ -1,14 +1,14 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Image Super Resolution**
+**应用领域（Application Domain）： Image Classification**
 
 **版本（Version）：1.1**
 
@@ -34,19 +34,19 @@
     该方法创建一个数据增强策略的搜索空间，利用搜索算法选取适合特定数据集的数据增强策略。
     此外，从一个数据集中学到的策略能够很好地迁移到其它相似的数据集上。 
 
--   参考论文：
+- 参考论文：
 
     https://arxiv.org/abs/1805.09501
     
--   参考实现：
+- 参考实现：
 
     https://github.com/4uiiurz1/keras-auto-augment
     
--   适配昇腾 AI 处理器的实现：
+- 适配昇腾 AI 处理器的实现：
     
     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/cv/image_classification/AUTOAUGMENT_ID0708_for_TensorFlow   
 
--   通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
     
         git clone {repository_url}    # 克隆仓库的代码
         cd {repository_name}    # 切换到模型的代码仓目录
@@ -56,11 +56,11 @@
     
 ## 默认配置<a name="section91661242121611"></a>
 
--   网络结构
+- 网络结构
 
     - WideResNet28-10
     
--   训练超参(单卡)：
+- 训练超参(单卡)：
     
     - depth: 28
     - width: 10
@@ -125,8 +125,8 @@
 
 ## 模型训练<a name="section715881518135"></a>
 
--  单击“立即下载”，并选择合适的下载方式下载源码包。
--  开始训练    
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+- 开始训练    
    
     1. 启动训练之前，首先要配置程序运行相关环境变量。
 
@@ -144,7 +144,7 @@
 
             bash train_full_1p.sh --data_path=./cifar-10
 
--  验证。
+- 验证。
    
 1、执行训练时，会进行eval评估，代码如下： 
        ```
@@ -162,17 +162,17 @@
     1.  获取数据。
         请参见“快速上手”中的数据集准备。
     
--   模型训练。
+- 模型训练。
 
     参考“模型训练”中训练步骤。
 
--   模型评估。
+- 模型评估。
 
     参考“模型训练”中验证步骤。
 
 <h2 id="高级参考.md">高级参考</h2>
 
-脚本和示例代码
+## 脚本和示例代码
 
 ```
 .

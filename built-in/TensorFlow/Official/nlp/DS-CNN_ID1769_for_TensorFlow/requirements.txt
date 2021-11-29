@@ -1,0 +1,5 @@
+numpy==1.19.5
+six==1.15.0
+tensorboard==1.15.0
+tensorflow==1.15.0
+tensorflow-estimator==1.15.1

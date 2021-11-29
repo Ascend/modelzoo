@@ -1,14 +1,245 @@
-# Video Restoration with Enhanced Deformable Convolution Networks
-## Introduction
-This is an EDVR implementation based on tensorflow, which supports running on NPU, GPU and CPU. For EDVR itself, please refer to the original [paper](https://arxiv.org/abs/1905.02716).
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
+<h2 id="基本信息.md">基本信息</h2>
 
-## Requirements
-- tensorflow==1.15
-- cv2
-- yacs
-- python3.7
+**发布者（Publisher）：Huawei**
 
-## Structure
+**应用领域（Application Domain）： Video Enhancement**
+
+**版本（Version）：1.1**
+
+**修改时间（Modified） ：2021.08.05**
+
+**大小（Size）：252k**
+
+**框架（Framework）：TensorFlow 1.15.0**
+
+**模型格式（Model Format）：ckpt**
+
+**精度（Precision）：Mixed**
+
+**处理器（Processor）：昇腾910**
+
+**应用级别（Categories）：Official**
+
+**描述（Description）：基于TensorFlow框架的edva网络训练代码**
+
+<h2 id="概述.md">概述</h2>
+
+- EDVR：使用增强的可变形卷积网络进行视频恢复.
+
+- 参考论文：
+
+    https://arxiv.org/abs/1905.02716
+    
+- 参考实现：
+
+    https://github.com/xinntao/EDVR
+   
+- 适配昇腾 AI 处理器的实现：
+    
+    
+     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/Video_enhancement/EDVR_ID0056_for_TensorFlow
+        
+
+- 通过Git获取对应commit_id的代码方法如下:
+    
+    
+        git clone {repository_url}    # 克隆仓库的代码
+        cd {repository_name}    # 切换到模型的代码仓目录
+        git checkout  {branch}    # 切换到对应分支
+        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    
+
+## 默认配置<a name="section91661242121611"></a>
+
+- 网络结构 
+    -   单卡batchsize：4
+    -   总Epoch数设置为1
+    -   mnum_threads: 8
+    
+- 训练数据集：
+  - 请用户自行准备REDS4数据数据集。
+
+  - 可按照以下命令下载REDS4数据对应的4个部分
+
+    ```
+    mkdir -p ${datadir}
+    python3 scripts/download_REDS.py --root_dir ${datadir} --train_sharp --train_sharp_bicubic --val_sharp --val_sharp_bicubic
+    ```
+
+  - 会将这四个部分下载下来，保存到data/reds目录中。下载完后进行解压到data/reds目录中
+
+  - 参考论文方法，合并原始训练集和验证集
+     ```
+     if [ ! -d ${datadir}/images ]; then
+     mkdir -p ${datadir}/images
+     fi
+     python3 scripts/regroup_reds_dataset.py ${datadir}
+     ```
+    这一步会将验证集（val_sharp和val_sharp_bicubic）合并到对应的初始训练集中。验证集部分将被重命名为序列240-269，并附在原训练集之后。因此总共有270个视频序列，每个 
+    视频序列有100帧。
+
+## 支持特性<a name="section1899153513554"></a>
+
+| 特性列表   | 是否支持 |
+| ---------- | -------- |
+| 分布式训练 | 否       |
+| 混合精度   | 是       |
+| 数据并行   | 是       |
+
+
+## 混合精度训练<a name="section168064817164"></a>
+
+ 混合精度训练昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
+
+## 开启混合精度<a name="section20779114113713"></a>
+
+    config = tf.ConfigProto()
+    custom_op =  config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name =  "NpuOptimizer"
+    if FLAGS.precision_mode == "allow_mix_precision":
+         custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+
+<h2 id="训练环境准备.md">训练环境准备</h2>
+
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
+
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
+
+    **表 1** 镜像列表
+
+    <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
+    <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="25.52%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074498056_p75071327115313"><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><em id="i1522994919122"><a name="i1522994919122"></a><a name="i1522994919122"></a>镜像版本</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="27.16%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000001074498056_p1024411406234"><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><em id="i723012493123"><a name="i723012493123"></a><a name="i723012493123"></a>配套CANN版本</em></p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-arm" target="_blank" rel="noopener noreferrer">ascend-tensorflow-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-x86" target="_blank" rel="noopener noreferrer">ascend-tensorflow-x86</a></em></li></ul>
+    </td>
+    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>20.2.0</em></p>
+    </td>
+    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373/software" target="_blank" rel="noopener noreferrer">20.2</a></em></p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+
+<h2 id="快速上手.md">快速上手</h2>
+
+## 数据集准备<a name="section361114841316"></a>
+
+  - 请用户自行准备REDS4数据数据集。
+
+  - 可按照以下命令下载REDS4数据对应的4个部分
+
+    ```
+    mkdir -p ${datadir}
+    python3 scripts/download_REDS.py --root_dir ${datadir} --train_sharp --train_sharp_bicubic --val_sharp --val_sharp_bicubic
+    ```
+
+  - 会将这四个部分下载下来，保存到data/reds目录中。下载完后进行解压到data/reds目录中
+
+  - 参考论文方法，合并原始训练集和验证集
+     ```
+     if [ ! -d ${datadir}/images ]; then
+     mkdir -p ${datadir}/images
+     fi
+     python3 scripts/regroup_reds_dataset.py ${datadir}
+     ```
+    这一步会将验证集（val_sharp和val_sharp_bicubic）合并到对应的初始训练集中。验证集部分将被重命名为序列240-269，并附在原训练集之后。因此总共有270个视频序列，每个 
+    视频序列有100帧。
+
+## 模型训练<a name="section715881518135"></a>
+
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+
+- 开始训练  
+   
+    1.启动训练之前，首先要配置程序运行相关环境变量。
+
+    环境变量配置信息参见：
+
+       [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+    
+    2.单卡训练 
+
+    ​	   2.1 配置train_full_1p.sh脚本中`data_dir`（脚本路径EDVR_ID0056_for_TensorFlow/test/train_full_1p.sh）,请用户根据实际路径配置，数据集参数如下所示：
+
+    ```
+    --data_dir=./data/reds
+    ```
+
+    ​	   2.2 单p指令如下:
+
+    ```
+    bash train_full_1p.sh
+    ```
+
+    
+<h2 id="迁移学习指导.md">迁移学习指导</h2>
+
+- 数据集准备。
+
+    1.  获取数据。
+        请参见“快速上手”中的数据集准备。
+    3.  数据目录结构如下：
+        
+        ```sh
+        data/reds
+        |-- images
+        |   |-- 000
+        |   |   |-- blur4
+        |   |   |   |-- 00000000.png
+        |   |   |   |-- 00000001.png
+        |   |   |   |-- 00000002.png
+        |   |   |   |-- 00000003.png
+        |   |   |   |-- ...
+        |   |   |   `-- 00000099.png
+        |   |   `-- truth
+        |   |       |-- 00000000.png
+        |   |       |-- 00000001.png
+        |   |       |-- 00000002.png
+        |   |       |-- 00000003.png
+        |   |       |-- ...
+        |   |       `-- 00000099.png
+        |   |-- 001
+        |   |   |-- blur4
+        |   |   `-- truth
+        |   |-- 002
+        |   |   |-- blur4
+        |   |   `-- truth
+        |   |-- 003
+        |   |-- ...
+        |   |-- ...
+        |   `-- 269
+        `-- sets
+            |-- train.json    
+            `-- val.json
+        ```
+
+    
+-   模型训练。
+
+    参考“模型训练”中训练步骤。
+
+-   模型评估。
+
+    参考“模型训练”中验证步骤。
+
+<h2 id="高级参考.md">高级参考</h2>
+
+## 脚本和示例代码
 
 ```sh
 edvr
@@ -48,256 +279,18 @@ edvr
     `-- main.py
 ```
 
-- ascendcv: some basic layers and runner
-- ascendvsr: basic vsr model and edvr moels
-- configs: specific configuration yaml files
-- data: dataset folder
-- scripts: top shell scripts
-- tools: top python entrance script
 
-## Prepare dataset
+## 脚本参数<a name="section6669162441511"></a>
 
-We take the REDS4 dataset for example.
-
-1. Download the datasets splits
-
-```bash
-# pwd: path/to/edvr
-datadir=./data/reds
-
-mkdir -p ${datadir}
-python3 scripts/download_REDS.py --root_dir ${datadir} --train_sharp --train_sharp_bicubic --val_sharp --val_sharp_bicubic
 ```
-This step will download the above splits and save them to ``data/reds``. Unzip these files in ``data/reds``.
-
-2. Merge and regroup the REDS4 dataset splits as in the paper
-
-```bash
-if [ ! -d ${datadir}/images ]; then
-    mkdir -p ${datadir}/images
-fi
-
-python3 scripts/regroup_reds_dataset.py ${datadir}
-```
-This step will merge the val splits into the train splits, and concatenate them together. The val splits will be renamed to index [240 - 269]. 
-
-3. Prepare dataset metadata. Of all the 270 clips, the 000, 011, 015, 020 will be used as the actual validation sets as is conducted by the paper. 
-
-```sh
-if [ ! -d ${datadir}/sets ]; then
-    mkdir -p ${datadir}/sets
-fi
-
-python3 scripts/make_reds_dataset.py ${datadir}
+    -   单卡batchsize：4
+    -   总Epoch数设置为1
+    -   mnum_threads: 8  
 ```
 
-**We've integrated these steps in a single shell script**. One can run the script directly for the REDS4 dataset：
+## 训练过程<a name="section1589455252218"></a>
 
-```sh
-bash scripts/prepare_reds_dataset.sh
-```
-
-Note that the download may take much time, since the dataset is quite large.
-
-### Dataset folder structure
-
-```sh
-data/reds
-|-- images
-|   |-- 000
-|   |   |-- blur4
-|   |   |   |-- 00000000.png
-|   |   |   |-- 00000001.png
-|   |   |   |-- 00000002.png
-|   |   |   |-- 00000003.png
-|   |   |   |-- ...
-|   |   |   `-- 00000099.png
-|   |   `-- truth
-|   |       |-- 00000000.png
-|   |       |-- 00000001.png
-|   |       |-- 00000002.png
-|   |       |-- 00000003.png
-|   |       |-- ...
-|   |       `-- 00000099.png
-|   |-- 001
-|   |   |-- blur4
-|   |   `-- truth
-|   |-- 002
-|   |   |-- blur4
-|   |   `-- truth
-|   |-- 003
-|   |-- ...
-|   |-- ...
-|   `-- 269
-`-- sets
-    |-- train.json
-    `-- val.json
-```
-
-### Prepare your own dataset
-
-We suggest users to follow our dataset folder structure and protocal, especially when validation and inference.
-
-## Training
-
-1. Training EDVR with device 0: 
-
-    ```sh
-   # Set ascend environment
-   source scripts/env.sh
-   
-    bash scripts/run_1p_train.sh 0 1
-    ```
-
-    This first argument 0 indicates the device id, while the second is the number of device used (a.k.a, device rank).
-
-    One can configure the training and dataset details by defining a new ``yaml`` file. Please refer to ``ascendvsr/config/defaults.py`` for all the default configure items, and ``configs/edvr.yaml`` for example.
-
-    The training status, e.g. loss value, step time, fps, will be printed on the screen every certain steps (``cfg.solver.print_interval``), and the checkpoint will be saved every ``cfg.solver.checkpoint_interval`` steps in the ``cfg.output_dir`` (default to ``outputs/edvr``). 
-
-    Training process with batchsize=4:
-
-    > 2020-12-25 08:34:46 Step:20, lr:0.00040000, loss:9476.21899544, time:209.62ms, fps:19.08 <br>
-    > 2020-12-25 08:34:51 Step:40, lr:0.00040000, loss:9483.95068774, time:210.05ms, fps:19.04 <br>
-    > 2020-12-25 08:34:55 Step:60, lr:0.00040000, loss:9374.16324098, time:212.36ms, fps:18.84 <br>
-    > 2020-12-25 08:34:59 Step:80, lr:0.00040000, loss:9282.14592199, time:215.24ms, fps:18.58 <br>
-    > 2020-12-25 08:35:03 Step:100, lr:0.00040000, loss:9225.38266487, time:214.05ms, fps:18.69 <br>
-    > 2020-12-25 08:35:08 Step:120, lr:0.00040000, loss:9147.80390486, time:216.20ms, fps:18.50 <br>
-    > 2020-12-25 08:35:12 Step:140, lr:0.00040000, loss:9152.80633528, time:210.89ms, fps:18.97 <br>
-    > 2020-12-25 08:35:16 Step:160, lr:0.00040000, loss:9033.11667964, time:221.91ms, fps:18.03 <br>
-    > 2020-12-25 08:35:21 Step:180, lr:0.00040000, loss:8864.82630793, time:214.61ms, fps:18.64 <br>
-    > 2020-12-25 08:35:25 Step:200, lr:0.00040000, loss:8713.98834194, time:213.67ms, fps:18.72 <br>
-    > 2020-12-25 08:35:29 Step:220, lr:0.00040000, loss:8513.21058127, time:211.83ms, fps:18.88 <br>
-    > 2020-12-25 08:35:33 Step:240, lr:0.00040000, loss:8290.43024285, time:212.71ms, fps:18.81 <br>
-    > 2020-12-25 08:35:38 Step:260, lr:0.00040000, loss:8128.87668816, time:212.40ms, fps:18.83 <br>
-    > 2020-12-25 08:35:42 Step:280, lr:0.00040000, loss:7993.71964797, time:215.15ms, fps:18.59 <br>
-    > 2020-12-25 08:35:46 Step:300, lr:0.00040000, loss:7808.95153805, time:214.33ms, fps:18.66 <br>
-    > 2020-12-25 08:35:50 Step:320, lr:0.00040000, loss:7670.07353983, time:215.52ms, fps:18.56 <br>
-    > 2020-12-25 08:35:55 Step:340, lr:0.00039999, loss:7567.70286385, time:213.47ms, fps:18.74 <br>
-    > 2020-12-25 08:35:59 Step:360, lr:0.00039999, loss:7432.47448890, time:209.44ms, fps:19.10 <br>
-    > 2020-12-25 08:36:03 Step:380, lr:0.00039999, loss:7331.30056232, time:214.45ms, fps:18.65 <br>
-    > 2020-12-25 08:36:07 Step:400, lr:0.00039999, loss:7172.49776584, time:212.36ms, fps:18.84 <br>
-    > 2020-12-25 08:36:12 Step:420, lr:0.00039999, loss:7051.55225264, time:209.99ms, fps:19.05 <br>
-    > 2020-12-25 08:36:16 Step:440, lr:0.00039999, loss:6938.33076964, time:214.65ms, fps:18.64 <br>
-    > 2020-12-25 08:36:20 Step:460, lr:0.00039999, loss:6866.46246160, time:212.75ms, fps:18.80 <br>
-    > 2020-12-25 08:36:24 Step:480, lr:0.00039999, loss:6809.04133592, time:212.99ms, fps:18.78 <br>
-    > 2020-12-25 08:36:29 Step:500, lr:0.00039999, loss:6736.72430321, time:210.67ms, fps:18.99 <br>
-
-2. Training EDVR with 8 devices:
-
-    ```sh
-   # Set ascend environment
-   source scripts/env.sh
-   
-    bash scripts/prepare_8p.sh
-    bash scripts/run_8p_train.sh
-    ```
-
-    Training process with batchsize=4 per device:
-
-    > 2021-01-05 14:05:28 Step:20, lr:0.00040000, loss:10128.23235736, time:225.60ms, fps:141.85 <br>
-    > 2021-01-05 14:05:32 Step:40, lr:0.00040000, loss:9911.20655139, time:230.63ms, fps:138.75 <br>
-    > 2021-01-05 14:05:37 Step:60, lr:0.00040000, loss:9746.84064846, time:225.71ms, fps:141.78 <br>
-    > 2021-01-05 14:05:41 Step:80, lr:0.00040000, loss:9610.47396385, time:225.90ms, fps:141.66 <br>
-    > 2021-01-05 14:05:46 Step:100, lr:0.00040000, loss:9442.95130887, time:223.77ms, fps:143.00 <br>
-    > 2021-01-05 14:05:50 Step:120, lr:0.00040000, loss:9300.51361234, time:228.85ms, fps:139.83 <br>
-    > 2021-01-05 14:05:55 Step:140, lr:0.00040000, loss:9029.22531498, time:227.36ms, fps:140.75 <br>
-    > 2021-01-05 14:05:59 Step:160, lr:0.00040000, loss:8850.09716859, time:225.94ms, fps:141.63 <br>
-    > 2021-01-05 14:06:04 Step:180, lr:0.00040000, loss:8620.74724067, time:228.48ms, fps:140.05 <br>
-    > 2021-01-05 14:06:09 Step:200, lr:0.00040000, loss:8384.87165179, time:227.64ms, fps:140.57 <br>
-    > 2021-01-05 14:06:13 Step:220, lr:0.00040000, loss:8193.46840854, time:230.90ms, fps:138.59 <br>
-    > 2021-01-05 14:06:18 Step:240, lr:0.00040000, loss:8052.94862988, time:229.94ms, fps:139.17 <br>
-    > 2021-01-05 14:06:22 Step:260, lr:0.00040000, loss:7884.65315172, time:226.39ms, fps:141.35 <br>
-    > 2021-01-05 14:06:27 Step:280, lr:0.00040000, loss:7719.58562702, time:225.88ms, fps:141.67 <br>
-    > 2021-01-05 14:06:31 Step:300, lr:0.00040000, loss:7546.77749729, time:229.57ms, fps:139.39 <br>
-    > 2021-01-05 14:06:36 Step:320, lr:0.00040000, loss:7387.72234128, time:228.84ms, fps:139.83 <br>
-    > 2021-01-05 14:06:40 Step:340, lr:0.00039999, loss:7278.32803386, time:229.31ms, fps:139.55 <br>
-    > 2021-01-05 14:06:45 Step:360, lr:0.00039999, loss:7133.84139243, time:226.94ms, fps:141.01 <br>
-    > 2021-01-05 14:06:50 Step:380, lr:0.00039999, loss:7018.06870953, time:227.69ms, fps:140.54 <br>
-    > 2021-01-05 14:06:54 Step:400, lr:0.00039999, loss:6941.95861095, time:228.10ms, fps:140.29 <br>
-    > 2021-01-05 14:06:59 Step:420, lr:0.00039999, loss:6833.76219723, time:225.16ms, fps:142.12 <br>
-    > 2021-01-05 14:07:03 Step:440, lr:0.00039999, loss:6742.74311336, time:226.48ms, fps:141.29 <br>
-    > 2021-01-05 14:07:08 Step:460, lr:0.00039999, loss:6676.80909872, time:227.10ms, fps:140.91 <br>
-    > 2021-01-05 14:07:12 Step:480, lr:0.00039999, loss:6571.46454924, time:226.12ms, fps:141.52 <br>
-    > 2021-01-05 14:07:17 Step:500, lr:0.00039999, loss:6452.07785241, time:223.62ms, fps:143.10 <br>
-
-**Note**: The given scripts ``edvr.yaml``, ``run_1p_train.sh`` are only for reference.
-    In ``run_1p_train.sh``, the training proceeds with ``batchsize=4`` and runs for only 1000 steps, 
-which cannot reach the reproduced precision (PSNR 31.24dB on REDS4). If one wants to fully 
-reproduce the given PSNR, please run ``run_1p_train_precision_overwatch.sh`` (for 1 device) or 
-``run_8p_train_precision_overwatch.sh`` (for 8 devices). The former requires several days to complete 
-the training, while the latter also takes one day at least.
-
-## Evaluation
-
-It's easy to evaluate the checkpoint or any other model file.
-
-```sh
-bash scripts/run_evaluation.sh 0 outputs/edvr/EDVR-600000
-```
-
-The first argument represents the device_id, and the second the certain checkpoint. The output will be like:
-
-```sh
-Evaluate 000
-Video 000 PSNR = 27.58365249633789
-        Inference time: 102.73
-Evaluate 011
-Video 011 PSNR = 30.992197036743164
-        Inference time: 102.67
-Evaluate 015
-Video 015 PSNR = 33.03461837768555
-        Inference time: 102.22
-Evaluate 020
-Video 020 PSNR = 29.36363983154297
-        Inference time: 102.83
-PSNR = 30.243528366088867
-```
-
-## Inference
-
-Similar to evalution: 
-
-```sh
-bash scripts/run_inference.sh 0 outputs/edvr/EDVR-600000
-```
-
-The inference results (images) will be saved in ``${cfg.output_dir}/test`` folder. Since the writing time is the 
-bottleneck of the total time, the project uses a standalone queue and mutliple threads to write the super-resolution
- image to hard disks. One may find the hint after the inference bar:
-
-> Writing images to files. This may take some time. Please DO NOT manually interrupt !!!
-
-and the prompt does not show. This is normal and please do not interrupt, because the threads are still writing the 
-rest images.
-
-## Freeze Graph
-
-```sh
-bash scripts/run_freeze.sh outputs/edvr/EDVR-600000
-```
-
-The frozen pb file will be saved at ``${cfg.output_dir}/EDVR.pb``. 
-
-If one wants to use 4D ``[N*D, H, W, C]`` input instead of 5D ``[N, D, H, W, C]`` where ``D`` represents the number of 
-consecutive frames of EDVR, please 
-set ``model.input_format_dimension=4`` when freezing; additionally, if one wants to use unknown batchsize in pb model, please set the 
-``data.eval_batch_size=-1`` when freezing. The output node of the model is by default of ``fp32`` data type. One can set 
-``model.convert_output_to_uint8=True`` when freezing so that the scripts will add a cast op before output converting to 
-``tf.uint8``.
-
-## Precision & Performance
-
-Evaluated on REDS4 dataset
-
-|      | Training Input Size (per device) | Training Time (ms/step) | Inference Input Size (single device) | Inference Time (ms/step) | PSNR (dB)   |
-| ---- | -------------------------------- | ----------------------- | ------------------------------------ | ------------------------ | ----------- |
-| 1p   | [32, 5, 64, 64, 3]               | 875                     | [1, 5, 180, 320, 3]                  | 102                      | 30.24352837 |
-| 8p   | [4, 5, 64, 64, 3]                | 230                     | [1, 5, 180, 320, 3]                  | 102                      | 30.24139595 |
-
-## NOTES
-
-1. To run on GPU, one can simply set the ``cfg.device`` to ``GPU``, and make sure to set the implementation of 
-   deformable convolution to the composed by ``cfg.edvr.impl='tf'``. The rest remains the same. However, the project only support for a single GPU device.
-2. (**IMPORTANT**) The standalone *deformable convolution* operator is available after version C76B220 (included). Otherwise one can only use the composed tensorflow operator for deformable convolution, but the performance is rather poor compared to the former one. Setting ``cfg.edvr.impl`` to ``tf`` so that the deformable convolution will be running on GPU/CPU, while with ``cfg.edvr.impl='npu'``  the NPU deformable operator is used.
-
+1. 通过“模型训练”中的训练指令启动单卡训练。 
+2. 将训练脚本（train_full_1p.sh）中的data_path设置为训练数据集的路径。具体的流程参见“模型训练”的示例。 
+3. 模型存储路径为“${cur_path}/output/$ASCEND_DEVICE_ID”，包括训练的log以及checkpoints文件。
+4. 以单卡训练为例，loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。 

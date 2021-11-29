@@ -43,7 +43,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 from tensorflow.contrib import slim as contrib_slim
-
+from npu_bridge.npu_init import *
 slim = contrib_slim
 
 
@@ -290,8 +290,9 @@ def vgg_19(inputs,
 
       # Use conv2d instead of fully_connected layers.
       net = slim.conv2d(net, 4096, [7, 7], padding=fc_conv_padding, scope='fc6')
-      net = slim.dropout(net, dropout_keep_prob, is_training=is_training,
-                         scope='dropout6')
+      # net = slim.dropout(net, dropout_keep_prob, is_training=is_training,
+      #                    scope='dropout6')
+      net = npu_ops.dropout(net, dropout_keep_prob, name='dropout6')
       net = slim.conv2d(net, 4096, [1, 1], scope='fc7')
       # Convert end_points_collection into a end_point dict.
       end_points = slim.utils.convert_collection_to_dict(end_points_collection)
@@ -300,8 +301,9 @@ def vgg_19(inputs,
             input_tensor=net, axis=[1, 2], keepdims=True, name='global_pool')
         end_points['global_pool'] = net
       if num_classes:
-        net = slim.dropout(net, dropout_keep_prob, is_training=is_training,
-                           scope='dropout7')
+        # net = slim.dropout(net, dropout_keep_prob, is_training=is_training,
+        #                    scope='dropout7')
+        net = npu_ops.dropout(net, dropout_keep_prob, name='dropout7')
         net = slim.conv2d(net, num_classes, [1, 1],
                           activation_fn=None,
                           normalizer_fn=None,

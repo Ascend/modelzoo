@@ -137,7 +137,15 @@ def train():
     d_optim = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(d_loss, var_list=d_vars)
 
     ###========================== RESTORE MODEL =============================###
-    sess = tf.Session(config=npu_config_proto(config_proto=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)))
+    config_proto = tf.ConfigProto()
+    custom_op =  config_proto.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name =  "NpuOptimizer" 
+    custom_op.parameter_map["use_off_line"].b = True
+    custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+    config_proto.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    sess = tf.Session(config=npu_config_proto(config_proto))
+
+    # sess = tf.Session(config=npu_config_proto(config_proto=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False)))
     tl.layers.initialize_global_variables(sess)
     if tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/g_{}.npz'.format(tl.global_flag['mode']), network=net_g) is False:
         tl.files.load_and_assign_npz(sess=sess, name=checkpoint_dir + '/g_{}_init.npz'.format(tl.global_flag['mode']), network=net_g)

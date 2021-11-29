@@ -72,4 +72,6 @@ sh train_8p.sh
  torch.npu.set_device("npu:id") # id可以设置为自己想指定的卡
 
 
-
+## 由于XLM模型在docker中训练需要占用比较大的内存，建议在开启docker时，将shm-size设置大些
+建议设置shm-size为100G，已经在docker_start.sh脚本中添加，如果宿主机内存不足100G，可以适当减小，
+修改docker_start.sh脚本中的shm-size参数配置， 可设置为10G左右。

@@ -1,15 +1,15 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 
 <h2 id="基本信息.md">基本信息</h2>
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Semantic Segmentation**
+**应用领域（Application Domain）：Instance Segmentation**
 
 **版本（Version）：1.1**
 
@@ -34,20 +34,20 @@
 
 - 
 
-  - 参考论文
+  - 参考论文：
 
       https://arxiv.org/pdf/1802.02611v3
 
-  - 参考实现
+  - 参考实现：
 
       https://github.com/tensorflow/models/tree/master/research/deeplab
 
-  - 适配昇腾 AI 处理器的实现(地址重新填写)：
+  - 适配昇腾 AI 处理器的实现：
 
-      https://gitee.com/sireneden/modelzoo/tree/master/contrib/TensorFlow/Research/cv/deeplab-v3-plus/deeplabv3+_hw09124698
+      https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_segmentation/DeepLabv3+_ID0147_for_TensorFlow
 
 
-- 通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
 
     ```
     git clone {repository_url}    # 克隆仓库的代码
@@ -134,7 +134,7 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_prec
 3. 获取数据集后，放入模型目录下，在训练脚本中指定数据集路径，可正常使用。
 
 ## 模型训练<a name="section715881518135"></a>
-- 下载训练脚本。
+- 单击“立即下载”，并选择合适的下载方式下载源码包
 - 开始训练。
 
     1. 启动训练之前，首先要配置程序运行相关环境变量。

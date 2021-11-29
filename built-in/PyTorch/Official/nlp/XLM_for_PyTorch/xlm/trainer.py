@@ -962,10 +962,10 @@ def clip_grad_norm_(parameters, max_norm, optimizers, norm_type=2):
     parameters = list(filter(lambda p: p.grad is not None, parameters))
     max_norm = float(max_norm)
     norm_type = float(norm_type)
+    combine_grads = optimizers['model'].get_optimizer_combined_grads()[0]
     if norm_type == inf:
         total_norm = max(p.grad.detach().abs().max() for p in parameters)
     else:
-        combine_grads = optimizers['model'].get_optimizer_combined_grads()[0]
         total_norm = torch.norm(combine_grads.detach(), norm_type)
     clip_coef = max_norm / (total_norm + 1e-6)
     if clip_coef < 1:

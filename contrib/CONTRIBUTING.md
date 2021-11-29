@@ -16,7 +16,7 @@ Ascend ModelZoo，欢迎各位开发者
 
 2、参考[sample](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Transformer_for_TensorFlow)
 
-3、贡献者模型代码目录规则："modelzoo/contrib/框架/Research/应用领域(nlp、cv、audio等)/网络名(全小写)/网络名_框架_华为云ID"（社区管理团队会在贡献完成进行整合）
+3、贡献者模型代码目录规则："modelzoo/contrib/框架/Research/应用领域(nlp、cv、audio等)/网络名_IDxxx_for_TensorFlow"（以tf为例，社区管理团队会在贡献完成进行整合）
 
 4、从其他开源迁移的代码，请增加License声明
 

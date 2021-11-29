@@ -106,11 +106,12 @@ class pix2pix(object):
     def load_random_samples(self, data_path):
         datapath = ('%s/val/*.jpg' %(data_path))
         data = np.random.choice(glob(datapath.format(self.dataset_name)), self.batch_size)
-        sample = [load_data(sample_file) for sample_file in data]
-        if self.is_grayscale:
-            sample_images = np.array(sample).astype(np.float32)[:, :, :, None]
-        else:
-            sample_images = np.array(sample).astype(np.float32)
+        sample_images = [load_data(sample_file) for sample_file in data]
+        # sample = [load_data(sample_file) for sample_file in data]
+        # if self.is_grayscale:
+        #     sample_images = np.array(sample).astype(np.float32)[:, :, :, None]
+        # else:
+        #     sample_images = np.array(sample).astype(np.float32)
         return sample_images
 
     def sample_model(self, data_path, sample_dir, epoch, idx):
@@ -118,6 +119,19 @@ class pix2pix(object):
         (samples, d_loss, g_loss) = self.sess.run([self.fake_B_sample, self.d_loss, self.g_loss], feed_dict={self.real_data: sample_images})
         save_images(samples, [self.batch_size, 1], './{}/train_{:02d}_{:04d}.png'.format(sample_dir, epoch, idx))
         print('[Sample] d_loss: {:.8f}, g_loss: {:.8f}'.format(d_loss, g_loss))
+
+    def process_function(self, image_path):
+        return tf.py_func(load_data, inp=[image_path], Tout=tf.float32)
+
+    def make_dataset(self, imagePathList, batch_size, epoch):
+        ds = tf.data.Dataset.from_tensor_slices(imagePathList)
+        ds = ds.map(lambda imagepath: self.process_function(imagepath), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        # same with data size for perfect shuffle
+        # ds = ds.shuffle(buffer_size=400)
+        ds = ds.repeat(epoch)
+        ds = ds.batch(batch_size, drop_remainder=True)
+        ds = ds.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
+        return ds
 
     def train(self, args):
         'Train pix2pix'
@@ -159,17 +173,27 @@ class pix2pix(object):
             print(' [*] Load SUCCESS')
         else:
             print(' [!] Load failed...')
+
+        datapath = ('%s/train/*.jpg' %(args.data_path))
+        data = glob(datapath.format(self.dataset_name))
+        batch_idxs = (min(len(data), args.train_size) // self.batch_size)
+        train_dataset = self.make_dataset(data, self.batch_size, args.epoch)
+        iterator = train_dataset.make_initializable_iterator()
+        next_element = iterator.get_next()
+        self.sess.run(iterator.initializer)
+
         for epoch in xrange(args.epoch):
-            datapath = ('%s/train/*.jpg' %(args.data_path))
-            data = glob(datapath.format(self.dataset_name))
-            batch_idxs = (min(len(data), args.train_size) // self.batch_size)
+            # datapath = ('%s/train/*.jpg' %(args.data_path))
+            # data = glob(datapath.format(self.dataset_name))
+            # batch_idxs = (min(len(data), args.train_size) // self.batch_size)
             for idx in xrange(0, batch_idxs):
-                batch_files = data[(idx * self.batch_size):((idx + 1) * self.batch_size)]
-                batch = [load_data(batch_file) for batch_file in batch_files]
-                if self.is_grayscale:
-                    batch_images = np.array(batch).astype(np.float32)[:, :, :, None]
-                else:
-                    batch_images = np.array(batch).astype(np.float32)
+                # batch_files = data[(idx * self.batch_size):((idx + 1) * self.batch_size)]
+                # batch = [load_data(batch_file) for batch_file in batch_files]
+                # if self.is_grayscale:
+                #     batch_images = np.array(batch).astype(np.float32)[:, :, :, None]
+                # else:
+                #     batch_images = np.array(batch).astype(np.float32)
+                batch_images = self.sess.run(next_element)
                 (_, summary_str) = self.sess.run([d_optim, self.d_sum], feed_dict={self.real_data: batch_images})
                 self.writer.add_summary(summary_str, counter)
                 (_, summary_str) = self.sess.run([g_optim, self.g_sum], feed_dict={self.real_data: batch_images})

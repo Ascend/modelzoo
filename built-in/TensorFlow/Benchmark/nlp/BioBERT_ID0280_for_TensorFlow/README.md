@@ -1,14 +1,14 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Image Super Resolution**
+**应用领域（Application Domain）：Natural Language Processing**
 
 **版本（Version）：1.1**
 
@@ -35,33 +35,33 @@
     尽管BERT的性能可与以前的最新模型相媲美，但在以下三个代表性的生物医学文本挖掘任务上，BioBERT的性能明显优于它们：生物医学命名实体识别（F1分数提高0.62％），
     生物医学关系提取（2.80％） F1分数提高）和生物医学问答（MRR提高12.24％）。 分析结果表明，对生物医学语料库进行BERT的预培训有助于其理解复杂的生物医学文献。 
 
--   参考论文：
+- 参考论文：
 
     https://arxiv.org/abs/1901.08746
     
--   参考实现：
+- 参考实现：
 
     https://github.com/dmis-lab/biobert
     
--   适配昇腾 AI 处理器的实现：
+- 适配昇腾 AI 处理器的实现：
     
     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/BioBERT_ID0280_for_TensorFlow    
 
--   通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
     
-        git clone {repository_url}    # 克隆仓库的代码
-        cd {repository_name}    # 切换到模型的代码仓目录
-        git checkout  {branch}    # 切换到对应分支
-        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+      git clone {repository_url}    # 克隆仓库的代码
+      cd {repository_name}    # 切换到模型的代码仓目录
+      git checkout  {branch}    # 切换到对应分支
+      git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+      cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
     
 ## 默认配置<a name="section91661242121611"></a>
 
--   网络结构
+- 网络结构
 
     - BioBERT-Base v1.0 (+ PubMed 200K + PMC 270K)
     
--   训练超参(单卡)：
+- 训练超参(单卡)：
     
     - train_batch_size: 32
     - max_seq_length: 128
@@ -131,8 +131,8 @@
 
 ## 模型训练<a name="section715881518135"></a>
 
--  单击“立即下载”，并选择合适的下载方式下载源码包。
--  开始训练    
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
+- 开始训练    
    
     1. 启动训练之前，首先要配置程序运行相关环境变量。
 
@@ -153,7 +153,7 @@
 
             bash train_full_1p.sh --data_path=./data
 
--  验证。
+- 验证。
 
     1. 执行训练时设置以下参数：
     
@@ -169,17 +169,17 @@
     1.  获取数据。
         请参见“快速上手”中的数据集准备。
     
--   模型训练。
+- 模型训练。
 
     参考“模型训练”中训练步骤。
 
--   模型评估。
+- 模型评估。
 
     参考“模型训练”中验证步骤。
 
 <h2 id="高级参考.md">高级参考</h2>
 
-脚本和示例代码
+## 脚本和示例代码
 
 ```
 .

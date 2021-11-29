@@ -1,15 +1,15 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 **发布者（Publisher）：Huawei**
 
 **应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.9.22**
 
@@ -28,9 +28,7 @@
 **描述（Description）：基于TensorFlow框架的图片分类识别网络训练代码**
 
 <h2 id="概述.md">概述</h2>
-## 简述
-
- AlexNet是2012年[ImageNet](https://baike.baidu.com/item/ImageNet/17752829)竞赛冠军获得者Hinton和他的学生Alex Krizhevsky设计的 深度卷积神经网络模型，可以算是LeNet的一种更深更宽的版本 学习网络。 AlexNet主要使用到的新技术点如下： 
+-     AlexNet是2012年Hinton和他的学生Alex Krizhevsky设计的 深度卷积神经网络模型，可以算是LeNet的一种更深更宽的版本 学习网络。 AlexNet主要使用到的新技术点如下： 
 
 （1）成功使用ReLU作为CNN的激活函数，并验证其效果在较深的网络超过了Sigmoid，成功解决了Sigmoid在网络较深时的梯度弥散问题。
 
@@ -46,44 +44,51 @@
 
 
 
-- 论文路径
+- 参考论文：
 
-  https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf
+    ```
+    https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf
+    ```
 
-- 开源代码路径
+- 参考实现：
+    ```
+    https://github.com/demul/AlexNet
+    ```
 
-  https://github.com/demul/AlexNet
+- 适配昇腾 AI 处理器的实现：
 
--   适配昇腾 AI 处理器的实现：
-    
-     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_ID0259_for_TensorFlow
+    ```
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_ID0259_for_TensorFlow
+    ```
 
--   通过Git获取对应commit\_id的代码方法如下：
-    
-        git clone {repository_url}    # 克隆仓库的代码
-        cd {repository_name}    # 切换到模型的代码仓目录
-        git checkout  {branch}    # 切换到对应分支
-        git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-        cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    
 
-## 默认配置<a name="section91661242121611"></a>
+- 通过Git获取对应commit_id的代码方法如下:
+
+    ```
+    git clone {repository_url}    # 克隆仓库的代码
+    cd {repository_name}    # 切换到模型的代码仓目录
+    git checkout  {branch}    # 切换到对应分支
+    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+    ```
+
+## 默认配置 <a name="section91661242121611"></a>
 -   网络结构
-    -    5层卷积层和3层全连接层 
+    5层卷积层和3层全连接层 
     
 -   训练超参（单卡）：
     -   Batch size: 100
     -   epoch: 35
     -   learning_rate: 0.001
-    -   momentum:0.9
-    -   LRN_depth=5
-    -   LRN_bias=2
-    -   lRN_alpha=0.0001
-    -   LRN_beta=0.75
-    -   keep_prob=0.5
+    -   momentum: 0.9
+    -   LRN_depth: 5
+    -   LRN_bias: 2
+    -   lRN_alpha: 0.0001
+    -   LRN_beta: 0.75
+    -   keep_prob: 0.5
 
 
-## 支持特性<a name="section1899153513554"></a>
+## 支持特性 <a name="section1899153513554"></a>
 
 | 特性列表  | 是否支持 |
 |-------|------|
@@ -92,14 +97,16 @@
 | 数据并行  | 是    |
 
 
-## 混合精度训练<a name="section168064817164"></a>
+## 混合精度训练 <a name="section168064817164"></a>
 
 昇腾910 AI处理器提供自动混合精度功能，可以针对全网中float32数据类型的算子，按照内置的优化策略，自动将部分float32的算子降低精度到float16，从而在精度损失很小的情况下提升系统性能并减少内存使用。
 
-## 开启混合精度<a name="section20779114113713"></a>
-训练脚本增加“precision_mode” 配置项
+## 开启混合精度 <a name="section20779114113713"></a>
+拉起脚本中，传入--precision_mode='allow_mix_precision'
 
 相关代码示例:
+
+
 
 ```
 config = tf.ConfigProto()
@@ -137,13 +144,14 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_prec
 
 
 <h2 id="快速上手.md">快速上手</h2>
-## 数据集准备<a name="section361114841316"></a>
+## 数据集准备 <a name="section361114841316"></a>
 
-1、自行下载“Catvs Dog” Datasets，25000张中有24000张是Training set，1000张是Test set。
+1. 自行下载“Catvs Dog” Datasets，25000张中有24000张是Training set，1000张是Test set。
 
 
-## 模型训练<a name="section715881518135"></a>
-- 下载训练脚本。
+## 模型训练 <a name="section715881518135"></a>
+- 单击“立即下载”，并选择合适的下载方式下载源码包
+
 - 开始训练。
 
     1. 启动训练之前，首先要配置程序运行相关环境变量。
@@ -154,82 +162,37 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_prec
 
 
     2. 单卡训练
-       
-        2. 1单卡训练指令（脚本位于AlexNet_ID0259_for_TensorFlow/test/train_full_1p.sh）
         
-            bash test/train_full_1p.sh --data_path=/home/Dog_Cats
-            
-    
-
-<h2 id="迁移学习指导.md">迁移学习指导</h2>
-- 数据集准备。
-
-  数据集要求如下：
-
-  1. 获取数据。
-
-     如果要使用自己的数据集，需要将数据集放到脚本参数data_path对应目录下。参考代码中的数据集存放路径如下：
-
-     - 训练集： /home/data/data_preprocessed/train
-     - 测试集：  /home/data/data_preprocessed/train
-
-     数据集也可以放在其它目录，则修改对应的脚本入参data_path即可。
-
-
-  2.  数据集文件结构，目录参考：
-
-        ```
-            |  data_preprocessed
-            |  dog_and_cat_25000_split
-            |  first_kernel_visualization
+   
+        ```        
+        bash test/train_full_1p.sh --data_path=/home/Dog_Cats
         ```
 
+​   
+<h2 id="高级参考.md">高级参考</h2>
+## 脚本和示例代码 <a name="section08421615141513"></a>
 
-- 加载预训练模型。 
+    |--main.py                 #训练脚本入口
+    |--train.py		           #执行训练主脚本
+    |--model.py                #构建模型脚本
+    |--test			           #训练脚本目录 
+    |	|--train_performance_1p.sh
+    |	|--train_full_1p.sh
+    |--data_loader.py          #数据集加载脚本
+    |--data_preprocessor.py    #数据集预处理脚本
 
 
-    1. 模型加载修改，修改文件train.py，修改以下代码行。
-       
-    ```
-    saver = tf.train.Saver(tf.global_variables())
-    ckpt = tf.train.get_checkpoint_state('/autotest/CI_daily/CarPeting_AlexNet/code/model')
-    if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
-        saver.restore(sess, ckpt.model_checkpoint_path)
-    else:
-        sess.run(tf.global_variables_initializer())
-    ```
 
--   模型训练。
-
-    参考“模型训练”中训练步骤。
-
-<h2 id="迁移学习指导.md">高级参考</h2>
-
-## 脚本和事例代码
+## 脚本参数 <a name="section6669162441511"></a>
 
 ```
-|--main.py                 #训练脚本入口
-|--train.py		           #执行训练主脚本
-|--model.py                #构建模型脚本
-|--test			           #训练脚本目录
-|	|--train_performance_1p.sh
-|	|--train_full_1p.sh
-|   |--......
-|--data_loader.py          #数据集加载脚本
-|--data_preprocessor.py    #数据集预处理脚本
-|--......
-```
-
-## 脚本参数<a name="section6669162441511"></a>
-
-```
-	--epoch		      		    Epoch to train,default:35
+    --epoch                       Epoch to train,default:35
     --learning_rate             Learning rate of for adam,default:0.001
-    --data_path                 dataset path
-    --batch_size                batch size，default：100
+    --data_path                  dataset path
+    --batch_size                 batch size，default：100
 ```
 
-## 训练过程<a name="section1589455252218"></a>
+## 训练过程 <a name="section1589455252218"></a>
 
 通过“模型训练”中的训练指令启动单卡或者多卡训练。单卡和多卡通过运行不同脚本，支持单卡训练。模型存储路径为${cur_path}/../model，包括训练的log以及checkpoints文件。loss信息在文件${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log中。
 

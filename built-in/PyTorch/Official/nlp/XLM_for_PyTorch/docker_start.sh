@@ -15,6 +15,7 @@ docker run -it --ipc=host \
                --device=/dev/davinci7 \
                --device=/dev/davinci_manager \
                --device=/dev/devmm_svm --device=/dev/hisi_hdc \
+               --shm-size=100G \
                -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
                -v /usr/local/Ascend/add-ons/:/usr/local/Ascend/add-ons/ \
                -v ${model_dir}:${model_dir} \

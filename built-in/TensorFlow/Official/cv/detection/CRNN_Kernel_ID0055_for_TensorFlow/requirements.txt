@@ -1,0 +1,5 @@
+glog==0.3.1
+easydict==1.9
+tqdm==4.28.1
+matplotlib==3.0.2
+pillow==8.0.0

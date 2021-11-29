@@ -489,6 +489,14 @@ class InputReader(object):
                     masks=instance_masks,
                     crop_mask_size=params['gt_mask_size']))
 
+          data2['classes'] = tf.cast(data2['classes'], dtype=tf.float32)
+
+          instance_masks_init = tf.identity(instance_masks)
+          indices_init = tf.identity(indices)
+          boxes_init = tf.identity(boxes)
+          classes_init = tf.identity(classes)
+          image_init = tf.identity(image)
+
           _copy_paste_aug = True
           if _copy_paste_aug:
             # paste objects and creates a new composed image
@@ -584,6 +592,35 @@ class InputReader(object):
               params['rpn_negative_overlap'],
               params['rpn_batch_size_per_im'],
               params['rpn_fg_fraction'])
+
+          def no_aug(instance_masks, indices, boxes, classes, image):
+            masks = tf.gather(instance_masks, indices)
+
+            cropped_boxes = boxes + tf.tile(tf.expand_dims(offset, axis=0), [1, 2])
+            cropped_boxes /= tf.tile(tf.expand_dims(image_scale, axis=0), [1, 2])
+
+            cropped_boxes = box_utils.normalize_boxes(cropped_boxes, image_shape)
+            num_masks = tf.shape(masks)[0]
+            masks = tf.image.crop_and_resize(
+              tf.expand_dims(masks, axis=-1),
+              cropped_boxes,
+              box_indices=tf.range(num_masks, dtype=tf.int32),
+              crop_size=[self._mask_crop_size, self._mask_crop_size],
+              method='bilinear'
+            )
+            masks = tf.squeeze(masks, axis=-1)
+            cropped_gt_masks = masks
+
+            cropped_gt_masks = tf.pad(
+              cropped_gt_masks,
+              paddings=tf.constant([[0, 0], [2, 2], [2, 2]]),
+              mode='CONSTANT',
+              constant_values=0.
+            )
+            return cropped_gt_masks, boxes, classes, image
+
+          if tf.shape(classes)[0] > 92:
+            cropped_gt_masks, boxes, classes, image = no_aug(instance_masks_init, indices_init, boxes_init, classes_init, image_init)
 
           # Assign anchors.
           score_targets, box_targets = anchor_labeler.label_anchors(

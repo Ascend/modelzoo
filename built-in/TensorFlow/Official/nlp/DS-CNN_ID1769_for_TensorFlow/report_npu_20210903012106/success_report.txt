@@ -1,0 +1,42 @@
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/train.py:99 tf.InteractiveSessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/train.py:4 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:268 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:287 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:377 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:397 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:407 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:571 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:581 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:591 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:632 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:686 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:710 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:742 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:1000 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:1049 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py:4 from npu_bridge.npu_init import *
+Finish conver file: /home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/models.py
+
+
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/input_data.py:118 tf.Sessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/input_data.py:135 tf.Sessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/input_data.py:314 tf.Sessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/input_data.py:539 tf.Sessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/input_data.py:4 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/freeze.py:118 tf.InteractiveSessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/freeze.py:4 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/quant_models.py:168 change tf.nn.dropout to npu_ops.dropout
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/quant_models.py:4 from npu_bridge.npu_init import *
+Finish conver file: /home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/quant_models.py
+
+
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/fold_batchnorm.py:53 tf.InteractiveSessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/fold_batchnorm.py:3 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/test.py:55 tf.InteractiveSessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/test.py:3 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/quant_test.py:55 tf.InteractiveSessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/quant_test.py:3 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/test_pb.py:62 tf.InteractiveSessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/test_pb.py:3 from npu_bridge.npu_init import *
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/label_wav.py:62 tf.Sessionadd npu config
+/home/zWX1053564/code/DS-CNN_ID1769_for_TensorFlow/label_wav.py:4 from npu_bridge.npu_init import *

@@ -116,7 +116,7 @@ do
     nohup python3.7 $cur_path/../train.py \
     --dataset_dir=${data_path} \
     --max_train_steps=1000 \
-    --iterations_per_loop=10 \
+    --iterations_per_loop=200 \
     --model_name="vgg_19" \
     --moving_average_decay=0.9999 \
     --label_smoothing=0.1 \
