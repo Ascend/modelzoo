@@ -5,9 +5,9 @@
 -   [迁移学习指导](#迁移学习指导.md)
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Natural Language Processing**
 
 **版本（Version）：1.1**
 
@@ -41,7 +41,7 @@
 
 -   适配昇腾 AI 处理器的实现：    
     
-    
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/ALBERT-lcqmc-ZH_ID1461_for_TensorFlow
 
 -   通过Git获取对应commit\_id的代码方法如下：
     

@@ -36,7 +36,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow.compat.v1 as tf
-
+from npu_bridge.npu_init import *
 
 def _rpn_score_loss(score_outputs, score_targets, normalizer=1.0):
   """Computes score loss."""
@@ -243,9 +243,11 @@ def fast_rcnn_loss(class_outputs, box_outputs, class_targets, box_targets,
   """
   with tf.name_scope('fast_rcnn_loss'):
     class_targets = tf.to_int32(class_targets)
-    class_targets_one_hot = tf.one_hot(class_targets, params['num_classes'])
-    class_loss = _fast_rcnn_class_loss(
-        class_outputs, class_targets_one_hot)
+    class_outputs = tf.cast(class_outputs, tf.float32)
+    with npu_scope.keep_dtype_scope():
+        class_targets_one_hot = tf.one_hot(class_targets, params['num_classes'])
+        class_loss = _fast_rcnn_class_loss(
+            class_outputs, class_targets_one_hot)
 
     # Selects the box from `box_outputs` based on `class_targets`, with which
     # the box has the maximum overlap.
@@ -300,14 +302,18 @@ def mask_rcnn_loss(mask_outputs, mask_targets, select_class_targets, params):
     mask_loss: a float tensor representing total mask loss.
   """
   with tf.name_scope('mask_rcnn_loss'):
-    (batch_size, num_masks, mask_height,
-     mask_width) = mask_outputs.get_shape().as_list()
+    mask_targets = tf.cast(mask_targets, tf.float32)
+    mask_outputs = tf.cast(mask_outputs, tf.float32)
+    select_class_targets = tf.cast(select_class_targets, tf.float32)
+    with npu_scope.keep_dtype_scope():
+        (batch_size, num_masks, mask_height,
+        mask_width) = mask_outputs.get_shape().as_list()
 
-    weights = tf.tile(
-        tf.reshape(tf.greater(select_class_targets, 0),
-                   [batch_size, num_masks, 1, 1]),
-        [1, 1, mask_height, mask_width])
-    loss = tf.losses.sigmoid_cross_entropy(
-        mask_targets, mask_outputs, weights=weights,
-        reduction=tf.losses.Reduction.SUM_BY_NONZERO_WEIGHTS)
+        weights = tf.tile(
+            tf.reshape(tf.greater(select_class_targets, 0),
+                    [batch_size, num_masks, 1, 1]),
+            [1, 1, mask_height, mask_width])
+        loss = tf.losses.sigmoid_cross_entropy(
+            mask_targets, mask_outputs, weights=weights,
+            reduction=tf.losses.Reduction.SUM_BY_NONZERO_WEIGHTS)
     return params['mrcnn_weight_loss_mask'] * loss

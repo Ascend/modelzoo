@@ -2,7 +2,7 @@
 
 #当前路径,不需要修改
 cur_path=`pwd`
-export ASCEND_SLOG_PRINT_TO_STDOUT=1
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export NPU_CALCULATE_DEVICE=$ASCEND_DEVICE_ID
 #集合通信参数,不需要修改
 
@@ -24,7 +24,7 @@ train_epochs=1
 #训练batch_size
 batch_size=16
 #训练step
-train_steps=2
+train_steps=50
 #学习率
 learning_rate=1e-3
 
@@ -137,12 +137,11 @@ sed -i "s|img_dir = '$data_path/data/MPII/images'|img_dir = 'data/MPII/images'|g
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
-sed -i "s|\r|\n|" ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log
+sed -i "s|\r|\n|g" ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep "the loss is:"  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "fps: " '{print $2}'|awk '{sum+=$1} END {print"",sum/NR}'|sed s/[[:space:]]//g`
-
+FPS=`grep "fps:"  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "fps: " '{print $2}'|awk '{sum+=$1} END {print"",sum/NR}'|sed s/[[:space:]]//g`
 
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
@@ -172,7 +171,7 @@ grep "the loss is: " $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
 #关键信息打印到${CaseName}.log中，不需要修改
-echo "Network = ${Network}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

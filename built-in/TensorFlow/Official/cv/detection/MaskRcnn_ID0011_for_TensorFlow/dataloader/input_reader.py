@@ -101,7 +101,7 @@ def _create_pre_batch_dataset_fn(file_pattern, dataset_type, config_params):
 
     # Parses the fetched records to input tensors for model function.
     dataset = dataset.map(
-        parser_fn, num_parallel_calls=64)
+        parser_fn, num_parallel_calls=96)
 
     return dataset
 
@@ -140,6 +140,6 @@ class InputFn(object):
       return transformed_images, labels
 
     if self._is_training:
-      dataset = dataset.map(_transform_fn, num_parallel_calls=64)
+      dataset = dataset.map(_transform_fn, num_parallel_calls=96)
 
     return dataset

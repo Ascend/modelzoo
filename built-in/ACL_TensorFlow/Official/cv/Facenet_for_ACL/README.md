@@ -26,6 +26,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Facenet_for_ACL
 
 **Convert pb to om.**
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Facenet_for_ACL.zip)
+
 - configure the env
 
   ```

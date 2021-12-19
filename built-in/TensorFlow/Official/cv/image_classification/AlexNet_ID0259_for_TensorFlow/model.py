@@ -28,6 +28,7 @@
 # limitations under the License.
 #
 import tensorflow as tf
+from npu_bridge.npu_init import *
 
 class AlexNetModel:
     def __init__(self, input_size, decaying_factor=0.0005, LRN_depth=5, LRN_bias=2, LRN_alpha=0.0001, LRN_beta=0.75):
@@ -139,7 +140,8 @@ class AlexNetModel:
         self.B6 = tf.get_variable('bias6', shape=[4096],
                                   dtype=tf.float32, initializer=tf.constant_initializer(1))
         self.L6 = tf.nn.bias_add(self.L6, self.B6)
-        self.L6 = tf.nn.relu(tf.nn.dropout(self.L6, keep_prob=keep_prob))
+        # self.L6 = tf.nn.relu(tf.nn.dropout(self.L6, keep_prob=keep_prob))
+        self.L6 = tf.nn.relu(npu_ops.dropout(self.L6, keep_prob=keep_prob))
 
         ##### 2st fc
         ##### this is original #####
@@ -154,7 +156,8 @@ class AlexNetModel:
         self.B7 = tf.get_variable('bias7', shape=[1000],
                                   dtype=tf.float32, initializer=tf.constant_initializer(1))
         self.L7 = tf.nn.bias_add(self.L7, self.B7)
-        self.L7 = tf.nn.relu(tf.nn.dropout(self.L7, keep_prob=keep_prob))
+        # self.L7 = tf.nn.relu(tf.nn.dropout(self.L7, keep_prob=keep_prob))
+        self.L7 = tf.nn.relu(npu_ops.dropout(self.L7, keep_prob=keep_prob))
 
         ##### 3st fc
         ##### this is original #####

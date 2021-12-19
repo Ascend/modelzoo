@@ -35,11 +35,16 @@ import cv2
 ######################## color augmentation is implemented in this module (to be processed during runtime) #############
 ######################## look 'Dataloader.color_augment()'    ##########################################################
 class DataLoader:
-    def __init__(self, validation_len=1000,train_dir = ""):
+    def __init__(self, validation_len=1000,train_dir = "",mul_rank_size=1, mul_device_id=0):
         self.train_dir = train_dir
+        self.mul_rank_size = mul_rank_size
+        self.mul_device_id = mul_device_id
         #test_dir = 'C:/kaggle/input/data_raw/test1'
 
         self.train_path_list = [os.path.join(self.train_dir, x) for x in os.listdir(self.train_dir)] # 250000
+        if mul_rank_size != 1:
+            len_single = int(len(self.train_path_list) / mul_rank_size)
+            self.train_path_list = self.train_path_list[mul_device_id*len_single:(mul_device_id+1)*len_single]
         np.random.shuffle(self.train_path_list)
 
         self.val_path_list = self.train_path_list[-validation_len:] # 10000

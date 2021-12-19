@@ -145,6 +145,7 @@ def make_network(configs):
     logger = open(os.path.join(exp_path, 'log'), 'a+')
 
     def make_train(batch_id, config, phase, **inputs):
+       
         for i in inputs:
             try:
                 inputs[i] = make_input(inputs[i])
@@ -153,10 +154,18 @@ def make_network(configs):
                 
         net = config['inference']['net']
         config['batch_id'] = batch_id
-
-        net = net.train()
-
+        if configs['opt'].ddp:
+            #net = net.to(f'npu:{NPU_CALCULATE_DEVICE}')
+            if not isinstance(net, torch.nn.parallel.DistributedDataParallel):
+                net = net.to(f'npu:{NPU_CALCULATE_DEVICE}')
+                net = torch.nn.parallel.DistributedDataParallel(net, device_ids=[NPU_CALCULATE_DEVICE], broadcast_buffers=False)
+                net.train()
+        else:
+            net = net.train()
+       
+        
         if phase != 'inference':
+            st_time = time.time()
             result = net(inputs['imgs'], **{i:inputs[i] for i in inputs if i!='imgs'})
             num_loss = len(config['train']['loss'])
 
@@ -164,8 +173,9 @@ def make_network(configs):
                         
             loss = 0
             toprint = '\n{}: '.format(batch_id)
+            
             for i in losses:
-                st_time = time.time()
+                
                 loss = loss + torch.mean(losses[i])
 
                 my_loss = make_output( losses[i] )
@@ -187,9 +197,10 @@ def make_network(configs):
                     scaled_loss.backward()
                 #loss.backward()
                 optimizer.step()
+                print("the loss is: %.6f" %(loss.item()))
                 step_time = time.time() - st_time
                 fps = 16 / step_time
-                print("the loss is: %.6f step_time: %.6f fps: %.6f" %(loss.item(), step_time, fps))
+                print("fps: %.6f" %(fps))
             
             if batch_id == config['train']['decay_iters']:
                 ## decrease the learning rate after decay # iterations

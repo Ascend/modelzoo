@@ -25,7 +25,7 @@ batch_size=6144
 train_steps=250000
 
 #TF2.X独有，不需要修改
-export NPU_ENABLE_PERF=true
+#export NPU_ENABLE_PERF=true
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_mix_precision"
@@ -162,10 +162,10 @@ FPS=`awk 'BEGIN{printf "%.2f\n",'${single_batch_step_sec}'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
-grep "Train history" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk '{print$8}'|sed 's/,//g'|sed 's/\[//g'|sed 's/\]//g' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep "Train history" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk '{print$8}'|sed 's/,//g'|sed 's/\[//g'|sed 's/\]//g' |sed 's/\}//g'>> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 #输出训练精度,需要模型审视修改
-grep "Train history" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk '{print$10}'|sed 's/,//g'|sed 's/\[//g'|sed 's/\]//g' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_acc.txt
+grep "Train history" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk '{print$8}'|sed 's/,//g'|sed 's/\[//g'|sed 's/\]//g'|sed 's/\}//g' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_acc.txt
 train_accuracy=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_acc.txt`
 #train_accuracy=`grep eval_accuracy $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|grep -v mlp_log|awk 'END {print $5}'|sed 's/,//g'|cut -c 1-5`
 #打印，不需要修改

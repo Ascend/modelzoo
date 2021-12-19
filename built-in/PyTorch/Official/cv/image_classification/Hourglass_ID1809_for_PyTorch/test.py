@@ -41,7 +41,7 @@ import copy
 
 from utils.group import HeatmapParser
 import utils.img
-import data.MPII.ref as ds
+import datat.MPII.ref as ds
 import torch.npu
 import os
 NPU_CALCULATE_DEVICE = 0

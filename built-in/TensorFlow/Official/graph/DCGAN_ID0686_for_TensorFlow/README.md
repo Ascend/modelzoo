@@ -166,15 +166,28 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
        环境变量配置信息参见：
 
           [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
-
+       
+       单卡训练需要配置指定运行的卡的环境变量：
+              export ASCEND_DEVICE_ID=X
+              其中：X=0~7
 
     2. 单卡训练
 
        
         ``` 
-        bash test/train_full_1p.sh --data_path=/home/data/mnist 
+        bash test/train_full_1p.sh --data_path=xxx 
         ``` 
-
+        其中：xxx是数据集的路径，例如, 数据集下载、解压后的路径为"/home/data"，目录结构如下：
+           |--data 
+           |	|--MNIST_bin
+           |        |--mnist
+           |            |--t10k-images-idx3-ubyte
+           |            |--t10k-labels-idx1-ubyte
+           |            |--train-images-idx3-ubyte
+           |            |--train-labels-idx1-ubyte
+          
+         此时，xxx=/home/data/MNIST_bin
+      
 
 <h2 id="高级参考.md">高级参考</h2>
 ## 脚本和示例代码 <a name="section08421615141513"></a>

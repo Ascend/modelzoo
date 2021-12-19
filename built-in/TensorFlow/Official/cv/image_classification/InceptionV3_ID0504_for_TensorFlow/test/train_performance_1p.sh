@@ -123,7 +123,7 @@ do
     --data_dir=${data_path} \
     --batch_size=${batch_size} \
     --lr=0.045 \
-    --display_every=100 \
+    --display_every=10 \
     --log_dir=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt \
     --eval_dir=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt \
     --log_name=inception_v3.log > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &

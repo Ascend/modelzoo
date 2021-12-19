@@ -478,7 +478,7 @@ class Solver(object):
                     c_org = torch.cat([zero, c_org, mask], dim=1)
                     c_trg = torch.cat([zero, c_trg, mask], dim=1)
 
-                x_real = x_real.to(self.device)             # Input images.
+                x_real = x_real.to(self.device, non_blocking=True)             # Input images.
                 c_org = c_org.to(self.device)               # Original domain labels.
                 c_trg = c_trg.to(self.device)               # Target domain labels.
                 label_org = label_org.to(self.device)       # Labels for computing classification loss.

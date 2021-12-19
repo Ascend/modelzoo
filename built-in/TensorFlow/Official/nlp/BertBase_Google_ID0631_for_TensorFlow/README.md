@@ -9,17 +9,27 @@
 
 ## 基本信息
 
-- 发布者（Publisher）：huawei
-- 应用领域（Application Domain）：Natural Language Processing
-- 版本（Version）：1.1
-- 修改时间（Modified） ：2021.07.17
-- 大小（Size）：1.3G
-- 框架（Framework）：TensorFlow 1.15.0
-- 模型格式（Model Format）：ckpt
-- 精度（Precision）：Mixed
-- 处理器（Processor）：昇腾910
-- 应用级别（Categories）：Official
-- 描述（Description）：基于TensorFlow框架的BERT网络训练代码
+**发布者（Publisher）：Huawei**
+
+**应用领域（Application Domain）：Natural Language Processing**
+
+**版本（Version）：1.1**
+
+**修改时间（Modified） ：2021.07.17**
+
+**大小（Size）：1.3G**
+
+**框架（Framework）：TensorFlow 1.15.0**
+
+**模型格式（Model Format）：ckpt**
+
+**精度（Precision）：Mixed**
+
+**处理器（Processor）：昇腾910**
+
+**应用级别（Categories）：Official**
+
+**描述（Description）：基于TensorFlow框架的BERT网络训练代码**
 
 ## 概述
 
@@ -118,7 +128,7 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
 
 ## 快速上手
 
-### 数据集和预训练模型准备
+### 数据集准备
 
   模型训练使用wikipedia数据集，参考源代码提供路径下载。
 

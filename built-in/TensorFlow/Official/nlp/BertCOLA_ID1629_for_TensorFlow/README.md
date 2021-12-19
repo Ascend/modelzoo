@@ -1,0 +1,4 @@
+
+运行命令
+train_performance_1p.sh --model_path=bertbase --task_name=cola
+python3 run_classifier.py --task_name=${task_name} --do_train=True --do_eval=True --data_dir=${data_path} --vocab_file=${config_path}/vocab.txt --bert_config_file=${config_path}/bert_config.json --init_checkpoint=${config_path}/bert_model.ckpt --max_seq_length=128 --train_batch_size=${train_batch_size} --learning_rate=${learning_rate} --num_train_epochs=${num_train_epochs} --output_dir=${cur_path}/output/${output_dir} --precision_mode=${precision_mode} --over_dump=${over_dump} --data_dump_flag=${data_dump_flag} --mul_rank_size=${RANK_SIZE} --mul_device_id=${ASCEND_DEVICE_ID} --autotune=${autotune} --profiling=${profiling} --profiling_dump_path=${profiling_dump_path} 拉起训练

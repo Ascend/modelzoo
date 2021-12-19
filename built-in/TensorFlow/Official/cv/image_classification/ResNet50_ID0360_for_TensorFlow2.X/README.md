@@ -38,7 +38,7 @@ Resnet是残差网络(Residual Network)的缩写,该系列网络广泛用于目�
 
   [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) by Kaiming He, et. al.
 
-- 开源代码路径
+- 参考实现
 
   https://github.com/tensorflow/models/tree/r2.4.0/official/vision/image_classification
 

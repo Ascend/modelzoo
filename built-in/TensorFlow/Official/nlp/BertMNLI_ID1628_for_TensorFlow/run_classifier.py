@@ -145,6 +145,8 @@ flags.DEFINE_integer(
     "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
 
+flags.DEFINE_integer("mul_rank_size", 1,"number of npu device")
+flags.DEFINE_integer("mul_device_id", 0,"indicator of npu device")
 
 ##################NPU_modify start#############################
 flags.DEFINE_bool("over_dump", False, "Whether check overflow")
@@ -573,6 +575,8 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
     # For training, we want a lot of parallel reading and shuffling.
     # For eval, we want no shuffling and parallel reading doesn't matter.
     d = tf.data.TFRecordDataset(input_file)
+    if FLAGS.do_train:
+      d.shard(FLAGS.mul_rank_size, FLAGS.mul_device_id)
     if is_training:
       d = d.repeat()
       d = d.shuffle(buffer_size=100)
@@ -915,6 +919,7 @@ def main(_):
       save_checkpoints_steps=FLAGS.save_checkpoints_steps,
       iterations_per_loop=FLAGS.iterations_per_loop,
       session_config=config,
+      hcom_parallel=True,
       precision_mode=FLAGS.precision_mode,
       keep_checkpoint_max=5,
       auto_tune_mode=auto_tune_mode,

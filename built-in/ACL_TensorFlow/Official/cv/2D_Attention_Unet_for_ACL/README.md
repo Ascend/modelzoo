@@ -35,6 +35,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/2D_Attention_Unet_for_ACL
   ```
 
 - convert pb to om
+
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/2D_Attention_Unet_for_ACL.zip)
   ```
   atc --model=model/2D_Attention_Unet_tf.pb --framework=3 --output=model/2DAttention_fp16_1batch --soc_version=Ascend710 --input_shape=inputs:1,224,224,3 --enable_small_channel=1 --insert_op_conf=2DAttention_aipp.cfg
   ```

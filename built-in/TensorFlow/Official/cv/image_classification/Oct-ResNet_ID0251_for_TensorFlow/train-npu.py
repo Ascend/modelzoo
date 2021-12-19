@@ -38,6 +38,8 @@ import os
 from npu_bridge.estimator import npu_ops
 import tensorflow as tf
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+from tensorflow.python.ops import math_ops
+from tensorflow.python.framework import dtypes
 sess_config = tf.ConfigProto()
 custom_op = sess_config.graph_options.rewrite_options.custom_optimizers.add()
 custom_op.name = "NpuOptimizer"
@@ -73,6 +75,11 @@ def lr_schedule(epoch):
         lr *= 1e-1
     print('Learning rate: ', lr)
     return lr
+
+def custom_metrics(y_true, y_pred):
+    return math_ops.cast(math_ops.equal(math_ops.argmax(y_true, axis=-1, output_type=dtypes.int32),
+                                        math_ops.argmax(y_pred, axis=-1, output_type=dtypes.int32)),
+                         K.floatx())
 
 if __name__ == "__main__":
     import sys
@@ -142,9 +149,8 @@ if __name__ == "__main__":
     # plot_model(model, to_file=model_type+'.pdf')
     # print("write model graph done!")
     # exit()
-    model.compile(loss='categorical_crossentropy',
-                  optimizer=Adam(lr=lr_schedule(0)),
-                  metrics=['accuracy'])
+   # model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=lr_schedule(0)), metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=lr_schedule(0)), metrics=[custom_metrics])
     model.summary()
     print(model_type)
 
@@ -236,8 +242,9 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
     # draw acc curve
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
+    #plt.plot(history.history['acc'])
+    plt.plot(history.history['custom_metrics'])
+    plt.plot(history.history['custom_metrics'])
     plt.title('Model accuracy')
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')

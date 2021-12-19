@@ -9,7 +9,7 @@
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Image Segmentation**
+**应用领域（Application Domain）：Instance Segmentation**
 
 **版本（Version）：1.1**
 

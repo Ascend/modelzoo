@@ -2,9 +2,9 @@
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：** Image Classification 
+**应用领域（Application Domain）： Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.01.26**
 
@@ -14,7 +14,7 @@
 
 **模型格式（Model Format）：ckpt**
 
-**精度（Precision）：Fp32**
+**精度（Precision）：FP32**
 
 **处理器（Processor）：昇腾910**
 

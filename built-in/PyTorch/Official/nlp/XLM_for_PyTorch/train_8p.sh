@@ -30,7 +30,7 @@ do
             --epoch_size 300000               \
             --max_epoch 180                \
             --validation_metrics _valid_mlm_ppl          \
-            --stopping_criterion _valid_mlm_ppl,10       \
+            --stopping_criterion _valid_mlm_ppl,8       \
             --fp16 true     \
             --amp 1 \
             --seed 1 \
@@ -54,7 +54,7 @@ do
             --epoch_size 300000               \
             --max_epoch 180                \
             --validation_metrics _valid_mlm_ppl          \
-            --stopping_criterion _valid_mlm_ppl,10       \
+            --stopping_criterion _valid_mlm_ppl,8       \
             --fp16 true     \
             --amp 1 \
             --seed 1 \

@@ -43,6 +43,8 @@ The jpegs pictures will be preprocessed to bin fils.
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Xception_for_ACL.zip)
+
   ```
   atc --model=xception_tf.pb --framework=3 --output=xception_tf_1batch --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,299,299,3" --log=info
   ```

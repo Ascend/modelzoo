@@ -76,7 +76,7 @@ class Trainer(object):
     def train(self):
         print ('training steps: %d' % self.args.nstep)
         self.classifier.train( input_fn=lambda:self.data.get_train_input_fn(),
-                               max_steps = self.args.nstep,
+                               max_steps = self.args.max_train_steps,
                                hooks = self.training_hook
                               )
 

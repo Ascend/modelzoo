@@ -43,6 +43,8 @@ from __future__ import print_function
 
 import collections
 import math
+import os
+from os import name
 import re
 from absl import logging
 import numpy as np
@@ -64,9 +66,12 @@ import sys
 #sys.path.append('tpu/models/official/mnasnet')
 #import mnasnet_models
 from npu_bridge.estimator.npu.npu_optimizer import NPUDistributedOptimizer
+from npu_bridge.estimator.npu.npu_optimizer import NPUOptimizer
+from npu_bridge.estimator.npu import npu_loss_scale_manager as lsm_lib
 from npu_bridge.estimator.npu.npu_loss_scale_optimizer import NPULossScaleOptimizer
 from npu_bridge.estimator.npu.npu_loss_scale_manager import FixedLossScaleManager
 from npu_bridge.estimator.npu.npu_loss_scale_manager import ExponentialUpdateLossScaleManager
+from npu_bridge.npu_init import *
 
 class MixedPrecisionOptimizer(tf.train.Optimizer):
     """An optimizer that updates trainable variables in fp32."""
@@ -106,7 +111,7 @@ class MixedPrecisionOptimizer(tf.train.Optimizer):
     def apply_gradients(self, *args, **kwargs):
         return self._optimizer.apply_gradients(*args, **kwargs)
 
-def create_optimizer(learning_rate, params):
+def create_optimizer(learning_rate, params, dynamic_loss_scale=True):
   """Creates optimized based on the specified flags."""
   if params['optimizer'] == 'momentum':
     optimizer = tf.train.MomentumOptimizer(
@@ -137,8 +142,20 @@ def create_optimizer(learning_rate, params):
   else:
     raise ValueError('Unsupported optimizer type %s.' % params['optimizer'])
   # loss scale
-  optimizer = MixedPrecisionOptimizer(optimizer, scale=256)
-  optimizer = NPUDistributedOptimizer(optimizer)  # 浣跨敤NPU鍒嗗竷寮忚绠楋紝鏇存柊姊害
+  if dynamic_loss_scale:
+    optimizer = MixedPrecisionOptimizer(optimizer, scale=1.0)
+    loss_scale_manager = lsm_lib.ExponentialUpdateLossScaleManager(
+        init_loss_scale=65536, incr_every_n_steps=1000,
+        decr_every_n_nan_or_inf=1, decr_ratio=0.5
+    )
+    distribute_flag=True
+    if os.environ['RANK_SIZE'] == '1':
+      distribute_flag=False
+    optimizer = NPUOptimizer(optimizer, loss_scale_manager, is_distributed=distribute_flag,
+    is_loss_scale=True, is_tailing_optimization=False)
+  else:
+    optimizer = MixedPrecisionOptimizer(optimizer, scale=256.0)
+    optimizer = NPUDistributedOptimizer(optimizer)  # 浣跨敤NPU鍒嗗竷寮忚绠楋紝鏇存柊姊害
   return optimizer #optimizer
 
 
@@ -567,7 +584,7 @@ def _model_fn(features, labels, mode, params, variable_filter_fn=None):
       for v in var_list
       if 'batch_normalization' not in v.name and 'bias' not in v.name
   ])
-  total_loss = (total_rpn_loss + total_fast_rcnn_loss + mask_loss * 0.7 +
+  total_loss = (total_rpn_loss + total_fast_rcnn_loss + mask_loss +
                 l2_regularization_loss)
 
   host_call = None

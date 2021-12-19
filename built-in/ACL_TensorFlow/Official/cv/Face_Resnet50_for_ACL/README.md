@@ -1,6 +1,6 @@
-# FACE-RESNET50F inference for Tensorflow
+# FACE-RESNET50 inference for Tensorflow
 
-This repository provides a script and recipe to Inference the
+This repository provides a script and recipe to Inference the face-resnet50 model.
 
 ## Quick Start Guide
 
@@ -25,6 +25,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Face_Resnet50_for_ACL
 ### 3. Offline Inference
 
 **Convert pb to om.**
+
 - get base model
   ```
   https://github.com/seasonSH/DocFace
@@ -35,6 +36,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Face_Resnet50_for_ACL
   for example:
    python3.7 /usr/local/python3.7.5/lib/python3.7/site-packages/tensorflow_core/python/tools/freeze_graph.py --input_checkpoint=./faceres_ms/ckpt-320000 --output_graph=./model/face_resnet50_tf.pb --output_node_names="embeddings" --input_meta_graph=./faceres_ms/graph.meta --input_binary=true
   ```
+
 - configure the env
 
   ```
@@ -46,6 +48,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Face_Resnet50_for_ACL
   ```
 
 - convert pb to om
+
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Face_Resnet50_for_ACL.zip)
 
   ```
   /usr/local/Ascend/atc/bin/atc --model ./model/face_resnet50_tf.pb   --framework=3  --output=face_resnet50 --input_shape="image_batch:1,112,96,3" --enable_small_channel=1 --soc_version=Ascend710

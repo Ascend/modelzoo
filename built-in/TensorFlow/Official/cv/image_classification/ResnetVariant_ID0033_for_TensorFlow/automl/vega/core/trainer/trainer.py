@@ -690,8 +690,9 @@ class Trainer(DistributedWorker):
                               save_checkpoints_steps=self.config.save_steps,
                               log_step_count_steps=self.config.report_freq,
                               session_config=sess_config,
+                              precision_mode="allow_mix_precision",
                               enable_data_pre_proc=True,
-                              iterations_per_loop=1)
+                              iterations_per_loop=10)
                               # profiling_config=profiling_config)
         self.estimator = NPUEstimator(model_fn=self.model_fn,
                                       config=config)

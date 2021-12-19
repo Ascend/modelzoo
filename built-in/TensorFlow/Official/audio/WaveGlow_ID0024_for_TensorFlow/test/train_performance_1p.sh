@@ -37,7 +37,7 @@ train_epochs=1
 #训练batch_size
 batch_size=12
 #训练step
-train_steps=50
+train_steps=500
 #学习率
 learning_rate=
 
@@ -106,10 +106,10 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-cp -r ${data_path}/wavs ${cur_path}/../LJSpeech-1.1/
+#cp -r ${data_path}/wavs ${cur_path}/../LJSpeech-1.1/
 
 #修改参数
-sed -i "30s|train_steps=1000000|train_steps=$train_epochs|g"  $cur_path/../params.py
+sed -i "30s|train_steps=1000000|train_steps=$train_steps|g"  $cur_path/../params.py
 sed -i "31s|epochs=100|#epochs=100|g"  $cur_path/../params.py
 sed -i "34s|\./data/mel_spect|${data_path}/mel_spect|g"  $cur_path/../params.py
 sed -i "36s|\./data/tfrecords|${data_path}/tfrecords|g"  $cur_path/../params.py
@@ -137,6 +137,7 @@ do
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path，--autotune
     nohup python3.7 ${cur_path}/../train.py --learning_rate 6e-4 \
+    --infer_raw_audio_filepath ${data_path}/wavs/LJ001-0001.wav \
     --decay_steps ${train_steps} \
     --batch_size ${batch_size} > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
@@ -146,10 +147,10 @@ wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
-rm -rf ${cur_path}/../LJSpeech-1.1/*
+#rm -rf ${cur_path}/../LJSpeech-1.1/*
 
 #参数改回
-sed -i "30s|train_steps=$train_epochs|train_steps=1000000|g"  $cur_path/../params.py
+sed -i "30s|train_steps=$train_steps|train_steps=1000000|g"  $cur_path/../params.py
 sed -i "31s|#epochs=100|epochs=100|g"  $cur_path/../params.py
 sed -i "34s|${data_path}/mel_spect|\./data/mel_spect|g"  $cur_path/../params.py
 sed -i "36s|${data_path}/tfrecords|\./data/tfrecords|g"  $cur_path/../params.py

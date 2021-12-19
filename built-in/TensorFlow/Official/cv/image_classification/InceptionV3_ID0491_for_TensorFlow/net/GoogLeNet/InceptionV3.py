@@ -37,7 +37,7 @@
 
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-
+from npu_bridge.npu_init import *
 
 """
 论文中提到的第一种模块结构,stride都是1,等效于三层
@@ -183,7 +183,8 @@ def V3_slim(inputs, num_cls, keep_prob=0.8, is_training=True, spatital_squeeze=T
                         net = inception_moudle_v3_3(net,scope='layer46',filter_num=[320,192,384,384,384,448,384,384,384])
                         print(net)
                         net = slim.avg_pool2d(net,[8,8],padding='VALID',scope='layer49')
-                        net = slim.dropout(net)
+                        #net = slim.dropout(net)
+                        net = npu_ops.dropout(net, keep_prob=0.5)
                         net = slim.conv2d(net,num_cls,[1,1],activation_fn=None,normalizer_fn=None,scope='layer50')
                         print(net)
                         if spatital_squeeze:

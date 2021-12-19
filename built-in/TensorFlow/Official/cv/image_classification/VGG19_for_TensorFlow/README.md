@@ -10,7 +10,7 @@
 
 **应用领域（Application Domain）： Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.7.21**
 

@@ -10,7 +10,7 @@
 
 **应用领域（Application Domain）：Natural Language Processing**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.7.17**
 
@@ -42,8 +42,7 @@ BERT是一种与训练语言表示的方法，这意味着我们在大型文本�
 
 - 适配昇腾 AI 处理器的实现：
   
-  
-  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Bertsquad_for_TensorFlow
+  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Bertsquad_ID0495_for_TensorFlow
 
 
 - 通过Git获取对应commit\_id的代码方法如下：

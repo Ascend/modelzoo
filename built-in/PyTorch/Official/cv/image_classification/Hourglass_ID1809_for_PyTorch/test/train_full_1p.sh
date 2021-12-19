@@ -125,6 +125,10 @@ do
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     nohup python3 train.py -e test_run_001  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+
+    wait
+
+    nohup python3 test.py -c test_run_001  > ${cur_path}/output/${ASCEND_DEVICE_ID}/test_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
 wait
 
@@ -133,20 +137,21 @@ wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
-sed -i "s|\r|\n|" ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log
+sed -i "s|\r|\n|g" ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log
+sed -i "s|\r|\n|g" ${cur_path}/output/${ASCEND_DEVICE_ID}/test_${ASCEND_DEVICE_ID}.log
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep "the loss is:"  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "fps: " '{print $2}'|awk '{sum+=$1} END {print"",sum/NR}'|sed s/[[:space:]]//g`
+FPS=`grep "fps:"  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F "fps: " '{print $2}'|awk '{sum+=$1} END {print"",sum/NR}'|sed s/[[:space:]]//g`
 
 
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=None
+train_accuracy=`grep "Val PCK @" ${cur_path}/output/${ASCEND_DEVICE_ID}/test_${ASCEND_DEVICE_ID}.log|grep total|head -1|awk -F 'total : ' '{print $2}'|awk -F ',' '{print $1}'`
 #打印，不需要修改
-#echo "Final Train Accuracy : ${train_accuracy}"
+echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 #稳定性精度看护结果汇总
@@ -168,7 +173,7 @@ grep "the loss is: " $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
 #关键信息打印到${CaseName}.log中，不需要修改
-echo "Network = ${Network}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

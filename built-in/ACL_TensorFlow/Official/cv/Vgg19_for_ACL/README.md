@@ -43,6 +43,8 @@ The jpegs pictures will be preprocessed to bin fils.
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Vgg19_for_ACL.zip)
+
   ```
   atc --model=vgg19_tf.pb --framework=3 --output=vgg19_tf_1batch --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,224,224,3" --log=info
   ```

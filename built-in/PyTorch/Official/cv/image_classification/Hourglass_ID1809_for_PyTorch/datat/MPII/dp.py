@@ -183,7 +183,12 @@ def init(config):
 
     loaders = {}
     for key in dataset:
-        loaders[key] = torch.utils.data.DataLoader(dataset[key], batch_size=batchsize, shuffle=True, num_workers=config['train']['num_workers'], pin_memory=False)
+        if config['opt'].ddp:
+            loaders_sampler = torch.utils.data.distributed.DistributedSampler(dataset[key])
+            loaders_batch_size = int(batchsize)
+            loaders[key] = torch.utils.data.DataLoader(dataset[key], batch_size=loaders_batch_size, shuffle=False, num_workers=config['train']['num_workers'], pin_memory=False, drop_last = True, sampler = loaders_sampler)
+        else:
+            loaders[key] = torch.utils.data.DataLoader(dataset[key], batch_size=batchsize, shuffle=True, num_workers=config['train']['num_workers'], pin_memory=False)
 
     def gen(phase):
         batchsize = config['train']['batchsize']

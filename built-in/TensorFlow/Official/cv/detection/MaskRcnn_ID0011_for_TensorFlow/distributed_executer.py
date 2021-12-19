@@ -420,7 +420,6 @@ class MultiWorkerExecuter(DistributedExecuter):
             save_summary_steps=1e9,
             save_checkpoints_steps=90000,
             keep_checkpoint_max=15,
-            fusion_switch_file="./fusion_switch.cfg",
             #save_checkpoints_secs=None,
         )
     else:
@@ -430,11 +429,11 @@ class MultiWorkerExecuter(DistributedExecuter):
             model_dir=self._flags.model_dir,
             precision_mode="allow_mix_precision",
             log_step_count_steps=100,
+            iterations_per_loop=1000,
             tf_random_seed=0,
             save_summary_steps=1e9,
             save_checkpoints_steps=90000,
             keep_checkpoint_max=15,
-            fusion_switch_file="./fusion_switch.cfg",
             #save_checkpoints_secs=None,
         )
         

@@ -46,6 +46,7 @@ from utils.saver import Saver
 from utils.summaries import TensorboardSummary
 from utils.metrics import Evaluator
 from apex import amp
+import apex
 import torch
 import time
 
@@ -81,7 +82,7 @@ class Trainer(object):
             print(model)
 
         # Define Optimizer
-        optimizer = torch.optim.SGD(train_params, momentum=args.momentum,
+        optimizer = apex.optimizers.NpuFusedSGD(train_params, momentum=args.momentum,
                                     weight_decay=args.weight_decay, nesterov=args.nesterov)
 
         # Define Criterion

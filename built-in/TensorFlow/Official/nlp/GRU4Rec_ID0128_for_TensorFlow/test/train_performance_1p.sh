@@ -7,9 +7,9 @@ export JOB_ID=10087
 RANK_ID_START=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
-data_file="/rsc15_train_1000.txt"
+data_file="/rsc15_train_40000.txt"
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
+#export ASCEND_GLOBAL_LOG_LEVEL=3
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="GRU4Rec_ID0128_for_TensorFlow"
@@ -78,7 +78,7 @@ if [[ $data_path == "" ]];then
     echo "[Error] para \"data_path\" must be confing"
     exit 1
 fi
-BatchSize=50
+BatchSize=4096
 CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 #训练开始时间，不需要修改
 start_time=$(date +%s)
@@ -109,8 +109,7 @@ do
         --train=1 \
         --epoch=${train_epochs} \
         --train_dataset_file=${data_file} \
-        > ${cur_path}/output/${ASCEND_DEVICE_ID}/train.log  \
-        2>&1 &
+        > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
     #python3 main.py --train=1 --epoch=${train_epochs} \
      #   --over_dump=${over_dump} \
@@ -123,10 +122,12 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-#FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $2}'`
-temp1=`grep "npu time is:" $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $6}'`
-TrainingTime=`echo "1000 * ${temp1}"|bc`
-FPS=`echo "scale=2;${BatchSize} / ${temp1}"|bc`
+#FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $2}'`
+temp1=`grep "npu time is:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}'`
+TrainingTime=`awk 'BEGIN{printf "%.2f\n",'1000'*'${temp1}'}'`
+#TrainingTime=`echo "1000 * ${temp1}"|bc`
+FPS=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'/'${temp1}'}'`
+#FPS=`echo "scale=2;${BatchSize} / ${temp1}"|bc`
 #打印，不需要修改
 #echo "Final Performance images/sec : $FPS"
 #输出训练精度,需要模型审视修改
@@ -141,13 +142,13 @@ DeviceType=`uname -m`
 #吞吐量，不需要修改
 ActualFPS=${FPS}
 #单迭代训练时长，不需要修改
-grep Each $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk '{print $6}'>>$cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_time.txt
+grep Each $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $6}'>>$cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_time.txt
 #TrainingTime=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_time.txt`
 #TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'*1000/'${FPS}'}'`
 #TrainningTime=`grep Each $cur_path/output/${ASCEND_DEVICE_ID}/train.log|awk 'END {print $6}'`
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
 #grep loss $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v BatchTimestamp|awk '{print $10}'|sed 's/,//g'|sed '/^$/d' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
-grep Epoch $cur_path/output/$ASCEND_DEVICE_ID/train.log|awk '{print $8}'>>$cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep Epoch $cur_path/output/$ASCEND_DEVICE_ID/train_${ASCEND_DEVICE_ID}.log|awk '{print $8}'>>$cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 #关键信息打印到${CaseName}.log中，不需要修改
@@ -161,4 +162,4 @@ echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${Ca
 #echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-sed -i -e '/ModuleNotFoundError/d' $cur_path/output/${ASCEND_DEVICE_ID}/train.log
+sed -i -e '/ModuleNotFoundError/d' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log

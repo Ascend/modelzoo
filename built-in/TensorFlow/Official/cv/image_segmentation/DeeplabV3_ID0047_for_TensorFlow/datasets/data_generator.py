@@ -86,7 +86,7 @@ _COCO2017_SEG_INFORMATION = DatasetDescriptor(
         'coco2017_trainval':122218,
         'coco2017_val': 4952,
     },
-    num_classes=21,
+    num_classes=32,
     ignore_label=255,
 )
 
@@ -99,7 +99,7 @@ _PASCAL_VOC_SEG_INFORMATION = DatasetDescriptor(
         'trainval': 2913,
         'val': 1449,
     },
-    num_classes=21,
+    num_classes=32,
     ignore_label=255,
 )
 

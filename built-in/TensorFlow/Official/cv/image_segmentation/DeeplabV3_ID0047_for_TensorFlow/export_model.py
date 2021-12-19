@@ -38,7 +38,7 @@ flags.DEFINE_string('checkpoint_path', None, 'Checkpoint path')
 flags.DEFINE_string('export_path', None,
                     'Path to output Tensorflow frozen graph.')
 
-flags.DEFINE_integer('num_classes', 21, 'Number of classes.')
+flags.DEFINE_integer('num_classes', 32, 'Number of classes.')
 
 flags.DEFINE_multi_integer('crop_size', [513, 513],
                            'Crop size [height, width].')

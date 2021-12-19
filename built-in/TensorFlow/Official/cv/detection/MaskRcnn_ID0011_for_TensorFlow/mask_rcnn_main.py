@@ -54,6 +54,8 @@ import time
 #from configs import mask_rcnn_config_1p as mask_rcnn_config
 #from configs import mask_rcnn_config_8p as mask_rcnn_config
 #from configs import mask_rcnn_config_8p_includeMask as mask_rcnn_config
+from hccl.split.api import set_split_strategy_by_size
+set_split_strategy_by_size([85, 15], 'hccl_world_group')
 
 common_tpu_flags.define_common_tpu_flags()
 common_hparams_flags.define_common_hparams_flags()

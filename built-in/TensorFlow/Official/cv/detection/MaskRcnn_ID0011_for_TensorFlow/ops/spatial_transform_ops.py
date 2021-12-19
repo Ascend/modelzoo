@@ -453,7 +453,7 @@ def multilevel_crop_and_resize(features,
     box_height = boxes[:, :, 2] - boxes[:, :, 0]
     areas_sqrt = tf.sqrt(box_height * box_width)
     levels = tf.cast(
-        tf.floordiv(tf.log(tf.div(areas_sqrt, 224.0)), tf.log(2.0)) + 4.0,
+        tf.floordiv(tf.log(tf.maximum(tf.div(areas_sqrt, 224.0), 0.0625)), tf.log(2.0)) + 4.0,
         dtype=tf.int32)
     # Maps levels between [min_level, max_level].
     levels = tf.minimum(max_level, tf.maximum(levels, min_level))

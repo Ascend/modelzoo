@@ -34,24 +34,24 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 -   参考论文：
 
     [Christian Szegedy, Sergey Ioffe, Vincent Vanhoucke, Alex Alemi, ​​Inception-v4, Inception-ResNet and the Impact of Residual Connection on Learning.2016](https://arxiv.org/abs/1602.07261)
+    
 -   参考实现：
 
     [https://github.com/tensorflow/models/tree/master/research/slim](https://github.com/tensorflow/models/tree/master/research/slim)
+    
 -   适配昇腾 AI 处理器的实现：
     
-        
-     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV3_for_TensorFlow
-        
-
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV3_ID0504_for_TensorFlow 
+    
 -   通过Git获取对应commit\_id的代码方法如下：
     
-        
+    
         git clone {repository_url}    # 克隆仓库的代码
         cd {repository_name}    # 切换到模型的代码仓目录
         git checkout  {branch}    # 切换到对应分支
         git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
         cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-        
+    
 
 ## 默认配置<a name="section91661242121611"></a>
 
@@ -143,7 +143,7 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 
 -  单击“立即下载”，并选择合适的下载方式下载源码包。
 -  开始训练    
-    
+   
     1. 启动训练之前，首先要配置程序运行相关环境变量。
 
        环境变量配置信息参见：
@@ -168,13 +168,14 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
 
         3.2 8p指令如下: 
             
-            bash run_8p.sh
-
+        
+        bash run_8p.sh
+   
 -  验证。
 
     1. 将运行模式mode修改为evaluate，并配置训练ckpt路径,请用户根据实际路径进行修改,如下所示：
     
-        
+       
         ```
         --mode=evaluate  
         --data_dir=/opt/npu/imagenet_data
@@ -227,7 +228,7 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
             else: 
                 with slim.arg_scope(inception_v3.inception_v3_arg_scope()): 
                 top_layer, end_points = inception_v3.inception_v3(inputs=features, num_classes=1000, dropout_keep_prob=1.0, is_training = False)
-            
+        
      2. 加载预训练模型。
 
         2.1 修改配置文件参数，修改文件train.py，增加以下参数。 
@@ -242,7 +243,7 @@ InceptionV4是2016年提出的Inception系列网络的第四个版本，随着Re
             #restore ckpt for finetune
             variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=['InceptionV4/Logits/Logits','InceptionV4/AuxLogits/Aux_logits'])                             
             tf.train.init_from_checkpoint(self.args.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})
-            
+        
 
 -   模型训练。
 

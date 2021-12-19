@@ -160,14 +160,29 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_prec
 
           [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
+       单卡训练需要配置指定运行的卡的环境变量：
+              export ASCEND_DEVICE_ID=X
+              其中：X=0~7
 
     2. 单卡训练
         
    
         ```        
-        bash test/train_full_1p.sh --data_path=/home/Dog_Cats
+        bash test/train_full_1p.sh --data_path=xxx
         ```
-
+        其中：xxx是数据集的路径，例如, 数据集下载、解压后的路径为"/home/datasets"，目录结构如下：
+           |--datasets  
+           |	|--data
+           |        |--data_preprocessed
+           |            |--train
+           |                |--...
+           |        |--dog_and_cat_25000_split
+           |            |--eval
+           |            |--train
+           |        |--first_kernel_visualization
+           |            |--...
+          
+         此时，xxx=/home/datasets
 ​   
 <h2 id="高级参考.md">高级参考</h2>
 ## 脚本和示例代码 <a name="section08421615141513"></a>

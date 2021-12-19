@@ -45,6 +45,7 @@ from deeplab.core import nas_genotypes
 from deeplab.core import utils
 from deeplab.core.nas_cell import NASBaseCell
 from tensorflow.contrib.slim.nets import resnet_utils
+from npu_bridge.estimator import npu_ops
 
 arg_scope = contrib_framework.arg_scope
 slim = contrib_slim
@@ -286,7 +287,7 @@ def pnasnet(images,
                                 len(backbone),
                                 hparams.total_training_steps,
                                 batch_norm_fn=batch_norm)
-  with arg_scope([slim.dropout, batch_norm], is_training=is_training):
+  with arg_scope([npu_ops.dropout, batch_norm], is_training=is_training):
     return _build_nas_base(
         images,
         cell=cell,
@@ -349,7 +350,7 @@ def hnasnet(images,
                      len(backbone),
                      hparams.total_training_steps,
                      batch_norm_fn=batch_norm)
-  with arg_scope([slim.dropout, batch_norm], is_training=is_training):
+  with arg_scope([npu_ops.dropout, batch_norm], is_training=is_training):
     return _build_nas_base(
         images,
         cell=cell,

@@ -57,8 +57,11 @@ The generated bin file is in the Model/input_bin directory
 
 
 **Convert pb to om**
+
+[pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/recommendation/KGAT_for_ACL.zip)
+
 ```Bash
-atc --model=ID1376_KGAT_tf_gpu.pb --framework=3 --output=ID1376_KGAT_tf_gpu --soc_version=Ascend310 --input_shape="Placeholder:2048;Placeholder_1:24915;Placeholder_4:3" --log=info
+atc --model=KGAT_tf.pb --framework=3 --output=ID1376_KGAT_tf_gpu --soc_version=Ascend310 --input_shape="Placeholder:2048;Placeholder_1:24915;Placeholder_4:3" --log=info
 ```
 
 Put the converted om file in the Model directory.

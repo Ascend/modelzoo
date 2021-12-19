@@ -35,6 +35,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Resnet50_TF_for_ACL
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Resnet50_for_ACL.zip)
+
   ```
   atc --model=resnet50_tf.pb --framework=3 --output=resnet50_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input_data:1,224,224,3" --log=info --insert_op_conf=resnet50_tf_aipp.cfg
   ```

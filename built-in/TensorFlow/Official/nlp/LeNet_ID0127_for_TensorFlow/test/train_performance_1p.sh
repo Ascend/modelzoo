@@ -21,10 +21,9 @@ data_path=""
 Network="LeNet_ID0127_for_TensorFlow"
 #训练epoch
 train_epochs=1
+train_steps=500
 #训练batch_size
 batch_size=64
-#训练step
-train_steps=100
 #学习率
 learning_rate=
 
@@ -135,7 +134,7 @@ do
 	--random_remove=$random_remove \
 	--data_path=$data_path \
 	--steps=$train_steps \
-    > $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log
+	--iteration_per_loop=10 > $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
     
 done 
 wait

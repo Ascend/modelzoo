@@ -38,6 +38,8 @@ put test dataset to **'acl/data/'**
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/recommendation/widedeep_tf.pb)
+
   ```
   atc --model=acl/model/widedeep_tf.pb --framework=3 --output=acl/model/widedeep_framework_tensorflow_aipp_0_batch_1_input_fp32_output_fp32 --soc_version=Ascend310 --input_shape="Input:1,51"
   ```

@@ -9,17 +9,17 @@
 
 ## 基本信息
 
--   发布者（Publisher）：Huawei
--   应用领域（Application Domain）： Machine Translation
--   版本（Version）：1.1
--   修改时间（Modified） ：2021.7.19
--   大小（Size）：736K
--   框架（Framework）：TensorFlow 1.15.0
--   模型格式（Model Format）：ckpt
--   精度（Precision）：Mixed
--   处理器（Processor）：昇腾910
--   应用级别（Categories）：Official
--   描述（Description）：利用pix2pix2进行图像翻译训练代码
+**发布者（Publisher）：Huawei
+**应用领域（Application Domain）： Machine Translation
+**版本（Version）：1.1
+**修改时间（Modified） ：2021.7.19
+**大小（Size）：736K
+**框架（Framework）：TensorFlow 1.15.0
+**模型格式（Model Format）：ckpt
+**精度（Precision）：Mixed
+**处理器（Processor）：昇腾910
+**应用级别（Categories）：Official
+**描述（Description）：利用pix2pix2进行图像翻译训练代码
 
 ## 概述
 

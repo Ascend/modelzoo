@@ -10,7 +10,7 @@
 
 **应用领域（Application Domain）：Natural Language Processing** 
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.4.6**
 
@@ -136,33 +136,32 @@
 ## 模型训练<a name="section715881518135"></a>
 
 - 单击“立即下载”，并选择合适的下载方式下载源码包。
+- 开始训练。
+    1. 启动训练之前，首先要配置程序运行相关环境变量。
 
-- 启动训练之前，首先要配置程序运行相关环境变量。
+      环境变量配置信息参见：
 
-  环境变量配置信息参见：
+         [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-     [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+      单卡训练需要配置指定运行的卡的环境变量：
+        export ASCEND_DEVICE_ID=X
+        其中：X=0~7
 
-- 单卡训练 
+    2. 单卡训练 
 
-  1. 配置训练参数。
+        ```
+        bash train_full_1p.sh --data_path=../MNIST
+        ```
+        其中：xxx是数据集的路径，例如, 数据集下载、解压后的路径为"/home/data"，目录结构如下：
+           |--data 
+           |	|--MINIST
+           |        |--t10k-images-idx3-ubyte
+           |        |--t10k-labels-idx1-ubyte
+           |        |--train-images-idx3-ubyte
+           |        |--train-labels-idx1-ubyte
+          
+         此时，xxx=/home/data/MNIST
 
-     首先在脚本test/train_full_1p.sh中，配置batch_size、steps、epochs、data_path等参数，请用户根据实际路径配置data_path，或者在启动训练的命令行中以参数形式下发。
-
-     ```
-      batch_size=64
-      steps=1000
-      epochs=5
-      data_path="../MNIST"
-     ```
-
-  2. 启动训练。
-
-     启动单卡训练 （脚本为LeNet_for_TensorFlow/test/train_full_1p.sh） 
-
-     ```
-     bash train_full_1p.sh --data_path=../MNIST
-     ```
 
 <h2 id="迁移学习指导.md">迁移学习指导</h2>
 

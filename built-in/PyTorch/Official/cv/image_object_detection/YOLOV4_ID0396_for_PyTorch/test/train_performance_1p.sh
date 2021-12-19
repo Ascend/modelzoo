@@ -78,6 +78,7 @@ wait
 sed -i "s|./coco/train2017.txt|$data_path/../coco_txl/COCO2017/train2017.txt|g" data/coco.yaml
 sed -i "s|./coco/val2017.txt|$data_path/../coco_txl/COCO2017/val2017.txt|g" data/coco.yaml
 sed -i "s|./coco/testdev2017.txt|$data_path/../coco_txl/COCO2017/testdev2017.txt|g" data/coco.yaml
+sed -i "s|./coco/annotations/instances_val|$data_path/../coco_txl/COCO2017/annotations/instances_val|g" test.py
 
 #################启动训练脚本#################
 # 训练开始时间，不需要修改
@@ -105,9 +106,10 @@ end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
 #参数复原
-sed -i "s|$data_path/../coco_txl/COCO2017/train2017.txt|/coco/train2017.txt|g" data/coco.yaml
-sed -i "s|$data_path/../coco_txl/COCO2017/val2017.txt|/coco/val2017.txt|g" data/coco.yaml
-sed -i "s|$data_path/../coco_txl/COCO2017/testdev2017.txt|/coco/testdev2017.txt|g" data/coco.yaml
+sed -i "s|$data_path/../coco_txl/COCO2017/train2017.txt|./coco/train2017.txt|g" data/coco.yaml
+sed -i "s|$data_path/../coco_txl/COCO2017/val2017.txt|./coco/val2017.txt|g" data/coco.yaml
+sed -i "s|$data_path/../coco_txl/COCO2017/testdev2017.txt|./coco/testdev2017.txt|g" data/coco.yaml
+sed -i "s|$data_path/../coco_txl/COCO2017/annotations/instances_val|./coco/annotations/instances_val|g" test.py
 
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"

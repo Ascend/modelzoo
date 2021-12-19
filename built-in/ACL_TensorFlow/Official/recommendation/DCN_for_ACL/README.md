@@ -51,6 +51,8 @@ labels
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/recommendation/DCN_for_ACL.zip)
+
   ```
   atc --model=dcn_tf.pb --framework=3 --output=dcn_tf_4000batch --output_type=FP32 --soc_version=Ascend310 --input_shape="input_1:4000,39" --input_format=ND --log=info
   ```

@@ -154,11 +154,11 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-TrainingTime=`grep "step_time " $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F " " 'END{print $6}'`
+#TrainingTime=`grep "step_time " $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F " " 'END{print $6}'`
 #FPS=`awk 'BEGIN {printf "%.2f\n", '1000'*'${batch_size}'/'${TrainingTime}'}'`
 #打印，不需要修改
 #TrainingTime=NA
-FPS=`grep "FPS" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F " " 'END{print $8}'`
+FPS=`grep epoch $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep FPS|awk '{print $NF}'|awk '{sum+=$1} END {print sum/NR}'`
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
@@ -176,6 +176,8 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 ##获取性能数据，不需要修改
 #吞吐量
 ActualFPS=${FPS}
+#单迭代训练时长
+TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
 grep "loss :" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F ":" '{print $3}' > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}_loss.txt

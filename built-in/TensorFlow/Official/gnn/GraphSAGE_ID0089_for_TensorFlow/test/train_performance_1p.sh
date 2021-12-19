@@ -14,13 +14,13 @@ RANK_ID_START=0
 data_path=""
 
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL_ETP=3
+#export ASCEND_GLOBAL_LOG_LEVEL_ETP=3
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="GraphSAGE_ID0089_for_TensorFlow"
 #训练epoch
-train_epochs=500
+train_epochs=20 #init 500
 #训练batch_size
 batch_size=512
 #训练step
@@ -36,6 +36,19 @@ data_dump_flag=False
 data_dump_step="10"
 profiling=False
 autotune=False
+
+for para in $*
+do
+   if [[ $para == --data_path* ]];then
+      data_path=`echo ${para#*=}`
+   fi
+   
+   if [[ $para == --conda_name* ]];then
+      conda_name=`echo ${para#*=}`
+	  source set_conda.sh
+	  source activate $conda_name
+   fi
+done
 
 # 帮助信息，不需要修改
 if [[ $1 == --help || $1 == -h ]];then
@@ -131,8 +144,12 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-Runtime=`cat ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log | grep "Runtime" | grep -v "supervised_train.py" | awk '{print $2}'`
-FPS=`echo "scale=5;1000 / $Runtime * $batch_size"|bc`
+#Runtime=`cat ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log | grep "Runtime" | grep -v "supervised_train.py" | awk '{print $2}'`
+#FPS=`echo "scale=5;1000 / $Runtime * $batch_size"|bc`
+ranksize=1
+step_sec=`grep 'Runtime:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $6}'`
+step_per_s=`awk 'BEGIN{printf "%.2f\n",1000/'${step_sec}'}'`
+FPS=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*'${step_per_s}'*'${ranksize}'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
@@ -170,3 +187,8 @@ echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+
+# 退出anaconda环境
+if [ -n "$conda_name" ];then
+   conda deactivate
+fi

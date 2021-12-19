@@ -6,11 +6,11 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Classification**
+**应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.10.14**
 
@@ -44,12 +44,11 @@ MobileNetV2是一种轻量型的适用于移动端的网络，其主要是由dep
 
 -   适配昇腾 AI 处理器的实现：
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_for_TensorFlow
-        
-
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV2_ID0074_for_TensorFlow    
+    
 -   通过Git获取对应commit\_id的代码方法如下：
     
-   
+      
     
     ```
     git clone {repository_url}    # 克隆仓库的代码
@@ -213,25 +212,25 @@ run_config = NPURunConfig(
           [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
     2. 单卡训练
-        
+       
         2.1 在脚本train_1p.sh中（脚本位于MobileNetV2_for_TensorFlow/train_1p.sh），配置`dataset_dir`训练数据集路径参数，请用户根据实际路径配置，参考示例如下。
 
             `--dataset_dir=/opt/npu/slimImagenet` 
     
 
         2.2 单卡训练训练指令（脚本位于MobileNetV2_for_TensorFlow/run_1p.sh）
-
+        
             `bash run_1p.sh`
 
     1. 8卡训练
-        
+       
         2.1 在脚本train_8p.sh中（脚本位于MobileNetV2_for_TensorFlow/train_8p.sh），配置`dataset_dir`训练数据集路径参数，请用户根据实际路径配置，参考示例如下。
 
             `--dataset_dir=/opt/npu/slimImagenet` 
     
 
         2.2 单卡训练训练指令（脚本位于MobileNetV2_for_TensorFlow/run_8p.sh）
-
+        
             `bash run_8p.sh`
 
 
@@ -239,7 +238,7 @@ run_config = NPURunConfig(
 
     1. 训练完成之后，可以开始测试，修改eval_image_classifier_mobilenet.py脚本中checkpoint的文件路径以及dataset_dir路径，请用户根据实际路径配置，示例如下。
 
-        
+       
         ```
         --checkpoint_path=path/to/checkpoint 
         --dataset_dir=path/to/validaton
@@ -320,49 +319,51 @@ run_config = NPURunConfig(
 
 
         1.4 修改estimator_impl.py，将num_classes=1001设置为num_classes=10。
-
+    
         ```
         def model_fn(self, features, labels, mode, params):
         num_classes = 1001
         ```
-
+    
         1.5 修改nets/post_training_quantization.py，将num_classes=1001设置为num_classes=10。
-
+    
         ```
         flags.DEFINE_integer("num_classes", 1001,
                              "Number of output classes for the model.")
         ```
-
+    
         1.6 修改datasets/imagenet.py，将_NUM_CLASSES=1001设置为_NUM_CLASSES=10。
-
+    
         `_NUM_CLASSES = 1001`
-
+    
     2. 加载预训练模型。
-
+    
        配置文件增加参数
-
+    
         2.1 修改文件train.py（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。
-            
-            
-            #用户根据预训练的实际ckpt进行配置
-            tf.app.flags.DEFINE_string(
-            'restore_path', '/code/ckpt/model.ckpt-187500', 'The directory where the ckpt files are stored.')
-            #不加载预训练网络中FC层权重
-            tf.app.flags.DEFINE_list(
-            'restore_exclude', ['MobilenetV2/Logits/'], 'The directory where the fc files are stored.')
-            
+
+
+​            
+​            #用户根据预训练的实际ckpt进行配置
+​            tf.app.flags.DEFINE_string(
+​            'restore_path', '/code/ckpt/model.ckpt-187500', 'The directory where the ckpt files are stored.')
+​            #不加载预训练网络中FC层权重
+​            tf.app.flags.DEFINE_list(
+​            'restore_exclude', ['MobilenetV2/Logits/'], 'The directory where the fc files are stored.')
+
 
         2.2 模型加载修改，修改文件estimator_impl.py，增加以下代码行。
 
-            
-            estimator_spec = tf.estimator.EstimatorSpec(
-                    mode=tf.estimator.ModeKeys.TRAIN, loss=total_loss, train_op=train_op)
-            #restore ckpt for finetune，
-            variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.env.FLAGS.restore_exclude)
-            tf.train.init_from_checkpoint(self.env.FLAGS.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})   
-            
 
-    
+​            
+​            estimator_spec = tf.estimator.EstimatorSpec(
+​                    mode=tf.estimator.ModeKeys.TRAIN, loss=total_loss, train_op=train_op)
+​            #restore ckpt for finetune，
+​            variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.env.FLAGS.restore_exclude)
+​            tf.train.init_from_checkpoint(self.env.FLAGS.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})   
+
+
+​    
 -   模型训练。
 
     参考“模型训练”中训练步骤。

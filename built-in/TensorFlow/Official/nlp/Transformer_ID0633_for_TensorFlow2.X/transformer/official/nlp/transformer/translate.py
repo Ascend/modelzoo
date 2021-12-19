@@ -30,7 +30,7 @@ _BEAM_SIZE = 4
 _ALPHA = 0.6
 
 
-def _get_sorted_inputs(filename):
+def _get_sorted_inputs(filename,batch_size):
   """Read and sort lines from the file sorted by decreasing length.
 
   Args:
@@ -46,13 +46,22 @@ def _get_sorted_inputs(filename):
       inputs.pop()
 
   input_lens = [(i, len(line.split())) for i, line in enumerate(inputs)]
+  #sorted by len
   sorted_input_lens = sorted(input_lens, key=lambda x: x[1], reverse=True)
 
   sorted_inputs = [None] * len(sorted_input_lens)
   sorted_keys = [0] * len(sorted_input_lens)
+  #static input modify
+  num_decode_batches = len(sorted_input_lens)//batch_size
+
   for i, (index, _) in enumerate(sorted_input_lens):
-    sorted_inputs[i] = inputs[index]
-    sorted_keys[index] = i
+    #static input modify
+    if(i>=num_decode_batches*batch_size):
+      logging.info("exceed maxium static input")
+      break
+    else:
+      sorted_inputs[i] = inputs[index]
+      sorted_keys[index] = i
   return sorted_inputs, sorted_keys
 
 
@@ -98,9 +107,11 @@ def translate_file(model,
 
   # Read and sort inputs by length. Keep dictionary (original index-->new index
   # in sorted list) to write translations in the original order.
-  sorted_inputs, sorted_keys = _get_sorted_inputs(input_file)
+  sorted_inputs, sorted_keys = _get_sorted_inputs(input_file,batch_size)
   total_samples = len(sorted_inputs)
-  num_decode_batches = (total_samples - 1) // batch_size + 1
+  #num_decode_batches = (total_samples - 1) // batch_size + 1
+  #static input modify
+  num_decode_batches = (total_samples)// batch_size
 
   def input_generator():
     """Yield encoded strings from sorted_inputs."""

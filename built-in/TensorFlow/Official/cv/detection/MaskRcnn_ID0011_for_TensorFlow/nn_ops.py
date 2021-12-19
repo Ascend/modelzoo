@@ -39,7 +39,7 @@ import tensorflow.compat.v1 as tf
 
 #import tpu_normalization
 
-_BATCH_NORM_DECAY = 0.997
+_BATCH_NORM_DECAY = 0.85
 _BATCH_NORM_EPSILON = 1e-4
 
 

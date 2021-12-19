@@ -36,6 +36,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow.compat.v1 as tf
+from npu_bridge.npu_init import *
 
 import box_utils
 import spatial_transform_ops
@@ -325,25 +326,29 @@ def get_mask_targets(fg_boxes, fg_proposal_to_label_map, fg_box_targets,
 
     # Projects box location and sizes to corresponding cropped ground truth
     # mask coordinates.
-    bb_y_min, bb_x_min, bb_y_max, bb_x_max = tf.split(
-        value=fg_boxes, num_or_size_splits=4, axis=2)
-    gt_y_min, gt_x_min, gt_y_max, gt_x_max = tf.split(
-        value=fg_box_targets, num_or_size_splits=4, axis=2)
-    valid_feature_width = max_feature_width - 4
-    valid_feature_height = max_feature_height - 4
-    y_transform = (bb_y_min - gt_y_min) * valid_feature_height / (
-        gt_y_max - gt_y_min + _EPSILON) + 2
-    x_transform = (bb_x_min - gt_x_min) * valid_feature_width / (
-        gt_x_max - gt_x_min + _EPSILON) + 2
-    h_transform = (bb_y_max - bb_y_min) * valid_feature_height / (
-        gt_y_max - gt_y_min + _EPSILON)
-    w_transform = (bb_x_max - bb_x_min) * valid_feature_width / (
-        gt_x_max - gt_x_min + _EPSILON)
+    # TODO _EPSILON is fp32, underflow in fp16
+    _EPSILON = 1e-5
+    fg_boxes = tf.cast(fg_boxes, tf.float32)
+    fg_box_targets = tf.cast(fg_box_targets, tf.float32)
+    with npu_scope.keep_dtype_scope():
+        bb_y_min, bb_x_min, bb_y_max, bb_x_max = tf.split(
+            value=fg_boxes, num_or_size_splits=4, axis=2)
+        gt_y_min, gt_x_min, gt_y_max, gt_x_max = tf.split(
+            value=fg_box_targets, num_or_size_splits=4, axis=2)
+        valid_feature_width = max_feature_width - 4
+        valid_feature_height = max_feature_height - 4
+        # TODO: adjust compute order or use normed bbox location
+        gt_y_0 = tf.maximum(gt_y_max - gt_y_min, 1.0)
+        gt_x_0 = tf.maximum(gt_x_max - gt_x_min, 1.0)
+        y_transform = (bb_y_min - gt_y_min) * valid_feature_height / gt_y_0 + 2
+        x_transform = (bb_x_min - gt_x_min) * valid_feature_width / gt_x_0 + 2
+        h_transform = (bb_y_max - bb_y_min) * valid_feature_height / gt_y_0
+        w_transform = (bb_x_max - bb_x_min) * valid_feature_width / gt_x_0
 
-    # Compute y and x coordinate indices.
-    box_grid_y, box_grid_x = spatial_transform_ops.compute_grid_positions(
-        tf.stack([y_transform, x_transform, h_transform, w_transform], axis=2),
-        output_size)
+        # Compute y and x coordinate indices.
+        box_grid_y, box_grid_x = spatial_transform_ops.compute_grid_positions(
+            tf.stack([y_transform, x_transform, h_transform, w_transform], axis=2),
+            output_size)
 
     box_grid_y0 = tf.floor(box_grid_y)
     box_grid_x0 = tf.floor(box_grid_x)

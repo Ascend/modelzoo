@@ -34,12 +34,27 @@ import data_loader
 import model
 import time
 import matplotlib.pyplot as plt
-
-from npu_bridge.estimator import npu_ops
-from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
+from npu_bridge.npu_init import *
+from hccl.split.api import set_split_strategy_by_size
+#from npu_bridge.estimator import npu_ops
+#from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 import queue
 import threading
 
+
+
+def broadcast_global_variables(root_rank, index):
+    op_list = []
+    for var in tf.global_variables():
+        if "float" in var.dtype.name:
+            inputs = [var]
+            outputs = hccl_ops.broadcast(tensor=inputs, root_rank=root_rank)
+            if outputs is not None:
+                op_list.append(outputs[0].op)
+                op_list.append(tf.assign(var, outputs[0]))
+    return tf.group(op_list)
+    
+    
 class AlexNet:
     def __init__(self, input_size, lr=0.01, momentum=0.9, decaying_factor=0.0005,
                  LRN_depth=5, LRN_bias=2, LRN_alpha=0.0001, LRN_beta=0.75, keep_prob=0.8):
@@ -76,7 +91,7 @@ class AlexNet:
 
         ##### must minimize total loss
         total_loss = tf.add_n(tf.get_collection('losses'))
-        train_op = tf.train.MomentumOptimizer(learning_rate=learning_rate_, momentum=self.momentum).minimize(total_loss)
+        train_op = NPUDistributedOptimizer(tf.train.MomentumOptimizer(learning_rate=learning_rate_, momentum=self.momentum)).minimize(total_loss)
 
         ##### but we need to watch Cross Entropy Error
         ##### to watch how well our model does converge.
@@ -90,14 +105,18 @@ class AlexNet:
             inputs.append(label_batch)
             q.put(inputs)
 
-    def run(self, max_epoch, loss_sampling_step, acc_sampling_step, max_step=0,data_path=""):
+    def run(self, max_epoch, loss_sampling_step, acc_sampling_step, max_step=0,data_path="",
+            mul_rank_size=1, mul_device_id=0):
         self.loss_sampling_step = loss_sampling_step
         self.acc_sampling_step = acc_sampling_step
 
         self.graph = tf.Graph()
         self.data_path = data_path
         with self.graph.as_default():
-            loader = data_loader.DataLoader(train_dir=data_path)
+            # 根据npu的数量切分数据集
+            loader = data_loader.DataLoader(train_dir=data_path,
+                                            mul_rank_size=mul_rank_size,
+                                            mul_device_id=mul_device_id)
 
             X = tf.placeholder(shape=[None, 227, 227, 3], dtype=tf.float32)
             Y = tf.placeholder(shape=[None, 2], dtype=tf.float32)
@@ -115,8 +134,9 @@ class AlexNet:
             custom_op.name = "NpuOptimizer"
             custom_op.parameter_map["use_off_line"].b = True # ������ʾ�������ڕN��AI������ִ��ѵ��
             custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
+            custom_op.parameter_map["hcom_parallel"].b = True
             config.graph_options.rewrite_options.remapping = RewriterConfig.OFF  # ������ʾ�ر�remap
-
+            bcast_op = broadcast_global_variables(0,1)
             sess = tf.Session(config=config)
 
             saver = tf.train.Saver(tf.global_variables())
@@ -124,6 +144,11 @@ class AlexNet:
             if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
                 saver.restore(sess, ckpt.model_checkpoint_path)
             else:
+                print("info join: do sess initialization")
+                if mul_rank_size !=1:
+                    sess.run(bcast_op)
+                else:
+                    print("info join: no need to do sess bcast_op")
                 sess.run(tf.global_variables_initializer())
 
             start_time = time.time()
@@ -140,12 +165,12 @@ class AlexNet:
             for epoch in range(max_epoch):
                 train_accuracy = 0
                 for itr in range(max_step):
-                    time1 = time.time()
+                    
                     #input_batch, label_batch = loader.next_train(self.input_size)
                     inputs = q.get()
                     input_batch = inputs[0]
                     label_batch = inputs[1]
-
+                    time1 = time.time()
                     _, loss, tmpacc = sess.run([train_op, loss_, accuracy],
                                                feed_dict={X: input_batch, Y: label_batch,
                                                           keep_prob: self.keep_prob, learning_rate: self.lr})
@@ -153,7 +178,7 @@ class AlexNet:
                     time2 = time.time()
                     step_time = time2 - time1
                     FPS = ( self.input_size / step_time )
-                    print("epoch",int(epoch),"step:",int(itr),"step_time",format(step_time, '.3f'),"FPS", format(FPS, '.3f'))
+                    print("epoch",int(epoch),"step:",int(itr),"step_time",format(step_time, '.3f'),"FPS", format(FPS, '.5f'))
                     #print("FPS",format(FPS, '.3f'))
                     #######################################################################
                     ############################## for debug ##############################

@@ -39,7 +39,7 @@ train_epochs=1
 #训练batch_size
 batch_size=12
 #训练step
-train_steps=50
+train_steps=500
 #学习率
 learning_rate=
 
@@ -111,7 +111,7 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-cp -r ${data_path}/wavs ${cur_path}/../LJSpeech-1.1/
+#cp -r ${data_path}/wavs ${cur_path}/../LJSpeech-1.1/
 
 #autotune时，先开启autotune执行单P训练，不需要修改
 if [[ $autotune == True ]]; then
@@ -121,7 +121,7 @@ if [[ $autotune == True ]]; then
 fi
 
 #修改参数
-sed -i "30s|train_steps=1000000|train_steps=$train_epochs|g"  $cur_path/../params.py
+sed -i "30s|train_steps=1000000|train_steps=$train_steps|g"  $cur_path/../params.py
 sed -i "31s|epochs=100|#epochs=100|g"  $cur_path/../params.py
 sed -i "34s|\./data/mel_spect|${data_path}/mel_spect|g"  $cur_path/../params.py
 sed -i "36s|\./data/tfrecords|${data_path}/tfrecords|g"  $cur_path/../params.py
@@ -161,6 +161,7 @@ do
         bind_core="taskset -c $a-$c"
     fi
     nohup ${bind_core} python3.7 ${cur_path}/../train.py --learning_rate 6e-4 \
+    --infer_raw_audio_filepath ${data_path}/wavs/LJ001-0001.wav \
     --decay_steps ${train_steps} \
     --batch_size ${batch_size} > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
@@ -171,17 +172,17 @@ end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
 #参数改回
-sed -i "30s|train_steps=$train_epochs|train_steps=1000000|g"  $cur_path/../params.py
+sed -i "30s|train_steps=$train_steps|train_steps=1000000|g"  $cur_path/../params.py
 sed -i "31s|#epochs=100|epochs=100|g"  $cur_path/../params.py
 sed -i "34s|${data_path}/mel_spect|\./data/mel_spect|g"  $cur_path/../params.py
 sed -i "36s|${data_path}/tfrecords|\./data/tfrecords|g"  $cur_path/../params.py
 
-rm -rf ${cur_path}/../LJSpeech-1.1/*
+#rm -rf ${cur_path}/../LJSpeech-1.1/*
 
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`cat ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log | grep "samples per second" | awk -F "samples per second=" '{print $2}' | awk -F "," '{print $1}' | tail -n +2 | awk '{sum+=$1} END {print sum/NR}'`
+FPS=`cat ${cur_path}/output/0/train_0.log | grep "samples per second" | awk -F "samples per second=" '{print $2}' | awk -F "," '{print $1}' | tail -n +2 | awk '{sum+=$1} END {print sum/NR}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
@@ -204,18 +205,18 @@ ActualFPS=${FPS}
 TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${batch_size}'*'${RANK_SIZE}'*1000/'${FPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep "samples per second" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F "loss = " '{print $2}' | awk -F "," '{print $1}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep "samples per second" $cur_path/output/0/train_0.log | awk -F "loss = " '{print $2}' | awk -F "," '{print $1}' >> $cur_path/output/0/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
-ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
+ActualLoss=`awk 'END {print}' $cur_path/output/0/train_${CaseName}_loss.txt`
 
 #关键信息打印到${CaseName}.log中，不需要修改
-echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "Network = ${Network}" > $cur_path/output/0/${CaseName}.log
+echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/0/${CaseName}.log
+echo "BatchSize = ${BatchSize}" >> $cur_path/output/0/${CaseName}.log
+echo "DeviceType = ${DeviceType}" >> $cur_path/output/0/${CaseName}.log
+echo "CaseName = ${CaseName}" >> $cur_path/output/0/${CaseName}.log
+echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/0/${CaseName}.log
+echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/0/${CaseName}.log
+echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/0/${CaseName}.log
+echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/0/${CaseName}.log

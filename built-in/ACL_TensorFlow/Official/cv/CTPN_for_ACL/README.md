@@ -28,13 +28,13 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/CTPN_for_ACL
    cd scripts/utils/bbox
    bash make.sh
    ```
-4. Download gt file by yourself and put it in the test directory
-   ```
-   https://rrc.cvc.uab.es/?ch=2&com=mymenthods&task=1
-   ```
+4. Download icdar2013 test dataset groundtruth files by yourself and put it in the test directory
+   
 ### 3. Offline Inference
 
 **Convert pb to om.**
+
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/CTPN_for_ACL.zip)
 
 - configure the env
 

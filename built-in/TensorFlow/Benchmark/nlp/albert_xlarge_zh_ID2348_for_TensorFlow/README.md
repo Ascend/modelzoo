@@ -77,7 +77,7 @@
 | ---------- | -------- |
 | 分布式训练 | 否       |
 | 混合精度   | 是       |
-| 数据并行   | 否       |
+| 数据并行   | 是       |
 
 ## 混合精度训练
 
@@ -146,14 +146,13 @@
     
     2. 单卡训练 
     
-        2.1 pretrain训练：配置train_full_1p_pretrain.sh脚本中`data_path`和`ckpt_path`（脚本路径albert_xlarge_zh_ID2348_for_TensorFlow/test/train_full_1p_pretrain.sh）,请用户根据实际路径配置，数据集和预训练模型参数如下所示：
+        2.1 pretrain训练：配置train_full_1p_pretrain.sh脚本中`data_path`（脚本路径albert_xlarge_zh_ID2348_for_TensorFlow/test/train_full_1p_pretrain.sh）,请用户根据实际路径配置，数据集参数如下所示：
 
-             --input_file=${data_path}/tf*.tfrecord \
-             --init_checkpoint=$ckpt_path/albert_model.ckpt \
+             --input_file=${data_path}/tf*.tfrecord
             
         2.2 单p指令如下:
 
-            bash train_full_1p_pretrain.sh --data_path=./XNLI --ckpt_path=albert_xlarge_zh_183k
+            bash train_full_1p_pretrain.sh --data_path=./lcqmc
 
         2.3 finetune训练：配置train_full_1p_finetune.sh脚本中`data_path`和`ckpt_path`（脚本路径albert_xlarge_zh_ID2348_for_TensorFlow/test/train_full_1p_finetune.sh）,请用户根据实际路径配置，数据集和预训练模型参数如下所示：
 
@@ -162,7 +161,7 @@
             
         2.4 单p指令如下:
 
-            bash train_full_1p_finetune.sh --data_path=./XNLI --ckpt_path=albert_xlarge_zh_183k
+            bash train_full_1p_finetune.sh --data_path=./lcqmc--ckpt_path=albert_xlarge_zh_183k
 
 - 验证。
 

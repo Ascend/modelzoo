@@ -136,7 +136,7 @@ wait
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
 step_time=`grep 'INFO loss' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'sec' '{print $1}'|tr -d '('|awk 'NR>2'|awk '{print $NF}'|awk '{sum+=$1} END {print  1000*sum/NR}'`
-FPS=`awk 'BEGIN{printf "%.2f\n",'${batch_size}'*1000/'${step_time}'}'`
+FPS=`awk 'BEGIN{printf "%.2f\n",'${batch_size}'*1000*10/'${step_time}'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 echo "E2E Training Duration sec : $e2e_time"

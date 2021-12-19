@@ -51,7 +51,7 @@ import importlib
 import argparse
 from datetime import datetime
 from pytz import timezone
-
+import time
 import shutil
 
 def parse_command_line():
@@ -59,7 +59,12 @@ def parse_command_line():
     parser.add_argument('-c', '--continue_exp', type=str, help='continue exp')
     parser.add_argument('-e', '--exp', type=str, default='pose', help='experiments name')
     parser.add_argument('-m', '--max_iters', type=int, default=250, help='max number of iterations (thousands)')
+    parser.add_argument( '--ddp',default=False,help='distributed or not ')
     args = parser.parse_args()
+    if args.ddp:
+        NPU_WORLD_SIZE = int(os.getenv('NPU_WORLD_SIZE'))
+        RANK = int(os.getenv('RANK'))
+        torch.distributed.init_process_group('hccl', rank=RANK, world_size=NPU_WORLD_SIZE)
     return args
 
 def reload(config):

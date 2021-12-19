@@ -49,6 +49,8 @@ python3 preprocess.py \
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/OpenPose_for_ACL.zip)
+
   ```
   atc --framework=3 \
       --model=./models/OpenPose_for_TensorFlow_BatchSize_1.pb \

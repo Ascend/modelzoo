@@ -92,7 +92,7 @@ do
             --epoch_size 300000               \
             --max_epoch 180                \
             --validation_metrics _valid_mlm_ppl          \
-            --stopping_criterion _valid_mlm_ppl,10       \
+            --stopping_criterion _valid_mlm_ppl,8       \
             --fp16 true     \
             --amp 1 \
             --seed 1 \
@@ -114,9 +114,9 @@ do
             --bptt 256                   \
             --optimizer npu_fused_adam_v2,lr=0.00005     \
             --epoch_size 300000               \
-            --max_epoch 100000              \
+            --max_epoch 180              \
             --validation_metrics _valid_mlm_ppl          \
-            --stopping_criterion _valid_mlm_ppl,15       \
+            --stopping_criterion _valid_mlm_ppl,8       \
             --fp16 true     \
             --amp 1 \
             --seed 1 \

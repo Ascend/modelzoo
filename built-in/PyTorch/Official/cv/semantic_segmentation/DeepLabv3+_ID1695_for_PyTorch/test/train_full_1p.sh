@@ -23,6 +23,8 @@ device_id=0
 # 学习率
 learning_rate=0.001
 
+PREC="--apex --apex-opt-level O2"
+
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
 do
@@ -33,7 +35,12 @@ do
     elif [[ $para == --more_path1* ]];then
         more_path1=`echo ${para#*=}`
     elif [[ $para == --precision_mode* ]];then
-        precision_mode=`echo ${para#*=}`
+        apex_opt_level=`echo ${para#*=}`
+        if [[ $apex_opt_level != "O1" ]] && [[ $apex_opt_level != "O2" ]] && [[ $apex_opt_level != "O3" ]]; then
+            echo "[Error] para \"precision_mode\" must be config O1 or O2 or O3"
+            exit 1
+        fi
+        PREC="--apex --apex-opt-level "$apex_opt_level
     elif [[ $para == --train_epochs* ]];then
         train_epochs=`echo ${para#*=}`
     elif [[ $para == --dataset* ]];then
@@ -113,6 +120,7 @@ python3 train.py \
     --backbone resnet \
     --lr ${learning_rate} \
     --workers 64 \
+    $PREC \
     --epochs ${epochs} \
     --batch-size ${batch_size} \
     --device_id ${ASCEND_DEVICE_ID} \

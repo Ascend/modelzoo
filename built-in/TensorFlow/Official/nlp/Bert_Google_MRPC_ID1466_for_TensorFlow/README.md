@@ -42,9 +42,7 @@ BERT模型的全称是Bidirectional Encoder Representation from Transformers，�
 
 - 适配昇腾 AI 处理器的实现：
   
-  
-  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Bert_Google_ID1466_MRPC_for_TensorFlow
-        
+  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Bert_Google_MRPC_ID1466_for_TensorFlow   
 
 
 - 通过Git获取对应commit\_id的代码方法如下：

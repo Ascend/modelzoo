@@ -36,7 +36,6 @@ import time
 import sys
 import argparse
 
-
 from npu_bridge.npu_init import *
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
 from tensorflow.core.protobuf import config_pb2
@@ -44,6 +43,7 @@ from tensorflow.core.protobuf import config_pb2
 import tensorflow as tf
 from matplotlib import pyplot as plt
 from tensorflow.examples.tutorials.mnist import input_data
+import math
 
 from npu_bridge.estimator.npu.npu_loss_scale_optimizer import NPULossScaleOptimizer
 from npu_bridge.estimator.npu.npu_loss_scale_manager import FixedLossScaleManager
@@ -72,7 +72,8 @@ def npu_session_config_init(args, session_config=None):
     if (isinstance(session_config, config_pb2.ConfigProto) or issubclass(type(session_config), config_pb2.ConfigProto)):
         custom_op = session_config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name = 'NpuOptimizer'
-        custom_op.parameter_map["use_off_line"].b = True
+        custom_op.parameter_map["enable_data_pre_proc"].b = True
+        custom_op.parameter_map["iterations_per_loop"].i = args.iteration_per_loop
         #calc mode
         custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(str(args.precision_mode))
         cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -137,11 +138,12 @@ def get_config(args):
     parser.add_argument("--random_remove", default='False', help="whether to remove random op in training.")
     parser.add_argument("--data_path", default='MNIST', help="training input data path.")
 
-    parser.add_argument("--batch_size", type=int, help="train batch size.")
+    parser.add_argument("--batch_size", type=int, default=64, help="train batch size.")
     parser.add_argument("--learing_rata", type=float, help="learning rate.")
-    parser.add_argument("--steps", type=int, help="training steps")
+    parser.add_argument("--steps", type=int, default=0, help="training steps")
     parser.add_argument("--ckpt_count", type=int, help="save checkpoiont max counts.")
-    parser.add_argument("--epochs", type=int, help="epoch number.")
+    parser.add_argument("--epochs", type=int, default=1, help="epoch number.")
+    parser.add_argument("--iteration_per_loop", default=1, type=int, help="every session run steps.")
 
     args, unknown = parser.parse_known_args(args)
 
@@ -168,12 +170,44 @@ def visualization(_mnist):
 
 class LeNet(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, args):
+        self.batch_size = args.batch_size
 
+    def create_eval(self, x):
+        x = tf.reshape(x, [self.batch_size, 28, 28, 1])
+        with tf.variable_scope('layer_1', reuse=True) as scope:
+            w_1 = tf.get_variable('weights', shape=[5, 5, 1, 6])
+            b_1 = tf.get_variable('bias', shape=[6])
+        conv_1 = tf.nn.conv2d(x, w_1, strides=[1, 1, 1, 1], padding='SAME')
+        act_1 = tf.sigmoid(tf.nn.bias_add(conv_1, b_1))
+        max_pool_1 = tf.nn.max_pool(act_1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+        with tf.variable_scope('layer_2', reuse=True) as scope:
+            w_2 = tf.get_variable('weights', shape=[5, 5, 6, 16])
+            b_2 = tf.get_variable('bias', shape=[16])
+        conv_2 = tf.nn.conv2d(max_pool_1, w_2, strides=[1, 1, 1, 1], padding='SAME')
+        act_2 = tf.sigmoid(tf.nn.bias_add(conv_2, b_2))
+        max_pool_2 = tf.nn.max_pool(act_2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+        flatten = tf.reshape(max_pool_2, shape=[(- 1), ((7 * 7) * 16)])
+        with tf.variable_scope('fc_1', reuse=True) as scope:
+            w_fc_1 = tf.get_variable('weight', shape=[((7 * 7) * 16), 120])
+            b_fc_1 = tf.get_variable('bias', shape=[120], trainable=True)
+        fc_1 = tf.nn.xw_plus_b(flatten, w_fc_1, b_fc_1)
+        act_fc_1 = tf.nn.sigmoid(fc_1)
+        with tf.variable_scope('fc_2', reuse=True) as scope:
+            w_fc_2 = tf.get_variable('weight', shape=[120, 84])
+            b_fc_2 = tf.get_variable('bias', shape=[84], trainable=True)
+        fc_2 = tf.nn.xw_plus_b(act_fc_1, w_fc_2, b_fc_2)
+        act_fc_2 = tf.nn.sigmoid(fc_2)
+        with tf.variable_scope('fc_3', reuse=True) as scope:
+            w_fc_3 = tf.get_variable('weight', shape=[84, 10])
+            b_fc_3 = tf.get_variable('bias', shape=[10], trainable=True)
+            tf.summary.histogram('weight', w_fc_3)
+            tf.summary.histogram('bias', b_fc_3)
+        fc_3 = tf.nn.xw_plus_b(act_fc_2, w_fc_3, b_fc_3)
+        return fc_3
 
     def create(self, x):
-        x = tf.reshape(x, [(- 1), 28, 28, 1])
+        x = tf.reshape(x, [self.batch_size, 28, 28, 1])
         with tf.variable_scope('layer_1') as scope:
             w_1 = tf.get_variable('weights', shape=[5, 5, 1, 6])
             b_1 = tf.get_variable('bias', shape=[6])
@@ -205,7 +239,18 @@ class LeNet(object):
         fc_3 = tf.nn.xw_plus_b(act_fc_2, w_fc_3, b_fc_3)
         return fc_3
 
-
+def make_dataset(image, label, batch_size, epoch=1):
+    ds = tf.data.Dataset.from_tensor_slices((image, label))
+    # same with data size for perfect shuffle
+    ds = ds.shuffle(buffer_size=image.shape[0])
+    ds = ds.repeat(epoch+1)
+    ds = ds.batch(batch_size, drop_remainder=True)
+    ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    options = tf.data.Options()
+    options.experimental_threading.private_threadpool_size = 128
+    options.experimental_threading.max_intra_op_parallelism = 1
+    ds = ds.with_options(options)
+    return ds
 
 def train(args):
     """
@@ -217,31 +262,25 @@ def train(args):
         None
     """
 
-    batch_size = 64
-    steps = 1000
-    epochs = 5
-
     e2e_start_time = time.time()
 
-    if args.batch_size is not None and args.batch_size > 0: 
-        batch_size = args.batch_size
-
-    if args.steps is not None and args.steps > 0: 
-        steps = args.steps
-
-    if args.epochs is not None and args.epochs > 0: 
-        epochs = args.epochs
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     output_path = os.path.join(cur_dir, "test/output")
     if (not os.path.exists(output_path)):
         os.mkdir(output_path)
 
-    x = tf.placeholder(tf.float32, [None, 784])
-    y = tf.placeholder(tf.float32, [batch_size, 10])
-    le = LeNet()
-    y_ = le.create(x)
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_, labels=y))
-    
+    mnist = input_data.read_data_sets(args.data_path, one_hot=True)
+    train_dataset = make_dataset(mnist.train.images, mnist.train.labels, args.batch_size, args.epochs)
+    test_dataset = make_dataset(mnist.test.images, mnist.test.labels, args.batch_size)
+    train_iterator = tf.compat.v1.data.make_initializable_iterator(train_dataset)
+    test_iterator = tf.compat.v1.data.make_initializable_iterator(test_dataset)
+    train_x, train_y = train_iterator.get_next()
+    test_next_element = test_iterator.get_next()
+
+    le = LeNet(args)
+    train_y_ = le.create(train_x)
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=train_y_, labels=train_y))
+
     optimizer = npu_tf_optimizer(tf.train.AdamOptimizer())
     if args.loss_scale_flag != 0:
         if args.loss_scale_value == 0:
@@ -254,38 +293,47 @@ def train(args):
 
     train_op = optimizer.minimize(loss)
     tf.summary.scalar('loss', loss)
-    correct_pred = tf.equal(tf.argmax(y_, 1), tf.argmax(y, 1))
 
+    x = tf.placeholder(tf.float32, [args.batch_size, 784])
+    y = tf.placeholder(tf.float32, [args.batch_size, 10])
+    y_ = le.create_eval(x)
+    correct_pred = tf.equal(tf.argmax(y_, 1, output_type=tf.int32), tf.argmax(y, 1, output_type=tf.int32))
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
     merged = tf.summary.merge_all()
     writer = tf.summary.FileWriter(output_path + '/logs')
 
-    saver = tf.train.Saver()
-    mnist = input_data.read_data_sets(args.data_path, one_hot=True)
+    if args.steps > 0:
+        steps = args.steps
+    else:
+        steps = math.ceil(mnist.train.num_examples / args.batch_size)
+
     with tf.Session(config=npu_session_config_init(args)) as sess:
+        sess.run(train_iterator.initializer)
         sess.run(tf.global_variables_initializer())
+        iteration_loop_op = util.set_iteration_per_loop(sess, train_op, args.iteration_per_loop)
         writer.add_graph(sess.graph)
-        i = 0
-        for epoch in range(epochs):
-            for step in range(steps):
+
+        for epoch in range(args.epochs):
+            for step in range(0, steps, args.iteration_per_loop):
                 start_time = time.time()
-                (batch_xs, batch_ys) = mnist.train.next_batch(batch_size)
-                (summary, loss_value, _) = sess.run([merged, loss, train_op], feed_dict={x: batch_xs, y: batch_ys})
-               
-                cost_time = time.time()-start_time
+                (summary, loss_value, _) = sess.run([merged, loss, iteration_loop_op])
+
+                cost_time = (time.time()-start_time) / args.iteration_per_loop
                 print("epoch : {}----step : {}----loss : {}----sec/step : {}".format(epoch, step, loss_value, cost_time))
                 
-                writer.add_summary(summary, i)
-                i += 1
+                writer.add_summary(summary, step)
+
+        sess.run(test_iterator.initializer)
         test_acc = 0
         test_count = 0
         for _ in range(10):
-            (batch_xs, batch_ys) = mnist.test.next_batch(batch_size)
+            (batch_xs, batch_ys) = sess.run(test_next_element)
             acc = sess.run(accuracy, feed_dict={x: batch_xs, y: batch_ys})
             test_acc += acc
             test_count += 1
             
         print('accuracy : {}'.format((test_acc / test_count)))
+        saver = tf.train.Saver()
         saver.save(sess, os.path.join("./output/ckpt_npu", "mode.ckpt"))
         tf.io.write_graph(sess.graph, './output/ckpt_npu', 'graph.pbtxt', as_text=True)
 

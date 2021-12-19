@@ -8,9 +8,9 @@
 
 **发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：** Image Classification 
+**应用领域（Application Domain）： Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.10.14**
 
@@ -41,14 +41,12 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
     
 
 - 适配昇腾 AI 处理器的实现：
-    
-        
-  https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow
-        
+  
+  [https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_ID0067_for_TensorFlow](https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_ID0067_for_TensorFlow)      
 
 
 - 通过Git获取对应commit\_id的代码方法如下：
-    
+  
     ```
     git clone {repository_url}    # 克隆仓库的代码
     cd {repository_name}    # 切换到模型的代码仓目录
@@ -264,14 +262,14 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
 
 
      1.2 修改densenet/densenet.py   将class_num = 1000 设置为10 。
-
+    
      ​	`import numpy as npclass_num = 1000`
 
 
 - 加载预训练模型。 
     1. 置文件参数，修改文件train.py，增加以下参数。
 
-        
+       
         ```
         parser.add_argument('--restore_path', default='/code/ckpt/model.ckpt-100',
         help="""restore path""")            #配置预训练ckpt路径		
@@ -281,7 +279,7 @@ DenseNet-121是一个经典的图像分类网络，主要特点是采用各层�
 
 
     2. 模型加载修改，修改文件densenet/model.py ，增加以下代码行。
-   
+
 
         ```
         assert (mode == tf.estimator.ModeKeys.TRAIN)

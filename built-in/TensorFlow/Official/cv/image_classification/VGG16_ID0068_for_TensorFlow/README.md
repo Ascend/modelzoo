@@ -6,11 +6,11 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Classification**
+**应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.10.14**
 
@@ -41,10 +41,8 @@ VGG16是一个经典的目标分类网络。整个网络都使用（3x3）的卷
 
 -   适配昇腾 AI 处理器的实现：
     
-        
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/VGG16_for_TensorFlow
-       
-
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/VGG16_ID0068_for_TensorFlow
+    
 -   通过Git获取对应commit\_id的代码方法如下：
     
     ```
@@ -154,7 +152,7 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
 
     [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 -  单卡训练
-    
+   
     1. 配置训练参数。 
 
        在脚本scripts/train_1p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
@@ -162,11 +160,11 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
          `−−datadir=/opt/npu/slimImagenet`
 
     2. 执行训练指令（脚本为scripts/run_1p.sh）。
-        
+       
         `bash run_1p.sh`
 
 -  8卡训练
-    
+   
     1. 配置训练参数。 
 
        在脚本scripts/train_8p.sh中，配置训练数据集路径，请用户根据实际路径配置，数据集参数如下所示：
@@ -178,9 +176,9 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
 -   验证。
 
     1. 测试的时候，需要修改脚本启动参数（脚本位于scripts/test.sh），配置mode为evaluate并在eval_dir中配置checkpoint文件所在路径，请用户根据实际路径配置，参数如下所示：
+       
         
-        
-        
+       
         ```
         −−mode=evaluate
         −−datadir=/opt/npu/slimImagenet
@@ -232,12 +230,12 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
 - 模型修改。
 
     1. 模型分类类别修改。 使用自有数据集进行分类，如需将分类类别修改为10，修改vgg16/model.py将depth=1000修改为depth=10。 
-        
+       
         `labels_one_hot = tf.one_hot(labels, depth=1000) `
 
     2. 修改vgg16/vgg.py，将1000设置为为10。
 
-        
+       
         ```
         #fc8
         x = tf.layers.dense(x, 1000, activation=None, use_bias=True, kernel_initializer=tf.keras.initializers.RandomNormal(stddev=0.01)) 
@@ -246,12 +244,12 @@ run_config = NPURunConfig( model_dir=flags_obj.model_dir,
 - 加载预训练模型。 
 
     1. 修改配置文件参数，修改train.py文件，增加以下参数。 
-        
+       
         ```
         parser.add_argument('--restore_path', default='/code/model.ckpt-100', help="""restore path""") #配置预训练ckpt路径 
         parser.add_argument('--restore_exclude', default=['dense_2'], help="""restore_exclude""") #不加载预训练网络中FC层权重
         ```
- 
+
     
     2. 模型加载修改，修改超规格vgg16/model.py文件，增加以下代码行。 
 

@@ -1,10 +1,16 @@
 文件作用说明：
 
-- vgg16_ssd_pth2onnx.py，pth转换om脚本
-- ATC转换脚本vgg16_ssd_atc.sh
-- benchmark二进制文件
-- 数据集预处理文件ssd_pth_preprocess.py
-- ReadMe.md
+1.  env.sh：ATC工具环境变量配置脚本
+2.  requirements.txt：脚本运行所需的第三方库
+3.  vgg16_ssd_amct.sh： 模型量化脚本
+4.  vgg16_ssd_atc.sh： ATC转换脚本
+5.  ssd_pth_preprocess.py： 二进制数据集预处理脚本
+6.  ssd_pth_postprocess.py： 验证推理结果脚本
+7.  get_info.py： ssd.info生成脚本 
+8.  vgg16_ssd_pth2onnx.py：pth模型文件转换onnx模型文件脚本
+9.  voc-model-labels.txt： VOC2007数据集的类别标签
+10. auto_atc.sh：模型推理自动化脚本
+11.  benchmark工具源码地址：https://github.com/Ascend/cann-benchmark/tree/master/infer
 
 推理端到端步骤：
 
@@ -23,7 +29,7 @@
    
    python3 ssd_pth_preprocess.py vgg16_ssd ./VOC2007/JPEGImages/ ./prep_bin
    第一个为预处理脚本，第二个为原图片文件，第三个为处理生成的bin文件路径
-   
+
 5. 使用get_info.py脚本获取预处理info文件
 
    python3.7 get_info.py bin ./prep_bin ./vgg16_ssd.info 300 300
@@ -35,6 +41,3 @@
 7. python3 ssd_pth_postprocess.py ./VOC2007/ ./voc-model-labels.txt ./result/dumpOutput_device0/ ./eval_results/
 
    验证推理结果
-
-​       
-

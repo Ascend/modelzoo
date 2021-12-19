@@ -14,7 +14,7 @@ train_batch_size=4
 learning_rate=0.00176
 max_predictions_per_seq=51
 num_train_steps=100
-num_warmup_steps=100
+num_warmup_steps=12500
 output_dir=./my_new_model_path  
 
 # 帮助信息，不需要修改
@@ -87,8 +87,8 @@ nohup python3 -u run_pretraining.py \
         --max_predictions_per_seq=$max_predictions_per_seq \
         --num_train_steps=$num_train_steps \
         --num_warmup_steps=$num_warmup_steps \
-        --learning_rate=$learning_rate \
-        --init_checkpoint=$ckpt_path/albert_model.ckpt  > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
+        --learning_rate=$learning_rate > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
+        #--init_checkpoint=$ckpt_path/albert_model.ckpt
 wait
 end=$(date +%s)
 e2etime=$(( $end - $start ))

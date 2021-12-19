@@ -14,7 +14,7 @@ max_seq_length=512
 train_batch_size=4  
 learning_rate=0.00176  
 max_predictions_per_seq=51
-num_train_steps=125000
+num_train_steps=4000
 num_warmup_steps=12500
 output_dir=./my_new_model_path  
 save_checkpoints_steps=20000
@@ -92,8 +92,8 @@ nohup python3 -u run_pretraining.py  \
         --num_train_steps=$num_train_steps \
         --num_warmup_steps=$num_warmup_steps \
         --save_checkpoints_steps=$save_checkpoints_steps \
-        --output_dir=$output_dir \
-        --init_checkpoint=$ckpt_path/albert_model.ckpt  > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
+        --output_dir=$output_dir > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
+        #--init_checkpoint=$ckpt_path/albert_model.ckpt  > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
 wait
 end=$(date +%s)
 e2etime=$(( $end - $start ))

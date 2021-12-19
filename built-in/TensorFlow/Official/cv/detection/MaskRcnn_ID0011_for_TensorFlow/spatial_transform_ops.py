@@ -399,7 +399,7 @@ def multilevel_crop_and_resize(features,
     box_width = tf.squeeze(boxes[:, :, 3:4] - boxes[:, :, 1:2], axis=-1)
     box_height = tf.squeeze(boxes[:, :, 2:3] - boxes[:, :, 0:1], axis=-1)
     areas_sqrt = tf.sqrt(box_height * box_width)
-    levels = tf.floordiv(tf.log(tf.div(areas_sqrt, 224.0)), tf.log(2.0)) + 4.0
+    levels = tf.floordiv(tf.log(tf.maximum(tf.div(areas_sqrt, 224.0), 0.0625)), tf.log(2.0)) + 4.0
     if not is_gpu_inference:
       levels = tf.cast(levels, dtype=tf.int32)
 

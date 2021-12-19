@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow.compat.v1 as tf
-
+from npu_bridge.npu_init import *
 
 EPSILON = 1e-8
 BBOX_XFORM_CLIP = np.log(1000. / 16.)
@@ -164,6 +164,7 @@ def denormalize_boxes(boxes, image_shape):
     xmax = xmax * width
 
     denormalized_boxes = tf.concat([ymin, xmin, ymax, xmax], axis=-1)
+    denormalized_boxes = tf.cast(tf.cast(denormalized_boxes, tf.float16), tf.float32, name='denorm_cast_custom')
     return denormalized_boxes
 
 
@@ -274,6 +275,10 @@ def encode_boxes(boxes, anchors, weights=None):
     anchor_w = anchor_xmax - anchor_xmin + 1.0
     anchor_yc = anchor_ymin + 0.5 * anchor_h
     anchor_xc = anchor_xmin + 0.5 * anchor_w
+    anchor_h = tf.maximum(anchor_h, 1.0)
+    anchor_w = tf.maximum(anchor_w, 1.0)
+    box_h = tf.maximum(box_h, 1.0)
+    box_w = tf.maximum(box_w, 1.0)
 
     encoded_dy = (box_yc - anchor_yc) / anchor_h
     encoded_dx = (box_xc - anchor_xc) / anchor_w
@@ -342,6 +347,8 @@ def decode_boxes(encoded_boxes, anchors, weights=None):
     decoded_boxes_xmin = decoded_boxes_xc - 0.5 * decoded_boxes_w
     decoded_boxes_ymax = decoded_boxes_ymin + decoded_boxes_h - 1.0
     decoded_boxes_xmax = decoded_boxes_xmin + decoded_boxes_w - 1.0
+    decoded_boxes_ymax = tf.maximum(decoded_boxes_ymax, decoded_boxes_ymin)
+    decoded_boxes_xmax = tf.maximum(decoded_boxes_xmax, decoded_boxes_xmin)
 
     decoded_boxes = tf.concat(
         [decoded_boxes_ymin, decoded_boxes_xmin,
@@ -490,34 +497,37 @@ def bbox_overlap(boxes, gt_boxes):
     iou: a tensor with as a shape of [batch_size, N, MAX_NUM_INSTANCES].
   """
   with tf.name_scope('bbox_overlap'):
-    bb_y_min, bb_x_min, bb_y_max, bb_x_max = tf.split(
-        value=boxes, num_or_size_splits=4, axis=2)
-    gt_y_min, gt_x_min, gt_y_max, gt_x_max = tf.split(
-        value=gt_boxes, num_or_size_splits=4, axis=2)
+    boxes = tf.cast(boxes, tf.float32)
+    gt_boxes = tf.cast(gt_boxes, tf.float32)
+    with npu_scope.keep_dtype_scope():
+        bb_y_min, bb_x_min, bb_y_max, bb_x_max = tf.split(
+            value=boxes, num_or_size_splits=4, axis=2)
+        gt_y_min, gt_x_min, gt_y_max, gt_x_max = tf.split(
+            value=gt_boxes, num_or_size_splits=4, axis=2)
 
-    # Calculates the intersection area.
-    i_xmin = tf.maximum(bb_x_min, tf.transpose(gt_x_min, [0, 2, 1]))
-    i_xmax = tf.minimum(bb_x_max, tf.transpose(gt_x_max, [0, 2, 1]))
-    i_ymin = tf.maximum(bb_y_min, tf.transpose(gt_y_min, [0, 2, 1]))
-    i_ymax = tf.minimum(bb_y_max, tf.transpose(gt_y_max, [0, 2, 1]))
-    i_area = tf.maximum((i_xmax - i_xmin), 0) * tf.maximum((i_ymax - i_ymin), 0)
+        # Calculates the intersection area.
+        i_xmin = tf.maximum(bb_x_min, tf.transpose(gt_x_min, [0, 2, 1]))
+        i_xmax = tf.minimum(bb_x_max, tf.transpose(gt_x_max, [0, 2, 1]))
+        i_ymin = tf.maximum(bb_y_min, tf.transpose(gt_y_min, [0, 2, 1]))
+        i_ymax = tf.minimum(bb_y_max, tf.transpose(gt_y_max, [0, 2, 1]))
+        i_area = tf.maximum((i_xmax - i_xmin), 0) * tf.maximum((i_ymax - i_ymin), 0)
 
-    # Calculates the union area.
-    bb_area = (bb_y_max - bb_y_min) * (bb_x_max - bb_x_min)
-    gt_area = (gt_y_max - gt_y_min) * (gt_x_max - gt_x_min)
-    # Adds a small epsilon to avoid divide-by-zero.
-    u_area = bb_area + tf.transpose(gt_area, [0, 2, 1]) - i_area + 1e-8
+        # Calculates the union area.
+        bb_area = (bb_y_max - bb_y_min) * (bb_x_max - bb_x_min)
+        gt_area = (gt_y_max - gt_y_min) * (gt_x_max - gt_x_min)
+        # Adds a small epsilon to avoid divide-by-zero.
+        u_area = bb_area + tf.transpose(gt_area, [0, 2, 1]) - i_area + 1e-8
 
-    # Calculates IoU.
-    iou = i_area / u_area
+        # Calculates IoU.
+        iou = i_area / u_area
 
-    # Fills -1 for IoU entries between the padded ground truth boxes.
-    gt_invalid_mask = tf.less(
-        tf.reduce_max(gt_boxes, axis=-1, keepdims=True), 0.0)
-    padding_mask = tf.logical_or(
-        tf.zeros_like(bb_x_min, dtype=tf.bool),
-        tf.transpose(gt_invalid_mask, [0, 2, 1]))
-    iou = tf.where(padding_mask, -tf.ones_like(iou), iou)
+        # Fills -1 for IoU entries between the padded ground truth boxes.
+        gt_invalid_mask = tf.less(
+            tf.reduce_max(gt_boxes, axis=-1, keepdims=True), 0.0)
+        padding_mask = tf.logical_or(
+            tf.zeros_like(bb_x_min, dtype=tf.bool),
+            tf.transpose(gt_invalid_mask, [0, 2, 1]))
+        iou = tf.where(padding_mask, -tf.ones_like(iou), iou)
 
     return iou
 

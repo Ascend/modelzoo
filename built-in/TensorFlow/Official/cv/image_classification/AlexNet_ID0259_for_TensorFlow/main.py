@@ -53,20 +53,28 @@ LRN_alpha = 0.0001
 LRN_beta = 0.75
 keep_prob = 0.5
 #
+from hccl.split.api import set_split_strategy_by_size
 loss_sampling_step = 20
 acc_sampling_step = 1
 
 parse = argparse.ArgumentParser()
 parse.add_argument("--data_path", metavar='DIR', default = "",help="path to dataset.")
 parse.add_argument("--step", type=int, default=0, help="max step.")
+parse.add_argument("--mul_device_id", type=int, default=0, help="device id.")
+parse.add_argument("--mul_rank_size", type=int, default=1, help="number of rank size")
 parse.add_argument("--epoch", type=int, default=1, help="max epoch.")
 args = parse.parse_args()
 max_step = args.step
 max_epoch = args.epoch
+mul_rank_size = args.mul_rank_size
+mul_device_id = args.mul_device_id
 data_path = os.path.join(args.data_path,"data/data_preprocessed/train")
 #
+if mul_rank_size != 1:
+    lr = lr * mul_rank_size
+    set_split_strategy_by_size([60, 19, 21]) 
 alexnet = train.AlexNet(input_size, lr, momentum, decaying_factor, LRN_depth, LRN_bias, LRN_alpha, LRN_beta, keep_prob)
-alexnet.run(max_epoch, loss_sampling_step, acc_sampling_step, max_step,data_path)
+alexnet.run(max_epoch, loss_sampling_step, acc_sampling_step, max_step,data_path,mul_rank_size,mul_device_id)
 alexnet.save_acc()
 alexnet.save_loss()
 #gif_maker.run(max_epoch)

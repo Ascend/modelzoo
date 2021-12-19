@@ -6,11 +6,11 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
 **应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.10.14**
 
@@ -37,15 +37,14 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
      [Saining Xie, Ross Girshick, Piotr Dollár, Zhuowen Tu, Kaiming He.Aggregated Residual Transformations for Deep Neural Networks](https://arxiv.org/abs/1611.05431) 
 
  -   参考实现：
-        
- 
+     
  -   适配昇腾 AI 处理器的实现：
-    
-     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_for_TensorFlow
+        
+     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/ResNext50_ID0070_for_TensorFlow
 
 
  -   通过Git获取对应commit\_id的代码方法如下：
-    
+        
         ```
         git clone {repository_url}    # 克隆仓库的代码
         cd {repository_name}    # 切换到模型的代码仓目录
@@ -183,7 +182,7 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
         ```
        python3.7 ResNext50_for_TensorFlow/code/resnext50_train/mains/res50.py --config_file=res50_32bs_1p_host --max_train_steps=10000 --  iterations_per_loop=1000   --debug=True  --eval=False  --model_dir=./  2>&1 | tee train_$RANK_ID.log &
-        ```
+       ```
 
     4. 修改`ModelZoo_ResNext50_TF_MTI\code\resnext50_train\configs` 中`res50_32bs_1p_host`文件:
 
@@ -203,21 +202,23 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
        5.1 进行训练时，需要使用 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`）， `mode` 默认设置为         `train`。
 
-           
+       
             'mode':'train',                                         # "train","evaluate"
 
-            
-       5.2 进行验证时，需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate`。
-
-            
+       
+       ​     
+    5.2 进行验证时，需要修改 `res50_32bs_1p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_1p_host.py`），将 `mode` 设置为 `evaluate`。
+       
+       
             'mode':'evaluate',                                         # "train","evaluate"
-            
+       
         
+       
        5.3 单卡训练指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_1p_host.sh`）
             
             
             bash  Resnext50_1p_host.sh
-            
+       
 
 - 8卡训练
 
@@ -239,7 +240,7 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
         ```
        python3.7 ResNext50_for_TensorFlow/code/resnext50_train/mains/res50.py --config_file=res50_32bs_8p_host --max_train_steps=10000 --  iterations_per_loop=1000   --debug=True  --eval=False  --model_dir=./  2>&1 | tee train_$RANK_ID.log &
-        ```
+       ```
 
     4. 修改`ModelZoo_ResNext50_TF_MTI\code\resnext50_train\configs` 中`res50_32bs_8p_host`文件:
 
@@ -259,21 +260,22 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
        5.1 进行训练时，需要使用 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`）， `mode` 默认设置为         `train`。
 
-            
+       
             'mode':'train',                                         # "train","evaluate"
-            
+       
        
        5.2 进行验证时，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
 
-            
+       
             'mode':'evaluate',                                         # "train","evaluate"
-            
+       
         
+       
        5.3 8P训练指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_8p_host.sh`）
             
             
             bash Resnext50_8p_host.sh
-            
+       
 
 - 验证。
 
@@ -281,14 +283,15 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
 
         1.1 进行验证之前，需要修改 `res50_32bs_8p_host.py` 脚本参数（脚本位于`ModelZoo_ResNext50_TF_MTI/code / resnext50_train / configs / res50_32bs_8p_host.py`），将 `mode` 设置为 `evaluate`。
 
-            
+    
             'mode':'evaluate',                                         # "train","evaluate"
-            
+    
         1.2 8P测试指令（脚本位于`ModelZoo_ResNext50_TF_MTI/testscript/Resnext50_8p_host.sh`）
             
             
-            bash Resnext50_8p_host.sh    
-
+    
+        bash Resnext50_8p_host.sh    
+    
     2. 在验证执行完成后，验证结果会输出到 ModelZoo_ResNext50_TF_MTI/result/cloud-localhost--0/0/resnet50_train/results/res50_32bs_8p目录中。 测试结束后会打印
 
 验证集的top1 accuracy和top5 accuracy。
@@ -346,7 +349,7 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
         
         1.1 使用自有数据集进行分类，如需将分类类别修改为10。 修改code/resnext50_train/models/resnet50/resnet.py文件，将units=1001设置为units=10。 
         
-            
+        ​    
         
             axes = [1,2] 
             x = tf.reduce_mean( x, axes, keepdims=True ) 
@@ -355,42 +358,44 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
             x = tf.layers.dense(inputs=x, units=1001,kernel_initializer= tf.variance_scaling_initializer() ) 
             . . . 
             x = tf.layers.dense(inputs=x, units=1001,kernel_initializer=tf.random_normal_initializer(stddev=0.01)) 
-       
+    
 
         1.2 修改code/resnext50_train/models/resnet50/res50_model.py文件，将depth=1001设置为depth=10。
             
             `labels_one_hot = tf.one_hot(labels, depth=1001) `
         
         1.3 修改code/resnext50_train/configs/res50_32bs_1p_host.py文件，将num_classes=1001设置为num_classes=10。 
-        
-            
+    
+    
+    ​        
             'model_name': 'resnet50', 
             'num_classes': 1001,
-            
+    
 
 
     2.  加载预训练模型。
-
+    
         2.1 配置文件增加参数，修改code/resnext50_train/configs/res50_32bs_1p_host.py文件（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。                     
         
         `'restore_path': '/code/ckpt0/model.ckpt-601000', `
-
+    
         2.2 用户根据预训练的实际ckpt进行配置 
-
+    
         `'restore_exclude': ['fp32_vars/dense'], `
-
+    
         2.3 不加载预训练网络中FC层权重 模型加载修改，修改code/resnext50_train/models/resnet50/res50_model.py文件，增加以下代码行。 
-        
-       
-           
-            
+
+
+​       
+​           
+​            
             #restore ckpt for finetune， 
             variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=self.config.get('restore_exclude'))         
             tf.train.init_from_checkpoint(self.config.get('restore_path'),{v.name.split(':')[0]: v for v in variables_to_restore})
-            
 
-        
- 
+
+​        
+
 
 - 模型训练。
 
@@ -428,31 +433,31 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
     --rank_size 使用NPU卡数量，默认：单P 配置1，8P 配置8 
     
     --mode 运行模式，默认train；可选：train，evaluate 
-
+    
     --max_train_steps 训练次数，单P 默认：10000 
-
+    
     --iterations_per_loop NPU运行时，device端下沉次数，默认：1000 
-
+    
     --eval 训练结束后，是否启动验证流程。默认：单P False，8P True 
-
+    
     --num_epochs 训练epoch次数， 默认：单P None，8P 120 
-
+    
     --data_url 数据集路径，默认：data/resnext50/imagenet_TF 
-
+    
     --ckpt_dir 验证时checkpoint文件地址 默认：/d_solution/ckpt0 
-
+    
     --lr_decay_mode 学习率方式，默认：cosine
-
+    
     --learning_rate_maximum 初始学习率，默认：0.1 
-
+    
     --learning_rate_end 结束学习率：默认：0.000001 
-
+    
     --batch_size 每个NPU的batch size，默认：32 
-
+    
     --warmup_epochs 初始warmup训练epoch数，默认：5 
-
+    
     --momentum 动量，默认：0.9
-
+    
     说明：当前默认模式为train，iterations_per_loop配置1000，每训练1000step会在日志中打印出 loss，FPS，和lr。在8P训练脚本中，配置了eval=True，当训练结束后，会进行验证流程，输出精度验证结果。
 
 ## 训练过程<a name="section1589455252218"></a>
@@ -477,7 +482,7 @@ ResNeXt网络在ResNet基础上进行了优化，同时采用Vgg/ResNet堆叠的
  通过“模型训练”中的测试指令启动8P测试。在120 epoch训练执行完成后，脚本会自动执行验证流程。验证结果会输出到 /result/cloud-localhost--0/0/resnet50_train/results/res50_32bs_8p目录中。 
 
 测试结束后会打印验证集的top1 accuracy和top5 accuracy，如下所示。
- 
+
 ```
 Evaluating 
 Validation dataset size: 50000 

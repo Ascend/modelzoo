@@ -5,9 +5,9 @@
 -   [迁移学习指导](#迁移学习指导.md)
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：cv**
+**应用领域（Application Domain）：Image Classification**
 
 **版本（Version）：1.1**
 
@@ -43,7 +43,7 @@
 -   适配昇腾 AI 处理器的实现：【深加工】
     
         ```
-        https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_for_TensorFlow
+        https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/cv/image_classification/Shufflenet_ID0645_for_TensorFlow
         branch=master
         commit_id= 477b07a1e95a35885b3a9a569b1c8ccb9ad5d7af
         ```

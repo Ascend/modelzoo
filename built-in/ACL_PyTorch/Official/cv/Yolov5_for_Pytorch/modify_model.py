@@ -51,7 +51,7 @@ def main(args):
                                           outputs=[f"yolo{i}_coord", f"yolo{i}_obj", f"yolo{i}_classes"],
                                           boxes=boxes,
                                           coords=coords,
-                                          clases=class_num,
+                                          classes=class_num,
                                           yolo_version='V5',
                                           name=f'yolo_{i}'))
         model.graph.node.append(yolo_node[i])
@@ -69,7 +69,7 @@ def main(args):
                                         outputs=['box_out', 'box_out_num'],
                                         boxes=boxes,
                                         coords=coords,
-                                        clases=class_num,
+                                        classes=class_num,
                                         pre_nms_topn=1024,
                                         post_nms_topn=1024,
                                         relative=1,

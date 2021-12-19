@@ -6,9 +6,9 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Classification**
+**应用领域（Application Domain）：Image Classification**
 
 **版本（Version）：1.1**
 
@@ -42,7 +42,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
 
 -   适配昇腾 AI 处理器的实现：
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/EfficientNet_B0_ID0009_for_TensorFlow
 
 
 
@@ -103,7 +103,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
             model_dir=FLAGS.model_dir,
             iterations_per_loop=FLAGS.iterations_per_loop,
             keep_checkpoint_max=5      ）
-    
+
 
 <h2 id="训练环境准备.md">训练环境准备</h2>
 
@@ -182,7 +182,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
              --data_dir=/data/slimImagenet
 
         2.2  单卡训练指令（脚本为run__1p.sh，脚本位于EfficientNet_B0_for_TensorFlow/run_1p.sh）
-	     
+	    
             bash run_1p.sh 
 
     3. 8卡训练
@@ -190,7 +190,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
         3.1 设置8卡训练参数（脚本为train_8p.sh，脚本位于EfficientNet_B0_for_TensorFlow/train_8p.sh），示例如下。
 
             请确保`train_8p.sh`脚本中的“--data_dir”修改为 用户生成的tfrecord的路径
-
+        
             --data_dir=/data/slimImagenet
         
         3.2 8卡训练指令（脚本为run_8p.sh，脚本位于EfficientNet_B0_for_TensorFlow/run_8p.sh）
@@ -209,7 +209,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
         --data_dir=/data/slimImagenet 
         --model_dir=result/8p/0/
         ```
- 
+
     
     2. 上述文件修改完成之后，执行8卡测试指令
 
@@ -259,32 +259,32 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
 
 	    1.2 修改efficientnet_builder.py、tpu/efficientnet_tpu_builder.py文件，将num_classes=1000修改为10。
 	
-            
+        
             global_params = efficientnet_model.GlobalParams(
             	batch_norm_momentum=0.99,
             	.  .  .     .  .   .
             	num_classes=1000,
             	width_coefficient=width_coefficient,
             	depth_coefficient=depth_coefficient,
-            
+        
 
 	    1.3 修改edgetpu/efficientnet_edgetpu_builder.py文件，将num_classes=1001修改为10。
 	
-            
+        
             global_params = efficientnet_model.GlobalParams(
             	batch_norm_momentum=0.99,
             	.  .  .     .  .   .
             	num_classes=1001,
             	width_coefficient=width_coefficient,
             	depth_coefficient=depth_coefficient,
-            
+        
 
 	    1.4 修改main_npu.py文件。将num_label_classes=1000修改为10。
 	
-            
+        
             flags.DEFINE_integer(
             	'num_label_classes', default=1000, help='Number of classes, at least 2')
-            
+        
 
 	    1.5 将num_label_classes == 1001修改为10。
 
@@ -292,41 +292,42 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
 	    
           1.6 修改export_model.py  "num_steps", 1000，修改为10。
 	
-            
+        
             flags.DEFINE_integer(
             	"num_steps", 1000,
             	"Number of post-training quantization calibration steps to run.")
-            
+        
 
 
     2.  加载预训练模型。
-
+    
         2.1 修改配置文件参数，修改main_npu.py文件，增加一下参数。
 
 
-            
-            RESTORE_PATH_DIR = '/code/efficientnet/ckpt111/model.ckpt-218750'
-            RESTORE_EXCLUDE_DIR = ['efficientnet-b0/model/head/dense/']
-            #用户根据预训练的实际ckpt进行配置
-            flags.DEFINE_string(
-            'restore_path',
-            default=RESTORE_PATH_DIR,
-            help=('restore path'))
-            #不加载预训练网络中FC层权重
-            flags.DEFINE_list(
-            'restore_exclude',
-            default=RESTORE_EXCLUDE_DIR,
-            help=('restore_exclude'))
-            
+​            
+​            RESTORE_PATH_DIR = '/code/efficientnet/ckpt111/model.ckpt-218750'
+​            RESTORE_EXCLUDE_DIR = ['efficientnet-b0/model/head/dense/']
+​            #用户根据预训练的实际ckpt进行配置
+​            flags.DEFINE_string(
+​            'restore_path',
+​            default=RESTORE_PATH_DIR,
+​            help=('restore path'))
+​            #不加载预训练网络中FC层权重
+​            flags.DEFINE_list(
+​            'restore_exclude',
+​            default=RESTORE_EXCLUDE_DIR,
+​            help=('restore_exclude'))
+
 
         2.2 模型加载修改，增加以下代码行。
-	
-            
-            is_training = (mode == tf.estimator.ModeKeys.TRAIN)
-            	#restore ckpt for finetune，
-            	variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=FLAGS.restore_exclude)
-            	tf.train.init_from_checkpoint(FLAGS.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})
-            
+
+
+​            
+​            is_training = (mode == tf.estimator.ModeKeys.TRAIN)
+​            	#restore ckpt for finetune，
+​            	variables_to_restore = tf.contrib.slim.get_variables_to_restore(exclude=FLAGS.restore_exclude)
+​            	tf.train.init_from_checkpoint(FLAGS.restore_path,{v.name.split(':')[0]: v for v in variables_to_restore})
+
 
 
 -   模型训练。
@@ -343,7 +344,7 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
 
 脚本和示例代码：
 
-    
+
         ├── efficientnet
         │  ├── 8p.json                    //rank table 配置文件
         │  ├── autoaugment.py             //自动数据增强
@@ -361,24 +362,24 @@ EfficientNets是一系列图像分类网络，基于AutoML和Compound Scaling技
         │  ├── train_8p.sh                //8卡 配置脚本
         │  ├── utils.py                   //部分调用函数封装
         │  ├── ...                        //其他文件
-    
+
 
 
 ## 脚本参数<a name="section6669162441511"></a>
 
 
-    
-    --data_dir                        directory of dataset, default: FAKE_DATA_DIR
-    --model_dir                       directory where the model stored, default: None
-    --mode                            mode to run the code, default: train_and_eval
-    --train_batch_size                batch size for training, default: 2048
-    --train_steps                     max number of training steps, default: 218949
-    --iterations_per_loop             number of steps to run on devices each iteration, default: 1251
-    --model_name                      name of the model, default: efficientnet-b0
-    --steps_per_eval                  controls how often evaluation is performed, default: 6255
-    --eval_batch_size                 batch size for evaluating in eval mode, default: 1024
-    --base_learning_rate              base learning rate for each card, default: 0.016
-    
+​    
+​    --data_dir                        directory of dataset, default: FAKE_DATA_DIR
+​    --model_dir                       directory where the model stored, default: None
+​    --mode                            mode to run the code, default: train_and_eval
+​    --train_batch_size                batch size for training, default: 2048
+​    --train_steps                     max number of training steps, default: 218949
+​    --iterations_per_loop             number of steps to run on devices each iteration, default: 1251
+​    --model_name                      name of the model, default: efficientnet-b0
+​    --steps_per_eval                  controls how often evaluation is performed, default: 6255
+​    --eval_batch_size                 batch size for evaluating in eval mode, default: 1024
+​    --base_learning_rate              base learning rate for each card, default: 0.016
+
 
 ## 训练过程<a name="section1589455252218"></a>
 

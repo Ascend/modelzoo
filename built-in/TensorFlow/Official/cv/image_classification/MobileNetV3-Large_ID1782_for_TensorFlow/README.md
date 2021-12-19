@@ -6,11 +6,11 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：Classification**
+**应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2021.6.17**
 
@@ -40,12 +40,14 @@ MobileNetV3是一种轻量型的适用于移动端的网络，其主要是由dep
 -   参考实现：
 
     [https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet](https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet)
-        
-        
+    
+-   适配昇腾 AI 处理器的实现：
 
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/MobileNetV3-Large_ID1782_for_TensorFlow
+    
 -   通过Git获取对应commit\_id的代码方法如下：
     
-   
+      
     
     ```
     git clone {repository_url}    # 克隆仓库的代码
@@ -250,7 +252,7 @@ run_config = NPURunConfig(
         ```
 
 
-    
+​    
 -   模型训练。
 
     参考“模型训练”中训练步骤。
@@ -300,6 +302,6 @@ run_config = NPURunConfig(
 
 | Acc@1    | FPS       | Npu_nums | Epochs   |
 | :------: | :------:  | :------: | :------: |
-| :------: |    2041   |   1      |   1      | 
+| :------: |    2041   |   1      |   1      |
 | 74.257   |   13021   |   8      |  300     |
 

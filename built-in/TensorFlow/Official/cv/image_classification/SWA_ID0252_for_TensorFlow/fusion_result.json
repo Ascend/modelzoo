@@ -1,0 +1,87 @@
+{
+    "graphId": "11",
+    "graph_fusion": {
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "4"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "2",
+            "match_times": "2"
+        }
+    }
+}{
+    "graphId": "41",
+    "graph_fusion": {
+        "AReduceMeanFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "AReduceSumFusionPass": {
+            "effect_times": "3",
+            "match_times": "6"
+        },
+        "AddNFusionPass": {
+            "effect_times": "0",
+            "match_times": "2"
+        },
+        "ConstToAttrPass": {
+            "effect_times": "2",
+            "match_times": "2"
+        },
+        "ConstToAttrReduceSumFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        },
+        "DreluFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MatMulBiasAddFusionPass": {
+            "effect_times": "2",
+            "match_times": "2"
+        },
+        "MulAddFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulAddNL2LossFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulAddNPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "MulGradFusionPass": {
+            "effect_times": "0",
+            "match_times": "1"
+        },
+        "TileConstToAttrFusion": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    },
+    "sessionId": "0",
+    "ub_fusion": {
+        "AutomaticUbFusion": {
+            "effect_times": "1",
+            "match_times": "3"
+        },
+        "TbeEltwiseFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "TbeMultiOutputFusionPass": {
+            "effect_times": "1",
+            "match_times": "1"
+        },
+        "TbeReduceElemwiseFusionPass": {
+            "effect_times": "3",
+            "match_times": "3"
+        }
+    }
+}

@@ -32,6 +32,7 @@ import tensorflow as tf
 
 from .layers import Layer, Dense
 from .inits import glorot, zeros
+from npu_bridge.npu_init import *
 
 
 class MeanAggregator(Layer):
@@ -74,8 +75,10 @@ class MeanAggregator(Layer):
     def _call(self, inputs):
         self_vecs, neigh_vecs = inputs
 
-        neigh_vecs = tf.nn.dropout(neigh_vecs, 1-self.dropout)
-        self_vecs = tf.nn.dropout(self_vecs, 1-self.dropout)
+        # neigh_vecs = tf.nn.dropout(neigh_vecs, 1-self.dropout)
+        # self_vecs = tf.nn.dropout(self_vecs, 1-self.dropout)
+        neigh_vecs = npu_ops.dropout(neigh_vecs, 1-self.dropout)
+        self_vecs = npu_ops.dropout(self_vecs, 1-self.dropout)
         neigh_means = tf.reduce_mean(neigh_vecs, axis=1)
        
         # [nodes] x [out_dim]
@@ -133,8 +136,10 @@ class GCNAggregator(Layer):
     def _call(self, inputs):
         self_vecs, neigh_vecs = inputs
 
-        neigh_vecs = tf.nn.dropout(neigh_vecs, 1-self.dropout)
-        self_vecs = tf.nn.dropout(self_vecs, 1-self.dropout)
+        # neigh_vecs = tf.nn.dropout(neigh_vecs, 1-self.dropout)
+        # self_vecs = tf.nn.dropout(self_vecs, 1-self.dropout)
+        neigh_vecs = npu_ops.dropout(neigh_vecs, 1-self.dropout)
+        self_vecs = npu_ops.dropout(self_vecs, 1-self.dropout)
         means = tf.reduce_mean(tf.concat([neigh_vecs, 
             tf.expand_dims(self_vecs, axis=1)], axis=1), axis=1)
        

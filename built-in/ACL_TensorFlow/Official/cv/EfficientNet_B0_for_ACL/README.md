@@ -35,6 +35,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/EfficientNet_B0_for_ACL
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/EfficientNetB0_for_ACL.zip)
+
   ```
   atc --model=efficientnetb0_tf.pb --framework=3 --output=efficientnetb0_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,224,224,3" --log=info --insert_op_conf=efficientnetb0_tf_aipp.cfg
   ```

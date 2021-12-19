@@ -5,7 +5,7 @@
 - [迁移学习指导](#迁移学习指导.md)
 - [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
 **应用领域（Application Domain）：Image Classification**
 
@@ -45,9 +45,9 @@
     ```
     
 - 适配昇腾 AI 处理器的实现：
-    
+  
     ```
-    https://gitee.com/zhangshouzhong2021/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/DS-CNN_ID1769_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/DS-CNN_ID1769_for_TensorFlow
     ```
 
 
@@ -59,7 +59,7 @@
     git checkout  {branch}    # 切换到对应分支
     git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
     cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    ```    
+    ```
 
 ## 默认配置 <a name="section91661242121611"></a>
 -   网络结构
@@ -157,14 +157,22 @@ custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes(FLAGS.precision
        环境变量配置信息参见：
 
           [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
-
+       
+       单卡训练需要配置指定运行的卡的环境变量：
+              export ASCEND_DEVICE_ID=X
+              其中：X=0~7
 
     2. 单卡训练
 
        
         ``` 
-        bash test/train_full_1p.sh --data_path=/home/data/mnist 
-        ``` 
+        bash test/train_full_1p.sh --data_path=xxx
+        ```
+         其中：xxx是数据集的路径，例如, 数据集下载保存的路径为"/home/data"，目录结构如下：
+           |--data 
+           |	|--speech_commands_v0.02.tar.gz
+        
+         此时，xxx=/home/data
 
 
 <h2 id="高级参考.md">高级参考</h2>

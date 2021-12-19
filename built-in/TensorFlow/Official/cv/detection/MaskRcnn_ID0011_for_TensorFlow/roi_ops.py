@@ -192,6 +192,7 @@ def _propose_rois_gpu(scores,
         boxes, height, width)
     pre_nms_boxes = tf.reshape(pre_nms_boxes, [batch_size, num_boxes, 1, 4])
     pre_nms_scores = tf.reshape(scores, [batch_size, num_boxes, 1])
+
     boxes, scores, _, _ = tf.image.combined_non_max_suppression(
         pre_nms_boxes,
         pre_nms_scores,
@@ -200,6 +201,8 @@ def _propose_rois_gpu(scores,
         iou_threshold=rpn_nms_threshold,
         score_threshold=0.0,
         pad_per_class=False)
+    boxes = tf.cast(boxes, tf.float32)
+    scores = tf.cast(scores, tf.float32)
     boxes = box_utils.to_absolute_coordinates(boxes, height, width)
   else:
     scores, boxes = box_utils.top_k(
@@ -275,7 +278,7 @@ def multilevel_propose_rois(scores_outputs,
 
         this_level_scores = tf.reshape(
             scores_outputs[level], [batch_size, num_boxes])
-        this_level_scores = tf.sigmoid(this_level_scores)
+        this_level_scores = tf.sigmoid(this_level_scores) * 32768.0
         this_level_boxes = tf.reshape(
             box_outputs[level], [batch_size, num_boxes, 4])
         this_level_anchors = tf.cast(

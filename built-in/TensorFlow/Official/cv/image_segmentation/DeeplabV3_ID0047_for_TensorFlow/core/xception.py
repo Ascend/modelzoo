@@ -56,6 +56,7 @@ from tensorflow.contrib import slim as contrib_slim
 from deeplab.core import utils
 from tensorflow.contrib.slim.nets import resnet_utils
 from nets.mobilenet import conv_blocks as mobilenet_v3_ops
+from npu_bridge.estimator import npu_ops
 
 slim = contrib_slim
 
@@ -499,8 +500,8 @@ def xception(inputs,
           net = tf.reduce_mean(net, [1, 2], name='global_pool', keepdims=True)
           end_points['global_pool'] = net
         if num_classes:
-          net = slim.dropout(net, keep_prob=keep_prob, is_training=is_training,
-                             scope='prelogits_dropout')
+          net = npu_ops.dropout(net, keep_prob=keep_prob, is_training=is_training,
+                             name='prelogits_dropout')
           net = slim.conv2d(net, num_classes, [1, 1], activation_fn=None,
                             normalizer_fn=None, scope='logits')
           end_points[sc.name + '/logits'] = net

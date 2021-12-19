@@ -36,15 +36,15 @@ gru4rec_BP 下的代码仅使用反向传播来训练 RNN，这是我们所采�
 -   参考论文：
 
     http://arxiv.org/abs/1511.06939
+    
 -   参考实现：
 
     https://github.com/Songweiping/GRU4Rec_TensorFlow
+    
 -   适配昇腾 AI 处理器的实现：
     
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/GRU4Rec_ID0128_for_TensorFlow    
     
-     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/GRU4Rec_for_TensorFlow
-        
-
 -   通过Git获取对应commit\_id的代码方法如下：
     
     
@@ -153,7 +153,7 @@ gru4rec_BP 下的代码仅使用反向传播来训练 RNN，这是我们所采�
 
             bash train_full_1p.sh
 
-   
+
 -  验证。
 
     1. 修改train_full_1p.sh脚本中的train参数为train=0:

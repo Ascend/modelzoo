@@ -9,17 +9,17 @@
 
 ## 基本信息
 
--   发布者（Publisher）：Huawei
--   应用领域（Application Domain）： Image Classification
--   版本（Version）：1.1
--   修改时间（Modified） ：2021.7.21
--   大小（Size）：112K
--   框架（Framework）：TensorFlow 1.15.0
--   模型格式（Model Format）：ckpt
--   精度（Precision）：Mixed
--   处理器（Processor）：昇腾910
--   应用级别（Categories）：Research
--   描述（Description）：使用八倍卷积降低卷积神经网络的空间冗余
+**发布者（Publisher）：Huawei
+**应用领域（Application Domain）： Image Classification
+**版本（Version）：1.1
+**修改时间（Modified） ：2021.7.21
+**大小（Size）：112K
+**框架（Framework）：TensorFlow 1.15.0
+**模型格式（Model Format）：ckpt
+**精度（Precision）：Mixed
+**处理器（Processor）：昇腾910
+**应用级别（Categories）：Research
+**描述（Description）：使用八倍卷积降低卷积神经网络的空间冗余
 
 ## 概述
 
@@ -39,10 +39,10 @@ Octave 一词表示 “八音阶” 或 “八度”，音乐里降 8 个音阶�
 
 - 适配昇腾 AI 处理器的实现：
 
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Research/cv/image_classification/Oct-ResNet_ID0251_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/Oct-ResNet_ID0251_for_TensorFlow
 
 - 通过Git获取对应commit\_id的代码方法如下：
-    
+  
     ```
     git clone {repository_url}    # 克隆仓库的代码
     cd {repository_name}    # 切换到模型的代码仓目录
@@ -93,7 +93,7 @@ Octave 一词表示 “八音阶” 或 “八度”，音乐里降 8 个音阶�
         sess_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
         sess = tf.Session(config=sess_config)
         K.set_session(sess)
- 
+
 <h2 id="训练环境准备">训练环境准备</h2>
 
 1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。

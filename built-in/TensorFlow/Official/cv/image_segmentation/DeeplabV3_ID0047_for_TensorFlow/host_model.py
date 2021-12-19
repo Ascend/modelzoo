@@ -42,7 +42,7 @@ class RestoreHook(tf.train.SessionRunHook):
 class Model(object):
     def __init__(self):
 
-        self.outputs_to_num_classes = {'semantic':21}
+        self.outputs_to_num_classes = {'semantic':32}
         self.ignore_label = 255
         self.model_options = common.ModelOptions(
             outputs_to_num_classes=self.outputs_to_num_classes,

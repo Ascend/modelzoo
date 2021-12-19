@@ -18,6 +18,8 @@ device_id=0
 # 学习率
 learning_rate=0.001
 
+PREC="--apex --apex-opt-level O2"
+
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
 do
@@ -30,7 +32,12 @@ do
 	elif [[ $para == --epochs* ]];then
         epochs=`echo ${para#*=}`	
     elif [[ $para == --precision_mode* ]];then
-        precision_mode=`echo ${para#*=}`
+        apex_opt_level=`echo ${para#*=}`
+        if [[ $apex_opt_level != "O1" ]] && [[ $apex_opt_level != "O2" ]] && [[ $apex_opt_level != "O3" ]]; then
+            echo "[Error] para \"precision_mode\" must be config O1 or O2 or O3"
+            exit 1
+        fi
+        PREC="--apex --apex-opt-level "$apex_opt_level
     fi
 done
 
@@ -104,6 +111,7 @@ python3 train.py \
     --device_id ${ASCEND_DEVICE_ID} \
     --checkname deeplab-resnet \
     --eval-interval 1 \
+    $PREC \
     --dataset pascal > ${test_path_dir}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait

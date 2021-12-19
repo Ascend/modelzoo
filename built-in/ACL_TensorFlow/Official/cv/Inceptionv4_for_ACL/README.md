@@ -35,6 +35,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Inceptionv4_for_ACL
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/Inceptionv4_for_ACL.zip)
+
   ```
   atc --model=inception_v4_tf.pb --framework=3 --output=inception_v4_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,299,299,3" --log=info --insert_op_conf=inception_v4_tf_aipp.cfg
   ```

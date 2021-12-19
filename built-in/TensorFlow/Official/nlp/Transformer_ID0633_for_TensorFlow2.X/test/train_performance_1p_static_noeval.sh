@@ -154,7 +154,7 @@ BatchSize=${batch_size}
 #设备类型
 DeviceType=`uname -m`
 #用例名称
-CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'fp32_perf'
 
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改

@@ -39,6 +39,8 @@ import os
 from npu_bridge.estimator.npu.npu_optimizer import NPUDistributedOptimizer
 from npu_bridge.estimator.npu import npu_loss_scale_optimizer as lso
 from npu_bridge.estimator.npu import npu_loss_scale_manager as lsm_lib
+from npu_bridge.npu_init import *
+from hccl.split.api import set_split_strategy_by_idx
 ####################NPU_modify end######################
 
 rank_size = int(os.getenv("RANK_SIZE"))
@@ -85,17 +87,15 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
       epsilon=1e-6,
       exclude_from_weight_decay=["LayerNorm", "layer_norm", "bias"])
 
-  if use_tpu:
-    optimizer = tf.contrib.tpu.CrossShardOptimizer(optimizer)
-
   tvars = tf.trainable_variables()
   if rank_size == 1:
       grads = tf.gradients(loss, tvars)
   else:
+      print("begain npu_allreduce optimeizer")
       optimizer = NPUDistributedOptimizer(optimizer)
-      grads_and_vars = optimizer.compute_gradients(loss, tvars)
-      grads_and_vars = [(g, v) for g, v in grads_and_vars if g is not None]
-      grads, tvars = list(zip(*grads_and_vars))
+      set_split_strategy_by_idx([56, 104, 199])
+      grads = npu_allreduce(tf.gradients(loss, tvars))
+      
   # This is how the model was pre-trained.
   (grads, _) = tf.clip_by_global_norm(grads, clip_norm=1.0)
 

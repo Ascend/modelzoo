@@ -35,6 +35,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/AlignedReID_for_ACL
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/AlignedReID_for_ACL.zip)
+
   ```
   atc --model=AlignedReID_tf.pb --framework=3 --output=AlignedReID_100batch --output_type=FP32 --soc_version=Ascend310 --input_shape="images_total:100,224,224,3" --log=info
   ```

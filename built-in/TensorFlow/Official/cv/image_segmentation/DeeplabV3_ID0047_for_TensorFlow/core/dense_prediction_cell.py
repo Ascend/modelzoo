@@ -27,7 +27,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 from tensorflow.contrib import slim as contrib_slim
-
+from npu_bridge.estimator import npu_ops
 from core import utils
 
 slim = contrib_slim
@@ -272,19 +272,17 @@ class DensePredictionCell(object):
           # Merge branch logits.
           concat_logits = tf.concat(branch_logits, 3)
           if self.hparams['dropout_on_concat_features']:
-            concat_logits = slim.dropout(
+            concat_logits = npu_ops.dropout(
                 concat_logits,
                 keep_prob=self.hparams['dropout_keep_prob'],
-                is_training=is_training,
-                scope=_CONCAT_PROJECTION_SCOPE + '_dropout')
+                name=_CONCAT_PROJECTION_SCOPE + '_dropout')
           concat_logits = slim.conv2d(concat_logits,
                                       self.hparams['concat_channels'],
                                       1,
                                       scope=_CONCAT_PROJECTION_SCOPE)
           if self.hparams['dropout_on_projection_features']:
-            concat_logits = slim.dropout(
+            concat_logits = npu_ops.dropout(
                 concat_logits,
                 keep_prob=self.hparams['dropout_keep_prob'],
-                is_training=is_training,
-                scope=_CONCAT_PROJECTION_SCOPE + '_dropout')
+                name=_CONCAT_PROJECTION_SCOPE + '_dropout')
           return concat_logits

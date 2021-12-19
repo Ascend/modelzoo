@@ -35,6 +35,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Densenet24_for_ACL
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/DenseNet24_for_ACL.zip)
+
   ```
   atc --model=model/densenet24.pb --framework=3 --output=model/densenet24_1batch --soc_version=Ascend710 --input_shape="Placeholder:1,38,38,38,2;Placeholder_1:1,38,38,38,2"
   ```

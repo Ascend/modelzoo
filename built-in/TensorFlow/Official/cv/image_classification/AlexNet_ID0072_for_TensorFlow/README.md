@@ -6,11 +6,11 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
 **应用领域（Application Domain）：Image Classification**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.10.14**
 
@@ -42,10 +42,10 @@ AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中
     [https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet](https://pytorch.org/docs/stable/_modules/torchvision/models/alexnet.html#alexnet)
         
         
- 
+
 -   适配昇腾 AI 处理器的实现：
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_for_TensorFlow
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/AlexNet_ID0072_for_TensorFlow
 
 -   通过Git获取对应commit\_id的代码方法如下：
     
@@ -54,7 +54,7 @@ AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中
         git checkout  {branch}    # 切换到对应分支
         git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
         cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-     
+    
 
 ## 默认配置<a name="section91661242121611"></a>
 -   网络结构
@@ -87,7 +87,7 @@ AlexNet是一个经典的图像分类网络，AlexNet在2012年ImageNet竞赛中
 
 
 ## 支持特性<a name="section1899153513554"></a>
-    
+
 | 特性列表  | 是否支持 |
 |-------|------|
 | 分布式训练 | 是    |
@@ -159,7 +159,7 @@ run_config = NPURunConfig(
 ## 模型训练<a name="section715881518135"></a>
 - 下载训练脚本。
 - 检查scripts/目录下是否有存在8卡IP的json配置文件“8p.json”。
-   
+  
 ```
  {"group_count": "1","group_list":     
                 [{"group_name": "worker","device_count": "8","instance_count": "1", "instance_list":      
@@ -176,7 +176,7 @@ run_config = NPURunConfig(
 ```
 
 - 开始训练。
-    
+  
     1. 启动训练之前，首先要配置程序运行相关环境变量。
 
        环境变量配置信息参见：
@@ -185,7 +185,7 @@ run_config = NPURunConfig(
     
 
     2. 单卡训练
-        
+       
         2.1 设置单卡训练参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_1p.sh），示例如下。请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的路径。
             
             --checkpoint_dir=${EXEC_DIR}/${RESULTS}/${device_id}/model_1p/
@@ -195,16 +195,17 @@ run_config = NPURunConfig(
             bash scripts/run_npu_1p.sh
 
     3. 8卡训练
-        
+       
         3.1 设置8卡训练参数（脚本位于AlexNet_for_TensorFlow/scripts/train_alexnet_8p.sh），示例如下。
     请确保下面例子中的“--data_dir”修改为用户生成的tfrecord的实际路径。
-           
+        
              --data_dir=/data/slimImagenet
 
         3.2 8卡训练指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_8p.sh）
             
+        
              bash run_npu_8p.sh
-   
+
 
 <h2 id="开始测试.md">开始测试</h2>
 
@@ -218,13 +219,13 @@ run_config = NPURunConfig(
         `--checkpoint_dir=./results/0/model_8p/`
 
     3. 将“`rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`”替换为“`#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`”，如下所示：
- 
+
         `#rm -rf ${EXEC_DIR}/${RESULTS}/${device_id}/*`
 
 - 执行测试指令
-    
+  
     1. 上述文件修改完成之后，执行8卡测试指令（脚本位于AlexNet_for_TensorFlow/scripts/run_npu_8p.sh）
-        
+       
         `bash scripts/run_npu_8p.sh`
 
 <h2 id="迁移学习指导.md">迁移学习指导</h2>
@@ -286,11 +287,11 @@ run_config = NPURunConfig(
         ```
 
 
-    
+​    
     2.  加载预训练模型。
         
         配置文件增加参数，修改文件train.py（具体配置文件名称，用户根据自己实际名称设置），增加以下参数。    
-
+    
         ```
         parser.add_argument('--restore_path', default='/code/ckpt0/model.ckpt-188000',
                     help="""restore path""")            #配置预训练ckpt路径
@@ -298,7 +299,7 @@ run_config = NPURunConfig(
                     help="""restore_exclude""")  #不加载预训练网络中FC层权重
         ```
     3. 模型加载修改，修改文件alexnet/model.py，增加以下代码行。
-
+    
         ```
         assert (mode == tf.estimator.ModeKeys.TRAIN)
         #restore ckpt for finetune，
@@ -312,13 +313,13 @@ run_config = NPURunConfig(
     请参考“快速上手”章节。
 
 -  模型评估。
-    
+   
     可以参考“模型训练”中训练步骤。
 
 <h2 id="高级参考.md">高级参考</h2>
 
 ## 脚本和示例代码<a name="section08421615141513"></a>
-    
+
     ├── train.py                                  //网络训练与测试代码
     ├── Dockerfile                                //docker场景构建    
     ├── README.md                                 //说明文档

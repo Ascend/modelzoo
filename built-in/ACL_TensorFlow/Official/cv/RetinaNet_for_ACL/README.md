@@ -48,6 +48,8 @@ python3 load_coco_json.py
 
 - convert pb to om
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/RetinaNet_for_ACL.zip)
+
   ```
   atc --model=retinanet_tf.pb --framework=3 --output=retinanet_tf_1batch --output_type=FP32 --soc_version=Ascend310 --input_shape="input_1:1,768,1024,3" --log=info
   ```

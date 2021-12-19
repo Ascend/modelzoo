@@ -6,11 +6,11 @@
 -   [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
-**发布者（Publisher）：huawei**
+**发布者（Publisher）：Huawei**
 
-**应用领域（Application Domain）：NLP**
+**应用领域（Application Domain）：Natural Language Processing**
 
-**版本（Version）：1.2**
+**版本（Version）：1.1**
 
 **修改时间（Modified） ：2020.10.14**
 
@@ -36,34 +36,31 @@
 
     [Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2018). Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv 
     preprint arXiv:1810.04805.](https://arxiv.org/pdf/1810.04805.pdf)
-        
+    
 -   参考实现：
 
     [https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/LanguageModeling/BERT](https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/LanguageModeling/BERT)
 
 -   适配昇腾 AI 处理器的实现：
     
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/nlp/Bert-base_ID0060_for_TensorFlow
     
-    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Benchmark/nlp/Bert-base_for_TensorFlow
+- 通过Git获取对应commit\_id的代码方法如下：
 
-
-
--   通过Git获取对应commit\_id的代码方法如下：
-    
-    ```
-    git clone {repository_url}    # 克隆仓库的代码
-    cd {repository_name}    # 切换到模型的代码仓目录
-    git checkout  {branch}    # 切换到对应分支
-    git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
-    cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
-    ```
+  ```
+  git clone {repository_url}    # 克隆仓库的代码
+  cd {repository_name}    # 切换到模型的代码仓目录
+  git checkout  {branch}    # 切换到对应分支
+  git reset --hard ｛commit_id｝     # 代码设置到对应的commit_id
+  cd ｛code_path｝    # 切换到模型代码所在路径，若仓库下只有该模型，则无需切换
+  ```
 
 ## 默认配置<a name="section91661242121611"></a>
 
 - 网络结构
- 
+
   学习率为1e-5，使用polynomial decay
- 
+
   优化器：Adam
 
   优化器Weight decay为0.01
@@ -152,13 +149,13 @@
 
 <h2 id="快速上手.md">快速上手</h2>
 
--  单击“立即下载”，下载源码包。
+- 单击“立即下载”，下载源码包。
 
--  数据集准备<a name="section361114841316"></a>
+- 数据集准备<a name="section361114841316"></a>
 
-   数据集以文本格式表示，每段之间以空行隔开，如wikipedia。
-   运行如下命令，将数据集转换为tfrecord格式。
-   
+数据集以文本格式表示，每段之间以空行隔开，如wikipedia。
+运行如下命令，将数据集转换为tfrecord格式。
+
 ```
       python src/pretrain/create_pretraining_data.py \   
       --input_file=<path to your testdata> \   
@@ -172,9 +169,11 @@
       --dupe_factor=5
 ```
 
+- 模型训练
 - 启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
 
-   [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+[Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
+
 - 脚本修改:
   版本Atlas Data Center SolutionV100R020C30之前的版本:
 
@@ -182,25 +181,27 @@
 
 
  - 单卡训练
-    
+   
     1. 在`scripts`路径下的`run_pretraining.sh`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径，如下：
-        
+       
 ```
         --input_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \      #训练数据集路径
         --eval_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \       #验证数据集路径
 ```
-  
+
       2. 单卡训练指令，在ModelZoo_BertBase_TF目录下，执行如下命令：
             
             bash scripts/run_pretraining.sh
 
    
+
+
 - 8卡训练
     1. 在`scripts`路径下的`train_8p.sh`中配置参数，确保 `--input_files_dir` 和 `--eval_files_dir` 配置为用户数据集具体路径，如下：
         ```
          --input_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \      #训练数据集路径
          --eval_files_dir=/autotest/CI_daily/ModelZoo_BertBase_TF/data/wikipedia_128 \       #验证数据集路径  
-         ```
+        ```
     2. 8卡训练指令，在ModelZoo_BertBase_TF目录下，执行如下命令： 
 
         ```
@@ -273,11 +274,11 @@
     ├── CONTRIBUTING.md                             //CONTRIBUTING.md
     ├── LICENCE                                   //LICENCE
     ├── NOTICE                                   //NOTICE├── README.md                                 //说明文档
-    
+
 
 ## 脚本参数<a name="section6669162441511"></a>
-    
-     
+
+
 ```
          --train_batch_size=128 \           #每个NPU训练的batch size，默认：128
          --learning_rate=1e-4 \             #学习率，默认：1e-4

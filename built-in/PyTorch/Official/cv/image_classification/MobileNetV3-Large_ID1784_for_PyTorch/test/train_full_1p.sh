@@ -19,9 +19,9 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="MobileNetV3-Large_ID1784_for_PyTorch"
-#训练epoch
+#训练epoch  全量训练需要600 epoch 建议采用8P
 #train_epochs=600
-train_epochs=90
+train_epochs=30
 #训练batch_size
 batch_size=128
 #训练step

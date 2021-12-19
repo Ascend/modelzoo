@@ -25,6 +25,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Research/cv/3DUNET_for_Tensorflow
 
 **Convert pb to om.**
 
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/3DUNET_for_ACL.zip)
+
 - configure the env
 
   ```
@@ -42,7 +44,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Research/cv/3DUNET_for_Tensorflow
 
 - convert pb to om(Ascend310)
   ```
-  atc --model=model/unet3d.pb --framework=3 --output=model/unet3d_1batch --soc_version=Ascend710 --input_shape=input:1,224,224,160,4 --optypelist_for_implmode=ReduceMeanD --op_select_implmode=high_precision
+  atc --model=model/unet3d.pb --framework=3 --output=model/unet3d_1batch --soc_version=Ascend310 --input_shape=input:1,224,224,160,4 --optypelist_for_implmode=ReduceMeanD --op_select_implmode=high_precision
   ```
 
 - Build the program

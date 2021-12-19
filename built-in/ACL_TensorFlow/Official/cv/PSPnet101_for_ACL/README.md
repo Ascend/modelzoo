@@ -1,6 +1,6 @@
-# CTPN inference for Tensorflow
+# PSPNet101 inference for Tensorflow
 
-This repository provides a script and recipe to Inference the
+This repository provides a script and recipe to Inference the PSPNet101 model.
 
 ## Quick Start Guide
 
@@ -16,12 +16,12 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/PSPNet101_for_ACL
 1. Download the dataset by yourself
 2. Executing the Preprocessing Script
    ```
-   without flip
+   #without flip
    python3 scripts/data_processing.py --img_num=500 --crop_width=720 --crop_height=720 --data_dir=../cityscapes --val_list=../cityscapes/list/cityscapes_val_list.txt --output_path=$dataset
    ```
 
    ```
-   flip
+   #flip
    python3 scripts/data_processing.py --img_num=500 --crop_width=720 --crop_height=720 --data_dir=../cityscapes --val_list=../cityscapes/list/cityscapes_val_list.txt --output_path=$dataset --flipped_eval --flipped_output_path=$flipped_dataset   
    ```
 
@@ -29,6 +29,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/PSPNet101_for_ACL
 ### 3. Offline Inference
 
 **Convert pb to om.**
+
+  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/PSPnet101_for_ACL.zip)
 
 - configure the env
 

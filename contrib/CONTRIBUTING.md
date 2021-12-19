@@ -196,7 +196,7 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 ReadMe写作可参考下面两个链接：
 
-[Readme example1](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_for_TensorFlow/README.md)
+[Readme example1](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_ID0067_for_TensorFlow/README.md)
 
 [Readme example2](https://www.hiascend.com/zh/software/modelzoo/detail/C/093ed0219cb14f068af33784c62cf7ec)
 
