@@ -194,11 +194,15 @@ readme用于指导用户理解和部署样例，要包含如下内容：
 
 - [ ] 脚本中不允许提供链接下载数据集，如果开源脚本上存在对应的链接，请修改或者删除对应的脚本
 
-ReadMe写作可参考下面两个链接：
+训练ReadMe写作可参考下面两个链接：
 
 [Readme example1](https://github.com/Ascend/modelzoo/blob/master/built-in/TensorFlow/Official/cv/image_classification/DenseNet121_ID0067_for_TensorFlow/README.md)
 
 [Readme example2](https://www.hiascend.com/zh/software/modelzoo/detail/C/093ed0219cb14f068af33784c62cf7ec)
+
+离线推理ReadMe写作可参考下面链接：
+
+[Readme example1](https://github.com/Ascend/modelzoo/tree/master/contrib/ACL_TensorFlow/Research/cv/AdvancedEAST_ID0130_for_ACL/README.md)
 
  **四、自测试用例**
 
@@ -212,7 +216,7 @@ ReadMe写作可参考下面两个链接：
 
 3、提交PR后，会自动触发门禁流水，后台会根据用例入口shell，自动将代码分发到对应执行环境；
 
-4、Jenkins预置账号：`global_read/huawei@123`，登录之后，可以查看到用例执行日志
+4、Jenkins预置账号：登录账号请联系华为工程师/接口人获取，登录之后，可以查看到用例执行日志
 
 5、如果提交失败，请查看日志，修复代码或其他问题后，在你当前的PR中，评论“compile”即可重新触发用例执行
 

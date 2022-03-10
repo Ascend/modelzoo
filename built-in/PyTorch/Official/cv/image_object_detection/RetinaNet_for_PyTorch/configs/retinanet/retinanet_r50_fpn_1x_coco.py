@@ -20,7 +20,7 @@ _base_ = [
 # optimizer
 optimizer = dict(type='NpuFusedSGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
 log_config = dict( # config to register logger hook
-    interval=50, # Interval to print the log
+    interval=10, # Interval to print the log
     hooks=[
         dict(type='TextLoggerHook')
     ])
@@ -31,9 +31,5 @@ data = dict(
     workers_per_gpu=8
 )
 
-lr_config = dict(
-    policy='step',
-    warmup='linear',
-    warmup_iters=800,
-    warmup_ratio=0.0005,
-    step=[8, 11])
+#optimizer_config = dict(_delete_=True, grad_clip=dict(max_norm=10, norm_type=2))
+total_epochs = 1

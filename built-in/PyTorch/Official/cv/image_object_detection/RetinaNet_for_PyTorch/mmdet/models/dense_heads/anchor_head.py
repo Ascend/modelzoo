@@ -299,16 +299,16 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
 
         pos_inds = sampling_result.pos_inds
         neg_inds = sampling_result.neg_inds
-        pos_inds_unsqu = pos_inds.unsqueeze(1)
+    
         if pos_inds.sum() > 0:
             if not self.reg_decoded_bbox:
                 pos_bbox_targets = self.bbox_coder.encode(
-                    sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes * pos_inds_unsqu)
+                    sampling_result.pos_bboxes, sampling_result.pos_gt_bboxes)
             else:
                 pos_bbox_targets = sampling_result.pos_gt_bboxes
 
             bbox_targets = pos_bbox_targets
-            bbox_weights = bbox_weights + pos_inds_unsqu.float()
+            bbox_weights = bbox_weights + pos_inds.unsqueeze(1).float()
             if gt_labels is None:
                 # Only rpn gives gt_labels as None
                 # Foreground is the first class since v2.5.0                

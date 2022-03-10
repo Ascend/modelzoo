@@ -161,7 +161,7 @@ class ParallelTfrecordInputPipelineConcat(InputPipeline):
         batch_size=batch_size,
         num_parallel_batches=num_threads,
         drop_remainder=True))
-    d = d.prefetch(buffer_size=100)
+    d = d.prefetch(buffer_size=300) #init buffer_size=100
     inputs = d.make_one_shot_iterator().get_next()
 
     # rename

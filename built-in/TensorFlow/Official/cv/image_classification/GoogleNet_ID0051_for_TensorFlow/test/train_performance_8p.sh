@@ -147,14 +147,17 @@ BatchSize=${batch_size}
 DeviceType=`uname -m`
 CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 #获取性能数据
-grep "FPS:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log > FPS.log
-sed -i '1d' FPS.log
+FPS=`grep epoch $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'FPS:' '{print $2}'|awk '{print $1}'|awk 'NR>1'|awk '{sum+=$1} END {print sum/NR}'`
 
-ActualFPS=`cat FPS.log | grep "FPS:" |awk '{sum+=$6} END {print sum/NR}'`
+ActualFPS=$FPS
 temp1=`echo "8000 * ${batch_size}"|bc`
 TrainingTime=`echo "scale=2;${temp1} / ${ActualFPS}"|bc`
 
-ActualLoss=`grep "loss" FPS.log | awk 'END {print $8}'`
+#从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
+grep epoch $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'loss:' '{print $2}'|awk '{print $1}'> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+
+#最后一个迭代loss值，不需要修改
+ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
 #关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

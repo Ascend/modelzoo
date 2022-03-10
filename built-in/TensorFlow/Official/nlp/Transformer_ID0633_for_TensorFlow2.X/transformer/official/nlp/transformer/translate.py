@@ -109,9 +109,9 @@ def translate_file(model,
   # in sorted list) to write translations in the original order.
   sorted_inputs, sorted_keys = _get_sorted_inputs(input_file,batch_size)
   total_samples = len(sorted_inputs)
-  #num_decode_batches = (total_samples - 1) // batch_size + 1
+  num_decode_batches = (total_samples - 1) // batch_size + 1
   #static input modify
-  num_decode_batches = (total_samples)// batch_size
+  #num_decode_batches = (total_samples)// batch_size
 
   def input_generator():
     """Yield encoded strings from sorted_inputs."""

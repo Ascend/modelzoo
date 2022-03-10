@@ -4,7 +4,7 @@
 cur_path=`pwd`
 
 #集合通信参数,不需要修改
-
+export BMMV2_ENABLE=1
 export RANK_SIZE=8
 export JOB_ID=10087
 RANK_ID_START=0
@@ -83,6 +83,7 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
+cp run_squad.py $cur_path/../
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 
@@ -184,3 +185,5 @@ echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+rm -rf ${data_path}/train-v1.1-min.json_bert-large-uncased_384_128_64
+export BMMV2_ENABLE=0

@@ -2,6 +2,17 @@
 
 This repository provides a script and recipe to Inference the
 
+## Notice
+**This sample only provides reference for you to learn the Ascend software stack and is not for commercial purposes.**
+
+Before starting, please pay attention to the following adaptation conditions. If they do not match, may leading in failure.
+
+| Conditions | Need |
+| --- | --- |
+| CANN Version | >=5.0.3 |
+| Chip Platform| Ascend310/Ascend710 |
+| 3rd Party Requirements| Please follow the 'requirements.txt' |
+
 ## Quick Start Guide
 
 ### 1. Clone the respository
@@ -15,8 +26,15 @@ cd modelzoo/built-in/ACL_TensorFlow/Research/cv/3DUNET_for_Tensorflow
 
 1. Download the dataset by yourself
 
-2. Executing the Preprocessing Script
+2. Put the dataset files to **'3DUNET_for_ACL/ori_images/'** like this:
+```
+--MICCAI_BraTS_2019_Data_Training
+
+```
+
+3. Executing the Preprocessing Script
    ```
+   mkdir ori_images/tfrecord
    python3 scripts/preprocess_data.py --input_dir=ori_images/MICCAI_BraTS_2019_Data_Training/ --output_dir=ori_images/tfrecord
    python3 scripts/prepocess.py ./ori_images/tfrecord/ ./datasets ./labels
    ```
@@ -24,8 +42,6 @@ cd modelzoo/built-in/ACL_TensorFlow/Research/cv/3DUNET_for_Tensorflow
 ### 3. Offline Inference
 
 **Convert pb to om.**
-
-  [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/3DUNET_for_ACL.zip)
 
 - configure the env
 
@@ -56,7 +72,8 @@ cd modelzoo/built-in/ACL_TensorFlow/Research/cv/3DUNET_for_Tensorflow
 - Run the program:
 
   ```
-  bash benchmark_tf.sh --batchSize=1 --modelPath=../../model/unet3d_1batch.om --dataPath=../../datasets/ --modelType=unet3d --imgType=rgb
+  cd scripts
+  bash benchmark_tf.sh
   ```
   
 ## Performance

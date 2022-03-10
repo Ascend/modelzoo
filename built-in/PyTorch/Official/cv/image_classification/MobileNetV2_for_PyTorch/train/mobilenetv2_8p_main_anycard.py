@@ -339,6 +339,8 @@ def train(train_loader, train_loader_len, model, criterion, optimizer, epoch, ar
     steps_per_epoch = train_loader_len
     print('==========step per epoch======================', steps_per_epoch)
     for i, (images, target) in enumerate(train_loader):
+        if i > 200 :
+            pass
         # measure data loading time
         data_time.update(time.time() - end)
 
@@ -426,6 +428,8 @@ def validate(val_loader, model, criterion, args, ngpus_per_node):
 
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
+            if i > 48 :
+                pass
 
             target = target.to(torch.int32)
             images = images.to(loc, non_blocking=True).to(torch.float).sub(mean).div(std)

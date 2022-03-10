@@ -23,9 +23,9 @@
     "mxpi_tensorinfer0": {
       "props": {
         "dataSource": "mxpi_imageresize0",
-        "modelPath": "../models/crnn/crnn.om",
+        "modelPath": "../convert/crnn.om",
         "waitingTime": "2000",
-        "outputDeviceId": "-1"
+	"outputDeviceId": "-1"
       },
       "factory": "mxpi_tensorinfer",
       "next": "mxpi_classpostprocessor0"
@@ -35,7 +35,7 @@
         "dataSource": "mxpi_tensorinfer0",
         "postProcessConfigPath": "./crnn.cfg",
         "labelPath": "./crnn-label.names",
-        "postProcessLibPath": "../../../lib/modelpostprocessors/libcrnnpostprocess.so"
+        "postProcessLibPath": "libcrnnpostprocess.so"
       },
       "factory": "mxpi_textgenerationpostprocessor",
       "next": "mxpi_dataserialize0"

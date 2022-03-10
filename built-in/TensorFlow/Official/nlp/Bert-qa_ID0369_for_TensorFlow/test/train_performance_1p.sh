@@ -32,7 +32,7 @@ else
    mkdir -p $cur_path/test/output/$ASCEND_DEVICE_ID
 fi
 wait
-
+batch_size=32
 start=$(date +%s)
 nohup python3 run_pretraining.py \
   --input_file=$data_path/tf_examples.tfrecord \
@@ -41,7 +41,7 @@ nohup python3 run_pretraining.py \
   --do_eval=True \
   --bert_config_file=$more_path1/bert_config.json \
   --init_checkpoint=$more_path2/bert_model.ckpt \
-  --train_batch_size=32 \
+  --train_batch_size=$batch_size \
   --max_seq_length=128 \
   --max_predictions_per_seq=20 \
   --num_train_steps=20 \
@@ -53,9 +53,9 @@ e2etime=$(( $end - $start ))
 cp -r $cur_path/pretraining_output $cur_path/test/output/$ASCEND_DEVICE_ID
 
 step_sec=`grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $2}'`
-average_perf=`awk 'BEGIN{printf "%.2f\n",'1000'/'$step_sec'}'`
+average_perf=`awk 'BEGIN{printf "%.2f\n",'$batch_size'*'$step_sec'}'`
 
-echo "Final Performance ms/step : $average_perf"
+echo "Final Performance FPS : $average_perf"
 echo "Final Training Duration sec : $e2etime"
 
 ###下面字段用于冒烟看护
@@ -65,7 +65,7 @@ Network="Bert-qa_ID0369_for_TensorFlow"
 #Device数量，单卡默认为1
 RankSize=1
 #BatchSize
-BatchSize=1
+BatchSize=32
 #设备类型，自动获取，此处无需修改
 DeviceType=`uname -m`
 #用例名称，自动获取，此处无需修改
@@ -73,21 +73,23 @@ CaseName=${Network}_${BatchSize}_${RankSize}'p'_'perf'
 
 ##获取性能数据
 #吞吐量
-ActualFPS=
+ActualFPS=$average_perf
 #单迭代训练时长
-TraingingTime=
+TraingingTime=$e2etime
 
 ##获取Loss
 #从train_$ASCEND_DEVICE_ID.log提取Loss到${CaseName}_loss.txt中，需要修改***匹配规则
-grep "***" $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log >> $cur_path/test/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.log
+grep "INFO:tensorflow:Saving dict for global step 20: global_step = 20, loss =" $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F ',' '{print $2}' | awk -F '=' '{print $2}'> $cur_path/test/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.log
 #最后一个迭代Loss值
-ActualLoss=
+ActualLoss=`grep "INFO:tensorflow:Saving dict for global step 20: global_step = 20, loss =" $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F ',' '{print $2}' | awk -F '=' '{print $2}'`
 
 #关键信息打印到CaseName.log中，此处无需修改
 echo "Network = ${Network}" > $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RankSize}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "BatchSize = ${batch_size}"  >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "DeviceType = ${DeviceType}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "CaseName = ${CaseName}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TraingingTime = ${TraingingTime}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "E2ETrainingTime = ${e2etime}" >> $cur_path/test/output/$ASCEND_DEVICE_ID/${CaseName}.log

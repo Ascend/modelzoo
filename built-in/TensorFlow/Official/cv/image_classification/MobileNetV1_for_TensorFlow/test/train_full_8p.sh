@@ -156,10 +156,10 @@ do
 done
 wait
 
-ckpt_path=`ls -l ${cur_path}/../results | awk '{print $NF}' | tail -2 | head -1 | awk -F '.' '{print $2}'`
+ckpt_path=`ls -l ${cur_path}/../results/${ASCEND_DEVICE_ID} | awk '{print $NF}' | tail -2 | head -1 | awk -F '.' '{print $2}'`
 python3.7 $cur_path/../eval_image_classifier_mobilenet.py \
     --alsologtostderr \
-    --checkpoint_path=${cur_path}/../results/model.${ckpt_path} \
+    --checkpoint_path=${cur_path}/../results/${ASCEND_DEVICE_ID}/model.${ckpt_path} \
     --dataset_dir=${data_path} \
     --dataset_name=imagenet \
     --dataset_split_name=validation \

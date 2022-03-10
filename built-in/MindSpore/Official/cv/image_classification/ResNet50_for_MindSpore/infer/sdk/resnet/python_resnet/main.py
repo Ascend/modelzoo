@@ -34,7 +34,7 @@ if __name__ == '__main__':
         exit()
 
     # create streams by pipeline config file
-    with open("./pipeline/resnet50_dvpp.pipeline", 'rb') as f:
+    with open("../pipeline/resnet50.pipeline", 'rb') as f:
         pipelineStr = f.read()
     ret = stream_manager_api.CreateMultipleStreams(pipelineStr)
 

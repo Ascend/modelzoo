@@ -15,12 +15,12 @@
 """Core Keras layers.
 """
 from tensorflow.python.framework import ops
-from tensorflow.python.keras.engine.base_layer import Layer
+from keras.engine.base_layer import Layer
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import nn
 from tensorflow.python.eager import monitoring
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.utils import control_flow_util
+from keras import backend as K
+from keras.utils import control_flow_util
 from . import npu_ops
 from absl import flags
 from absl import logging

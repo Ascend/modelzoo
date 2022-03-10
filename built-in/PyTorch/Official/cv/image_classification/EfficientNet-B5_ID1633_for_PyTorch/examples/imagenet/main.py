@@ -332,6 +332,11 @@ def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node
                              top5, prefix="Epoch: [{}]".format(epoch))
 
     # switch to train mode
+    # 替换Swish API
+    if args.distributed:
+        model.module.set_swish(memory_efficient=False)
+    else:
+        model.set_swish(memory_efficient=False)
     model.train()
 
     end = time.time()

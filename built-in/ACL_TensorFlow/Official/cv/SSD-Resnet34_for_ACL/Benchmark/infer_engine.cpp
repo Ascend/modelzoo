@@ -335,7 +335,10 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t right = 0;
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
-
+#ifdef ASCEND710_DVPP
+    right = width - 1;
+    bottom =  height - 1;
+#else
     if (width % 2 == 0)
     {
         right = width - 1;
@@ -353,6 +356,7 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     {
         bottom = height;
     }
+#endif
     printf("InitCropRoiConfig right=%d, bottom=%d \n", right, bottom);
     cropConfig = acldvppCreateRoiConfig(0, right, 0, bottom);
     if (cropConfig == nullptr)
@@ -448,24 +452,75 @@ aclError DVPP_SSD_ResNet34(std::string fileLocation, char *&ptr)
     
     //2.0 Prepare the ouputDesc of decode
     GetImageHW(buff, fileSize, fileLocation, W, H);
+#ifdef ASCEND710_DVPP
+    W_Aligned = (W + 63) / 64 * 64;
+    H_Aligned = (H + 15) / 16 * 16;
+    
+    outputBuffSize=0;
+    int32_t components = 0;
+    acldvppJpegFormat realformat;
+    int aclformat;
+    acldvppJpegGetImageInfoV2(buff, fileSize, &W, &H, &components,&realformat);
+    switch (realformat){
+        case 0:
+            aclformat = 6;
+            outputBuffSize = W_Aligned * H_Aligned * 3;
+            break;
+        case 1:
+            aclformat = 4;
+            outputBuffSize = W_Aligned * H_Aligned * 2;
+            break;
+        case 2:
+            aclformat = 2;
+            outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+            break;
+        case 4:
+            aclformat = 1001;
+            outputBuffSize = W_Aligned * H_Aligned  * 2;
+            break;
+        case 3:
+            aclformat = 0;
+            outputBuffSize = W_Aligned * H_Aligned;
+            break;    
+        default:
+            aclformat = 1;
+            outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+            break;
+    }
+    if (aclformat == 0) {
+        aclformat = 1;
+        outputBuffSize = outputBuffSize * 3/2;
+    }
+
+    if(W_Aligned > 4096 || H_Aligned > 4096)
+    {
+        return -1; 
+    } 
+#else
     W_Aligned = (W + 127) / 128 * 128;
     H_Aligned = (H + 15) / 16 * 16;
     outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
-
+#endif
     ret = acldvppMalloc(&decodeOutput, outputBuffSize);
     if (ret != ACL_ERROR_NONE)
     {
         LOG("Malloc decodeOutput buff failed[%d]\n", ret);
         return ret;
     }
+#ifdef ASCEND710_DVPP
+    decodeOutputDesc = createDvppPicDesc(decodeOutput, acldvppPixelFormat(aclformat), W, H, W_Aligned, H_Aligned, outputBuffSize);
+    LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
+                fileLocation.c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, acldvppPixelFormat(aclformat));
+#else
     decodeOutputDesc = createDvppPicDesc(decodeOutput, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned, H_Aligned, outputBuffSize);
+    LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
+                fileLocation.c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
+#endif
     if (decodeOutputDesc == nullptr)
     {
         LOG("create jpeg_output_desc failed\n");
         return 1;
     }
-    LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
-                fileLocation.c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
 
     //3.0 Decode
     ret = acldvppJpegDecodeAsync(dvpp_channel_desc, decodeInput, fileSize, decodeOutputDesc, stream);
@@ -479,6 +534,14 @@ aclError DVPP_SSD_ResNet34(std::string fileLocation, char *&ptr)
     aclrtFreeHost(buff);
 
     /**************************crop and resize**************************/
+#ifdef ASCEND710_DVPP
+    uint32_t w_new = acldvppGetPicDescWidth(decodeOutputDesc);
+    uint32_t h_new = acldvppGetPicDescHeight(decodeOutputDesc);
+    uint32_t format = acldvppGetPicDescFormat(decodeOutputDesc);
+    W = w_new;
+    H = h_new;
+    printf("w_new=%d, h_new=%d, format=%u\n", w_new, h_new, format); 
+#endif
     acldvppPicDesc *resizeOutputDesc = nullptr;
     acldvppResizeConfig *resizeConfig = acldvppCreateResizeConfig();
     acldvppRoiConfig *cropconfig = InitCropRoiConfig(W, H);
@@ -491,7 +554,17 @@ aclError DVPP_SSD_ResNet34(std::string fileLocation, char *&ptr)
         return -1;
     }
 
+#ifdef ASCEND710_DVPP
+	ret = acldvppSetResizeConfigInterpolation(resizeConfig, 1);
+	if (ret != ACL_ERROR_NONE)
+    {
+        std::cout << "[ERROR][Vision] resize acldvppSetResizeConfigInterpolatio failed, ret = " << ret << std::endl;
+        return ret;
+    } 
+	ret = acldvppVpcCropResizeAsync(dvpp_channel_desc, decodeOutputDesc, resizeOutputDesc, cropconfig, resizeConfig, stream);
+#else
     ret = acldvppVpcCropAsync(dvpp_channel_desc, decodeOutputDesc, resizeOutputDesc, cropconfig, stream);
+#endif
     if( ret != ACL_ERROR_NONE)
     {
         LOG("crop failed\n");
@@ -500,7 +573,11 @@ aclError DVPP_SSD_ResNet34(std::string fileLocation, char *&ptr)
 
     ptr += resizedOutputBufferSize;
 
-    aclrtSynchronizeStream(stream);
+    ret = aclrtSynchronizeStream(stream);
+    if (ret != ACL_ERROR_NONE) {
+        printf(" aclrtSynchronizeStream failed acldvppVpcCropResizeAsync  \n");
+        return ret;
+    }
 
     /*************************Release resources************************/
     acldvppFree(decodeInput);

@@ -77,7 +77,7 @@ class InputPipeline(Configurable):
   @staticmethod
   def default_params():
     return {
-        "num_threads": 4,
+        "num_threads": 16, # init 4
         "output_buffer_size": None,
         "batch_size": 32,
         "batch_multiplier": 1,

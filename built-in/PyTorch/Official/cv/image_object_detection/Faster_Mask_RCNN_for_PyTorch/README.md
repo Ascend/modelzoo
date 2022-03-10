@@ -10,6 +10,9 @@
 ## Dataset Prepare
 1. 下载COCO数据集，放在datasets中。如已有下载可通过设置环境变量DETECTRON2_DATASETS=“coco所在数据集路径”进行设置，如export DETECTRON2_DATASETS=/home/sample，则coco数据集放在/home/sample目录中
 
+## Pre-Train Weights File 
+1. 模型脚本会自动下载预训练权重文件。若下载失败，请自行准备R-101.pkl等权重文件，同时修改相应配置文件中预训练权重文件路径。
+
 ### Build Detectron2 from Source
 
 编译器版本：gcc & g++ ≥ 5

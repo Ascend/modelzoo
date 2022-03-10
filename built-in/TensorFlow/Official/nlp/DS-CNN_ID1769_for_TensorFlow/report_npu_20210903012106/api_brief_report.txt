@@ -1,2 +1,0 @@
-1.In brief: Total API: 434, in which Support: 409, API support after migration: 15, Network training support after migration: 0, Not support but no impact on migration: 0, Not support or recommended: 0, Compatible: 0, Deprecated: 10, Analysing: 0
-2.After eliminate duplicate: Total API: 73, in which Support: 67, API support after migration: 1, Network training support after migration: 0, Not support but no impact on migration: 0, Not support or recommended: 0, Compatible: 0, Deprecated: 5, Analysing: 0

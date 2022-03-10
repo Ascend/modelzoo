@@ -4,6 +4,17 @@
 
 This repository provides a script and recipe to Inference of the RetinaNet model.
 
+## Notice
+**This sample only provides reference for you to learn the Ascend software stack and is not for commercial purposes.**
+
+Before starting, please pay attention to the following adaptation conditions. If they do not match, may leading in failure.
+
+| Conditions | Need |
+| --- | --- |
+| CANN Version | >=5.0.3 |
+| Chip Platform| Ascend310/Ascend710 |
+| 3rd Party Requirements| Please follow the 'requirements.txt' |
+
 ## Quick Start Guide
 
 ### 1. Clone the respository
@@ -15,15 +26,15 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/RetinaNet_for_ACL
 
 ### 2. Download and preprocess the dataset
 
-1. Download the Voc2017 validation dataset by yourself. 
+1. Download the COCO-2017 validation dataset by yourself. 
 
-2. Put pictures to **'scripts/voc2017val'**
+2. Put pictures to **'scripts/val2017'**
 
 3. Images Preprocess:
 ```
 cd scripts
 mkdir input_bins
-python3 preprocess.py ./voc2017val/ ./input_bins/
+python3 preprocess.py ./val2017/ ./input_bins/
 ```
    The pictures will be preprocessed to bin files and a **rawScale.txt** file will be created under **retinanet_postprocess** directory.
 

@@ -10,8 +10,8 @@ OUTPUT_DIR: 'output'
 DATASET:
   DATA_FILTER: true
   DATASET: LMDB
-  TRAIN_ROOT: "/home/dataset/MJ_LMDB"
-  TEST_ROOT: "/home/dataset/IIIT5K_lmdb"
+  TRAIN_ROOT: "/npu/traindata/crnn_data/MJ_LMDB"
+  TEST_ROOT: "/npu/traindata/crnn_data/IIIT5K_lmdb"
   ALPHABETS: '0123456789abcdefghijklmnopqrstuvwxyz'
 
 TRAIN:
@@ -21,7 +21,7 @@ TRAIN:
   BATCH_SIZE_PER_GPU: 20480
   SHUFFLE: True
   BEGIN_EPOCH: 0
-  END_EPOCH: 20
+  END_EPOCH: 3
   OPTIMIZER: 'adadelta'
   RESUME:
     IS_RESUME: False

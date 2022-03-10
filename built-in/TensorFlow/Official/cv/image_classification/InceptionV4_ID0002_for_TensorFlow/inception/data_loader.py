@@ -32,6 +32,7 @@ import numpy as np
 from . import inception_preprocessing
 import tensorflow as tf
 import os,sys
+from tensorflow.python.data.experimental.ops import threadpool
 
 IMAGE_SIZE = 299
 
@@ -148,15 +149,16 @@ def make_dataset(args, take_count, batch_size,
     options = tf.data.Options()
     options.experimental_threading.max_intra_op_parallelism = 1
     ds = ds.with_options(options)
-    ds = ds.prefetch(buffer_size = batch_size)
+    #ds = ds.prefetch(buffer_size = batch_size)
 
     if training:
         ds = ds.shuffle(buffer_size = shuffle_buffer_size)
         ds = ds.repeat()
 
-    ds = ds.map(lambda image: parse_record(image, training), num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    ds = ds.map(lambda image: parse_record(image, training), num_parallel_calls=256)
     ds = ds.batch(batch_size, drop_remainder=True)
-    ds = ds.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
+    #ds = ds.prefetch(buffer_size=tf.contrib.data.AUTOTUNE)
+    ds = threadpool.override_threadpool(ds, threadpool.PrivateThreadPool(128, display_name='input_pipeline_thread_pool'))
     return ds
 
 

@@ -44,8 +44,8 @@ if not os.path.exists(save_dir):
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
-
-work_path = '../../../'
+#work_path = '../../../'
+work_path = os.path.abspath(os.path.dirname(__file__))
 ### Some paths
 train_file =        os.path.join(work_path, './data/coco2014_trainval.txt')  # The path of the training txt file.
 val_file =          os.path.join(work_path, './data/coco2014_minival.txt')  # The path of the validation txt file.
@@ -56,13 +56,13 @@ class_name_path =   os.path.join(work_path, './data/coco.names')  # The path of 
 ### Distribution setting
 num_gpus=int(os.environ['RANK_SIZE'])
 #iterations_per_loop=10
-iterations_per_loop=100
+iterations_per_loop=10
 ### Training releated numbersls
 
 batch_size = 32
 img_size = [416, 416]  # Images will be resized to `img_size` and fed to the network, size format: [width, height]
 letterbox_resize = True  # Whether to use the letterbox resize, i.e., keep the original aspect ratio in the resized image.
-total_epoches = 1
+total_epoches = 200
 train_evaluation_step = 1000  # Evaluate on the training batch after some steps.
 val_evaluation_epoch = 2  # Evaluate on the whole validation dataset after some epochs. Set to None to evaluate every epoch.
 save_epoch = 10  # Save the model after some epochs.

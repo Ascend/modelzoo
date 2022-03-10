@@ -14,11 +14,11 @@ RANK_ID_START=0
 data_path=""
 
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
+#export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
-Network="AlexNet_for_TensorFlow"
+Network="AlexNet_ID0072_for_TensorFlow"
 
 #训练batch_size
 batch_size=128
@@ -95,46 +95,36 @@ start_time=$(date +%s)
 
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
+    #设置环境变量，不需要修改
     echo "Device ID: $RANK_ID"
     export RANK_ID=$RANK_ID
     export ASCEND_DEVICE_ID=$RANK_ID
     ASCEND_DEVICE_ID=$RANK_ID
 
-   if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
+    export DEVICE_ID=$RANK_ID
+	DEVICE_INDEX=$RANK_ID
+    export DEVICE_INDEX=${DEVICE_INDEX}
+
+    #创建DeviceID输出目录，不需要修改
+    if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
         rm -rf ${cur_path}/output/${ASCEND_DEVICE_ID}
-   #    mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
-   #else
+        mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
+    else
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
-	
-EXEC_DIR=$(pwd)
 
-RESULTS=results/8p
-
-mkdir -p ${EXEC_DIR}/${RESULTS}/${ASCEND_DEVICE_ID}	
-	
-rm -rf ${EXEC_DIR}/${RESULTS}/${ASCEND_DEVICE_ID}/*
-
-cd ${EXEC_DIR}/${RESULTS}/${ASCEND_DEVICE_ID}
-
-env > ${EXEC_DIR}/${RESULTS}/env_${ASCEND_DEVICE_ID}.log
-
-#start exec
-#bind kernel
-num_cpus=$(getconf _NPROCESSORS_ONLN)
-num_cpus_per_device=$((num_cpus/8))
-
-start_id=$((num_cpus_per_device*ASCEND_DEVICE_ID))	
-end_id=$((num_cpus_per_device*ASCEND_DEVICE_ID+num_cpus_per_device-1))
-
-    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
-    let a=RANK_ID*${corenum}/8
+	# 绑核，不需要的绑核的模型删除，需要模型审视修改
+    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    let a=RANK_ID*${corenum}/${RANK_SIZE}
     let b=RANK_ID+1
-    let c=b*${corenum}/8-1
+    let c=b*${corenum}/${RANK_SIZE}-1
+
+    #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
+    #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
     if [ "x${bind_core}" != x ];then
         bind_core="taskset -c $a-$c"
     fi
-nohup ${bind_core} python3.7 ${EXEC_DIR}/../train.py --rank_size=8 \
+python3.7 ${cur_path}/../train.py --rank_size=8 \
                       --epochs_between_evals=1 \
                       --mode=train \
         	            --max_epochs=150 \
@@ -143,12 +133,33 @@ nohup ${bind_core} python3.7 ${EXEC_DIR}/../train.py --rank_size=8 \
         	            --data_dir=${data_path} \
         	            --lr=0.06 \
                       --checkpoint_dir=./model_8p \
-        	            --log_dir=./model_8p > ./train_${ASCEND_DEVICE_ID}.log 2>&1 &
+        	            --log_dir=./model_8p > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 						
-cd  -
+
 
 done
+for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
+do
+#设置环境变量，不需要修改
+    echo "Device ID: $RANK_ID"
+    export RANK_ID=$RANK_ID
+    export ASCEND_DEVICE_ID=$RANK_ID
+    ASCEND_DEVICE_ID=$RANK_ID
 
+    export DEVICE_ID=$RANK_ID
+	DEVICE_INDEX=$RANK_ID
+    export DEVICE_INDEX=${DEVICE_INDEX}
+python3 ${cur_path}/../train.py --rank_size=8 \
+                      --epochs_between_evals=1 \
+                      --mode=evaluate \
+        	            --max_epochs=150 \
+                      --iterations_per_loop=100 \
+        	            --batch_size=${batch_size} \
+        	            --data_dir=${data_path} \
+        	            --lr=0.06 \
+                      --checkpoint_dir=./model_8p \
+        	            --log_dir=./model_8p >> ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+done
 wait
 
 #训练结束时间，不需要修改
@@ -158,7 +169,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能ms/step,需要模型审视修改
-step_sec=`grep fps  $cur_path/${EXEC_DIR}/${RESULTS}/0/train_0.log|awk 'END {print $22}'`
+step_sec=`grep FPS  ${cur_path}/output/0/train_0.log|awk 'END {print $3}'|awk -F ":" 'END {print $2}'|awk -F "," 'END {print $1}'`
 #打印，不需要修改
 echo "Final Performance ms/step : $step_sec"
 
@@ -166,7 +177,7 @@ echo "Final Performance ms/step : $step_sec"
 #打印，不需要修改
 echo "Final Training Duration sec : $e2e_sec"
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep "current best auc"  $cur_path/${EXEC_DIR}/${RESULTS}/0/train_0.log|awk 'END {print $4}'`
+train_accuracy=`grep -A 3 "top1" ${cur_path}/output/0/train_0.log|tail -1|awk 'END {print $3}'`
 #打印，不需要修改
 echo "Final train_accuracy is ${train_accuracy}"
 echo "E2E training Duration sec: $e2e_time"
@@ -184,11 +195,11 @@ ActualFPS=${step_sec}
 TrainingTime=`expr ${batch_size} \* 1000 / ${step_sec}`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-#grep loss $cur_path/${EXEC_DIR}/${RESULTS}/0/train_0.log|awk 'END {print $4}'` >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+`grep total_loss ${cur_path}/output/0/train_0.log|awk 'END {print $5}'|tr -d , >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
-
+TrainAccuracy=$train_accuracy
 #关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "RankSize = ${RANK_SIZE}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
@@ -198,3 +209,5 @@ echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.
 echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "TrainAccuracy = ${TrainAccuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

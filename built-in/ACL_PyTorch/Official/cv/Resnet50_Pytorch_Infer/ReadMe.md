@@ -16,9 +16,17 @@
 
 8.benchmark工具源码地址：https://github.com/Ascend/cann-benchmark/tree/master/infer
 
+710增加文件说明：
 
+1.pthtar2onx_dynamic.py：用于转换pth.tar文件到动态onnx文件；
 
+2.imagenet_torch_preprocess.py：imagenet数据集预处理；
 
+3.gen_dataset_info.py：获取imagenet数据集信息info文件脚本；
+
+4.gen_resnet50_64bs_bin.py：基于数据预处理结果合成量化所需的64bs输入；
+
+5.aipp_resnet50_710.aippconfig：aipp配置文件
 
 推理端到端步骤：
 
@@ -45,4 +53,18 @@
 （5）python3.7 vision_metric_ImageNet.py result/dumpOutput/ ./val_label.txt ./ result.json
 
 验证推理结果
+
+710精度验证步骤：
+
+（1）python3.7.5 imagenet_torch_preprocess.py resnet ./ImageNet/val_union ./prep_dataset
+数据集处理；
+
+（2）python3.7.5 gen_dataset_info.py ./prep_dataset ./resnet50_prep_bin.info 256 256
+获取数据集信息info文件；
+
+（3）./benchmark.x86_64 -model_type=vision -batch_size=16 -device_id=0 -input_text_path=./resnet50_prep_bin.info -input_width=256 -input_height=256 -om_path=./resnet50_pytorch.om -output_binary=False -useDvpp=False
+数据集信息输入，调用benchmark完成推理OM模型；
+
+（4）python3.7.5 vision_metric_ImageNet.py result/dumpOutput_device0/ ./val_label.txt ./ result_prep.json
+查看result_prep.json中精度结果。
 

@@ -127,7 +127,7 @@ annFile = './instances_val2017.json'
 coco = COCO(annFile)
 anns = coco.imgToAnns
 print(len(anns))
-gt_dir = './yolov4_postprocess/groundtruths/'
+output_dir = './yolov4_postprocess/groundtruths/'
 if not os.path.isdir(output_dir):
     os.mkdir(output_dir)
 
@@ -141,5 +141,5 @@ for i in sorted(anns):
             content += str(int(xy)) + ' '
         content += '\n'
 
-    with open(os.path.join(gt_dir,filename),'w') as f:
+    with open(os.path.join(output_dir,filename),'w') as f:
         f.write(content)

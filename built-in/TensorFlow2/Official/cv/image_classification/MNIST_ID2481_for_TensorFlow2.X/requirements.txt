@@ -1,0 +1,2 @@
+dm_tree == 0.1.6
+tensorflow-model-optimization >= 0.6.0

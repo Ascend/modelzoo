@@ -42,9 +42,9 @@ from tensorflow.python.distribute import distribution_strategy_context as distri
 from tensorflow.python.distribute import parameter_server_strategy
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import dtypes
-from tensorflow.python.keras import backend
-from tensorflow.python.keras.optimizer_v2 import optimizer_v2
-from tensorflow.python.keras.optimizer_v2 import utils as optimizer_utils
+from keras import backend
+from keras.optimizer_v2 import optimizer_v2
+from keras.optimizer_v2 import utils as optimizer_utils
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import variables as tf_variables
 

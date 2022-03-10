@@ -1,12 +1,12 @@
 #!/bin/bash
-source env.sh
+
 #当前路径,不需要修改
 cur_path=`pwd`
 
 #集合通信参数,不需要修改
 #保证rank table file 文件rank_table_8p.json存放在和test同级的configs目录下
 export RANK_SIZE=8
-export RANK_TABLE_FILE=${cur_path}/../configs/8p.json
+export RANK_TABLE_FILE=${cur_path}/../8p.json
 export JOB_ID=10087
 RANK_ID_START=0
 
@@ -14,13 +14,12 @@ RANK_ID_START=0
 data_path="/npu/traindata/imagenet_TF"
 
 #设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
-Network="EfficientNet_B0_for_TensorFlow"
+Network="EfficientNet_B0_ID0009_for_TensorFlow"
 #训练epoch
-train_epochs=90
+train_epochs=
 #训练batch_size
 batch_size=256
 #训练step
@@ -29,7 +28,7 @@ train_steps=`expr 1281167 / ${batch_size}`
 learning_rate=""
 
 #TF2.X独有，不需要修改
-export NPU_LOOP_SIZE=${train_steps}
+#export NPU_LOOP_SIZE=${train_steps}
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_mix_precision"
@@ -138,7 +137,7 @@ do
     if [ "x${bind_core}" != x ];then
         bind_core="taskset -c $a-$c"
     fi
-    nohup ${bind_core} python3.7 efficientnet/main_npu.py \
+    nohup python3.7 efficientnet/main_npu.py \
     --data_dir=${data_path} \
     --model_dir=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt \
     --mode=train_and_eval \
@@ -163,7 +162,7 @@ FPS=`grep 'logger.py:54' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep -A 1 top1 $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $3}'`
+train_accuracy=`grep -r top_1_accuracy $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log |awk 'END {print $13}'|tr -d ,`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

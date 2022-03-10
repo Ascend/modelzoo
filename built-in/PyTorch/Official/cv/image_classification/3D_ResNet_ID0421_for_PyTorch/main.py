@@ -191,6 +191,7 @@ def get_train_utils(opt, model_parameters):
                                          shuffle=(train_sampler is None),
                                          num_workers=opt.n_threads,
                                          pin_memory=False,
+                                         drop_last=True,
                                          sampler=train_sampler,
                                          worker_init_fn=worker_init_fn)
 

@@ -41,7 +41,7 @@ from torch.autograd import Variable
 import torch.npu
 import os
 import argparse
-
+import apex
 try:
     from apex import amp
 except ImportError:
@@ -80,9 +80,9 @@ alpha=0.1
 gamma=15
 
 criterion=nn.BCELoss().to(f'npu:{NPU_CALCULATE_DEVICE}')
-optim_E=torch.optim.RMSprop(gen.encoder.parameters(), lr=lr)
-optim_D=torch.optim.RMSprop(gen.decoder.parameters(), lr=lr)
-optim_Dis=torch.optim.RMSprop(discrim.parameters(), lr=lr*alpha)
+optim_E=apex.optimizers.NpuFusedRMSprop(gen.encoder.parameters(), lr=lr)
+optim_D=apex.optimizers.NpuFusedRMSprop(gen.decoder.parameters(), lr=lr)
+optim_Dis=apex.optimizers.NpuFusedRMSprop(discrim.parameters(), lr=lr*alpha)
 args = parser.parse_args()
 if args.apex:
   [gen.encoder,gen.decoder,discrim], [optim_E,optim_D,optim_Dis] = amp.initialize([gen.encoder,gen.decoder,discrim], [optim_E,optim_D,optim_Dis],opt_level=args.apex_opt_level, loss_scale=128, combine_grad=True)

@@ -20,7 +20,7 @@ from absl.testing import parameterized
 import numpy as np
 import tensorflow as tf
 # pylint: disable=g-direct-tensorflow-import
-from tensorflow.python.keras.testing_utils import layer_test
+from keras.testing_utils import layer_test
 from official.nlp.modeling.layers.tn_expand_condense import TNExpandCondense
 
 

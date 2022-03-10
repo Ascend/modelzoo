@@ -8,7 +8,7 @@ cur_path=`pwd`
 export RANK_SIZE=8
 export JOB_ID=10087
 RANK_ID_START=0
-
+export BMMV2_ENABLE=1
 
 # 数据集路径,保持为空,不需要修改
 data_path=""
@@ -18,9 +18,9 @@ ckpt_path=""
 #网络名称，同目录名称
 Network="Bert-Squad_ID0470_for_PyTorch"
 #训练epoch
-train_epochs=2
+train_epochs=3
 #训练batch_size
-batch_size=32
+batch_size=16
 #训练step
 train_steps=
 #学习率
@@ -83,55 +83,57 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
+
+#设置环境变量，不需要修改
+ASCEND_DEVICE_ID=0
+echo "Device ID: $ASCEND_DEVICE_ID"
+
+	
+#创建DeviceID输出目录，不需要修改
+if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
+    rm -rf ${cur_path}/output/${ASCEND_DEVICE_ID}
+    mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
+
+else
+    mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID 
+    mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
+fi
+
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/../
-for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
+
+for i in $(seq 0 7)
 do
-    #设置环境变量，不需要修改
-    echo "Device ID: $ASCEND_DEVICE_ID"
-    export RANK_ID=$RANK_ID
-    export ASCEND_DEVICE_ID=$RANK_ID
-
-
-
-    #创建DeviceID输出目录，不需要修改
-    if [ -d ${cur_path}/output/${ASCEND_DEVICE_ID} ];then
-        rm -rf ${cur_path}/output/${ASCEND_DEVICE_ID}
-        mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
-    else
-        mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
-    fi
-
-    
-    #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
-    #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    nohup python3.7 run_squad.py \
-          --init_checkpoint ${ckpt_path}/bert_large_pretrained_amp.pt \
-          --bert_model bert-large-uncased \
-		  --do_train \
-		  --train_file ${data_path}/train-v1.1.json \
-		  --train_batch_size ${batch_size} \
-		  --do_predict \
-		  --predict_batch_size ${batch_size} \
-		  --predict_file ${data_path}/dev-v1.1.json \
-		  --learning_rate ${learning_rate} \
-		  --num_train_epochs ${train_epochs} \
-		  --seed 1 \
-		  --fp16 \
-		  --loss_scale 4096 \
-		  --vocab_file "data/uncased_L-24_H-1024_A-16/vocab.txt" \
-		  --do_eval \
-          --eval_script ${data_path}/evaluate-v1.1.py \
-		  --npu_id ${ASCEND_DEVICE_ID} \
-		  --do_lower_case \
-		  --output_dir ${cur_path}/../results \
-		  --config_file bert_config.json \
-		  --num_npu 8 \
-		  --json-summary ${cur_path}/output/${ASCEND_DEVICE_ID}/dllogger.json> ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
-done 
+    python3.7 run_squad.py \
+            --init_checkpoint ${ckpt_path}/bert_large_pretrained_amp.pt \
+            --bert_model bert-large-uncased \
+            --do_train \
+            --train_file ${data_path}/train-v1.1.json \
+            --train_batch_size ${batch_size} \
+            --do_predict \
+            --predict_batch_size ${batch_size} \
+            --predict_file ${data_path}/dev-v1.1.json \
+            --learning_rate ${learning_rate} \
+            --num_train_epochs ${train_epochs} \
+            --seed 1 \
+            --fp16 \
+            --loss_scale 4096 \
+            --vocab_file "data/uncased_L-24_H-1024_A-16/vocab.txt" \
+            --do_eval \
+            --eval_script ${data_path}/evaluate-v1.1.py \
+            --npu_id ${ASCEND_DEVICE_ID} \
+            --do_lower_case \
+            --output_dir ${cur_path}/../results \
+            --config_file bert_config.json \
+            --num_npu 8 \
+            --local_rank=$i \
+            --addr=127.0.0.1 \
+            --json-summary ${cur_path}/output/${ASCEND_DEVICE_ID}/dllogger.json > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+done           
+ 
 wait
 
 #训练结束时间，不需要修改
@@ -183,3 +185,4 @@ echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${Ca
 echo "TrainAccuracy = ${train_accuracy}">> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+export BMMV2_ENABLE=0

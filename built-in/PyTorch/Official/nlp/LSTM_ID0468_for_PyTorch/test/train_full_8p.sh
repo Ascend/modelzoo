@@ -14,15 +14,15 @@ data_path=""
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="LSTM_for_PyTorch"
+Network="LSTM_ID0468_for_PyTorch"
 #训练epoch
-train_epochs=0
+train_epochs=30
 #训练batch_size
-batch_size=128
+batch_size=1024
 #训练step
-train_steps=10000
+train_steps=
 #学习率
-learning_rate=0.1
+learning_rate=0.001
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_fp32_to_fp16"
@@ -129,7 +129,7 @@ e2e_time=$(( $end_time - $start_time ))
 
 #训练完恢复参数配置
 sed -i "s|${data_path}|data|g" conf/ctc_config.yaml
-sed -i "s|from tensorboardX import SummaryWriter|from torch.utils.tensorboard import SummaryWriter|g" ../NPU/1p/steps/train_ctc.py
+sed -i "s|from tensorboardX import SummaryWriter|from torch.utils.tensorboard import SummaryWriter|g"  steps/train_ctc.py
 sed -i "s|${data_path}|data|g" ${data_path}/train/fbank.scp
 sed -i "s|${data_path}|data|g" ${data_path}/dev/fbank.scp
 sed -i "s|${data_path}|data|g" ${data_path}/test/fbank.scp
@@ -142,7 +142,7 @@ FPS=`grep "Epoch:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID
 echo "Final Performance item/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep "cv acc is:" ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $7}'|sed 's/,$//'`
+train_accuracy=`grep "acc is:" ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $10}'`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"

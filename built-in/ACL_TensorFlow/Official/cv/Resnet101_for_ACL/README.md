@@ -4,6 +4,17 @@
 
 This repository provides a script and recipe to Inference the ResNet101 model.
 
+## Notice
+**This sample only provides reference for you to learn the Ascend software stack and is not for commercial purposes.**
+
+Before starting, please pay attention to the following adaptation conditions. If they do not match, may leading in failure.
+
+| Conditions | Need |
+| --- | --- |
+| CANN Version | >=5.0.3 |
+| Chip Platform| Ascend310/Ascend710 |
+| 3rd Party Requirements| Please follow the 'requirements.txt' |
+
 ## Quick Start Guide
 
 ### 1. Clone the respository
@@ -28,6 +39,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Resnet101_for_ACL
 - configure the env
 
   ```
+  #Please modify the environment settings as needed
   export install_path=/usr/local/Ascend
   export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
   export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
@@ -37,13 +49,25 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Resnet101_for_ACL
 
 - convert pb to om
 
+  For Ascend310:
   ```
   atc --model=resnet101_tf.pb --framework=3 --output=resnet101_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,224,224,3" --log=info --insert_op_conf=resnet101_tf_aipp.cfg
+  ```
+  For Ascend710:
+  ```
+  atc --model=resnet101_tf.pb --framework=3 --output=resnet101_tf_aipp --output_type=FP32 --soc_version=Ascend710 --input_shape="input:1,224,224,3" --log=info --insert_op_conf=resnet101_tf_aipp.cfg
   ```
 
 - Build the program
 
+  For Ascend310:
   ```
+  unset ASCEND710_DVPP
+  bash build.sh
+  ```
+  For Ascend710:
+  ```
+  export ASCEND710_DVPP=1
   bash build.sh
   ```
 
@@ -64,6 +88,7 @@ Our result were obtained by running the applicable inference script. To achieve 
 
 #### Inference accuracy results
 
-|       model       | **data**  |    Top1/Top5    |
-| :---------------: | :-------: | :-------------: |
-| offline Inference | 5W images | 78.51 %/ 94.28% |
+|       model     |  SOC  | **data**  |    Top1/Top5    |
+| :---------------:|:-------:|:-------: | :-------------: |
+| offline Inference| Ascend310     | 50K images | 78.51 %/ 94.28% |
+| offline Inference| Ascend710     | 50K images | 78.7 %/ 94.4% |

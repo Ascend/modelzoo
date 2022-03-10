@@ -65,7 +65,8 @@ class HyperParams:
         nsteps_per_epoch = self.args.num_training_samples // self.args.global_batch_size
         self.args.nsteps_per_epoch = nsteps_per_epoch
         if self.args.max_epochs:
-            nstep = nsteps_per_epoch * self.args.max_epochs
+            #nstep = nsteps_per_epoch * self.args.max_epochs
+            nstep = self.args.max_train_steps
         else:
             nstep = self.args.max_train_steps
         self.args.nstep = nstep

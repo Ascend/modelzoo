@@ -29,9 +29,6 @@
 # limitations under the License.
 # ============================================================================
 import tensorflow as tf
-import numpy as np
-
-import sys
 import ast
 
 import densenet.data_loader as dl
@@ -104,7 +101,7 @@ def parse_args():
     parser.add_argument('--restore_path', default='',
                         help="""restore path of pretrained model""")
     # 不加载预训练网络中FC层权重
-    parser.add_argument('--restore_exclude', default=['linear/'],
+    parser.add_argument('--restore_exclude', default=['linear/', 'global_step'],
                         help="""restore_exclude""")
     # 数据集中的类别数量
     parser.add_argument('--num_classes', default=1000, type=int,

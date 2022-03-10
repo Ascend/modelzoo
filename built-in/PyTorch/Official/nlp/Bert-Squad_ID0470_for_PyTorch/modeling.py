@@ -63,14 +63,14 @@ class MatmulApply(torch.autograd.Function):
         # y: a * b^T
         ctx.save_for_backward(self, mat2)
         result = torch.matmul(self, mat2.transpose(-2, -1))
-        return result.detach()
+        return result
     @staticmethod
     def backward(ctx, grad):
         # da: grad * b
         # db: grad^T * a
         self, mat2 = ctx.saved_tensors
-        self_grad = torch.npu_bmmV2(grad, mat2, [])
-        mat2_grad = torch.npu_bmmV2(grad.transpose(-2, -1), self, [])
+        self_grad = torch.matmul(grad, mat2)
+        mat2_grad = torch.matmul(grad.transpose(-2, -1), self)
         return self_grad, mat2_grad
 
 class NpuLinear(nn.Linear):
@@ -144,18 +144,15 @@ def gelu(x):
     return x * 0.5 * (1.0 + torch.erf(x / 1.41421))
 
 #used only for triton inference
-def bias_gelu(bias, y):
-    x = y + bias
+def bias_gelu(bias, x):
     return x * 0.5 * (1.0 + torch.erf(x / 1.41421))
 
 # used specifically for training since torch.nn.functional.gelu breaks ONNX export
-def bias_gelu_training(bias, y):
-    x = y + bias
+def bias_gelu_training(bias, x):
     #return torch.nn.functional.gelu(x) # Breaks ONNX export
     return torch.fast_gelu(x)
 
-def bias_tanh(bias, y):
-    x = y + bias
+def bias_tanh(bias, x):
     return torch.tanh(x)
 
 def swish(x):
@@ -203,7 +200,7 @@ class LinearActivation(Module):
 
     def forward(self, input):
         if not self.bias is None:
-            return self.biased_act_fn(self.bias, torch.npu_linear(input, self.weight, None))
+            return self.biased_act_fn(self.bias, torch.npu_linear(input, self.weight, self.bias))
         else:
             return self.act_fn(torch.npu_linear(input, self.weight, self.bias))
 
@@ -352,7 +349,7 @@ class BertEmbeddings(nn.Module):
         # self.LayerNorm is not snake-cased to stick with TensorFlow model variable name and be able to load
         # any TensorFlow checkpoint file
         self.LayerNorm = BertLayerNorm(config.hidden_size, eps=1e-12)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
 
     def forward(self, input_ids, token_type_ids):
         seq_length = input_ids.size(1)
@@ -384,12 +381,37 @@ class BertSelfAttention(nn.Module):
         self.key = NpuLinear(config.hidden_size, self.all_head_size)
         self.value = NpuLinear(config.hidden_size, self.all_head_size)
 
-        self.dropout = nn.Dropout(config.attention_probs_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.attention_probs_dropout_prob)
+        self.attention_probs_dropout_prob = config.attention_probs_dropout_prob
 
     def transpose_for_qkv(self, x):
         new_x_shape = (self.bs, x.size()[0] // self.bs) + (self.num_attention_heads, self.attention_head_size)
         return x.npu_confusion_transpose((0, 2, 1, 3), new_x_shape, False)
 
+    
+    def fuse_add_softmax_dropout(self, attn_mask, attn_scores, attn_head_size, p):
+        high_performance_support_hw = [128, 256, 384, 512]
+        n, c, h, w = attn_scores.size()
+        if h in high_performance_support_hw and (n * c) % 32 == 0:
+            if self.training:
+                drop_p = p
+            else:
+                drop_p = 0
+            _, _, attn_probs = torch.npu_dropout_with_add_softmax(attn_scores, attn_mask,
+                                                                  1 / math.sqrt(attn_head_size), drop_p, -1)
+        else:                  
+            # Apply the attention mask is (precomputed for all layers in BertModel forward() function)
+            attn_scores = torch.add(attn_mask, attn_scores, alpha=(1 / math.sqrt(attn_head_size)))
+
+            # Normalize the attention scores to probabilities.chrome
+            attn_probs = F.softmax(attn_scores, dim=-1)
+
+            # This is actually dropping out entire tokens to attend to, which might
+            # seem a bit unusual, but is taken from the original Transformer paper.
+            attn_probs = self.dropout(attn_probs)    
+        
+        return attn_probs
+        
     def forward(self, hidden_states, attention_mask):
         self.bs, _, _, _ = attention_mask.size()
 
@@ -403,17 +425,9 @@ class BertSelfAttention(nn.Module):
 
         # Take the dot product between "query" and "key" to get the raw attention scores.
         attention_scores = Matmul_transpose(query_layer, key_layer)
-        #attention_scores = attention_scores / math.sqrt(self.attention_head_size)
-        # Apply the attention mask is (precomputed for all layers in BertModel forward() function)
-        attention_scores = torch.add(attention_mask, attention_scores, alpha=(1 / math.sqrt(self.attention_head_size)))
-        #attention_scores = attention_scores + attention_mask
 
-        # Normalize the attention scores to probabilities.chrome
-        attention_probs = F.softmax(attention_scores, dim=-1)
-
-        # This is actually dropping out entire tokens to attend to, which might
-        # seem a bit unusual, but is taken from the original Transformer paper.
-        attention_probs = self.dropout(attention_probs)
+        attention_probs = self.fuse_add_softmax_dropout(attention_mask, attention_scores, 
+                                                        self.attention_head_size, self.attention_probs_dropout_prob)
 
         context_layer = torch.matmul(attention_probs, value_layer)
         context_layer = context_layer.npu_confusion_transpose((0, 2, 1, 3), (
@@ -426,7 +440,7 @@ class BertSelfOutput(nn.Module):
         super(BertSelfOutput, self).__init__()
         self.dense = NpuLinear(config.hidden_size, config.hidden_size)
         self.LayerNorm = BertLayerNorm(config.hidden_size, eps=1e-12)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
 
     def forward(self, hidden_states, input_tensor):
         hidden_states = self.dense(hidden_states)
@@ -462,7 +476,7 @@ class BertOutput(nn.Module):
         super(BertOutput, self).__init__()
         self.dense = NpuLinear(config.intermediate_size, config.hidden_size)
         self.LayerNorm = BertLayerNorm(config.hidden_size, eps=1e-12)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
 
     def forward(self, hidden_states, input_tensor):
         hidden_states = self.dense(hidden_states)
@@ -1086,7 +1100,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
         super(BertForSequenceClassification, self).__init__(config)
         self.num_labels = num_labels
         self.bert = BertModel(config)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, num_labels)
         self.apply(self.init_bert_weights)
 
@@ -1144,7 +1158,7 @@ class BertForMultipleChoice(BertPreTrainedModel):
         super(BertForMultipleChoice, self).__init__(config)
         self.num_choices = num_choices
         self.bert = BertModel(config)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, 1)
         self.apply(self.init_bert_weights)
 
@@ -1214,7 +1228,7 @@ class BertForTokenClassification(BertPreTrainedModel):
         super(BertForTokenClassification, self).__init__(config)
         self.num_labels = num_labels
         self.bert = BertModel(config)
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, num_labels)
         self.apply(self.init_bert_weights)
 
@@ -1281,7 +1295,7 @@ class BertForQuestionAnswering(BertPreTrainedModel):
         super(BertForQuestionAnswering, self).__init__(config)
         self.bert = BertModel(config)
         # TODO check with Google if it's normal there is no dropout on the token classifier of SQuAD in the TF version
-        # self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.dropout = nn.DropoutWithByteMask(config.hidden_dropout_prob)
         self.qa_outputs = nn.Linear(config.hidden_size, 2)
         self.apply(self.init_bert_weights)
 

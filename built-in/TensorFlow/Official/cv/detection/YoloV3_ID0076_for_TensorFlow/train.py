@@ -332,8 +332,6 @@ with tf.Session(config=config) as sess:
                 loss_class.average)
             print(info)
             logging.info(info)
-            if int(__global_step) >= 400:
-                break
 
         # NOTE: this is just demo. You can set the conditions when to save the weights.
         temp_epoch = epoch + 1
@@ -343,12 +341,8 @@ with tf.Session(config=config) as sess:
                 int(__global_step),
                 loss_total.average,
                 __lr))
-        if epoch >= 10:
-            break
-        if __lr <= 0:
-            break
 
-        if __global_step >= 500:
+        if __lr <= 0:
             break
 
     saver_to_save.save(sess, args.save_dir + 'model-final_step_{}_loss_{:.4f}_lr_{:.5g}'.format( \

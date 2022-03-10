@@ -90,6 +90,9 @@ start_time=$(date +%s)
 
 #进入训练脚本目录，需要模型审视修改
 cd $cur_path/..
+#修改参数
+#sed -i "s|pass|break|g" examples/imagenet/main.py
+
 for((RANK_ID=$RANK_ID_START;RANK_ID<$((RANK_SIZE+RANK_ID_START));RANK_ID++));
 do
     #设置环境变量，不需要修改
@@ -124,10 +127,13 @@ do
         --pm=O2 \
         --loss_scale=32 \
         --val_feq=10 \
-		--stop-step-num=128 \
+		--stop-step-num=100 \
         --npu=$ASCEND_DEVICE_ID > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
 wait
+
+#恢复参数
+#sed -i "s|break|pass|g" examples/imagenet/main.py
 
 #训练结束时间，不需要修改
 end_time=$(date +%s)

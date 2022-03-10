@@ -16,12 +16,9 @@ export HCCL_CONNECT_TIMEOUT=600
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
-#设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
-
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
-Network="MobileNetV2_for_TensorFlow"
+Network="MobileNetV2_ID0074_for_TensorFlow"
 #训练epoch
 train_epochs=300
 #训练batch_size
@@ -31,7 +28,7 @@ batch_size=256
 #export NPU_LOOP_SIZE=${train_steps}
 
 #维测参数，precision_mode需要模型审视修改
-precision_mode="allow_mix_precision"
+#precision_mode="allow_mix_precision"
 #维持参数，以下不需要修改
 over_dump=False
 data_dump_flag=False
@@ -138,14 +135,14 @@ do
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
-    let a=RANK_ID*${corenum}/8
-    let b=RANK_ID+1
-    let c=b*${corenum}/8-1
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
-    ${bind_core} python3.7 train.py \
+    #corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
+    #let a=RANK_ID*${corenum}/8
+    #let b=RANK_ID+1
+    #let c=b*${corenum}/8-1
+    #if [ "x${bind_core}" != x ];then
+    #    bind_core="taskset -c $a-$c"
+    #fi
+    python3.7 train.py \
         --dataset_dir=$data_path \
         --max_epoch=$train_epochs \
         --model_name="mobilenet_v2" \
@@ -168,6 +165,11 @@ do
         #--profiling=${profiling} \
         #--profiling_dump_path=${profiling_dump_path} \
         #--autotune=${autotune} > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+
+    
+    python3.7 eval_image_classifier_mobilenet.py \
+        --dataset_dir=${data_path} \
+        --checkpoint_path=${data_path}/../MobileNetV2_train/result/8p/2/results/model.ckpt-187500 >> ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
 wait
 
@@ -178,12 +180,12 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}'`
+FPS=`grep 'ips:' $cur_path/output/0/train_0.log|grep -v "logger.py"|awk -F 'ips:' '{print $2}'|awk '{print $1}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep train_accuracy $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $8}'|cut -c 1-5`
+train_accuracy=`grep acc: $cur_path/output/0/train_0.log|awk 'END {print $2}'|cut -c 2-6`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
@@ -201,7 +203,7 @@ ActualFPS=${FPS}
 TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'*'${RANK_SIZE}'*1000/'${FPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-grep train_loss $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v BatchTimestamp|awk '{print $10}'|sed 's/,//g'|sed '/^$/d' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep "loss =" $cur_path/output/0/train_0.log|grep -v basic_session_run_hooks.py|awk '{print $3}'|sed 's/,//g' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`

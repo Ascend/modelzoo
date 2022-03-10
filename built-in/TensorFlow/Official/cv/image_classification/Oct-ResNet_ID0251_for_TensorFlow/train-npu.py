@@ -25,69 +25,68 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import numpy as np
+import os
+import time
 
 from tensorflow import keras
+from scipy import linalg
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import ModelCheckpoint, LearningRateScheduler
-from tensorflow.keras.callbacks import ReduceLROnPlateau
+from tensorflow.python.keras.preprocessing.image import ImageDataGenerator, apply_affine_transform
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import backend as K
 from tensorflow.keras.datasets import cifar10
-import numpy as np
-import os
 from npu_bridge.estimator import npu_ops
+from npu_bridge.npu_init import *
 import tensorflow as tf
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-from tensorflow.python.ops import math_ops
-from tensorflow.python.framework import dtypes
-sess_config = tf.ConfigProto()
-custom_op = sess_config.graph_options.rewrite_options.custom_optimizers.add()
-custom_op.name = "NpuOptimizer"
-custom_op.parameter_map["use_off_line"].b = True
-custom_op.parameter_map["dynamic_input"].b = True
-custom_op.parameter_map["dynamic_graph_execute_mode"].s = tf.compat.as_bytes("lazy_recompile")
-sess_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
-sess = tf.Session(config=sess_config)
-K.set_session(sess)
-
+from tensorflow.python.data.experimental.ops import threadpool
 from model.resnet import resnet_v1, resnet_v2
 
-def lr_schedule(epoch):
-    """Learning Rate Schedule
-
-    Learning rate is scheduled to be reduced after 80, 120, 160, 180 epochs.
-    Called automatically every epoch as part of callbacks during training.
-
-    # Arguments
-        epoch (int): The number of epochs
-
-    # Returns
-        lr (float32): learning rate
-    """
-    lr = 1e-3
-    if epoch > 180:
-        lr *= 0.5e-3
-    elif epoch > 160:
-        lr *= 1e-3
-    elif epoch > 120:
-        lr *= 1e-2
-    elif epoch > 80:
-        lr *= 1e-1
-    print('Learning rate: ', lr)
-    return lr
-
-def custom_metrics(y_true, y_pred):
-    return math_ops.cast(math_ops.equal(math_ops.argmax(y_true, axis=-1, output_type=dtypes.int32),
-                                        math_ops.argmax(y_pred, axis=-1, output_type=dtypes.int32)),
-                         K.floatx())
+class LogSessionRunHook(tf.train.SessionRunHook):
+    def __init__(self, batch_size, 
+                 iterations_per_loop, 
+                 display_every,
+                 num_records):
+        self.iter_times = []
+        self.iterations_per_loop = iterations_per_loop
+        self.batch_size = batch_size
+        self.num_records = num_records
+        self.display_every = display_every
+        self.elapsed_secs = 0.
+        self.count = 0
+        
+    def before_run(self, run_context):
+        self.start_time = time.time()
+        return tf.train.SessionRunArgs(fetches=[tf.train.get_global_step(), 'loss/add:0'])
+        
+    def after_run(self, run_context, run_values):
+        batch_time = time.time() - self.start_time
+        self.iter_times.append(batch_time)
+        self.elapsed_secs += batch_time
+        self.count += 1
+        global_step, loss = run_values.results
+        if global_step == 1 or global_step % self.display_every == 0:
+            dt = self.elapsed_secs / self.count
+            img_per_sec = self.batch_size * self.iterations_per_loop / dt
+            epoch = global_step * self.batch_size / self.num_records
+            print('step:%6i  epoch:%5.1f  FPS:%7.1f  loss:%6.3f'  %
+                             (global_step, epoch, img_per_sec, loss))
+                             
+            self.elapsed_secs = 0.
+            self.count = 0
+            
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
 if __name__ == "__main__":
     import sys
     # Training parameters
     batch_size = 32  # orig paper trained all networks with batch_size=128
     epochs = 3
-    data_augmentation = True
+    lre = 1e-3
     num_classes = 10
+
+    model_path = './model_dir'
 
     # Subtracting pixel mean improves accuracy
     subtract_pixel_mean = True
@@ -104,9 +103,6 @@ if __name__ == "__main__":
         depth = n * 6 + 2
     elif version == 2:
         depth = n * 9 + 2
-
-    # Model name, depth and version
-    model_type = 'ResNet%dv%d' % (depth, version)
 
     # Load the CIFAR10 data.
     if os.path.exists("/root/.keras/datasets/") == False:
@@ -130,141 +126,128 @@ if __name__ == "__main__":
         x_train -= x_train_mean
         x_test -= x_train_mean
 
-    print('x_train shape:', x_train.shape)
-    print(x_train.shape[0], 'train samples')
-    print(x_test.shape[0], 'test samples')
-    print('y_train shape:', y_train.shape)
-
-    # Convert class vectors to binary class matrices.
-    y_train = keras.utils.to_categorical(y_train, num_classes)
-    y_test = keras.utils.to_categorical(y_test, num_classes)
-
-
     if version == 2:
         model = resnet_v2(input_shape=input_shape, depth=depth)
     else:
         model = resnet_v1(input_shape=input_shape, depth=depth)
 
-    # from tensorflow.keras.utils import plot_model
-    # plot_model(model, to_file=model_type+'.pdf')
-    # print("write model graph done!")
-    # exit()
-   # model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=lr_schedule(0)), metrics=['accuracy'])
-    model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=lr_schedule(0)), metrics=[custom_metrics])
-    model.summary()
-    print(model_type)
+    model.compile(loss='categorical_crossentropy', 
+                  optimizer=Adam(lr=lre), 
+                  metrics=['accuracy'])
 
-    # Prepare model model saving directory.
-    save_dir = os.path.join(os.getcwd(), 'saved_models')
-    model_name = 'cifar10_%s_model.{epoch:03d}.h5' % model_type
-    if not os.path.isdir(save_dir):
-        os.makedirs(save_dir)
-    filepath = os.path.join(save_dir, model_name)
+    def process_function(x_data,
+                     image_size,
+                     num_channels=3,
+                     shear_range=0.,
+                     zoom_range=0.,
+                     rotation_range=0.,
+                     width_shift_range=0.,
+                     height_shift_range=0.,
+                     horizontal_flip=False,
+                     data_format='channels_last'):
+        
+        img = x_data
 
-    # Prepare callbacks for model saving and for learning rate adjustment.
-    checkpoint = ModelCheckpoint(filepath=filepath,
-                                 monitor='val_acc',
-                                 verbose=1,
-                                 save_best_only=True)
+        def data_augment(x):
+            if data_format == 'channels_first':
+                channel_axis = 0
+                row_axis = 1
+                col_axis = 2
+            if data_format == 'channels_last':
+                channel_axis = 2
+                row_axis = 0
+                col_axis = 1
+            
+            if isinstance(zoom_range, (float, int)):
+                zr = [1 - zoom_range, 1 + zoom_range]
+            elif (len(zoom_range) == 2 and
+                all(isinstance(val, (float, int)) for val in zoom_range)):
+                zr = [zoom_range[0], zoom_range[1]]
+            else:
+                zr = [1, 1]
 
-    lr_scheduler = LearningRateScheduler(lr_schedule)
+            if rotation_range:
+                theta = np.random.uniform(low=-rotation_range, high=rotation_range)
+            else:
+                theta = 0
+            
+            h, w = x.shape[row_axis], x.shape[col_axis]
+            if height_shift_range:
+                tx = np.random.uniform(low=-height_shift_range, high=height_shift_range) * h
+            else:
+                tx = 0
+            if width_shift_range:
+                ty = np.random.uniform(low=-width_shift_range, high=width_shift_range) * w
+            else:
+                ty = 0
 
-    lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1),
-                                   cooldown=0,
-                                   patience=5,
-                                   min_lr=0.5e-6)
+            if shear_range:
+                shear = np.random.uniform(low=-shear_range, high=shear_range)
+            else:
+                shear = 0
 
-    callbacks = [checkpoint, lr_reducer, lr_scheduler]
+            if zr[0] == 1 and zr[1] == 1:
+                zx, zy = 1, 1
+            else:
+                zx, zy = np.random.uniform(low=zr[0], high=zr[1], size=2)
 
-    # Run training, with or without data augmentation.
-    if not data_augmentation:
-        print('Not using data augmentation.')
-        history = model.fit(x_train, y_train,
-                            batch_size=batch_size,
-                            epochs=epochs,
-                            validation_data=(x_test, y_test),
-                            shuffle=True,
-                            callbacks=callbacks)
-    else:
-        print('Using real-time data augmentation.')
-        # This will do preprocessing and realtime data augmentation:
-        datagen = ImageDataGenerator(
-            # set input mean to 0 over the dataset
-            featurewise_center=False,
-            # set each sample mean to 0
-            samplewise_center=False,
-            # divide inputs by std of dataset
-            featurewise_std_normalization=False,
-            # divide each input by its std
-            samplewise_std_normalization=False,
-            # apply ZCA whitening
-            zca_whitening=False,
-            # epsilon for ZCA whitening
-            zca_epsilon=1e-06,
-            # randomly rotate images in the range (deg 0 to 180)
-            rotation_range=0,
-            # randomly shift images horizontally
-            width_shift_range=0.1,
-            # randomly shift images vertically
-            height_shift_range=0.1,
-            # set range for random shear
-            shear_range=0.,
-            # set range for random zoom
-            zoom_range=0.,
-            # set range for random channel shifts
-            channel_shift_range=0.,
-            # set mode for filling points outside the input boundaries
-            fill_mode='nearest',
-            # value used for fill_mode = "constant"
-            cval=0.,
-            # randomly flip images
-            horizontal_flip=True,
-            # randomly flip images
-            vertical_flip=False,
-            # set rescaling factor (applied before any other transformation)
-            rescale=None,
-            # set function that will be applied on each input
-            preprocessing_function=None,
-            # image data format, either "channels_first" or "channels_last"
-            data_format=None,
-            # fraction of images reserved for validation (strictly between 0 and 1)
-            validation_split=0.0)
+            x = apply_affine_transform(x, theta=theta, tx=tx, ty=ty,
+                                    shear=shear, zx=zx, zy=zy,
+                                    row_axis=row_axis,
+                                    col_axis=col_axis,
+                                    channel_axis=channel_axis)
 
-        # Compute quantities required for featurewise normalization
-        # (std, mean, and principal components if ZCA whitening is applied).
-        datagen.fit(x_train)
+            flip_horizontal = (np.random.random() < 0.5) * horizontal_flip
+            if flip_horizontal:
+                x = np.asarray(x).swapaxes(col_axis, 0)
+                x = x[::-1, ...]
+                x = x.swapaxes(0, col_axis)
 
-        # Fit the model on the batches generated by datagen.flow().
-        history = model.fit_generator(datagen.flow(x_train, y_train, batch_size=batch_size),
-                                      validation_data=(x_test, y_test),
-                                      epochs=epochs, verbose=1, workers=1,
-                                      callbacks=callbacks)
+            return x
+        
+        result_tensors = tf.py_func(data_augment, inp=[img], Tout=tf.float32)
+        result_tensors.set_shape((image_size[0], image_size[1], num_channels))
+        return result_tensors
 
-    import matplotlib.pyplot as plt
-    # draw acc curve
-    #plt.plot(history.history['acc'])
-    plt.plot(history.history['custom_metrics'])
-    plt.plot(history.history['custom_metrics'])
-    plt.title('Model accuracy')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.savefig('./acc.png')
-    plt.show()
+    def input_fn(batch_size, image_size, x_data, labels, num_classes, is_train):
+        if is_train:
+            kwargs = {'image_size' : image_size,
+                    'num_channels': 3,
+                    'shear_range': 0.,
+                    'zoom_range': 0.,
+                    'rotation_range': 0.,
+                    'width_shift_range': 0.,
+                    'height_shift_range': 0.,
+                    'horizontal_flip': False,
+                    'data_format': 'channels_last'}
+        else:
+            kwargs = {'image_size' : image_size,
+                    'num_channels': 3}
+        
+        img_ds = tf.data.Dataset.from_tensor_slices(x_data)
+        img_ds = img_ds.map(lambda path: process_function(path, **kwargs), num_parallel_calls=256)
 
-    # draw loss curve
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model loss')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Test'], loc='upper left')
-    plt.savefig('./loss.png')
-    plt.show()
+        # Convert class vectors to binary class matrices
+        y_train = keras.utils.to_categorical(labels, num_classes)
+        label_ds = tf.data.Dataset.from_tensor_slices(y_train)
+        ds = tf.data.Dataset.zip((img_ds, label_ds))
+        ds = ds.shuffle(buffer_size=batch_size * 1, seed=np.random.randint(1e6)).batch(32, drop_remainder=True).repeat(100)
+        ds = threadpool.override_threadpool(ds, threadpool.PrivateThreadPool(128, display_name='input_pipeline_thread_pool'))
+        return ds
 
-    # Score trained model.
-    scores = model.evaluate(x_test, y_test, verbose=1)
-    print('Test loss:', scores[0])
-    print('Test accuracy:', scores[1])
-    
-    sess.close()
+    run_config = NPURunConfig(enable_data_pre_proc=True,
+                          save_checkpoints_steps=5000,
+                          model_dir=model_path,
+                          precision_mode='allow_mix_precision',
+                          iterations_per_loop=10)
+
+    est_resnet = keras_to_npu.model_to_npu_estimator(model, model_dir=model_path, config=run_config)
+    K.clear_session()
+
+    training_hooks = [LogSessionRunHook(32, 10, 1, 50000)]
+    est_resnet.train(input_fn=lambda: input_fn(batch_size, input_shape, x_train, y_train, num_classes, True),
+                     max_steps=4689,
+                     hooks=training_hooks)
+
+    est_resnet.evaluate(input_fn=lambda: input_fn(batch_size, input_shape, x_test, y_test, num_classes, False),
+                        steps=313)

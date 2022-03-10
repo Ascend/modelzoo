@@ -450,9 +450,51 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
         cout << "acldvppJpegGetImageInfo failed, ret " << ret << "filename: " << fileLocation.c_str() << endl;
     }
 
+#ifdef ASCEND710_DVPP
+    W_Aligned = (W + 63) / 64 * 64;
+    H_Aligned = (H + 15) / 16 * 16;
+    if(W_Aligned > 4096 || H_Aligned > 4096){
+        return -1;
+    }
+    acldvppJpegFormat realformat;
+    int aclformat;
+    acldvppJpegGetImageInfoV2(buff, fileSize, &W, &H, &components,&realformat);
+    switch (realformat){
+        case 0:
+            aclformat = 6;
+            outputBuffSize = W_Aligned * H_Aligned * 3;
+            break;
+        case 1:
+            aclformat = 4;
+            outputBuffSize = W_Aligned * H_Aligned * 2;
+            break;
+        case 2:
+            aclformat = 2;
+            outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+            break;
+        case 4:
+            aclformat = 1001;
+            outputBuffSize = W_Aligned * H_Aligned  * 2;
+            break;
+        case 3:
+            aclformat = 0;
+            outputBuffSize = W_Aligned * H_Aligned;
+            break;    
+        default:
+            aclformat = 1;
+            outputBuffSize = W_Aligned * H_Aligned * 3/2;
+            break;
+    }
+    if (aclformat == 0) {
+        aclformat = 1;
+        outputBuffSize = outputBuffSize * 3/2;
+    }    
+#else
     W_Aligned = (W + 127) / 128 * 128;
     H_Aligned = (H + 15) / 16 * 16;
     outputBuffSize = W_Aligned * H_Aligned * 3 / NUM_2;
+#endif
+
     void *jpeg_dev_mem_in_ptr = nullptr;
     ret = acldvppMalloc(&jpeg_dev_mem_in_ptr, fileSize);
     if (ret != ACL_ERROR_NONE) {
@@ -508,12 +550,30 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     gettimeofday(&func_end, NULL);
     costTime = (func_end.tv_sec - func_start.tv_sec) * 1000000 + (func_end.tv_usec - func_start.tv_usec);
     dvppTime[funcName] += costTime;
-    aclrtSynchronizeStream(stream);
+    ret = aclrtSynchronizeStream(stream);
+    if (ret != ACL_ERROR_NONE) {
+        LOG(" aclrtSynchronizeStream failed, acldvppJpegDecodeAsync \n");
+        return ret;
+    }
+	ret = acldvppGetPicDescRetCode(jpeg_output_desc);
+    if (ret != ACL_ERROR_NONE)
+	{
+        printf(" acldvppGetPicDescRetCode failed\n");
+        return ret;
+    }
 
     // 4 对jpegd解码的图片进行原分辨率抠图及长边416等比例缩放。
     acldvppPicDesc *cropOutputDesc = nullptr;
     acldvppRoiConfig *cropConfig = nullptr;
     // 设置对解码后的图片进行原图裁剪，目的是为了减少因jpegd解码后对齐的无效数据对图像精度的影响
+#ifdef ASCEND710_DVPP
+	uint32_t w_new = acldvppGetPicDescWidth(jpeg_output_desc);
+    uint32_t h_new = acldvppGetPicDescHeight(jpeg_output_desc);
+    uint32_t format = acldvppGetPicDescFormat(jpeg_output_desc);
+    W = w_new;
+    H = h_new;
+    printf("w_new=%d, h_new=%d, format=%u\n", w_new, h_new, format);
+#endif
     cropConfig = InitCropRoiConfig(W, H);
     uint32_t newInputWidth = 0;
     uint32_t newInputHeight = 0;
@@ -540,13 +600,29 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     }
 
     // 原格式抠图以及长边等比例缩放可以在一个接口中完成
+#ifdef ASCEND710_DVPP
+    acldvppResizeConfig *resizeConfig = acldvppCreateResizeConfig();
+	ret = acldvppSetResizeConfigInterpolation(resizeConfig, 1);
+	if (ret != ACL_ERROR_NONE)
+    {
+        std::cout << "[ERROR][Vision] resize acldvppSetResizeConfigInterpolatio failed, ret = " << ret << std::endl;
+        return ret;
+    }
+	ret = acldvppVpcCropResizeAsync(dvpp_channel_desc, jpeg_output_desc, cropOutputDesc, cropConfig, resizeConfig, stream);
+#else
     ret = acldvppVpcCropAsync(dvpp_channel_desc, jpeg_output_desc, cropOutputDesc, cropConfig, stream);
+#endif
+    
     if (ret != ACL_ERROR_NONE) {
         LOG("acldvppVpcCropAsync failed, ret=%d\n", ret);
         return ret;
     }
 
-    aclrtSynchronizeStream(stream);
+    ret = aclrtSynchronizeStream(stream);
+    if (ret != ACL_ERROR_NONE) {
+        LOG(" aclrtSynchronizeStream failed, acldvppVpcCropResizeAsync \n");
+        return ret;
+    }
     acldvppDestroyRoiConfig(cropConfig);
     cropConfig = nullptr;
 
@@ -563,9 +639,12 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     cropConfig = InitCropRoiConfig(newInputWidth, newInputHeight);
     // 设置贴图区域以及贴图目标区域
     pasteConfig = InitVpcOutConfig(newInputWidth, newInputHeight, 416, 416);
+#ifdef ASCEND710_DVPP
+    ret = acldvppVpcCropResizePasteAsync(dvpp_channel_desc, cropOutputDesc, cropAndPasteOutputDesc, cropConfig, pasteConfig, resizeConfig, stream);
+#else
+    ret = acldvppVpcCropAndPasteAsync(dvpp_channel_desc, cropOutputDesc, cropAndPasteOutputDesc, cropConfig,pasteConfig, stream);
+#endif
 
-    ret = acldvppVpcCropAndPasteAsync(dvpp_channel_desc, cropOutputDesc, cropAndPasteOutputDesc, cropConfig,
-                                      pasteConfig, stream);
     if (ret != ACL_ERROR_NONE) {
         LOG("acldvppVpcCropAndPasteAsync failed, ret = %d\n", ret);
         return ret;
@@ -579,6 +658,11 @@ aclError DVPP_Yolo(std::string fileLocation, char *&ptr)
     gettimeofday(&func_start, NULL);
     ptr += vpcOutBufferSize;
     ret = aclrtSynchronizeStream(stream);
+    if (ret != ACL_ERROR_NONE)
+	{
+        LOG(" aclrtSynchronizeStream failed, acldvppVpcCropResizePasteAsync\n");
+        return ret;
+    }
     gettimeofday(&func_end, NULL);
     costTime = (func_end.tv_sec - func_start.tv_sec) * 1000000 + (func_end.tv_usec - func_start.tv_usec);
     dvppTime[funcName] += costTime;
@@ -674,7 +758,10 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t right = 0;
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
-
+#ifdef ASCEND710_DVPP
+    right = width - 1;
+    bottom = height - 1;
+#else
     if ((width % NUM_2) == 0) {
         right = width - 1;
     } else {
@@ -686,6 +773,7 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     } else {
         bottom = height;
     }
+#endif
 
     cropConfig = acldvppCreateRoiConfig(0, right, 0, bottom);
     if (cropConfig == nullptr) {

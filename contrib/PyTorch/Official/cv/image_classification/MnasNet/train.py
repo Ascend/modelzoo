@@ -22,6 +22,7 @@ import math
 import numpy as np
 
 import torch
+import apex
 import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -257,7 +258,7 @@ def main_worker(npu, ngpus_per_node, args):
     # criterion = nn.CrossEntropyLoss().to(loc)
     criterion = LabelSmoothingCrossEntropy().to(loc)
 
-    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+    optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
                                     momentum=args.momentum,
                                     weight_decay=args.weight_decay,
                                     nesterov=True)

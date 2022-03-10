@@ -31,10 +31,6 @@
 import tensorflow as tf
 import sys
 import ast
-#sys.path.append("..")
-#sys.path.append("../models")
-#sys.path.append("./resnet50_train/")
-#sys.path.append("./resnet50_train/models")
 import os
 base_path=os.path.split(os.path.realpath(__file__))[0]
 print ("#########base_path:", base_path)
@@ -87,8 +83,7 @@ def main():
                         help="whether to enable overflow")
     cmdline.add_argument("--over_dump_path", default="./",
                         help="path to save overflow dump files")
-    cmdline.add_argument("--data_path", default="PATH_TO_BE_CONFIGURED",
-                        help="path of dataset")
+    cmdline.add_argument("--data_path", default="", help="path of dataset")
     
     FLAGS, unknown_args = cmdline.parse_known_args()
     if len(unknown_args) > 0:
@@ -101,24 +96,15 @@ def main():
     cfg = getattr(__import__(configs, fromlist=[cfg_file]), cfg_file)
     #------------------------------------------------------------------
 
-    #if FLAGS.data_path == "PATH_TO_BE_CONFIGURED":
-    #    pass
-    #else:
-    #    f1 = open("../configs/config.py", "r")
-    #    lines = f1.readlines()
-    #    f2 = open("../configs/config.py", "w")
-    #    for line in lines:
-    #        f2.write(line.replace('\'data_url\': \'file://PATH_TO_BE_CONFIGURED\',', '\'data_url\': \'file://' + FLAGS.data_path + '\','))
-    #    f2.close()
-    #    f1.close()
-
     config = cfg.res50_config()
     config['iterations_per_loop'] = int(FLAGS.iterations_per_loop)
     config['max_train_steps'] = int(FLAGS.max_train_steps)
     config['debug'] = FLAGS.debug
     config['eval'] = FLAGS.eval
     config['model_dir'] = FLAGS.model_dir
-    
+    if FLAGS.data_path:
+        config['data_url'] = FLAGS.data_path
+
     config['over_dump'] = FLAGS.over_dump
     config['over_dump_path'] = FLAGS.over_dump_path
     

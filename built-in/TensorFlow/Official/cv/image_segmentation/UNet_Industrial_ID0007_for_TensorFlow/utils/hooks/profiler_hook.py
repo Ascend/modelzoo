@@ -49,6 +49,11 @@ class ProfilerHook(tf.train.SessionRunHook):
 
         self._sample_dir = sample_dir
 
+        if self._log_every == 25:
+            self._iterations_per_loop = 10
+        else:
+            self._iterations_per_loop = 1
+
         self._processing_speed_arr = list()
 
     @staticmethod
@@ -135,7 +140,7 @@ class ProfilerHook(tf.train.SessionRunHook):
 
             request_fetches.update(additional_fetches)
 
-            print("\n######### START: %d ##############" % self._current_step)
+            print("\n######### START: %d ##############" % (self._current_step * self._iterations_per_loop))
 
         self._t0 = time.time()
         return tf.train.SessionRunArgs(fetches=request_fetches)
@@ -145,7 +150,7 @@ class ProfilerHook(tf.train.SessionRunHook):
         batch_time = time.time() - self._t0
         now_time = time.time()
         
-        imgs_per_sec = int(self._global_batch_size / batch_time)
+        imgs_per_sec = int(self._global_batch_size * self._iterations_per_loop / batch_time)
              
         
         is_log_step = self._current_step % self._log_every == 0
@@ -155,7 +160,7 @@ class ProfilerHook(tf.train.SessionRunHook):
             if self._current_step > self._warmup_steps:
                 imgs_per_sec = float(ProfilerHook.moving_average(self._processing_speed_arr, n=30)[-1])
             
-            LOGGER.log("iteration", int(self._current_step))
+            LOGGER.log("iteration", int(self._current_step * self._iterations_per_loop))
             LOGGER.log("iteration time: %f" % batch_time)
             LOGGER.log("fps", float(imgs_per_sec))
 
@@ -189,7 +194,7 @@ class ProfilerHook(tf.train.SessionRunHook):
                     ) as fd:
                         fd.write(run_values.results["samples"]["mask"])
 
-            print("######### STOP: %d ##############" % self._current_step)
+            print("######### STOP: %d ##############" % (self._current_step * self._iterations_per_loop))
 
         elif self._current_step > self._warmup_steps:
             self._processing_speed_arr.append(imgs_per_sec)

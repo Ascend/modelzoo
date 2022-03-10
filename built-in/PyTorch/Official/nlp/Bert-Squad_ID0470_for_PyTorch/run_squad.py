@@ -1025,11 +1025,15 @@ def main():
 
             if args.loss_scale == 0:
                 model, optimizer = amp.initialize(model, optimizer, opt_level="O2", keep_batchnorm_fp32=False,
-                                                      loss_scale="dynamic")
+                                                  loss_scale="dynamic", combine_grad=True,
+                                                  combine_ddp=True if args.local_rank != -1 else False)
             else:
-                model, optimizer = amp.initialize(model, optimizer, opt_level="O2", keep_batchnorm_fp32=False, loss_scale=args.loss_scale, combine_grad=True)
+                model, optimizer = amp.initialize(model, optimizer, opt_level="O2", keep_batchnorm_fp32=False,
+                                                  loss_scale=args.loss_scale, combine_grad=True,
+                                                  combine_ddp=True if args.local_rank != -1 else False)
             if args.do_train:
-                scheduler = LinearWarmUpScheduler(optimizer, warmup=args.warmup_proportion, total_steps=num_train_optimization_steps)
+                scheduler = LinearWarmUpScheduler(optimizer, warmup=args.warmup_proportion,
+                                                  total_steps=num_train_optimization_steps)
 
         else:
             optimizer = BertAdam(optimizer_grouped_parameters,
@@ -1037,18 +1041,7 @@ def main():
                                     warmup=args.warmup_proportion,
                                     t_total=num_train_optimization_steps)
 
-    if args.local_rank != -1:
-        # try:
-        #     from apex.parallel import DistributedDataParallel as DDP
-        # except ImportError:
-        #     raise ImportError(
-        #         "Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
-        #
-        # model = DDP(model)
-
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank], broadcast_buffers=False, find_unused_parameters=True)
-    elif n_npu > 1:
-        model = torch.nn.DataParallel(model)
+    model.qa_outputs.bias.data = model.qa_outputs.bias.data.float() # for ascend910 special
 
     global_step = 0
     if args.do_train:
@@ -1103,7 +1096,8 @@ def main():
             train_sampler = RandomSampler(train_data)
         else:
             train_sampler = DistributedSampler(train_data)
-        train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.train_batch_size * n_npu, num_workers=2, pin_memory=True, drop_last=True)
+        train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.train_batch_size * n_npu,
+                                      num_workers=2, pin_memory=True, drop_last=True)
 
         model.train()
         #gradClipper = GradientClipper(max_grad_norm=1.0)
@@ -1120,7 +1114,7 @@ def main():
                     break
 
                 if n_npu == 1:
-                    batch = tuple(t.to(device) for t in batch)  # multi-gpu does scattering it-self
+                    batch = tuple(t.to(device, non_blocking=True) for t in batch)  # multi-gpu does scattering it-self
                 input_ids, input_mask, segment_ids, start_positions, end_positions = batch
                 start_logits, end_logits = model(input_ids, segment_ids, input_mask)
                 # If we are on multi-GPU, split add a dimension
@@ -1163,7 +1157,8 @@ def main():
                     #                                                "learning_rate": optimizer.param_groups[0]['lr']})
                     dllogger.log(step=(str(epoch) + '/' + str(int(args.num_train_epochs)),
                                        str(global_step) + '/' + str(int(num_train_optimization_steps)),),
-                                 data={"step_time": round(step_time, 4), "data_time": round(data_time, 4),
+                                 data={"step_time": round(step_time, 4),
+                                       "data_time": round(data_time, 4),
                                        "step_loss": round(final_loss, 4),
                                        "learning_rate": round(optimizer.param_groups[0]['lr'], 10)})
                 step_start_time = time.time()

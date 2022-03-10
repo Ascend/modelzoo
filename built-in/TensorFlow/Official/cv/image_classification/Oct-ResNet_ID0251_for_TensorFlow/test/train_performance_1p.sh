@@ -28,7 +28,7 @@ batch_size=32
 learning_rate=1e-3
 
 #维测参数，precision_mode需要模型审视修改
-precision_mode="allow_fp32_to_fp16"
+precision_mode="allow_mix_precision"
 #维持参数，以下不需要修改
 over_dump=False
 data_dump_flag=False
@@ -148,14 +148,13 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-tmp_TrainingTime=`grep "1563/1563" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk '{print $5}' | tail -n 1 | awk -F "ms" '{print $1}'`
-TrainingTime=`awk 'BEGIN {printf "%.2f\n",'${tmp_TrainingTime}'/1000}'`
-FPS=`awk 'BEGIN {printf "%.2f\n",'${batch_size}'/'${TrainingTime}'}'`
+FPS=`cat ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log | grep "FPS:" | awk -F "FPS: " '{print $2}' | awk -F 'loss:' '{print $1}' | tail -n +2 | awk '{sum+=$1} END {print sum/NR}'`
+TrainingTime=`awk 'BEGIN {printf "%.2f\n",1000*'${batch_size}'/'${FPS}'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep "accuracy:" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk -F " " '{print $3}'`
+train_accuracy=`grep "acc =" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | tail -n 1 | awk -F " " '{print $9}'`
 #打印，不需要修改
 echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
@@ -170,10 +169,14 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 #吞吐量
 ActualFPS=${FPS}
 
+##清除生成文件
+rm -rf $cur_path/../model_dir/*
+
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要根据模型审视
-cat $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | tr -d '\b\r' | grep -Eo "loss: [0-9]*\.[0-9]*" | awk -F " " '{print $2}' > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}_loss.txt
+#cat $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | tr -d '\b\r' | grep -Eo "loss: [0-9]*\.[0-9]*" | awk -F " " '{print $2}' > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}_loss.txt
 #最后一个迭代loss值，不需要修改
-ActualLoss=(`awk 'END {print $NF}' $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}_loss.txt`)
+ActualLoss=`grep "Loss for final step:" $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | tail -n 1 | awk -F " " '{print $5}'`
+ActualLoss=${ActualLoss%?}
 
 #关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

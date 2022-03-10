@@ -52,7 +52,8 @@ class Trainer(object):
                                   save_checkpoints_steps = FLAGS.save_checkpoints_steps,
                                   session_config=session_config, model_dir = FLAGS.train_logdir,
                                   iterations_per_loop=FLAGS.iterations_per_loop,
-                                  keep_checkpoint_max=FLAGS.max_to_save)
+                                  keep_checkpoint_max=FLAGS.max_to_save,
+                                  enable_small_channel=1)
 
 
         classifier =NPUEstimator(

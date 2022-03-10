@@ -36,7 +36,6 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 import torch.npu
 import DistributedResnet50.image_classification.resnet as nvmodels
-import apex
 from apex import amp
 
 BATCH_SIZE = 512
@@ -69,6 +68,11 @@ parser.add_argument('-j', '--workers',
                     type=int,
                     metavar='N',
                     help='number of data loading workers (default: 8)')
+parser.add_argument('--num_classes',
+                    default=1000,
+                    type=int,
+                    metavar='N',
+                    help='class number of dataset')
 parser.add_argument('--epochs',
                     default=EPOCHS_SIZE,
                     type=int,
@@ -115,7 +119,6 @@ parser.add_argument('--resume',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate',
                     dest='evaluate',
-                    action='store_true',
                     help='evaluate model on validation set')
 parser.add_argument('--pretrained',
                     dest='pretrained',
@@ -247,7 +250,7 @@ def main_worker(gpu, ngpus_per_node, args):
         model.load_state_dict(pretrained_dict, strict=False)
     else:
         print("=> creating model '{}'".format(args.arch))
-        model = models.__dict__[args.arch](zero_init_residual=True)
+        model = models.__dict__[args.arch](zero_init_residual=True, num_classes=args.num_classes)
 
     if args.fine_tuning:
         print("=> transfer learning + fine tuning(train only the last FC layer)")
@@ -329,7 +332,6 @@ def main_worker(gpu, ngpus_per_node, args):
                 # best_acc1 may be from a checkpoint from a different GPU
                 best_acc1 = best_acc1.to(args.gpu)
             model.load_state_dict(checkpoint['state_dict'])
-            #optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
         else:
@@ -378,7 +380,6 @@ def main_worker(gpu, ngpus_per_node, args):
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
-        # adjust_learning_rate(optimizer, epoch, args)
         lr_policy(optimizer, 0, epoch)
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, args)
@@ -395,9 +396,7 @@ def main_worker(gpu, ngpus_per_node, args):
             'epoch': epoch + 1,
             'arch': args.arch,
             'state_dict': modeltmp.state_dict(),
-            # 'state_dict': model,
             'best_acc1': best_acc1,
-            # 'optimizer' : optimizer.state_dict(),
         }, is_best, file_name)
         modeltmp.to(CALCULATE_DEVICE)
 
@@ -428,6 +427,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     optimizer.zero_grad()
     end = time.time()
     for i, (images, target) in enumerate(train_loader):
+        if i > 100:
+            pass
         # measure data loading time
         data_time.update(time.time() - end)
 
@@ -492,6 +493,8 @@ def validate(val_loader, model, criterion, args):
     with torch.no_grad():
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
+            if i > 50:
+                pass
             if args.gpu is not None:
                 images = images.cuda(args.gpu, non_blocking=True)
             images = images.to(CALCULATE_DEVICE, non_blocking=True)

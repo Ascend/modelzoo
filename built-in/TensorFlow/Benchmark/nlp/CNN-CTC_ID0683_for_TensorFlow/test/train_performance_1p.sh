@@ -10,13 +10,9 @@ Network="CNN-CTC_ID0683_for_TensorFlow"
 RankSize=1
 #训练epoch，可选
 train_epochs=2
-#训练step
-train_steps=
 #学习率
-learning_rate=
+learning_rate=0.0001
 
-#参数配置
-data_path="../imgs"
 
 if [[ $1 == --help || $1 == --h ]];then
    echo "usage:./train_performance_1p.sh --data_path=./imgs"
@@ -53,9 +49,10 @@ nohup python3 main.py --train_dir=${data_path}/train/ \
 	--image_channel=1 \
 	--out_channels=64 \
 	--num_hidden=128 \
-	--batch_size=128 \
+	--batch_size=$batch_size \
 	--logs_dir=./log \
 	--num_gpus=1 \
+    --initial_learning_rate=$learning_rate \
 	--num_epochs=${train_epochs} \
 	--mode=train > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
 wait

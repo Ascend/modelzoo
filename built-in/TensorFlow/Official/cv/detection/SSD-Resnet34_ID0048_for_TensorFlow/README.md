@@ -1,22 +1,25 @@
 # SSD-ResNet34 for TensorFlow
 
 ## 目录
-
+* [基本信息](#基本信息)
 * [概述](#概述)
-* [要求](#要求)
-* [默认配置](#默认配置)
+* [训练环境准备](#训练环境准备)
 * [快速上手](#快速上手)
-  * [准备数据集](#准备数据集)
-  * [准备预训练网络](#准备预训练网络)
-  * [Docker容器场景](#Docker容器场景)
-  * [检查json](#检查json)
-  * [关键配置修改](#关键配置修改)
-  * [运行示例](#运行示例)
-    * [训练](#训练)
-    * [推理](#推理)
-* [高级](#高级)
-  * [脚本参数](#脚本参数) 
+* [高级参考](#高级参考)
 
+## 基本信息
+
+**发布者（Publisher）：Huawei**
+**应用领域（Application Domain）：Object Detection
+**版本（Version）：1.1
+**修改时间（Modified） ：2021.11.19
+**大小（Size）：214KB
+**框架（Framework）：TensorFlow 1.15.0
+**模型格式（Model Format）：ckpt
+**精度（Precision）：Mixed
+**处理器（Processor）：昇腾910
+**应用级别（Categories）：Official
+**描述（Description）：基于tensorflow实现，以Resnet34为backbone的SSD目标检测网络。
 
 
 ## 概述
@@ -25,18 +28,20 @@ SSD（Single Shot MultiBox Detector）属于one - stage目标检测模型，在�
 
 Ascend本次提供的是以ResNet34为主干网络、输入shape为300的SSD-ResNet34模型。
 
-参考论文：Wei Liu, Dragomir Anguelov, Dumitru Erhan, Christian Szegedy, Scott Reed, Cheng-Yang Fu, Alexander C. Berg. SSD: Single Shot MultiBox Detector, ECCV 2016
+- 参考论文
+     
+     https://arxiv.org/abs/1512.02325
 
-参考实现：https://github.com/mlperf/training_results_v0.6/tree/master/Google/benchmarks/ssd/implementations/tpu-v3-32-ssd
+- 参考实现
 
-## 要求
+    https://github.com/mlperf/training_results_v0.6/tree/master/Google/benchmarks/ssd/implementations/tpu-v3-32-ssd
 
-- 安装有昇腾AI处理器的硬件环境
-- 根据requirements.txt安装必要的依赖包
-- 下载并预处理COCO或pascal voc数据集以进行训练和评估。
+- 适配昇腾 AI 处理器的实现：
+
+    https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/detection/SSD-Resnet34_ID0048_for_TensorFlow
 
 
-## 默认配置
+### 默认配置
 
 - 训练数据集预处理(以coco2017/Train为例，仅作为用户参考示例)
 
@@ -78,10 +83,42 @@ Ascend本次提供的是以ResNet34为主干网络、输入shape为300的SSD-Res
 
   - warm up epoch数: 0.8
 
+## 训练环境准备
+
+1.  硬件环境准备请参见各硬件产品文档"[驱动和固件安装升级指南]( https://support.huawei.com/enterprise/zh/category/ai-computing-platform-pid-1557196528909)"。需要在硬件设备上安装与CANN版本配套的固件与驱动。
+2.  宿主机上需要安装Docker并登录[Ascend Hub中心](https://ascendhub.huawei.com/#/detail?name=ascend-tensorflow-arm)获取镜像。
+
+    当前模型支持的镜像列表如[表1](#zh-cn_topic_0000001074498056_table1519011227314)所示。
+
+    **表 1** 镜像列表
+
+    <a name="zh-cn_topic_0000001074498056_table1519011227314"></a>
+    <table><thead align="left"><tr id="zh-cn_topic_0000001074498056_row0190152218319"><th class="cellrowborder" valign="top" width="47.32%" id="mcps1.2.4.1.1"><p id="zh-cn_topic_0000001074498056_p1419132211315"><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><a name="zh-cn_topic_0000001074498056_p1419132211315"></a><em id="i1522884921219"><a name="i1522884921219"></a><a name="i1522884921219"></a>镜像名称</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="25.52%" id="mcps1.2.4.1.2"><p id="zh-cn_topic_0000001074498056_p75071327115313"><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><a name="zh-cn_topic_0000001074498056_p75071327115313"></a><em id="i1522994919122"><a name="i1522994919122"></a><a name="i1522994919122"></a>镜像版本</em></p>
+    </th>
+    <th class="cellrowborder" valign="top" width="27.16%" id="mcps1.2.4.1.3"><p id="zh-cn_topic_0000001074498056_p1024411406234"><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><a name="zh-cn_topic_0000001074498056_p1024411406234"></a><em id="i723012493123"><a name="i723012493123"></a><a name="i723012493123"></a>配套CANN版本</em></p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="zh-cn_topic_0000001074498056_row71915221134"><td class="cellrowborder" valign="top" width="47.32%" headers="mcps1.2.4.1.1 "><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><a name="zh-cn_topic_0000001074498056_ul81691515131910"></a><ul id="zh-cn_topic_0000001074498056_ul81691515131910"><li><em id="i82326495129"><a name="i82326495129"></a><a name="i82326495129"></a>ARM架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-arm" target="_blank" rel="noopener noreferrer">ascend-tensorflow-arm</a></em></li><li><em id="i18233184918125"><a name="i18233184918125"></a><a name="i18233184918125"></a>x86架构：<a href="https://ascend.huawei.com/ascendhub/#/detail?name=ascend-tensorflow-x86" target="_blank" rel="noopener noreferrer">ascend-tensorflow-x86</a></em></li></ul>
+    </td>
+    <td class="cellrowborder" valign="top" width="25.52%" headers="mcps1.2.4.1.2 "><p id="zh-cn_topic_0000001074498056_p1450714271532"><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><a name="zh-cn_topic_0000001074498056_p1450714271532"></a><em id="i72359495125"><a name="i72359495125"></a><a name="i72359495125"></a>21.0.2</em></p>
+    </td>
+    <td class="cellrowborder" valign="top" width="27.16%" headers="mcps1.2.4.1.3 "><p id="zh-cn_topic_0000001074498056_p18244640152312"><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><a name="zh-cn_topic_0000001074498056_p18244640152312"></a><em id="i162363492129"><a name="i162363492129"></a><a name="i162363492129"></a><a href="https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373/software" target="_blank" rel="noopener noreferrer">5.0.2</a></em></p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
+
+## 安装依赖
+
+- 根据requirements.txt安装必要的依赖包
+
 
 ## 快速上手
 
-### 准备数据集
+### 数据集准备
 
 - 请用户自行准备好数据集，包含训练集和验证集两部分，支持多种数据集，如coco、pascal voc等，请根据需要下载数据集。
 
@@ -92,7 +129,7 @@ Ascend本次提供的是以ResNet34为主干网络、输入shape为300的SSD-Res
 - 将标注json文件放置于<path_to_annotations>目录中。
 
 
-### 准备预训练模型
+### 预训练模型准备
 
 请自行下载主干网络ResNet34的预训练模型的所有文件。
 
@@ -285,7 +322,7 @@ python3 $3/ssd_main.py  \
 
 ### 运行示例
 
-#### 训练
+#### 模型训练
 
 - 1p训练
 
@@ -303,7 +340,7 @@ python3 $3/ssd_main.py  \
 ./run_npu_8p.sh
 ```
 
-#### 推理
+#### 模型评估
 
 默认情况下训练模式为train_and_eval，即训练全部完成后进行一次eval。若用户需要单独进行测试，请修改脚本`exec_main.sh`中的参数，将mode参数修改为eval。
 ```
@@ -330,7 +367,52 @@ python3 $3/ssd_main.py  \
 ./run_npu_8p.sh
 ```
 
-## 高级
+## 高级参考
+
+### 脚本和示例代码<a name="section08421615141513"></a>
+
+```
+├── npu_config
+│   └── 8p.json
+├── object_detection
+│   ├── __init__.py
+│   ├── argmax_matcher.py
+│   ├── box_coder.py
+│   ├── box_list.py
+│   ├── faster_rcnn_coder.py
+│   ├── matcher.py
+│   ├── preprocessor.py
+│   ├── region_similarity_calculator.py
+│   ├── shape_utils.py
+│   ├── target_assigner.py
+│   └── tf_example_decoder.py
+├── test
+│   ├── train_full_1p.sh                
+│   ├── train_performance_1p.sh
+│   └── train_performance_8p.sh
+├── Dockerfile
+├── LICENSE
+├── README.md  
+├── coco_metric.py   
+├── create_coco_tf_record.py  
+├── dataloader.py  
+├── docker_start.sh  
+├── exec_main.sh 
+├── frozen_graph.py 
+├── infer_from_pb.py
+├── modelzoo_level.txt                
+├── requirements.txt   
+├── run_npu_1p.sh 
+├── run_npu_8p.sh 
+├── ssd_1p.sh 
+├── ssd_8p.sh 
+├── ssd_architecture.py 
+├── ssd_constants.py
+├── ssd_main.py               
+└── ssd_mmodel.py
+
+
+```
 
 ### 脚本参数
 

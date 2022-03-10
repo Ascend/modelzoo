@@ -316,8 +316,8 @@ def main_worker(npu, nnpus_per_node, args):
                         'optimizer': optimizer.state_dict(),
                         'amp': amp.state_dict(),
                     })
-        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
-            break
+        #if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+        #    break
 
 def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node):
     global cur_step
@@ -332,11 +332,18 @@ def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node
                              top5, prefix="Epoch: [{}]".format(epoch))
 
     # switch to train mode
+    # 替换Swish API
+    if args.distributed:
+        model.module.set_swish(memory_efficient=False)
+    else:
+        model.set_swish(memory_efficient=False)
     model.train()
 
     end = time.time()
     step_per_epoch = len(train_loader)
     for i, (images, target) in enumerate(train_loader):
+        #if i > 100:
+        #  pass
         cur_step = epoch * step_per_epoch + i
         adjust_learning_rate_fraction_epoch(optimizer, epoch, args)
 
@@ -376,7 +383,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % nnpus_per_node == 0):
             progress.print(i)
-        if args.stop_step_num is not None and cur_step >= args.stop_step_num:
+        if args.stop_step_num is not None and i >= args.stop_step_num:
             break
 
     if not args.multiprocessing_distributed or (args.multiprocessing_distributed

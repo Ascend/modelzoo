@@ -24,6 +24,7 @@ import time
 import warnings
 
 import torch
+import apex
 import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -242,12 +243,12 @@ def main_worker(gpu, ngpus_per_node, args):
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().to(CALCULATE_DEVICE)
 
-    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+    optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 
     if args.amp:
-        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale)
+        model, optimizer = amp.initialize(model, optimizer, opt_level=args.opt_level, loss_scale=args.loss_scale, combine_grad=True)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -363,6 +364,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     end = time.time()
     step_per_epoch = len(train_loader)
     for i, (images, target) in enumerate(train_loader):
+        if i > 100:
+            pass
         cur_step = epoch * step_per_epoch + i
         # measure data loading time
         data_time.update(time.time() - end)
@@ -419,6 +422,8 @@ def validate(val_loader, model, criterion, args, epoch=0, writer=None):
     with torch.no_grad():
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
+            if i > 50:
+                pass
             target = target.to(torch.int32)
             images, target = images.to(CALCULATE_DEVICE, non_blocking=False), target.to(CALCULATE_DEVICE,
                                                                                         non_blocking=False)

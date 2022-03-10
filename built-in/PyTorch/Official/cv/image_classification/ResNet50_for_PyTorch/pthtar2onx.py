@@ -12,11 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+import argparse
+
 import torch
 from DistributedResnet50.image_classification import resnet
 import torch.onnx
 
 from collections import OrderedDict
+
+parser = argparse.ArgumentParser(description='PyTorch pth convert onnx')
+parser.add_argument('--pth_file_path',
+                    metavar='PATH',
+                    default='./resnet50checkpoint.pth.tar',
+                    help='path of pth file')
+
+parser.add_argument('--onnx_file_path',
+                    metavar='PATH',
+                    default='resnet50_npu_16.onnx',
+                    help='path of onnx file')
+args = parser.parse_args()
 
 
 def proc_node_module(checkpoint, AttrName):
@@ -45,7 +59,11 @@ def convert(pth_file_path, onnx_file_path):
                       opset_version=11)
 
 
-if __name__ == "__main__":
-    src_file_path = "./resnet50checkpoint.pth.tar"
-    dst_file_path = "resnet50_npu_16.onnx"
+def main():
+    src_file_path = args.pth_file_path
+    dst_file_path = args.onnx_file_path
     convert(src_file_path, dst_file_path)
+
+
+if __name__ == "__main__":
+    main()

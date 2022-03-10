@@ -13,24 +13,21 @@ RANK_ID_START=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
-#设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
 
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
-Network="ResNet50_for_TensorFlow"
+Network="ResNet50_ID0058_for_TensorFlow"
 
 export HCCL_CONNECT_TIMEOUT=600
 corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
 export RANK_INDEX=0
 export RANK_ID=0
 
-config_file=res50_256bs_8p
-max_train_steps=1000
+config_file=res50_256bs_8p_eval
 iterations_per_loop=100
 debug=True
 eval=True
-
+batch_size=256
 
 #维持参数，不需要修改
 over_dump=False
@@ -132,18 +129,19 @@ do
     #执行训练脚本，需要模型审视修改
 	cd ${cur_path}/../src/mains
     corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
-    let a=RANK_ID*${corenum}/8
-    let b=RANK_ID+1
-    let c=b*${corenum}/8-1
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
-	taskset ${bind_core} python3.7 res50.py \
+    #let a=RANK_ID*${corenum}/8
+    #let b=RANK_ID+1
+    #let c=b*${corenum}/8-1
+    #if [ "x${bind_core}" != x ];then
+    #    bind_core="taskset -c $a-$c"
+    #fi
+    #--max_train_steps=$max_train_steps \
+	python3.7 res50.py \
 	    --config_file=$config_file \
-        --max_train_steps=$max_train_steps \
 	    --iterations_per_loop=$iterations_per_loop \
 	    --debug=$debug \
 	    --eval=$eval \
+        --data_path=${data_path} \
 	    --model_dir=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt \
 		--over_dump=${over_dump} \
 		--over_dump_path=${over_dump_path} \
@@ -164,24 +162,27 @@ e2e_time=$(( $end_time - $start_time ))
 
 echo "------------------ Final result ------------------"
 #单step时长，需要从train_$ASCEND_DEVICE_ID.log里，通过关键字获取。需要模型审视修改
-#step_sec=`grep TimeHistory  $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $6}'`
-#echo "Final Performance ms/step : $step_sec"
-#计算训练时长，需要模型审视修改
-#step_sec=`echo ${step_sec%.*}`
-#e2e_sec=`expr ${train_epochs} \* 1281167 / ${step_sec} `
-#echo "Final Training Duration sec : $e2e_sec"
-#训练精度，需要从train_$ASCEND_DEVICE_ID.log里，通过关键字获取。需要模型审视修改
-li=`cat $cur_path/output/0/train_0.log | wc -l`
-num=$(($li - 1))
-train_accuracy=`sed -n "${num}p" $cur_path/output/0/train_0.log | awk '{print $3}'`
-echo "Final train_accuracy is ${train_accuracy}"
-E2E训练端到端时长，直接计算，不需要修改
-echo "E2E training Duration sec: $e2e_time"
+FPS=grep "FPS:" ${cur_path}/output/0/train_0.log |grep -v "hooks.py"|awk -F " " 'END {print $5}' |awk -F ":" '{print $2}'
+#echo "Final Performance ms/step : $FPS"
 
+#输出训练精度,需要模型审视修改
+train_accuracy=`grep -A 2 "top1" ${cur_path}/output/0/train_0.log|tail -1|awk 'END {print $3}'`
+#打印，不需要修改
+echo "Final Train Accuracy : ${train_accuracy}"
+echo "E2E Training Duration sec : $e2e_time"
+
+#稳定性精度看护结果汇总
 #训练用例信息，不需要修改
-BatchSize=256
+BatchSize=${batch_size}
 DeviceType=`uname -m`
 CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
+
+##获取性能数据
+#吞吐量，不需要修改
+ActualFPS=${FPS}
+#单迭代训练时长，不需要修改
+TrainingTime=`awk 'BEGIN{printf "%.2f\n",'${BatchSize}'*'${RANK_SIZE}'*1000/'${FPS}'}'`
+
 
 ##获取性能数据，不需要修改
 #吞吐量
@@ -190,10 +191,10 @@ ActualFPS=${e2e_time}
 TrainingTime=${e2e_time}
 
 ##获取Loss，通过train_*.log中关键字，需要根据模型审视
-#grep train_loss $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v BatchTimestamp|awk '{print $10}'|sed 's/,//g'|sed '/^$/d' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep "total_loss:" $cur_path/output/0/train_0.log|awk '{print $9}' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 
 #最后一个迭代loss值，不需要修改
-ActualLoss=`sed -n "${num}p" $cur_path/output/0/train_0.log | awk '{print $5}'`
+ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
 #关键信息打印到${CaseName}.log中，不需要修改
 echo "Network = ${Network}" > $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

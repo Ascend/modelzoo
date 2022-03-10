@@ -86,6 +86,23 @@ python3.7 preprocess_chid_zeroshot.py --data_dir ${PATH_TO_DATA_DIR} --tokenizer
 
 ### 2.2 Zero-Shot 测试
 
+1、单机单卡自动化测试。
+
+在test/eval_1p.sh文件里更改数据路径和模型路径如下：
+
+```
+DATA_DIR=""
+CHECKPOINT_PATH=""
+```
+
+然后运行以下语句开始推理：
+
+```
+bash eval_1p.sh
+```
+
+2、单机单卡和单机8卡手动测试。
+
 ```[bash]
 脚本zero-shot_chid_large_1p.sh用于单机单卡，zero-shot_chid_large_8p.sh用于单机8卡。
 ```

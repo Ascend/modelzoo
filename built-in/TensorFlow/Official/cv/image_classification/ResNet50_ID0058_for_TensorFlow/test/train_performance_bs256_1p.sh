@@ -97,6 +97,7 @@ fi
 sed -i "50s|PATH_TO_BE_CONFIGURED|${data_path}|g"  $cur_path/../src/configs/res50_256bs_1p.py
 sed -i "107s|PATH_TO_BE_CONFIGURED|${cur_path}/output/0/d\_solution/ckpt0|g"  $cur_path/../src/configs/res50_256bs_1p.py
 
+cp data_loader.py $cur_path/../src/data_loader/resnet50/
 #训练开始时间，不需要修改
 start_time=$(date +%s)
 cd $cur_path/../

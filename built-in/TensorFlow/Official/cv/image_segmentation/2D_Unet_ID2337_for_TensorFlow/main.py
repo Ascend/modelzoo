@@ -38,6 +38,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--epochs', default=5, type=int)
 parser.add_argument('--train_data_path', default='./data/membrane/train')
 parser.add_argument('--test_data_path', default='./data/membrane/test')
+parser.add_argument('--predict_data_path', default='./data/membrane/predict')
 args = parser.parse_args()
 
 def main():
@@ -56,7 +57,7 @@ def main():
 
     testGene = testGenerator(args.test_data_path)
     results = model.predict_generator(testGene,30,verbose=2)
-    saveResult(args.test_data_path,results)
+    saveResult(args.predict_data_path,results)
 
 if __name__ == '__main__':
     # ***** npu modify begin *****

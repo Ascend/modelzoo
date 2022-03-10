@@ -20,9 +20,10 @@ env > ${currentDir}/log/env_${device_id}.log
 
 #start exec
 python3.7 ../src/mains/res50.py \
-	--config_file=res50_256bs_1p \
+    --config_file=res50_256bs_1p \
     --max_train_steps=1000 \
-	--iterations_per_loop=100 \
-	--debug=True \
-	--eval=False \
-	--model_dir=${currentDir}/d_solution/ckpt${DEVICE_ID} > ${currentDir}/log/train_${device_id}.log 2>&1
+    --iterations_per_loop=100 \
+    --debug=True \
+    --eval=False \
+    --data_path=/data/imagenet/ \
+    --model_dir=${currentDir}/d_solution/ckpt${DEVICE_ID} > ${currentDir}/log/train_${device_id}.log 2>&1

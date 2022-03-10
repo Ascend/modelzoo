@@ -16,11 +16,11 @@ data_path=""
 #网络名称，同目录名称
 Network="LSTM_ID0468_for_PyTorch"
 #训练epoch
-train_epochs=0
+train_epochs=1
 #训练batch_size
 batch_size=128
 #训练step
-train_steps=0
+train_steps=1
 #学习率
 learning_rate=0.1
 
@@ -86,7 +86,7 @@ fi
 cd $cur_path/../timit/
 
 #训练前修改参数配置
-sed -i "s|num_epoches: 500|num_epoches: 1|g" conf/ctc_config.yaml
+sed -i "s|num_epoches: 500|num_epoches: $train_epochs|g" conf/ctc_config.yaml
 sed -i "s|data|${data_path}|g" conf/ctc_config.yaml
 sed -i "s|data|${data_path}|g" ${data_path}/train/fbank.scp
 sed -i "s|data|${data_path}|g" ${data_path}/dev/fbank.scp

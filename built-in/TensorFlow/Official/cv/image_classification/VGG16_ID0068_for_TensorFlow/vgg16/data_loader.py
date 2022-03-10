@@ -126,7 +126,9 @@ def make_dataset(args, take_count, batch_size,
         filename_pattern = os.path.join(args.data_dir, '%s-*')
         filenames = sorted(tf.gfile.Glob(filename_pattern % 'validation'))
 
-    ds = tf.data.Dataset.from_tensor_slices(filenames)
+    # ds = tf.data.Dataset.from_tensor_slices(filenames) # init
+    ds = tf.data.TFRecordDataset.list_files(filenames, shuffle=False) # add 
+
 
     if not training:
         ds = ds.take(take_count)
@@ -134,7 +136,8 @@ def make_dataset(args, take_count, batch_size,
     if training:
         ds = ds.shuffle(1000, seed=7*(1+rank_id))
 
-    ds = ds.interleave(tf.data.TFRecordDataset, cycle_length=num_readers, block_length=1)
+    #ds = ds.interleave(tf.data.TFRecordDataset, cycle_length=num_readers, block_length=1)
+    ds = ds.interleave(tf.data.TFRecordDataset, cycle_length=num_readers, block_length=1,num_parallel_calls=tf.data.experimental.AUTOTUNE)# add
     counter = tf.data.Dataset.range(sys.maxsize)
     ds = tf.data.Dataset.zip((ds, counter))
 
@@ -144,6 +147,9 @@ def make_dataset(args, take_count, batch_size,
     ds = ds.map(lambda image, counter: parse_record(image, training), num_parallel_calls=14)
 
     ds = ds.batch(batch_size, drop_remainder=True)
+    
+    ds = ds.prefetch(buffer_size=batch_size) # add
+
     return ds
 
 

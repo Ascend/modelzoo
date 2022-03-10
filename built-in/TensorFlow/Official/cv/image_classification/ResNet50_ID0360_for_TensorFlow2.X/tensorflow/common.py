@@ -49,7 +49,7 @@ from tf2_common.utils.mlp_log import mlp_log
 import imagenet_preprocessing
 import lars_optimizer
 import lars_util
-from tensorflow.python.keras.optimizer_v2 import gradient_descent as gradient_descent_v2
+from keras.optimizer_v2 import gradient_descent as gradient_descent_v2
 
 FLAGS = flags.FLAGS
 # BASE_LEARNING_RATE = 0.1  # This matches Jing's version.

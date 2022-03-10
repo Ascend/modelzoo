@@ -2,6 +2,17 @@
 
 This repository provides a script and recipe to Inference the
 
+## Notice
+**This sample only provides reference for you to learn the Ascend software stack and is not for commercial purposes.**
+
+Before starting, please pay attention to the following adaptation conditions. If they do not match, may leading in failure.
+
+| Conditions | Need |
+| --- | --- |
+| CANN Version | >=5.0.3 |
+| Chip Platform| Ascend310/Ascend710 |
+| 3rd Party Requirements| Please follow the 'requirements.txt' |
+
 ## Quick Start Guide
 
 ### 1. Clone the respository
@@ -41,7 +52,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/Facenet_for_ACL
 - convert pb to om
 
   ```
-   /usr/local/Ascend/atc/bin/atc --framework=3 --model=./model/facenet_tf.pb  --output=./model/facenet --soc_version=Ascend310 --insert_op_conf=./facenet_tensorflow.cfg --input_format=NHWC --input_shape=input:4,160,160,3
+   atc --framework=3 --model=./model/facenet_tf.pb  --output=./model/facenet --soc_version=Ascend310 --insert_op_conf=./facenet_tensorflow.cfg --input_format=NHWC --input_shape=input:4,160,160,3
   ```
 
 - Build the program

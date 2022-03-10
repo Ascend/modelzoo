@@ -124,15 +124,17 @@ docker run -it --ipc=host \
 
 ### 关键配置修改
 
-启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
+-- 启动训练之前，首先要配置程序运行相关环境变量。环境变量配置信息参见：
 
 - [Ascend 910训练平台环境变量设置](https://github.com/Ascend/modelzoo/wikis/Ascend%20910%E8%AE%AD%E7%BB%83%E5%B9%B3%E5%8F%B0%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AE%BE%E7%BD%AE?sort_id=3148819)
 
-原则上NEZHA只能用集群进行训练，以NEZHA-Large为例，至少需要以8*8p的集群规模训练若干天。具体训练时间以您的数据集大小为准。配置多级多卡分布式训练，需要您修改configs目录下NEZHA_large_64p_poc.json配置文件，将对应IP修改为您的集群对应的IP。
+-- 原则上NEZHA只能用集群进行训练，以NEZHA-Large为例，至少需要以8*8p的集群规模训练若干天。具体训练时间以您的数据集大小为准。配置多级多卡分布式训练，需要您修改configs目录下NEZHA_large_64p_poc.json配置文件，将对应IP修改为您的集群对应的IP。
 
-多P训练时，需要依次拉起所有训练进程，因此需要在每个训练进程启动前，需要分别设置DEVICE_ID和RANK_ID，例如：
-export DEVICE_ID=1
-export RANK_ID=1
+-- 多P训练时，需要依次拉起所有训练进程，因此需要在每个训练进程启动前，需要分别设置DEVICE_ID和RANK_ID，例如：  
+export DEVICE_ID=1  
+export RANK_ID=1  
+
+-- 多P训练时，本示例为了提升集群性能，使能了hccl的自定义梯度切分功能（set_split_strategy_by_idx和set_split_strategy_by_size）。如果用户调整相关参数，比如vocab_size或者layer层数，那么用户需要对应调整hccl的自定义梯度切分参数分配，或者注释不使用该功能。具体调整方法可参考hccl接口资料。
 
 ### 运行示例
 

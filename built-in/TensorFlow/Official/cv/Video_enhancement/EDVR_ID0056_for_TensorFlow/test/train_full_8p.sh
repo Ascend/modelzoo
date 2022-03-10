@@ -19,20 +19,17 @@ data_path=""
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
 Network="EDVR_ID0056_for_TensorFlow"
-#训练epoch
-train_epochs=1
+
 #训练batch_size
 batch_size=4
-#训练step
-train_steps=800
-#学习率
-learning_rate=""
+
+
 
 #TF2.X独有，不需要修改
-export NPU_LOOP_SIZE=${train_steps}
+#export NPU_LOOP_SIZE=${train_steps}
 
 #维测参数，precision_mode需要模型审视修改
-precision_mode="allow_mix_precision"
+#precision_mode="allow_mix_precision"
 #维持参数，以下不需要修改
 over_dump=False
 data_dump_flag=False
@@ -108,8 +105,8 @@ fi
 
 #参数修改
 sed -i "s|data/|${data_path}/|g" $cur_path/../ascendvsr/config/defaults.py
-sed -i "s|cfg.solver.print_interval = 20|cfg.solver.print_interval = 100|g" $cur_path/../ascendvsr/config/defaults.py
-sed -i "s|2000|${train_steps}|g" $cur_path/../configs/edvr.yaml
+#sed -i "s|cfg.solver.print_interval = 20|cfg.solver.print_interval = 100|g" $cur_path/../ascendvsr/config/defaults.py
+#sed -i "s|2000|${train_steps}|g" $cur_path/../configs/edvr.yaml
 
 #训练开始时间，不需要修改
 start_time=$(date +%s)
@@ -134,18 +131,35 @@ do
     fi
     
      # 绑核，不需要的绑核的模型删除，需要模型审视修改
-    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
-    let a=RANK_ID*${corenum}/${RANK_SIZE}
-    let b=RANK_ID+1
-    let c=b*${corenum}/${RANK_SIZE}-1
+    #corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    #let a=RANK_ID*${corenum}/${RANK_SIZE}
+    #let b=RANK_ID+1
+    #let c=b*${corenum}/${RANK_SIZE}-1
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
-    nohup ${bind_core} python3.7 $cur_path/../tools/main.py --config-file $cur_path/../configs/edvr.yaml solver.checkpoint_interval 5000 solver.print_interval 100 rank_size 8  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    #if [ "x${bind_core}" != x ];then
+    #    bind_core="taskset -c $a-$c"
+    #fi
+    python3.7 $cur_path/../tools/main.py --config-file $cur_path/../configs/edvr_precision_overwatch.yaml solver.checkpoint_interval 5000 solver.print_interval 20 rank_size 8  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
+wait
+
+export JOB_ID=123456789
+DEVICE_ID=0
+export DEVICE_ID=${DEVICE_ID}
+export DEVICE_INDEX=${DEVICE_ID}
+export RANK_ID=${DEVICE_ID}
+export RANK_SIZE=1
+unset RANK_TABLE_FILE
+
+python3 tools/main.py \
+    --config-file $cur_path/../configs/edvr.yaml \
+    mode eval \
+    data.data_dir ${data_path}/reds \
+    data.eval_in_size 180,320 \
+    checkpoint ${cur_path}/../outputs/edvr/EDVR-600000 >> ${cur_path}/output/0/train_0.log 2>&1 &
+
 wait
 
 #训练结束时间，不需要修改
@@ -161,16 +175,16 @@ FPS=`grep 'fps:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-#train_accuracy=`grep -A 1 top1 $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $3}'`
+train_accuracy=`grep PSNR $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v "Video"|awk 'END {print $3}'`
 #打印，不需要修改
-#echo "Final Train Accuracy : ${train_accuracy}"
+echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 #稳定性精度看护结果汇总
 #训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
-CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据
 #吞吐量，不需要修改
@@ -191,6 +205,7 @@ echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

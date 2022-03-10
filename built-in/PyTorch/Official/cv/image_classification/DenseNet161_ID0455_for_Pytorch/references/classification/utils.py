@@ -173,10 +173,10 @@ class MetricLogger(object):
             yield obj
             iter_time.update(time.time() - end)
             if header == "Test:":
-                if i > 10:
+                if i > 5:
                     pass
             else:
-                if i > 50:
+                if i > args.max_steps:
                     pass
             if args.is_master_node and i % args.print_freq == 0:
                 eta_seconds = iter_time.global_avg * (len(iterable) - i)

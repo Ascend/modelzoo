@@ -30,10 +30,7 @@
 # ============================================================================
 import tensorflow as tf
 from . import resnet, res50_helper
-from trainers.train_helper import stage
-#from tensorflow.contrib.offline_train.python.npu.npu_optimizer import NPUDistributedOptimizer
 from npu_bridge.estimator.npu.npu_optimizer import NPUDistributedOptimizer
-#from tensorflow.contrib.offline_train.python import npu_ops
 from npu_bridge.estimator import npu_ops
 _NUM_EXAMPLES_NAME="num_examples"
 
@@ -72,19 +69,15 @@ class Model(object):
             predicted_classes = tf.argmax(logits, axis=1, output_type=tf.int32)
             logits = tf.cast(logits, tf.float32)
 
-            #loss = self.loss.get_loss(logits, labels)  
-            #loss = tf.losses.sparse_softmax_cross_entropy(logits=logits, labels=labels)
-
             labels_one_hot = tf.one_hot(labels, depth=1001)
             loss = tf.losses.softmax_cross_entropy(
                 logits=logits, onehot_labels=labels_one_hot, label_smoothing=self.config['label_smoothing'])
 
 
             base_loss = tf.identity(loss, name='loss')  # For access by logger (TODO: Better way to access it?)
-     #       base_loss = tf.add_n([loss])                                    
 
             def exclude_batch_norm(name):
-              #return 'batch_normalization' not in name
+              # return 'batch_normalization' not in name
               return 'BatchNorm' not in name
             loss_filter_fn = exclude_batch_norm
           
@@ -93,8 +86,6 @@ class Model(object):
                 # loss is computed using fp32 for numerical stability.
                 [tf.nn.l2_loss(tf.cast(v, tf.float32)) for v in tf.trainable_variables()
                  if loss_filter_fn(v.name)])
-            #tf.summary.scalar('l2_loss', l2_loss)
-     #       total_loss = base_loss + l2_loss
             if self.config['use_lars']:
                 total_loss = base_loss
             else:
@@ -111,10 +102,6 @@ class Model(object):
                     mode, loss=loss, eval_metric_ops=metrics)
 
             assert (mode == tf.estimator.ModeKeys.TRAIN)
-
-            #reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-            #total_loss = tf.add_n([tf.saturate_cast(loss, self.config['dtype']) ] + reg_losses, name='total_loss')
-            #total_loss = tf.add_n([loss], name='total_loss')
     
             batch_size = tf.shape(inputs)[0]
     
@@ -198,35 +185,14 @@ class Model(object):
                             else:
                                 print('do not use lars111111111111111111')
                                 for g, var in  fp32_grads_and_vars:
-                                    #if 'BatchNorm' not in var.name and 'bias' not in var.name:
-                                    #    decayed_g = tf.add( g, tf.multiply( self.config['weight_decay'], var ) )
-                                    #    g = decayed_g
                                     g_and_v = ( g, var )
                                     grad_var_list.append( g_and_v )
             #-----------------------------------------end Lars------------------------------------------
 
-
-
-
                         train_op = opt.apply_gradients( grad_var_list, global_step = global_step )
 
             train_op = tf.group(train_op)
-
-            #with tf.device('/cpu:0'):
-                #tf.summary.scalar('total_loss', total_loss)
-                #tf.summary.scalar('base_loss', base_loss)
-                #tf.summary.scalar('learning_rate', learning_rate)
-                #tf.contrib.summary.flush()
-#                if self.config['do_checkpoint']:
-#                    summary_hook = tf.train.SummarySaverHook( save_steps=20, 
-#                                                        output_dir=self.config['log_dir']+'/train_summary',
-#                                                        summary_op = tf.summary.merge_all() ) 
-
-            #return  tf.estimator.EstimatorSpec(mode, loss=total_loss, train_op=train_op, training_hooks=[summary_hook] )\
-            #                   if self.config['do_checkpoint'] else tf.estimator.EstimatorSpec(mode, loss=total_loss, train_op=train_op )
-            return   tf.estimator.EstimatorSpec(mode, loss=total_loss, train_op=train_op )
-          
-            # return tf.estimator.EstimatorSpec(mode, loss=total_loss, train_op=train_op)
+            return   tf.estimator.EstimatorSpec(mode, loss=total_loss, train_op=train_op)
 
 
 

@@ -19,7 +19,7 @@ data_path=""
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="ResNext50_ID0070_for_TensorFlow"
-batch_size=32
+batch_size=256
 #训练步数
 train_steps=1000
 
@@ -86,7 +86,7 @@ fi
 
 cd $cur_path/../code/resnext50_train/mains/
 #修改参数
-sed -i "s|file:///data/imagenet_TF|file://$data_path|g"  $cur_path/../code/resnext50_train/configs/res50_32bs_1p_host.py
+sed -i "s|file:///data/imagenet_TF|file://$data_path|g"  $cur_path/../code/resnext50_train/configs/res50_256bs_1p_host.py
 #sed -i "s|/data/imagenet_TF|$data_path|g"  $cur_path/../code/resnext50_train/mains/res50.py
 wait
 #训练开始时间，不需要修改
@@ -109,7 +109,7 @@ do
     fi
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
-    nohup python3  res50.py --config_file=res50_32bs_1p_host \
+    nohup python3  res50.py --config_file=res50_256bs_1p_host \
          --max_train_steps=$train_steps \
          --iterations_per_loop=100 \
         --debug=True \
@@ -124,7 +124,7 @@ end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 
 #参数改回
-sed -i "s|file://$data_path|file:///data/imagenet_TF|g"  $cur_path/../code/resnext50_train/configs/res50_32bs_1p_host.py
+sed -i "s|file://$data_path|file:///data/imagenet_TF|g"  $cur_path/../code/resnext50_train/configs/res50_256bs_1p_host.py
 #sed -i "s|$data_path|/data/imagenet_TF|g"  $cur_path/../code/resnext50_train/mains/res50.py
 wait
 

@@ -17,7 +17,7 @@ data_path=""
 #网络名称，同目录名称
 Network="ResNet50_ID0360_for_TensorFlow2.X"
 #训练epoch
-train_epochs=6
+train_epochs=12
 #训练batch_size
 batch_size=2048
 #训练step
@@ -160,7 +160,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}'`
+FPS=`grep TimeHistory  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $6}'|tail -n +7|awk '{sum+=$1} END {print sum/NR}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 

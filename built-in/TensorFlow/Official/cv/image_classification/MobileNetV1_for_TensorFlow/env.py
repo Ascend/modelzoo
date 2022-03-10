@@ -87,7 +87,7 @@ class Env:
 
 
     def create_logdir(self):
-        logdir = "results"
+        logdir = "results/"+os.getenv("RANK_ID")
         os.makedirs(logdir, exist_ok=True)
         return logdir
 

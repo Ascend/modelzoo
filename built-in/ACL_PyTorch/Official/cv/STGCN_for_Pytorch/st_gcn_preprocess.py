@@ -70,7 +70,7 @@ def create_input_dataset(output_dir, data_dir, label_dir):
         label_data.tofile(label_bin_path)
 
 
-def preprocess(dataset_cfg, output_dir, batch_size=1, workers=0):
+def preprocess(dataset_cfg, output_dir, batch_size=1, workers=1):
     """ST-GCN preprocess script to create input dataset.
     Args:
         -dataset_cfg: dataset config file
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         help='output the preprocessed data and label')
     parser.add_argument('-batch_size', default=1,
         help='batch size of the model input')
-    parser.add_argument('-num_workers', default=0,
+    parser.add_argument('-num_workers', default=1,
         help='count of the dataloader')
     args = parser.parse_args()
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     }
 
     # create input_data
-    create_input_dataset(batch, dataset_path, labels_path)
+    create_input_dataset(output_path, dataset_path, labels_path)
 
     # preprocess
-    preprocess(dataset_file, output_path, batch, num_worker)
+    preprocess(dataset_file, output_path, int(batch), int(num_worker))

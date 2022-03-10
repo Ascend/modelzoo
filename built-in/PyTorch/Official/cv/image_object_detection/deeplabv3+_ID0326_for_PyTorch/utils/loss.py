@@ -58,7 +58,8 @@ class SegmentationLosses(object):
         if self.npu:
             criterion = criterion.npu()
 
-        loss = criterion(logit, target.long())
+        #loss = criterion(logit, target.long())
+        loss = criterion(logit, target.to(torch.int32))
 
         if self.batch_average:
             loss /= n

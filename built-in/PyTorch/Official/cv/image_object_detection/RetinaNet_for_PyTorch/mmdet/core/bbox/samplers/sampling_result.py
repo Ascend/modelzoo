@@ -40,9 +40,11 @@ class SamplingResult(util_mixins.NiceRepr):
                  gt_flags):
         self.pos_inds = pos_inds
         self.neg_inds = neg_inds
-        self.pos_bboxes = bboxes * pos_inds.unsqueeze(1)
+        pos_inds_unsqu = pos_inds.unsqueeze(1)
+        self.pos_bboxes = bboxes * pos_inds_unsqu
         self.neg_bboxes = bboxes * neg_inds.unsqueeze(1)
         self.pos_is_gt = gt_flags * pos_inds
+
 
         self.num_gts = gt_bboxes.shape[0]
         self.pos_assigned_gt_inds = (assign_result.gt_inds.int() - 1) * pos_inds
@@ -56,7 +58,7 @@ class SamplingResult(util_mixins.NiceRepr):
                 gt_bboxes = gt_bboxes.view(-1, 4)
 
             self.pos_gt_bboxes = torch.index_select(gt_bboxes, 0, self.pos_assigned_gt_inds)
-
+        self.pos_gt_bboxes = self.pos_gt_bboxes * pos_inds_unsqu
         if assign_result.labels is not None:
             self.pos_gt_labels = (assign_result.labels.int() * pos_inds).long()
         else:

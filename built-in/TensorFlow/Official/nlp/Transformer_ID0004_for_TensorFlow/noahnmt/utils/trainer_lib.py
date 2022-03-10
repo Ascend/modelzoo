@@ -57,7 +57,7 @@ from noahnmt.hooks import metrics_hook
 
 # from tensorflow.contrib.offline_train.python.npu.npu_config import NPURunConfig
 from npu_bridge.estimator.npu.npu_config import NPURunConfig
-
+from hccl.split.api import set_split_strategy_by_size # add
 
 RANK_SIZE = int(os.environ.get('RANK_SIZE', '1').strip())
 RANK_ID = int(os.environ.get('DEVICE_ID', '0').strip())
@@ -179,6 +179,11 @@ def create_run_config(master="",
   custom_op.parameter_map["use_off_line"].b = True
   custom_op.parameter_map["min_group_size"].b = 1
   custom_op.parameter_map["enable_auto_mix_precision"].b=False
+
+  ####add###
+  #开启allreduce 和前后向并行执行
+  custom_op.parameter_map["hcom_parallel"].b=True
+  ##########
 
   #  init autotune module start
   autotune = False
@@ -466,6 +471,8 @@ def create_experiment(
     if not tf.gfile.Exists(run_config.model_dir):
       tf.gfile.MakeDirs(run_config.model_dir)
     train_options.dump(run_config.model_dir)
+
+  set_split_strategy_by_size([60,30,10]) # self
 
   # Estimator
   estimator = create_estimator(

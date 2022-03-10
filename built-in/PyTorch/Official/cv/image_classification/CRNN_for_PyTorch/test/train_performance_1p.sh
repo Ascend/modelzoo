@@ -8,7 +8,7 @@ export RANK_SIZE=1
 data_path=""
 
 #网络名称,同目录名称,需要模型审视修改
-Network="CRNN_for_PyTorch"
+Network="CRNN_ID0103_for_PyTorch"
 
 #训练batch_size,,需要模型审视修改
 batch_size=2560
@@ -16,7 +16,7 @@ batch_size=2560
 #训练epoch，不需要修改
 epochs=2
 # 指定训练所使用的npu device卡id
-device_id=0
+#device_id=0
 # 参数校验，data_path为必传参数，其他参数的增删由模型自身决定；此处新增参数需在上面有定义并赋值
 for para in $*
 do
@@ -78,7 +78,7 @@ sed -i "0,/BATCH_SIZE_PER_GPU.*$/s//BATCH_SIZE_PER_GPU\: ${batch_size}/g" ${cur_
 sed -i "s/END_EPOCH.*$/END_EPOCH\: ${epochs}/g" ${cur_path}/LMDB_config.yaml
 sed -i "s|TRAIN_ROOT.*$|TRAIN_ROOT\: ${data_path}/MJ_LMDB|g" ${cur_path}/LMDB_config.yaml
 sed -i "s|TEST_ROOT.*$|TEST_ROOT\: ${data_path}/IIIT5K_lmdb|g" ${cur_path}/LMDB_config.yaml
-sed -i "s/DEVICE_ID.*$/DEVICE_ID\: ${device_id}/g" ${cur_path}/LMDB_config.yaml
+#sed -i "s/DEVICE_ID.*$/DEVICE_ID\: ${device_id}/g" ${cur_path}/LMDB_config.yaml
 #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
 export ASCEND_SLOG_PRINT_TO_STDOUT=0
 export ASCEND_GLOBAL_LOG_LEVEL=3

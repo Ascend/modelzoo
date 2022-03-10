@@ -77,16 +77,6 @@ do
 	KERNEL_NUM=$(($(nproc)/8))
 	PID_START=$((KERNEL_NUM * RANK_ID))
 	PID_END=$((PID_START + KERNEL_NUM - 1))
-
-	ASCEND_DEVICE_ID=${RANK_ID}
-	
-	#创建DeviceID输出目录，不需要修改
-	if [ -d ${test_path_dir}/output/${ASCEND_DEVICE_ID} ];then
-		rm -rf ${test_path_dir}/output/${ASCEND_DEVICE_ID}
-		mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-	else
-		mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
-	fi
 	
 	taskset -c $PID_START-$PID_END python3.7 -u train.py \
 	  ${data_path} \

@@ -170,10 +170,11 @@ def start_check_performance_optimization(sub_path: dict):
         else:
             logging.info("11. Finite interface not found.")
 
-    if npulogcheck:
+    if sub_path['npu_log'] and os.path.exists(sub_path['npu_log']):
 
-        if npulogcheck.check_dataset_bottleneck_with_log():
-            Npu_Log_Suggestions.append(cfg.DATASET_LOG_SUGGESTIONS)
+        result =  npulogcheck.check_dataset_bottleneck_with_log()
+        if result:
+            Npu_Log_Suggestions.append(result)
 
     return TFAdpater_Suggestions, Profiling_Suggestions, TrainingCode_Suggestions, Npu_Log_Suggestions
 

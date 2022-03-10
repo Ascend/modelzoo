@@ -183,7 +183,8 @@ sed -i "s|log_step_count_steps=1|log_step_count_steps=100|g" $cur_path/../distri
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPSper=`grep "] global_step/sec:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}'`
+#FPSper=`grep "] global_step/sec:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $6}'`
+FPSper=`grep "] global_step/sec:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk '{print $6}'|tail -n 10|awk '{sum+=$1} END {print sum/NR}'`
 FPS=`awk 'BEGIN{printf "%f\n",'${batch_size}'*'${RANK_SIZE}'*'${FPSper}'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"

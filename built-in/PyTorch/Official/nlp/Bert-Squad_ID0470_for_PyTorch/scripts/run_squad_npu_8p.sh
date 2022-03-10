@@ -102,3 +102,4 @@ else
     $CMD --local_rank=$i &
   done
 fi
+wait

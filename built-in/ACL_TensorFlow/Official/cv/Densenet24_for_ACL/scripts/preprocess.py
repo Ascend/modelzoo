@@ -32,7 +32,7 @@
 # limitations under the License.
 
 import numpy as np
-#import keras
+# import keras
 import tensorflow.python.keras as keras
 import argparse
 import os
@@ -46,7 +46,7 @@ from tensorflow.python.keras.layers.pooling import AveragePooling3D
 from tensorflow.python.keras.layers import Input
 from tensorflow.python.keras.layers.merge import concatenate
 from tensorflow.python.keras.layers.normalization import BatchNormalization
-#from tensorflow.contrib.keras.python.keras.backend import learning_phase
+# from tensorflow.contrib.keras.python.keras.backend import learning_phase
 from tensorflow.python.keras.backend import learning_phase
 
 from nibabel import load as load_nii
@@ -54,7 +54,9 @@ from sklearn.preprocessing import scale
 import matplotlib.pyplot as plt
 
 from tensorflow.core.protobuf.rewriter_config_pb2 import RewriterConfig
-#from npu_bridge.estimator import npu_ops
+
+
+# from npu_bridge.estimator import npu_ops
 
 # SAVE_PATH = 'unet3d_baseline.hdf5'
 # OFFSET_W = 16
@@ -84,12 +86,13 @@ def parse_inputs():
     parser.add_argument('-input1', '--input_flair', dest='input_flair', default='../datasets/input_flair/')
     parser.add_argument('-input2', '--input_t1', dest='input_t1', default='../datasets/input_t1/')
 
-
     return vars(parser.parse_args())
 
 
 options = parse_inputs()
-#os.environ["CUDA_VISIBLE_DEVICES"] = options['gpu']
+
+
+# os.environ["CUDA_VISIBLE_DEVICES"] = options['gpu']
 
 def norm(image):
     image = np.squeeze(image)
@@ -98,7 +101,6 @@ def norm(image):
 
 
 def vox_generator_test(all_files):
-
     path = options['root_path']
 
     while 1:
@@ -129,11 +131,17 @@ def vox_generator_test(all_files):
             yield data, data_norm, labels
 
 
-
 def main():
+    bin_path_1 = "../datasets/input_flair/"
+    bin_path_2 = "../datssets/input_t1/"
+    if not os.path.exists(bin_path_1):
+        os.makedirs(bin_path_1)
+    if not os.path.exists(bin_path_2):
+        os.makedirs(bin_path_2)
+
     test_files = []
     DATA_PATH = options['root_path']
-    with open(DATA_PATH+'val.txt') as f:
+    with open(DATA_PATH + 'val.txt') as f:
         for line in f:
             test_files.append(line[:-1])
 
@@ -156,11 +164,8 @@ def main():
     batches_h = int(np.ceil((240 - HSIZE) / float(OFFSET_H))) + 1
     batches_c = int(np.ceil((155 - CSIZE) / float(OFFSET_C))) + 1
 
-
-
     flair_t2_node = tf.placeholder(dtype=tf.float32, shape=(None, HSIZE, WSIZE, CSIZE, 2))
     t1_t1ce_node = tf.placeholder(dtype=tf.float32, shape=(None, HSIZE, WSIZE, CSIZE, 2))
-
 
     if model_name == 'dense48':
 
@@ -193,7 +198,6 @@ def main():
     t1_t1ce_score = t1_t1ce_15[:, 13:25, 13:25, 13:25, :] + \
                     t1_t1ce_27[:, 13:25, 13:25, 13:25, :]
 
-
     saver = tf.train.Saver()
     data_gen_test = vox_generator_test(test_files)
     dice_whole, dice_core, dice_et = [], [], []
@@ -209,24 +213,25 @@ def main():
     with tf.Session(config=config) as sess:
         saver.restore(sess, SAVE_PATH)
         for i in range(len(test_files)):
-            print ('predicting %s' % test_files[i])
-           # x, x_n, y = data_gen_test.next()
+            print('predicting %s' % test_files[i])
+            # x, x_n, y = data_gen_test.next()
             x, x_n, y = next(data_gen_test)
             pred = np.zeros([240, 240, 155, 5])
             for hi in range(batches_h):
                 offset_h = min(OFFSET_H * hi, 240 - HSIZE)
-               # offset_ph = offset_h + OFFSET_PH
+                # offset_ph = offset_h + OFFSET_PH
                 offset_ph = int(offset_h + OFFSET_PH)
                 for wi in range(batches_w):
                     offset_w = min(OFFSET_W * wi, 240 - WSIZE)
-                   # offset_pw = offset_w + OFFSET_PW
+                    # offset_pw = offset_w + OFFSET_PW
                     offset_pw = int(offset_w + OFFSET_PW)
                     for ci in range(batches_c):
                         offset_c = min(OFFSET_C * ci, 155 - CSIZE)
-                       # offset_pc = offset_c + OFFSET_PC
+                        # offset_pc = offset_c + OFFSET_PC
                         offset_pc = int(offset_c + OFFSET_PC)
                         data = x[offset_h:offset_h + HSIZE, offset_w:offset_w + WSIZE, offset_c:offset_c + CSIZE, :]
-                        data_norm = x_n[offset_h:offset_h + HSIZE, offset_w:offset_w + WSIZE, offset_c:offset_c + CSIZE, :]
+                        data_norm = x_n[offset_h:offset_h + HSIZE, offset_w:offset_w + WSIZE, offset_c:offset_c + CSIZE,
+                                    :]
                         data_norm = np.expand_dims(data_norm, 0)
                         if not np.max(data) == 0 and np.min(data) == 0:
                             score = sess.run(fetches=t1_t1ce_score,
@@ -239,10 +244,10 @@ def main():
                             flair1 = np.asarray(flair, dtype='float32')
                             t11 = np.asarray(t1, dtype='float32')
                             flair1.tofile(options['input_flair'] + "input_flair_" + str(i) + ".bin")
-                            t11.tofile(options['input_t1'] + "input_t1_" + str(i) +".bin")
+                            t11.tofile(options['input_t1'] + "input_t1_" + str(i) + ".bin")
 
 
 if __name__ == '__main__':
     options = parse_inputs()
-    #os.environ["CUDA_VISIBLE_DEVICES"] = options['gpu']
+    # os.environ["CUDA_VISIBLE_DEVICES"] = options['gpu']
     main()

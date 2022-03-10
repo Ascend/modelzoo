@@ -1,0 +1,9 @@
+## Dataset
+
+注意：github已包含数据集，https://github.com/hwwang55/KGNN-LS/tree/master/data/restaurant
+
+`Dianping-Food.zip`: containing the final rating file and the final KG file;
+
+执行解压即可
+
+`unzip Dianping-Food.zip

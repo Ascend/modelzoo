@@ -31,7 +31,7 @@
         "mxpi_tensorinfer0": {
             "props": {
                 "dataSource": "mxpi_imageresize0",
-                "modelPath": "../models/yolov3/yolov3_tf_aipp.om",
+                "modelPath": "../data/model/yolov3_tf_aipp.om",
                 "waitingTime": "2000",
                 "outputDeviceId": "-1"
             },
@@ -41,9 +41,9 @@
         "mxpi_objectpostprocessor0": {
             "props": {
                 "dataSource": "mxpi_tensorinfer0",
-                "postProcessConfigPath": "../models/yolov3/yolov3_tf_bs1_fp16.cfg",
-                "labelPath": "../models/yolov3/coco.names",
-                "postProcessLibPath": "../../../lib/modelpostprocessors/libyolov3postprocess.so"
+                "postProcessConfigPath": "../data/config/yolov3_tf_bs1_fp16.cfg",
+                "labelPath": "../data/config/coco.names",
+                "postProcessLibPath": "libyolov3postprocess.so"
             },
             "factory": "mxpi_objectpostprocessor",
             "next": "mxpi_dataserialize0"

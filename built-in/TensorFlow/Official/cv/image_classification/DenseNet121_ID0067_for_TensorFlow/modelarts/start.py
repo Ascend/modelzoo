@@ -31,10 +31,8 @@
 import os
 
 import tensorflow as tf
-import numpy as np
 
 import glob
-import sys
 import ast
 
 import densenet.data_loader as dl
@@ -71,7 +69,7 @@ def parse_args():
     parser.add_argument('--restore_path', type=str, default='',
                         help="""restore path""")
     # 不加载预训练网络中FC层权重
-    parser.add_argument('--restore_exclude', default=['linear/'], help="""restore_exclude""")
+    parser.add_argument('--restore_exclude', default=['linear/', 'global_step'], help="""restore_exclude""")
 
     parser.add_argument('--rank_size', default=1, type=int,
                         help="""number of NPUs  to use.""")

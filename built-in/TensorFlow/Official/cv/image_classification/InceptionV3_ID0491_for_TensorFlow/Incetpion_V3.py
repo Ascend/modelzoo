@@ -45,8 +45,22 @@ import cv2
 import numpy as np
 import os
 tf.app.flags.DEFINE_integer('epoch_num', 1, '')
+tf.app.flags.DEFINE_string('NPU_DEVICE_INDEX', '0', '')
+tf.app.flags.DEFINE_integer('npu_nums', 1, '')
 tf.app.flags.DEFINE_string('precision_mode', 'allow_fp32_to_fp16', '')
 FLAGS = tf.app.flags.FLAGS
+
+def broadcast_global_variables(root_rank, index):
+    op_list = []
+    for var in tf.global_variables():
+        if "float" in var.dtype.name:
+            inputs = [var]
+            outputs = hccl_ops.broadcast(tensor=inputs, root_rank=root_rank)
+            if outputs is not None:
+                op_list.append(outputs[0].op)
+                op_list.append(tf.assign(var, outputs[0]))
+    return tf.group(op_list)
+
 def run():
     model_dir = ''
     logdir = ''
@@ -60,8 +74,8 @@ def run():
     ITER_NUM = 1500
     LEARNING_RATE_VAL = 0.001
     if utils.isLinuxSys():
-        logdir = './result/log'
-        model_dir = './result/model'
+        logdir = './result/' + FLAGS.NPU_DEVICE_INDEX+ '/log'
+        model_dir = './result/' + FLAGS.NPU_DEVICE_INDEX + '/model'
     else:
         model_dir = 'D:\\DataSets\\cifar\\cifar\\model_flie\\inceptionv3'
         logdir = 'D:\\DataSets\\cifar\\cifar\\logs\\train\\inceptionv3'
@@ -104,7 +118,7 @@ def run():
     # custom_op.parameter_map["use_off_line"].b = True
     # config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
      # for npu
-
+    broad_op = broadcast_global_variables(0, 1)
     with tf.Session(config=config) as sess:
         if utils.isHasGpu():
             dev = '/gpu:0'
@@ -137,6 +151,8 @@ def run():
 #                            break
                         duration = 0
                         for step in range(1, (ITER_NUM + 1)):
+                            if FLAGS.npu_nums == 8:
+                                sess.run(broad_op)
 #                            if coord.should_stop():
 #                                print('coord should stop ...')
 #                                break

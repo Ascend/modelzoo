@@ -38,8 +38,8 @@ import argparse
 
 sys.path.append("../")
 
-from models.resnet50 import res50_model as ml
-from configs.res50_256bs_1p import res50_config
+from src.models.resnet50 import res50_model as ml
+from src.configs.res50_256bs_1p import res50_config
 
 config = res50_config()
 tf.reset_default_graph()
@@ -72,10 +72,6 @@ def add_placeholder_on_ckpt(input_file, save_path):
         print('TensorFlow model checkpoint has been saved to {}'.format(
             save_path))
 
-
-# weight_path = tf.train.latest_checkpoint(config.get('model_dir'))
-
-
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_file', type=str, help='the input file name')
@@ -84,7 +80,6 @@ def parse_arguments(argv):
 
 
 def main():
-    # args = ['model-epoch_17_step_9350_loss_3.8476_lr_0.001875']
     args = None
     args = parse_arguments(args)
     add_placeholder_on_ckpt(args.input_file, args.output_file)

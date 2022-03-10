@@ -1,3 +1,16 @@
+# Copyright [yyyy] [name of copyright owner]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -64,6 +77,8 @@ parser.add_argument('--dist-backend', default='nccl', type=str,
                     help='distributed backend')
 parser.add_argument('--seed', default=1234, type=int,
                     help='seed for initializing training. ')
+parser.add_argument('--data-dir', default='/npu/traindata/gru', type=str,
+                    help='gru')
 parser.add_argument('--gpu', default=None, type=int,
                     help='GPU id to use.')
 parser.add_argument('--multiprocessing-distributed', action='store_true',
@@ -118,7 +133,7 @@ def main_worker(args):
                 eos_token='<eos>',
                 lower=True, fix_length=46)
 
-    train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'),
+    train_data, valid_data, test_data = Multi30k.splits(exts=('.de', '.en'),root=args.data_dir,
                                                         fields=(SRC, TRG))
     SRC.build_vocab(train_data, min_freq=2)
     TRG.build_vocab(train_data, min_freq=2)

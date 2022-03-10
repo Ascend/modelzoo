@@ -1,12 +1,12 @@
-# Welcome to the Model Zoo for Ascend
+# Welcome to Ascend ModelZoo
 
-In order to facilitate developers to enjoy the benefits of Ascend ModelZoo, we will continue to add typical networks and some of the related pre-trained models. If you have needs for the modelzoo, you can file an issue on [gitee](https://github.com/Ascend/modelzoo/issues) or [ModelZoo](https://bbs.huaweicloud.com/forum/forum-726-1.html), We will consider it in time.
+To make it easier for developers to enjoy the benefits of Ascend ModelZoo, we are continuing to add typical networks and related pre-trained models. If you have any needs, open an issue on [Gitee](https://github.com/Ascend/modelzoo/issues) or [ModelZoo](https://bbs.huaweicloud.com/forum/forum-726-1.html), and we will response to it in a timely manner.
 
-## Contributing
+## Contribution
 
-Before you start,Please read the [notice](https://github.com/Ascend/modelzoo/blob/master/contrib/CONTRIBUTING.md)
-
-Thank You!
+Before you start, read the [notice](https://github.com/Ascend/modelzoo/blob/master/contrib/CONTRIBUTING.md) first.
+ 
+Thank you!
 
 ## Table of Contents
 - Models
@@ -207,8 +207,9 @@ Thank You!
 		
 ## Disclaimers
 
-Ascend ModelZoo only provides scripts that downloads and preprocesses public datasets. We do not own these datasets and are not responsible for their quality or maintenance. Please make sure you have permission to use the dataset under the dataset’s license. The models trained on these dataset are for non-commercial research and educational purpose only.
+Ascend ModelZoo provides only scripts for downloading and preprocessing public datasets. We do not own these datasets and are not responsible for their quality or maintenance. Please ensure that you have the permission to use a dataset under the dataset's license. Models trained on these datasets are used only for non-commercial research and educational purposes.
 
-To dataset owners: we will remove or update all public content upon request if you don’t want your dataset included on Modelzoo, or wish to update it in any way. Please contact us through a Github/Gitee issue. Your understanding and contribution to this community is greatly appreciated.
+To dataset owners:
+If you do not want your dataset to be included on ModelZoo, or wish to update it in any way, we will remove or update all public content upon your request. You can contact us with Github/Gitee issues. Your understanding and contribution to this community are greatly appreciated.
 
-Ascend ModelZoo is Apache 2.0 licensed，Please see the LICENSE file.
+Ascend ModelZoo is Apache 2.0 licensed, see the LICENSE file.

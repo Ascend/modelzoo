@@ -2,7 +2,7 @@
 
 #当前路径,不需要修改
 cur_path=`pwd`
-# source env.sh
+
 #集合通信参数,不需要修改
 
 export RANK_SIZE=8
@@ -14,22 +14,16 @@ RANK_ID_START=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
-#设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL_ETP=3
-
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="DenseNet121_ID0067_for_TensorFlow"
 #训练epoch
-train_epochs=1
+max_epochs=150
 #训练batch_size
 batch_size=32
-#训练step
-max_train_steps=200
-#训练step
-#train_steps=`expr 1281167 / ${batch_size}`
+
 #学习率
-learning_rate=0.04
+learning_rate=0.1
 
 #TF2.X独有，需要模型审视修改
 #export NPU_LOOP_SIZE=${train_steps}
@@ -121,22 +115,16 @@ do
     
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
-    let a=RANK_ID*${corenum}/8
-    let b=RANK_ID+1
-    let c=b*${corenum}/8-1
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
-    nohup ${bind_core} python3.7 ./train.py \
+    
+    python3.7 ./train.py \
     --data_dir=${data_path} \
     --rank_size=${RANK_SIZE} \
-    --iterations_per_loop=10 \
-    --mode=train \
-	--max_train_steps=${max_train_steps} \
+    --iterations_per_loop=1000 \
+    --mode=train_and_evaluate \
+	--max_epochs=${max_epochs} \
+    --epochs_between_evals=149 \
 	--lr=${learning_rate} \
-	--display_every=10 \
-	--log_dir=./model_8p_${RANK_ID} \
+	--log_dir=./model_8p \
     --log_name=densenet121_8p.log > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
 wait
@@ -153,16 +141,16 @@ FPS=`grep epoch $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.l
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-#train_accuracy=`cat $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F " " '{print $3}'|awk 'END {print}'`
+train_accuracy=`grep -A 1 "top1" ${cur_path}/output/0/train_0.log|tail -1|awk 'END {print $3}'`
 #打印，不需要修改
-#echo "Final Train Accuracy : ${train_accuracy}"
+echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 #性能看护结果汇总
 #训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
-CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据，不需要修改
 #吞吐量
@@ -182,6 +170,7 @@ echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

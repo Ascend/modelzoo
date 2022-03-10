@@ -20,16 +20,20 @@ https://github.com/LeeJunHyun/Image_Segmentation
 脚本提供了单卡/8卡的训练脚本和test脚本。修改数据集路径参数后，运行train_1p.sh 和 train_8p.sh即可。其中数据集路径设置到train和test的父目录即可。训练完成后后，会在当前目录下生成训练日志和结果，单卡和8卡分别对应result_1p,result_8p. 文件下保存着最终训练完成的模型pkl文件。
 修改test.sh的配置参数可以完成test过程。
 
+
+
 ### Step 3: Training Results
 
 
-| DEVICE   | FPS      | Npu_nums | Epochs   |BatchSize | AMP     | ACC     |
-| :------: | :------: | :------: | :------: | :------: |:------: |:------: |
-| V100     | 38       | 1        | 100      | 16       |   O2    |  NA     |
-| V100     | 304      | 8        | 100      | 16*8     |   O2    | 0.908   |
-| NPU910   | 47       | 1        | 100      | 16       |   O2    |  NA     |
-| NPU910   | 376      | 8        | 100      | 16*8     |   O2    | 0.910   |
+| DEVICE | FPS  | Npu_nums | Epochs | BatchSize | AMP  |  ACC  |
+| :----: | :--: | :------: | :----: | :-------: | :--: | :---: |
+|  V100  |  38  |    1     |  100   |    16     |  O2  |  NA   |
+|  V100  | 304  |    8     |  100   |   16*8    |  O2  | 0.908 |
+| NPU910 |  47  |    1     |  100   |    16     |  O2  |  NA   |
+| NPU910 | 376  |    8     |  100   |   16*8    |  O2  |       |
 
 
 
+注：
 
+权重文件格式转换onnx，修改pthtar2onx.py文件中的第54行，将对应的值改为训练产生的pkl文件名

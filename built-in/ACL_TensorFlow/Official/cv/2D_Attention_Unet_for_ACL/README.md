@@ -1,6 +1,17 @@
 # 2D_Attention_Unet inference for Tensorflow
 
-This repository provides a script and recipe to Inference the
+This repository provides a script and recipe to offline inference
+
+## Notice
+**This sample only provides reference for you to learn the Ascend software stack and is not for commercial purposes.**
+
+Before starting, please pay attention to the following adaptation conditions. If they do not match, may leading in failure.
+
+| Conditions | Need |
+| --- | --- |
+| CANN Version | >=5.0.3 |
+| Chip Platform| Ascend310/Ascend710 |
+| 3rd Party Requirements| Please follow the 'requirements.txt' |
 
 ## Quick Start Guide
 
@@ -15,9 +26,23 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/2D_Attention_Unet_for_ACL
 
 1. Download the Massachusetts Roads Dataset by yourself
 
-2. Executing the Preprocessing Script
+
+2. Put the dataset files to **'2D_Attention_Unet_for_ACL/image_ori/'** like this:
+```
+--image_ori
+  |----lashan
+    |----test(xxx.tiff,total:49images)
+    |----test_labels
+    |----val
+    |----val_labels
+  |----Val(xxx_gt/xxx_img/xxx_pred .png)
+```
+
+
+3. Executing the Preprocessing Script
    ```
-   python3 scripts/preprocess_data.py --dataset=../image_ori/lashan --crop_height=224 --crop_width=224
+   cd scripts
+   python3 preprocessdata_test.py --dataset=../image_ori/lashan --crop_height=224 --crop_width=224
    ```
  
 ### 3. Offline Inference
@@ -36,10 +61,15 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/2D_Attention_Unet_for_ACL
 
 - convert pb to om
 
+
   [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/Official/cv/2D_Attention_Unet_for_ACL.zip)
+
   ```
+  cd ..
+  mkdir model
   atc --model=model/2D_Attention_Unet_tf.pb --framework=3 --output=model/2DAttention_fp16_1batch --soc_version=Ascend710 --input_shape=inputs:1,224,224,3 --enable_small_channel=1 --insert_op_conf=2DAttention_aipp.cfg
   ```
+
 
 - Build the program
 
@@ -50,7 +80,7 @@ cd modelzoo/built-in/ACL_TensorFlow/Official/cv/2D_Attention_Unet_for_ACL
 - Run the program:
 
   ```
-  bash benchmark_tf.sh --batchSize=1 --outputType=fp32 --modelPath=../../model/2DAttention_fp16_1batch.om --dataPath=../../datasets/ --modelType=2DAttention_unet --imgTupe=rgb --trueValuePath=../../image_ori/Val
+  bash benchmark_tf.sh 
   ```
   
 ## Performance

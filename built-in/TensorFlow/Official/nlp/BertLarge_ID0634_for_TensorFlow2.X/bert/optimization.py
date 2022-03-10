@@ -25,7 +25,7 @@ from absl import flags
 from absl import logging
 import tensorflow as tf
 from tensorflow.python.framework  import ops
-from tensorflow.python.keras import backend_config
+from keras import backend_config
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import linalg_ops

@@ -317,7 +317,7 @@ class DefaultTrainer(SimpleTrainer):
         self.start_iter = 0
         self.max_iter = cfg.SOLVER.MAX_ITER
         self.cfg = cfg
-
+        self.batchsize = cfg.SOLVER.IMS_PER_BATCH
         self.register_hooks(self.build_hooks())
 
     def resume_or_load(self, resume=True):
@@ -350,7 +350,7 @@ class DefaultTrainer(SimpleTrainer):
         cfg.DATALOADER.NUM_WORKERS = 0  # save some memory and time for PreciseBN
 
         ret = [
-            hooks.IterationTimer(),
+            hooks.IterationTimer(self.batchsize),
             hooks.LRScheduler(self.optimizer, self.scheduler),
             hooks.PreciseBN(
                 # Run at the same freq as (but before) evaluation.
@@ -377,7 +377,7 @@ class DefaultTrainer(SimpleTrainer):
 
         # Do evaluation after checkpointer, because then if it fails,
         # we can use the saved checkpoint to debug.
-        ret.append(hooks.EvalHook(cfg.TEST.EVAL_PERIOD, test_and_save_results))
+        #ret.append(hooks.EvalHook(cfg.TEST.EVAL_PERIOD, test_and_save_results))
 
         if comm.is_main_process():
             # run writers in the end, so that evaluation metrics are written

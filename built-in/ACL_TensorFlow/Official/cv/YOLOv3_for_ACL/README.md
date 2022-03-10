@@ -4,6 +4,17 @@
 
 This repository provides a script and recipe to Inference the Yolov3 model.
 
+## Notice
+**This sample only provides reference for you to learn the Ascend software stack and is not for commercial purposes.**
+
+Before starting, please pay attention to the following adaptation conditions. If they do not match, may leading in failure.
+
+| Conditions | Need |
+| --- | --- |
+| CANN Version | >=5.0.3 |
+| Chip Platform| Ascend310/Ascend710 |
+| 3rd Party Requirements| Please follow the 'requirements.txt' |
+
 ## Quick Start Guide
 
 ### 1. Clone the respository
@@ -55,6 +66,7 @@ opencv-python==4.2.0.34
 - Configure the env according to your installation path 
 
   ```
+  #Please modify the environment settings as needed
   export install_path=/usr/local/Ascend
   export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:$PATH
   export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:$PYTHONPATH
@@ -66,13 +78,25 @@ opencv-python==4.2.0.34
 
   [pb download link](https://modelzoo-train-atc.obs.cn-north-4.myhuaweicloud.com/003_Atc_Models/modelzoo/yolov3_tf.pb)
 
+  For Ascend310:
   ```
   atc --model=yolov3_tf.pb --framework=3 --output=yolov3_tf_aipp --output_type=FP32 --soc_version=Ascend310 --input_shape="input:1,416,416,3" --log=info --insert_op_conf=yolov3_tf_aipp.cfg
+  ```
+  For Ascend710:
+  ```
+  atc --model=yolov3_tf.pb --framework=3 --output=yolov3_tf_aipp --output_type=FP32 --soc_version=Ascend710 --input_shape="input:1,416,416,3" --log=info --insert_op_conf=yolov3_tf_aipp.cfg
   ```
 
 - Build the program
 
+  For Ascend310:
   ```
+  unset ASCEND710_DVPP
+  bash build.sh
+  ```
+  For Ascend710:
+  ```
+  export ASCEND710_DVPP=1
   bash build.sh
   ```
 
@@ -94,6 +118,6 @@ Our result were obtained by running the applicable inference script. To achieve 
 #### Inference accuracy results
 
 IoU=0.5
-| model  | Npu_nums | **MAP** | 
+| model  | Npu_nums | **mAP** | 
 | :----: | :------: | :-----: | 
-| Yolov3 |    1     |  55.3   | 
+| Yolov3 |    1     |  55.3%   | 

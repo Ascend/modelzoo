@@ -60,7 +60,11 @@ def train_one_epoch(model, criterion, optimizer, data_loader, device, epoch, arg
     metric_logger.add_meter('img/s', utils.SmoothedValue(window_size=10, fmt='{value}'))
 
     header = 'Epoch: [{}]'.format(epoch)
+    n = 0
     for image, target in metric_logger.log_every(data_loader, args, header):
+        if args.max_steps and n > args.max_steps:
+            break
+        n += 1
         start_time = time.time()
         image, target = image.to(device), target.to(torch.int).to(device)
         output = model(image)
@@ -357,6 +361,8 @@ def parse_args():
                         default=1,
                         type=int,
                         help='Manually set random seed')
+    parser.add_argument('--max_steps', default=None, type=int, metavar='N',
+                        help='number of total steps to run')
     args = parser.parse_args()
 
     return args

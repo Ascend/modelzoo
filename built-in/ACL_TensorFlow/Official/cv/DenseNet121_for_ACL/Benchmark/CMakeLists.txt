@@ -13,7 +13,10 @@ set(CMAKE_OUTPUT_DIR "out")
 set(CMAKE_CXX_FLAGS_RELEASE "-fPIC -O2 -g -Wall")
 
 ADD_DEFINITIONS("-DENABLE_DVPP_INTERFACE -D_GLIBCXX_USE_CXX11_ABI=0")
-
+if(DEFINED ENV{ASCEND710_DVPP})
+        add_definitions(-DASCEND710_DVPP)
+        message("set ASCEND710_DVPP=true")
+endif()
 # Header path
 include_directories(
 inc
@@ -22,7 +25,7 @@ $ENV{install_path}/acllib/include
 $ENV{install_path}/driver/kernel/libc_sec/include
 /usr/include
 )
-
+message("+++++++++$ENV{install_path}")
 # add host lib path
 link_directories($ENV{install_path}/acllib/lib64/stub)
 #link_directories(/usr/local/Ascend/driver/lib64)

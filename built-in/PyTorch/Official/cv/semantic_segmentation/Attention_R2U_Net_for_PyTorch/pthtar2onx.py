@@ -51,6 +51,6 @@ def convert(pth_file_path, onnx_file_path):
 
 
 if __name__ == "__main__":
-    src_file_path = "checkpoint.pth.tar"
+    src_file_path = "checkpoint.pkl"
     dst_file_path = "R2AttU_Net.onnx"
     convert(src_file_path, dst_file_path)

@@ -399,7 +399,6 @@ class TrainingCodeCheck(object):
 
         return match_api, describe_api
 
-
 class NpuLogCheck(object):
     """check npu log here."""
 
@@ -411,22 +410,76 @@ class NpuLogCheck(object):
         self.sub_dir = sub_dir
         self.training_log = "This training has reached the data-preprocess performance bottleneck"
 
-    def check_dataset_bottleneck_with_log(self):
-        bottleneck_flag = False
+    def check_zeros(self, nums):
+        nums = [int(num) for num in nums]
+        for i in range(len(nums) - 2):
+            if nums[i] + nums[i + 1] + nums[i + 2] == 0:
+                return True
+        return False
 
-        for parent, dirnames, filenames in os.walk(self.sub_dir, followlinks=True):
-            for file in filenames:
-                file_path = os.path.join(parent, file)
-                if os.path.isfile(file_path):
-                    with open(file_path, "r", encoding='utf-8', errors='ignore') as f:
-                        filelines = f.readlines()
-                        for line in filelines:
-                            if self.training_log in line:
-                                bottleneck_flag = True
+    def check_data_preprocess_bottleneck(self):
+        bottle_cmd = "grep -rn 'performance bottleneck' " + self.sub_dir + "/device-*/* | wc -l"
+        dv_tdt_cmd = "grep -rn 'outContent:Queue_Edge_' " + self.sub_dir + "/device-*/*|awk '{print $3}'|awk -F ':' '{print $NF}'"
+        host_tdt_cmd = "grep -rn 'has sent a tdtDataElem' " + self.sub_dir + "/plog/* |awk '{print$22}' |awk -F ',' '{print$1}'|sort|uniq"
+        host_queue_cmd = "grep -rn 'Host queue' " + self.sub_dir + "/plog/*|awk '{print $NF}'"
 
-        if bottleneck_flag:
-            logging.warning("12. This training has reached the data-preprocess performance bottleneck")
-            return True
+        bottel_res = os.popen(bottle_cmd).read()
+        if int(bottel_res[0]) > 0:  # DP-queue空
+            print(0)
+            logging.info("12. This training has reached the data-preprocess performance bottleneck")
+            dv_tdt_res = os.popen(dv_tdt_cmd).read()
+            if self.check_zeros(dv_tdt_res):  # DEVICE-TDT 空
+                host_tdt_res = os.popen(host_tdt_cmd).read()
+                if self.check_zeros(host_tdt_res):  # HOST-TDT 空
+                    host_queue_res = os.popen(host_queue_cmd).read()
+                    if self.check_zeros(host_queue_res):  # HOST-Queue 空
+                        logging.info(
+                            "12. Some iters found no data in Host Queue, it may have performance bottleneck here!")
+                        return True
+                    else:
+                        logging.info(
+                            "12. Have enough data in Host Queue but null in Host TDT Queue, it may have performance bottleneck here!")
+                        return True
+                else:
+                    logging.info(
+                        "12. Have enough data in Host TDT Queue but null in Device TDT Queue, it may have performance bottleneck here!")
+                    return True
+            else:
+                logging.info(
+                    "12. Have data in Device TDT Queue data but null in DP Queue,it may have performance bottleneck here! ")
+                return True
         else:
+            print(1)
             logging.info("12. Not found data-preprocess performance bottleneck")
             return False
+
+# class NpuLogCheck(object):
+#     """check npu log here."""
+
+#     def __init__(self, sub_dir):
+#         """
+
+#         :param sub_dir:
+#         """
+#         self.sub_dir = sub_dir
+#         self.training_log = "This training has reached the data-preprocess performance bottleneck"
+
+#     def check_dataset_bottleneck_with_log(self):
+#         bottleneck_flag = False
+
+#         for parent, dirnames, filenames in os.walk(self.sub_dir, followlinks=True):
+#             for file in filenames:
+#                 file_path = os.path.join(parent, file)
+#                 if os.path.isfile(file_path):
+#                     with open(file_path, "r", encoding='utf-8', errors='ignore') as f:
+#                         filelines = f.readlines()
+#                         for line in filelines:
+#                             if self.training_log in line:
+#                                 bottleneck_flag = True
+
+#         if bottleneck_flag:
+#             logging.warning("12. This training has reached the data-preprocess performance bottleneck")
+#             return True
+#         else:
+#             logging.info("12. Not found data-preprocess performance bottleneck")
+#             return False

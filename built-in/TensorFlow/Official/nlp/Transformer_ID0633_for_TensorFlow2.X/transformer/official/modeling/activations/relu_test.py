@@ -16,7 +16,7 @@
 
 import tensorflow as tf
 
-from tensorflow.python.keras import \
+from keras import \
   keras_parameterized  # pylint: disable=g-direct-tensorflow-import
 from official.modeling import activations
 

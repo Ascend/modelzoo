@@ -30,7 +30,7 @@ export ASCEND_GLOBAL_LOG_LEVEL=3
 #网络名称，同目录名称
 Network="ResNext50_for_TensorFlow"
 
-config_file=res50_32bs_8p_host
+config_file=res50_256bs_8p_host
 max_train_steps=10000
 iterations_per_loop=1000
 debug=True

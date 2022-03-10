@@ -141,14 +141,14 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep Fps $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|grep -v "\[1/" | grep -v "\[2/" | awk -F "Fps" '{print$2}' | awk '{print$1}' | awk '{sum+=$1} END {print"",sum/NR}'`
+FPS=`grep Fps $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|grep -v "\[1/"| grep -v "\[2/"|grep -v "\[3/"|awk -F "Fps" '{print $2}'|awk '{sum+=$1} END {print  sum/NR}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-train_accuracy=`grep "Fps" $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|tail -2|head -1|awk '{print $17}'|sed 's/[()]//g' `
+#train_accuracy=`grep "Fps" $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|tail -2|head -1|awk '{print $17}'|sed 's/[()]//g' `
 #打印，不需要修改
-echo "Final Train Accuracy : ${train_accuracy}"
+#echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 #性能看护结果汇总

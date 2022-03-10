@@ -153,7 +153,8 @@ class GRU4Rec():
             softmax_W = tf.get_variable('softmax_w', [self.n_items, self.rnn_size], initializer=initializer)
             softmax_b = tf.get_variable('softmax_b', [self.n_items], initializer=tf.constant_initializer(0.0))
             cell = rnn_cell.GRUCell(self.rnn_size, activation=self.hidden_act)
-            drop_cell = rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_p_hidden)
+#            drop_cell = rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_p_hidden)
+            drop_cell=cell
             stacked_cell = rnn_cell.MultiRNNCell(([drop_cell] * self.layers))
             inputs = tf.nn.embedding_lookup(embedding, self.X)
             (output, state) = stacked_cell(inputs, tuple(self.state))
@@ -215,13 +216,15 @@ class GRU4Rec():
                 for i in range((minlen - 1)):
                     in_idx = out_idx
                     out_idx = data.ItemIdx.values[((start + i) + 1)]
-                    fetches = [self.cost, self.final_state, self.global_step, self.lr, self.train_op]
+#                    fetches = [self.cost, self.final_state, self.global_step, self.lr, self.train_op]
+                    fetches = [self.cost, self.global_step, self.lr, self.train_op]
                     feed_dict = {self.X: in_idx, self.Y: out_idx}
                     for j in range(self.layers):
                         feed_dict[self.state[j]] = state[j]
-                    start_time = time.clock() #train start
-                    (cost, state, step, lr, _) = self.sess.run(fetches, feed_dict)
-                    end_time = time.clock()  #train end
+                    start_time = time.time() #train start
+#                    (cost, state, step, lr, _) = self.sess.run(fetches, feed_dict)
+                    (cost, step, lr, _) = self.sess.run(fetches, feed_dict)
+                    end_time = time.time()  #train end
                     #print("Step cost time is:{:.4f}".format(end_time-start_time))
                     epoch_cost.append(cost)
                     if np.isnan(cost):

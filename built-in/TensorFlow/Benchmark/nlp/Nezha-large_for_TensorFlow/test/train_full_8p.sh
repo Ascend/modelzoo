@@ -17,9 +17,6 @@ export SLOG_PRINT_TO_STDOUT=0
 # 数据集路径,保持为空,不需要修改
 data_path=""
 
-#设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
-
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
 Network="Nezha-large_for_TensorFlow"
@@ -135,14 +132,8 @@ do
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    corenum=`cat /proc/cpuinfo |grep 'processor' |wc -l`
-    let a=RANK_ID*${corenum}/8
-    let b=RANK_ID+1
-    let c=b*${corenum}/8-1
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
-    ${bind_core} python3.7 src/pretrain/run_pretraining.py \
+    
+    python3.7 src/pretrain/run_pretraining.py \
 	    --bert_config_file=${cur_path}/../configs/nezha_large_config.json \
 		--max_seq_length=128 \
 		--max_predictions_per_seq=20 \
@@ -154,7 +145,7 @@ do
 		--manual_fp16=True \
 		--use_fp16_cls=True \
 		--input_files_dir=$data_path/wikipedia_128 \
-		--eval_files_dir=$data_path/cn-wiki-128 \
+		--eval_files_dir=$data_path/wikipedia_128 \
 		--npu_bert_debug=False \
 		--npu_bert_use_tdt=True \
 		--do_train=True \
@@ -166,8 +157,6 @@ do
 		--distributed=True \
 		--npu_bert_loss_scale=0 \
 		--output_dir=${cur_path}/output/$ASCEND_DEVICE_ID/ckpt \
-        --over_dump=${over_dump} \
-        --over_dump_path=${over_dump_path} \
 		> ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
         #--data_dump_flag=${data_dump_flag} \
         #--data_dump_step=${data_dump_step} \

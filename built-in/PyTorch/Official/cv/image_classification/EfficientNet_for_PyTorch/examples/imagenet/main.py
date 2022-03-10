@@ -111,6 +111,14 @@ parser.add_argument('--stop-step-num', default=None, type=int,
                     help='after the stop-step, killing the training task')
 cur_step = 0
 
+# for servers to immediately record the logs
+#def flush_print(func):
+    #def new_print(*args, **kwargs):
+        #func(*args, **kwargs)
+        #sys.stdout.flush()
+    #return new_print
+#print = flush_print(print)
+
 def device_id_to_process_device_map(device_list):
     devices = device_list.split(",")
     devices = [int(x) for x in devices]
@@ -335,6 +343,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args, nnpus_per_node
     end = time.time()
     step_per_epoch = len(train_loader)
     for i, (images, target) in enumerate(train_loader):
+        if i > 100:
+            pass
         cur_step = epoch * step_per_epoch + i
         adjust_learning_rate_fraction_epoch(optimizer, epoch, args)
 
@@ -398,7 +408,8 @@ def validate(val_loader, model, criterion, args, nnpus_per_node):
     with torch.no_grad():
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
-
+            if i > 10:
+                pass
             target = target.int()
             images, target = images.to('npu:' + str(args.npu), non_blocking=True), target.to('npu:' + str(args.npu), non_blocking=True)
 

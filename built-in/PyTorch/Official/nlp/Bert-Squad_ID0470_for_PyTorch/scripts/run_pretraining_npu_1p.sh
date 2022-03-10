@@ -18,6 +18,7 @@ echo "Container nvidia build = " $NVIDIA_BUILD_ID
 train_batch_size=${1:-8192}
 learning_rate=${2:-"6e-3"}
 precision=${3:-"fp16"}
+num_npu=${4:-8}
 warmup_proportion=${5:-"0.2843"}
 train_steps=${6:-7038}
 save_checkpoint_steps=${7:-200}
@@ -128,7 +129,7 @@ CMD+=" --npu_id=0"
 CMD+=" --loss_scale=8192.0"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="taskset -c 0-31  python3.7 -u $CMD"
+CMD="python3.7 -u $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size \* $num_npu)
@@ -206,7 +207,7 @@ CMD+=" --npu_id=0"
 CMD+=" --loss_scale=4096.0"
 CMD+=" --json-summary ${RESULTS_DIR}/dllogger.json "
 
-CMD="taskset -c 0-31  python3.7 -u $CMD"
+CMD="python3.7 -u $CMD"
 
 if [ "$create_logfile" = "true" ] ; then
   export GBS=$(expr $train_batch_size_phase2 \* $num_npu)

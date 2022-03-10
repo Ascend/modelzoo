@@ -32,7 +32,6 @@ import argparse
 import time
 import json
 import pickle
-from tqdm import tqdm
 from arguments import get_args
 from utils import Timers
 from utils import load_checkpoint
@@ -54,6 +53,48 @@ from pretrain_gpt2 import *
 
 def yprint(str):
     print("\033[43;30m{}\033[0m".format(str))
+
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+
+    def __init__(self, name, fmt=':f'):
+        self.name = name
+        self.fmt = fmt
+        self.reset()
+        self.start_count_index = 10
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.count += n
+        if self.count > (self.start_count_index * n):
+            self.sum += val * n
+            self.avg = self.sum / (self.count - self.start_count_index * n)
+
+    def __str__(self):
+        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
+        return fmtstr.format(**self.__dict__)
+
+class ProgressMeter(object):
+    def __init__(self, num_batches, meters, prefix=""):
+        self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
+        self.meters = meters
+        self.prefix = prefix
+
+    def display(self, batch):
+        entries = [self.prefix + self.batch_fmtstr.format(batch)]
+        entries += [str(meter) for meter in self.meters]
+        print("[npu id:", '0', "]", '\t'.join(entries))
+
+    def _get_batch_fmtstr(self, num_batches):
+        num_digits = len(str(num_batches // 1))
+        fmt = '{:' + str(num_digits) + 'd}'
+        return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
 class CHIDDataset(torch.utils.data.Dataset):
     def __init__(self, args, data_path, split, tokenizer, ratio=1):
@@ -212,7 +253,18 @@ def main():
     all_cids = []
     all_losses = []
     with torch.no_grad():
-        for batch, no_model_batch in tqdm(test_dataloader, desc="Evaluating", disable=(torch.distributed.get_rank() != 0)):
+        batch_time = AverageMeter('Time', ':6.3f')
+        data_time = AverageMeter('Data', ':6.3f')
+        losses_show = AverageMeter('Loss', ':.4e')
+        fps = AverageMeter('it/s', ':.4e')
+        progress = ProgressMeter(
+            len(test_dataloader),
+            [batch_time, data_time, losses_show, fps],
+            prefix="Test: ")
+        end = time.time()
+        i = 0
+        for batch, no_model_batch in test_dataloader:
+            data_time.update(time.time() - end)
             for k in batch:
                 batch[k] = batch[k].to(device)
             for k in no_model_batch:
@@ -223,6 +275,15 @@ def main():
             loss_mask = no_model_batch["loss_mask"]
             loss = torch.sum(losses * loss_mask, dim=-1) / loss_mask.sum(dim=-1)
 
+            if loss != None:
+                losses_show.update(loss.item())
+            if i >= 10:
+                t = time.time()
+                batch_time.update(t - end)
+                fps.update(args.batch_size / batch_time.val)
+                progress.display(i)
+            end = time.time()
+            i = i + 1
             loss_tensor_list = [torch.zeros_like(loss).to(device) for _ in range(mpu.get_data_parallel_world_size())]
             torch.distributed.all_gather(loss_tensor_list, loss.data, group=mpu.get_data_parallel_group())
             for loss_item in loss_tensor_list:

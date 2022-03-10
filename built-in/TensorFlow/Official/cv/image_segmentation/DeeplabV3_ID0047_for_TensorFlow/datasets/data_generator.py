@@ -475,7 +475,7 @@ class Dataset(object):
     ds = ds.interleave(tf.data.TFRecordDataset, cycle_length=10, block_length=1,
                       num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-    ds = ds.map(self._parse_function_v2, num_parallel_calls=64)
+    ds = ds.map(self._parse_function_v2, num_parallel_calls=256)
     ds = ds.map(self._preprocess_image_v2)
 
 

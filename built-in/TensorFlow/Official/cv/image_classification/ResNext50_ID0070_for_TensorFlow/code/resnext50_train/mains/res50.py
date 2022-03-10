@@ -108,9 +108,9 @@ def main():
     if FLAGS.data_path == "/data/imagenet_TF":
         pass
     else:
-        f1 = open("../configs/res50_32bs_8p_host.py", "r")
+        f1 = open("../configs/res50_256bs_8p_host.py", "r")
         lines = f1.readlines()
-        f2 = open("../configs/res50_32bs_8p_host.py", "w")
+        f2 = open("../configs/res50_256bs_8p_host.py", "w")
         for line in lines:
             f2.write(line.replace('\'data_url\': \'file:///data/imagenet_TF\',', '\'data_url\': \'file://' + FLAGS.data_path + '\','))
         f2.close()

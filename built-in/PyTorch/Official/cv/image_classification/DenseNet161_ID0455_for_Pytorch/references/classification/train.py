@@ -366,6 +366,8 @@ def parse_args():
                         default=1,
                         type=int,
                         help='Manually set random seed')
+    parser.add_argument('--max_steps', default=10, type=int, metavar='N',
+                        help='number of total steps to run')
     args = parser.parse_args()
 
     return args

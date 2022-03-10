@@ -30,7 +30,7 @@
         "mxpi_tensorinfer0": {
             "props": {
                 "dataSource": "mxpi_imageresize0",
-                "modelPath": "./models/resnet.om",
+                "modelPath": "../../models/resnet.om",
                 "waitingTime": "2000",
                 "outputDeviceId": "-1"
             },
@@ -40,9 +40,9 @@
         "mxpi_classpostprocessor0": {
             "props": {
                 "dataSource": "mxpi_tensorinfer0",
-                "postProcessConfigPath": "./models/resnet50/resnet50.cfg",
-                "labelPath": "./models/resnet50/imagenet1000_clsidx_to_labels.names",
-                "postProcessLibPath": "../../../lib/modelpostprocessors/libresnet50postprocess.so"
+                "postProcessConfigPath": "../models/resnet/resnet50.cfg",
+                "labelPath": "../models/resnet/imagenet1000_clsidx_to_labels.names",
+                "postProcessLibPath": "libresnet50postprocess.so"
             },
             "factory": "mxpi_classpostprocessor",
             "next": "mxpi_dataserialize0"

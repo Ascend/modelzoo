@@ -46,8 +46,12 @@ else
 fi
 wait
 
+mkdir -p ${cur_path}/test/predict
 start=$(date +%s)
-python3 main.py --epochs=${train_epochs} --train_data_path=${data_path}/data/membrane/train --test_data_path=${data_path}/data/membrane/test > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
+python3 main.py --epochs=${train_epochs} \
+                --train_data_path=${data_path}/data/membrane/train \
+                --test_data_path=${data_path}/data/membrane/test \
+                --predict_data_path=${cur_path}/test/predict > $cur_path/test/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log 2>&1 &
 wait
 
 end=$(date +%s)

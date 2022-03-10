@@ -112,7 +112,7 @@ do
         --data_dir=$data_path \
         --lr=0.015 \
         --log_dir=./model_1p \
-        --max_train_steps=1000  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+        --max_train_steps=5000  > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 done 
 wait
 
@@ -124,7 +124,12 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep epoch $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'FPS:' '{print $2}'|tr -d ',' |awk 'NR>2'|awk '{sum+=$1} END {print  sum/NR}'`
+#FPS=`grep epoch $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'FPS:' '{print $2}'|tr -d ',' |awk 'NR>2'|awk '{sum+=$1} END {print  sum/NR}'`
+
+grep "FPS:" $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log > FPS.log
+sed -i '1d' FPS.log
+FPS=`grep "FPS:" FPS.log | awk -F 'FPS:' '{print $2}'|awk '{sum+=$1} END {print sum/NR}'`
+
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 echo "E2E Training Duration sec : $e2e_time"

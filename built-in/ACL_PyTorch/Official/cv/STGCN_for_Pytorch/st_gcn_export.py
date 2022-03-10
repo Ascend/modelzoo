@@ -49,7 +49,7 @@ def pt2onnx():
     parser.add_argument('-onnx', 
         default='./st-gcn_kinetics-skeleton_bs1.onnx', 
         help='output onnx file path')
-    parser.add_argument('batch_size', default=1, 
+    parser.add_argument('-batch_size', default=1, 
         help='define batch_size of the model')
     args = parser.parse_args()
 
@@ -62,7 +62,7 @@ def pt2onnx():
     print("========= ST_GCN model ========")
     print(model)
     print("===============================")
-    load_checkpoint(model, args.checkpoint, map_location='cpu')
+    load_checkpoint(model, args.ckpt, map_location='cpu')
     model.eval()
 
     input_name = ["input1"]

@@ -73,7 +73,7 @@ def main():
 
     for file_name in file_list:
         file_path = os.path.join(dir_name, file_name)
-        if file_name.endswith(".JPEG") or file_name.endswith(".jpeg"):
+        if file_name.lower().endswith(".jpg") or file_name.lower().endswith(".jpeg"):
             portion = os.path.splitext(file_name)
             with open(file_path, 'rb') as f:
                 data_input.data = f.read()

@@ -46,6 +46,7 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 import torch.distributed as dist
+import apex
 from apex import amp
 
 
@@ -233,7 +234,8 @@ def main():
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().to(device)
 
-    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+    #optimizer = torch.optim.SGD(model.parameters(), args.lr,
+    optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
 

@@ -102,6 +102,7 @@ fi
 sed -i "50s|PATH_TO_BE_CONFIGURED|${data_path}|g"  $cur_path/../src/configs/res50_256bs_HW192_8p.py
 sed -i "107s|PATH_TO_BE_CONFIGURED|${cur_path}/output/0/d\_solution/ckpt0|g"  $cur_path/../src/configs/res50_256bs_HW192_8p.py
 
+cp data_loader.py $cur_path/../src/data_loader/resnet50/
 #autotune时，先开启autotune执行单P训练，不需要修改
 if [[ $autotune == True ]]; then
     train_full_1p.sh --autotune=$autotune --data_path=$data_path

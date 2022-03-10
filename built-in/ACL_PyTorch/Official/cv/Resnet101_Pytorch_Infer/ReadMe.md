@@ -7,7 +7,8 @@
 	-   [2.2 python第三方库](#22-python第三方库)
 -   [3 模型转换](#3-模型转换)
 	-   [3.1 pth转onnx模型](#31-pth转onnx模型)
-	-   [3.2 onnx转om模型](#32-onnx转om模型)
+	-   [3.2 onnx模型量化](#32-onnx模型量化)
+	-   [3.3 onnx转om模型](#33-onnx转om模型)
 -   [4 数据集预处理](#4-数据集预处理)
 	-   [4.1 数据集获取](#41-数据集获取)
 	-   [4.2 数据集预处理](#42-数据集预处理)
@@ -48,7 +49,7 @@ commit_id:7d955df73fe0e9b47f7d6c77c699324b256fc41f
 
 ### 2.1 深度学习框架
 ```
-CANN 5.0.1
+CANN 5.0.4
 
 torch == 1.5.1
 torchvision == 0.6.1
@@ -100,17 +101,45 @@ python3.7 resnet101_pth2onnx.py ./resnet101-63fe2227.pth resnet101.onnx
  **模型转换要点：**  
 >此模型转换为onnx不需要修改开源代码仓代码，故不需要特殊说明
 
-### 3.2 onnx转om模型
+### 3.2 onnx模型量化
+
+1.AMCT工具包安装，具体参考《[CANN 开发辅助工具指南  01](https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373?category=developer-documents&subcategory=auxiliary-development-tools)》中的昇腾模型压缩工具使用指南（ONNX）章节；
+
+2.生成bin格式数据集，数据集用于校正量化因子。当前模型为动态batch，建议使用较大的batch size：
+
+```
+python3.7 gen_calibration_bin.py resnet /root/datasets/imagenet/val ./calibration_bin 32 1
+```
+
+参数说明：
+
+- resnet：模型类型
+- /root/datasets/imagenet/val：模型使用的数据集路径；
+- ./calibration_bin：生成的bin格式数据集路径；
+- 32：batch size；
+- 1：batch num。
+
+3.ONNX模型量化
+
+```
+amct_onnx calibration --model resnet101.onnx  --save_path ./result/resnet101  --input_shape "image:32,3,224,224" --data_dir "./calibration_bin" --data_types "float32" 
+```
+
+会在result目录下生成resnet101_deploy_model.onnx量化模型
+
+4.量化模型后续的推理验证流程和非量化一致。
+
+### 3.3 onnx转om模型
 
 1.设置环境变量
+
 ```
 source env.sh
 ```
-2.使用atc将onnx模型转换为om模型文件，工具使用方法可以参考[CANN V100R020C10 开发辅助工具指南 (推理) 01](https://support.huawei.com/enterprise/zh/doc/EDOC1100164868?idPath=23710424%7C251366513%7C22892968%7C251168373)
+2.使用atc将onnx模型转换为om模型文件，工具使用方法可以参考《[CANN 开发辅助工具指南  01](https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373?category=developer-documents&subcategory=auxiliary-development-tools)》中的ATC工具使用指南章节
 
 ```
 atc --framework=5 --model=./resnet101.onnx --output=resnet101_bs16 --input_format=NCHW --input_shape="image:16,3,224,224" --log=debug --soc_version=Ascend310 --insert_op_conf=aipp.config
-
 ```
 
 **说明：**  
@@ -129,8 +158,6 @@ atc --framework=5 --model=./resnet101.onnx --output=resnet101_bs16 --input_forma
 
 ### 4.1 数据集获取
 该模型使用ImageNet的5万张验证集进行测试，图片与标签分别存放在/root/datasets/imagenet/val与/root/datasets/imagenet/val_label.txt。
-
-数据集获取请参考[pytorch原始仓](https://github.com/pytorch/examples/tree/master/imagenet)说明。
 
 ### 4.2 数据集预处理
 
@@ -156,7 +183,7 @@ python3.7 gen_dataset_info.py bin ./prep_dataset ./resnet101_prep_bin.info 224 2
 
 ### 5.1 benchmark工具概述
 
-benchmark工具为华为自研的模型推理工具，支持多种模型的离线推理，能够迅速统计出模型在Ascend310上的性能，支持真实数据和纯推理两种模式，配合后处理脚本，可以实现诸多模型的端到端过程，获取工具及使用方法可以参考[CANN V100R020C10 推理benchmark工具用户指南 01](https://support.huawei.com/enterprise/zh/doc/EDOC1100164874?idPath=23710424%7C251366513%7C22892968%7C251168373)
+benchmark工具为华为自研的模型推理工具，支持多种模型的离线推理，能够迅速统计出模型在Ascend310、710上的性能，支持真实数据和纯推理两种模式，配合后处理脚本，可以实现诸多模型的端到端过程，获取工具及使用方法可以参考《[CANN 推理benchmark工具用户指南 01](https://support.huawei.com/enterprise/zh/ascend-computing/cann-pid-251168373?category=developer-documents&subcategory=auxiliary-development-tools)》
 ### 5.2 离线推理
 1.设置环境变量
 ```

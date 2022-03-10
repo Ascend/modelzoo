@@ -21,7 +21,7 @@ Network="DeeplabV3_ID0047_for_TensorFlow"
 #训练epoch
 train_epochs=1
 #训练batch_size
-batch_size=8
+batch_size=32
 #训练step
 train_steps=1000
 #学习率
@@ -145,8 +145,8 @@ do
     --atrous_rates=12 \
     --atrous_rates=18 \
     --output_stride=16 \
-    --train_batch_size=8 \
-    --training_number_of_steps=1000 \
+    --train_batch_size=${batch_size} \
+    --training_number_of_steps=${train_steps} \
     --fine_tune_batch_norm=true \
     --tf_initial_checkpoint=${data_path}/pretrained/model.ckpt \
     --log_steps=100 \

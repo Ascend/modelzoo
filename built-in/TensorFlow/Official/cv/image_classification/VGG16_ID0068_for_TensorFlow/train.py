@@ -114,6 +114,11 @@ def main():
     hyper_param = hp.HyperParams(args)
     layers = ly.Layers() 
     logger = lg.LogSessionRunHook(args)
+
+    #------------add--------------
+    from hccl.split.api import set_split_strategy_by_size
+    set_split_strategy_by_size([80,20])
+    #-----------------------------
     model = ml.Model(args, data, hyper_param, layers, logger)
    
     trainer = tr.Trainer(session, args, data, model, logger)

@@ -104,9 +104,8 @@ class Nvlamb(torch.optim.Optimizer):
         param_norm = self.multi_tensor_l2norm(tensor_list[1], True)
         for i in range(0, len(g)):
             tensor_list_single = [g[i], p[i], m[i], v[i]]
-            lamb_stage_1(tensor_list_single, beta1, beta2, beta3, beta1_correction,
-                         beta2_correction, eps, adam_w_mode, weight_decay,
-                         global_grad_norm, max_grad_norm)
+            lamb_stage_1(tensor_list_single, beta1, beta2, beta3, beta1_correction, beta2_correction, eps,
+                         adam_w_mode, weight_decay, global_grad_norm, max_grad_norm)
         update_norm = self.multi_tensor_l2norm(g, True)
         for i in range(0, len(g)):
             lamb_stage_2([g[i], p[i]], update_norm[i], param_norm[i], lr, weight_decay, use_nvlamb)

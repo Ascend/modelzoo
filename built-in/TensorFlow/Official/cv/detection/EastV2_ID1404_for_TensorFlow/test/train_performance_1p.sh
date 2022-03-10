@@ -71,7 +71,7 @@ sed -i "s|${data_path}/train_data.txt|./train_data.txt|g" config.py
 sed -i "s|max_steps = $train_steps|max_steps = 1000|g" config.py
 
 #输出性能FPS，需要模型审视修改
-ActualFPS=`grep "Step" $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'examples/second' '{print $1}'|awk '{print $NF}'|awk 'END {print}'`
+ActualFPS=`grep "Step" $cur_path/test/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk -F 'examples/second' '{print $1}'|awk '{print $NF}'|awk 'NR>5'|awk '{sum+=$1} END {print sum/NR}'`
 #打印，不需要修改
 
 echo "Final Performance examples/sec : $ActualFPS"

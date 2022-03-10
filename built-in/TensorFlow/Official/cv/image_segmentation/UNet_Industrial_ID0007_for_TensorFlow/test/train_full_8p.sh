@@ -18,20 +18,16 @@ data_path=""
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
 Network="UNet_Industrial_ID0007_for_TensorFlow"
-#训练epoch
-train_epochs=1
+
 #训练batch_size
 batch_size=2
-#训练step
-train_steps=2500
-#学习率
-learning_rate=""
+
 
 #TF2.X独有，不需要修改
-export NPU_LOOP_SIZE=${train_steps}
+#export NPU_LOOP_SIZE=${train_steps}
 
 #维测参数，precision_mode需要模型审视修改
-precision_mode="allow_mix_precision"
+#precision_mode="allow_mix_precision"
 #维持参数，以下不需要修改
 over_dump=False
 data_dump_flag=False
@@ -139,16 +135,16 @@ do
     fi
     
      # 绑核，不需要的绑核的模型删除，需要模型审视修改
-    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
-    let a=RANK_ID*${corenum}/${RANK_SIZE}
-    let b=RANK_ID+1
-    let c=b*${corenum}/${RANK_SIZE}-1
+    #corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
+    #let a=RANK_ID*${corenum}/${RANK_SIZE}
+    #let b=RANK_ID+1
+    #let c=b*${corenum}/${RANK_SIZE}-1
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
+    #if [ "x${bind_core}" != x ];then
+    #    bind_core="taskset -c $a-$c"
+    #fi
     nohup python3.7 $cur_path/../main.py \
     --unet_variant='tinyUNet' \
     --activation_fn='relu' \
@@ -196,16 +192,16 @@ FPS=`awk 'BEGIN{printf "%.2f\n",'${temp_FPS}'*8}'`
 echo "Final Performance images/sec : $FPS"
 
 #输出训练精度,需要模型审视修改
-#train_accuracy=`grep -A 1 top1 $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|awk 'END {print $3}'`
+train_accuracy=`grep TNR $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $6}'|cut -c 3-8`
 #打印，不需要修改
-#echo "Final Train Accuracy : ${train_accuracy}"
+echo "Final Train Accuracy : ${train_accuracy}"
 echo "E2E Training Duration sec : $e2e_time"
 
 #稳定性精度看护结果汇总
 #训练用例信息，不需要修改
 BatchSize=${batch_size}
 DeviceType=`uname -m`
-CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
+CaseName=${Network}${name_bind}_bs${BatchSize}_${RANK_SIZE}'p'_'acc'
 
 ##获取性能数据
 #吞吐量，不需要修改
@@ -227,6 +223,7 @@ echo "BatchSize = ${BatchSize}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

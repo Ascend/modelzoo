@@ -8,7 +8,6 @@ export RANK_SIZE=8
 export RANK_TABLE_FILE=${cur_path}/../config/rank_table_unet_8p.json
 export JOB_ID=10087
 RANK_ID_START=0
-
 # 数据集路径,保持为空,不需要修改
 data_path=""
 

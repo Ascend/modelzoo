@@ -164,7 +164,13 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-step_sec=`grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log| sed -n 20p | awk '{print $2}'`
+#step_sec=`grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log| sed -n 20p | awk '{print $2}'`
+
+grep -a 'INFO:tensorflow:global_step/sec: ' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log | awk '{print $2}' > global_step.log
+sed -i '1,10d' global_step.log
+sed -i '$d' global_step.log
+step_sec=`cat global_step.log | awk '{sum+=$0} END {print sum/NR}'`
+
 FPS=`awk 'BEGIN{printf "%d\n", '$step_sec' * '$train_batch_size'}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"

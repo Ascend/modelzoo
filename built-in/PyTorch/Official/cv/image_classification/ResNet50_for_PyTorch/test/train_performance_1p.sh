@@ -3,7 +3,7 @@
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
-Network="ResNet50_for_PyTorch"
+Network="ResNet50_ID0095_for_PyTorch"
 # 训练batch_size
 batch_size=512
 # 训练使用的npu卡数
@@ -67,7 +67,9 @@ else
     mkdir -p ${test_path_dir}/output/$ASCEND_DEVICE_ID
 fi
 
-
+#修改参数
+sed -i "s|pass|break|g" ${test_path_dir}/../pytorch_resnet50_apex.py
+wait
 #################启动训练脚本#################
 # 训练开始时间，不需要修改
 start_time=$(date +%s)
@@ -95,6 +97,11 @@ wait
 # 训练结束时间，不需要修改
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
+
+
+#参数改回
+sed -i "s|break|pass|g" ${test_path_dir}/../pytorch_resnet50_apex.py
+wait
 
 # 训练用例信息，不需要修改
 BatchSize=${batch_size}

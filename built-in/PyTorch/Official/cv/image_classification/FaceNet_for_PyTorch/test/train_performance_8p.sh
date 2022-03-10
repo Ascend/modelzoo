@@ -11,10 +11,11 @@ RANK_ID_START=0
 data_path=""
 
 #网络名称,同目录名称,需要模型审视修改
-Network="FaceNet_for_PyTorch"
+Network="FaceNet_ID0434_for_PyTorch"
 
 #训练batch_size,,需要模型审视修改
 batch_size=4096
+train_epochs=1
 
 #参数校验，不需要修改
 for para in $*
@@ -75,9 +76,9 @@ do
             --opt_level O2 \
             --loss_scale_value 1024 \
             --device_list '0,1,2,3,4,5,6,7' \
-            --batch_size 4096 \
-            --epochs 1 \
-            --epochs_per_save 1 \
+            --batch_size $batch_size \
+            --epochs $train_epochs \
+            --epochs_per_save 5 \
             --lr 0.005 \
             --workers 64 \
             --data_dir $data_path \
@@ -94,9 +95,9 @@ do
             --opt_level O2 \
             --loss_scale_value 1024 \
             --device_list '0,1,2,3,4,5,6,7' \
-            --batch_size 4096 \
-            --epochs 1 \
-            --epochs_per_save 1 \
+            --batch_size $batch_size \
+            --epochs $train_epochs \
+            --epochs_per_save 5 \
             --lr 0.005 \
             --workers 64 \
             --data_dir $data_path \
@@ -120,7 +121,7 @@ e2e_time=$(( $end_time - $start_time ))
 #结果打印，不需要修改
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
-FPS=`grep -a 'Train'  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log| awk -F " " '{print $9}'|awk 'END {print}'|sed 's/.$//'`
+FPS=`grep Train  $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log|grep -v '1/'|grep -v '2/' |grep -v '3/'|awk -F 'fps:' '{print $2}'|awk '{print $1}'|awk '{sum+=$1} END {print  sum/NR*8}'`
 #打印，不需要修改
 echo "Final Performance images/sec : $FPS"
 
@@ -136,10 +137,10 @@ CaseName=${Network}_bs${BatchSize}_${RANK_SIZE}'p'_'perf'
 #吞吐量
 ActualFPS=${FPS}
 #单迭代训练时长
-TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'/'${FPS}'}'`
+TrainingTime=`awk 'BEGIN{printf "%.2f\n", '${batch_size}'*1000/'${FPS}'}'`
 
 #从train_$ASCEND_DEVICE_ID.log提取Loss到train_${CaseName}_loss.txt中，需要模型审视修改
-grep -a Train $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep loss|awk -F "loss: " '{print $NF}' | awk -F " " '{print $1}' |awk 'END {print}'|sed 's/.$//' >> $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
+grep -a Train $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep loss|awk -F "loss: " '{print $NF}' | awk -F " " '{print $1}'  > $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt
 #最后一个迭代loss值，不需要修改
 ActualLoss=`awk 'END {print}' $cur_path/output/$ASCEND_DEVICE_ID/train_${CaseName}_loss.txt`
 
@@ -151,6 +152,6 @@ echo "DeviceType = ${DeviceType}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseNa
 echo "CaseName = ${CaseName}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
+#echo "TrainAccuracy = ${train_accuracy}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log

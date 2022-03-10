@@ -1,3 +1,19 @@
+/* *
+* Copyright 2020 Huawei Technologies Co., Ltd
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+* */
+
 #include "acl/acl.h"
 #include "infer_engine.h"
 #include "acl/acl_mdl.h"
@@ -255,7 +271,10 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t right = 0;
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
-
+#ifdef ASCEND710_DVPP
+    right = width - 1;
+    bottom =  height - 1;
+#else
     if (width % 2 == 0)
     {
         right = width - 1;
@@ -273,6 +292,8 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     {
         bottom = height;
     }
+#endif
+
     std::cout << "InitCropRoiConfig right=" << right << ", bottom=" << bottom << std::endl; 
     cropConfig = acldvppCreateRoiConfig(0, right, 0, bottom);
     CHECK_NULL_RET("acldvppCreateRoiConfig failed", cropConfig);
@@ -347,26 +368,97 @@ aclError DVPP_EfficientNetB0(std::string fileLocation, char *&ptr)
 
     //2.0 Prepare the ouputDesc of decode
     GetImageHW(buff, fileSize, fileLocation, W, H);
+#ifdef ASCEND710_DVPP
+    W_Aligned = (W + 63) / 64* 64;
+    H_Aligned = (H + 15) / 16 * 16;
+	int32_t components = 0;
+    acldvppJpegFormat realformat;
+    int aclformat;
+    acldvppJpegGetImageInfoV2(buff, fileSize, &W, &H, &components,&realformat);
+    switch (realformat){
+        case 0:
+            aclformat = 6;
+            outputBuffSize = W_Aligned * H_Aligned * 3;
+            break;
+        case 1:
+            aclformat = 4;
+            outputBuffSize = W_Aligned * H_Aligned * 2;
+            break;
+        case 2:
+            aclformat = 2;
+            outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+            break;
+        case 4:
+            aclformat = 1001;
+            outputBuffSize = W_Aligned * H_Aligned  * 2;
+            break;
+        case 3:
+            aclformat = 0;
+            outputBuffSize = W_Aligned * H_Aligned;
+            break;    
+        default:
+            aclformat = 1;
+            outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+            break;
+    }
+    if (aclformat == 0) {
+        aclformat = 1;
+        outputBuffSize = outputBuffSize *3/2;
+    }
+	
+    if(W_Aligned > 4096 || H_Aligned > 4096)
+        return -1; 
+#else
     W_Aligned = (W + 127) / 128 * 128;
     H_Aligned = (H + 15) / 16 * 16;
     outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
+#endif
+
     ret = acldvppMalloc(&decodeOutput, outputBuffSize);
     CHECK_ACL_RET("malloc decode buff failed", ret);
 
+#ifdef ASCEND710_DVPP
+    decodeOutputDesc = createDvppPicDesc(decodeOutput, acldvppPixelFormat(aclformat), W, H, W_Aligned, H_Aligned, outputBuffSize);
+    std::cout << "file[" << fileLocation << "] jpeg picDesc info: W=" << W 
+              << ", H=" << H << ", W_Aligned=" << W_Aligned << ", H_Aligned=" << H_Aligned
+              << ", outBufSize=" << outputBuffSize << ", format=" << acldvppPixelFormat(aclformat)
+              <<std::endl;
+#else
     decodeOutputDesc = createDvppPicDesc(decodeOutput, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned, H_Aligned, outputBuffSize);
     std::cout << "file[" << fileLocation << "] jpeg picDesc info: W=" << W 
               << ", H=" << H << ", W_Aligned=" << W_Aligned << ", H_Aligned=" << H_Aligned
               << ", outBufSize=" << outputBuffSize << ", format=" << PIXEL_FORMAT_YUV_SEMIPLANAR_420
               <<std::endl;
+#endif
 
     //3.0 Decode
     ret = acldvppJpegDecodeAsync(dvpp_channel_desc, decodeInput, fileSize, decodeOutputDesc, stream);
     CHECK_ACL_RET("acldvppJpegDecodeAsync failed", ret);
 
     aclrtFreeHost(buff);
-    aclrtSynchronizeStream(stream);
+    ret = aclrtSynchronizeStream(stream);
+	if (ret != ACL_ERROR_NONE) 
+	{
+            printf(" aclrtSynchronizeStream failed first \n");
+            return ret;
+    }
+    ret = acldvppGetPicDescRetCode(decodeOutputDesc);
+    if (ret != ACL_ERROR_NONE)
+	{
+            printf(" acldvppGetPicDescRetCode failed\n");
+            return ret;
+    }
 
     /**************************Center crop**************************/
+#ifdef ASCEND710_DVPP
+    uint32_t w_new = acldvppGetPicDescWidth(decodeOutputDesc);
+    uint32_t h_new = acldvppGetPicDescHeight(decodeOutputDesc);
+    uint32_t format = acldvppGetPicDescFormat(decodeOutputDesc);
+    W = w_new;
+    H = h_new;
+    printf("w_new=%d, h_new=%d, format=%u\n", w_new, h_new, format); 
+#endif
+
     acldvppRoiConfig *centralcropConfig = nullptr;
     acldvppPicDesc *centralcropOutputDesc = nullptr; // resize output desc
     float central_fraction = 0.875;
@@ -383,12 +475,28 @@ aclError DVPP_EfficientNetB0(std::string fileLocation, char *&ptr)
         std::cout << "create cropOutputDesc failed" << std::endl;
         return 1;
     }
-
+#ifdef ASCEND710_DVPP
+    acldvppResizeConfig *resizeConfig = acldvppCreateResizeConfig();
+	ret = acldvppSetResizeConfigInterpolation(resizeConfig, 1);
+	if (ret != ACL_ERROR_NONE)
+    {
+        std::cout << "[ERROR][Vision] resize acldvppSetResizeConfigInterpolatio failed, ret = " << ret << std::endl;
+        return ret;
+    } 
+	ret = acldvppVpcCropResizeAsync(dvpp_channel_desc, decodeOutputDesc, centralcropOutputDesc, centralcropConfig, resizeConfig, stream);
+#else
     ret = acldvppVpcCropAsync(dvpp_channel_desc, decodeOutputDesc, centralcropOutputDesc, centralcropConfig, stream);
+#endif
+
     CHECK_ACL_RET("acldvppVpcCropAsync failed", ret);
 
     ptr += resizedOutputBufferSize;
-    aclrtSynchronizeStream(stream);
+    ret = aclrtSynchronizeStream(stream);
+    if (ret != ACL_ERROR_NONE) 
+	{
+            printf(" aclrtSynchronizeStream failed second \n");
+            return ret;
+    }
   
     /*************************Release resources************************/
     acldvppFree(decodeInput);
@@ -432,6 +540,13 @@ aclError DvppInitInput(std::vector<std::string> files)
 
     aclmdlDataset *input = aclmdlCreateDataset();
     aclDataBuffer *inputData = aclCreateDataBuffer((void *)dst, cfg.inputInfo[0].size);
+
+    //write image buffer after dvpp
+    /*FILE* dvppFile;
+    dvppFile = fopen("./dvpp.bin", "wb");
+    fwrite((uint8_t *)inputData, cfg.inputInfo[0].size, sizeof(char), dvppFile);
+    fclose(dvppFile);
+    */
 
     if (inputData == nullptr)
     {

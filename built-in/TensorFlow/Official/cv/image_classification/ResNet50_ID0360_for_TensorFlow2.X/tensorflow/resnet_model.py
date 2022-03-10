@@ -48,11 +48,11 @@ from absl import flags
 import tensorflow as tf
 
 import imagenet_preprocessing
-from tensorflow.python.keras import backend
-from tensorflow.python.keras import initializers
-from tensorflow.python.keras import layers as tf_python_keras_layers
-from tensorflow.python.keras import models
-from tensorflow.python.keras import regularizers
+from keras import backend
+from keras import initializers
+from keras import layers as tf_python_keras_layers
+from keras import models
+from keras import regularizers
 
 BATCH_NORM_DECAY = 0.9
 BATCH_NORM_EPSILON = 1e-5

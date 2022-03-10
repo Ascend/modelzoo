@@ -4,7 +4,7 @@
     "server_count": "1",
     "server_list": [
         {
-            "server_id": "10.155.170.99",
+            "server_id": "127.0.0.1",
             "device": [
                 {
                     "device_id": "0",

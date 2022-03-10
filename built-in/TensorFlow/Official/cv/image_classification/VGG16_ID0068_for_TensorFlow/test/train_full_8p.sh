@@ -11,25 +11,15 @@ export JOB_ID=10087
 RANK_ID_START=0
 
 # 数据集路径,保持为空,不需要修改
-data_path="/npu/traindata/imagenet_TF"
-
-#设置默认日志级别,不需要修改
-export ASCEND_GLOBAL_LOG_LEVEL=3
+data_path=""
 
 #基础参数 需要模型审视修改
 #网络名称，同目录名称
-Network="VGG16_for_TensorFlow"
-#训练epoch
-train_epochs=90
+Network="VGG16_ID0068_for_TensorFlow"
+
 #训练batch_size
 batch_size=256
-#训练step
-train_steps=`expr 1281167 / ${batch_size}`
-#学习率
-learning_rate=""
 
-#TF2.X独有，不需要修改
-export NPU_LOOP_SIZE=${train_steps}
 
 #维测参数，precision_mode需要模型审视修改
 precision_mode="allow_mix_precision"
@@ -128,19 +118,11 @@ do
         mkdir -p ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt
     fi
     
-     # 绑核，不需要的绑核的模型删除，需要模型审视修改
-    corenum=`cat /proc/cpuinfo |grep "processor"|wc -l`
-    let a=RANK_ID*${corenum}/${RANK_SIZE}
-    let b=RANK_ID+1
-    let c=b*${corenum}/${RANK_SIZE}-1
 
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
-    if [ "x${bind_core}" != x ];then
-        bind_core="taskset -c $a-$c"
-    fi
-    nohup ${bind_core} python3.7 $cur_path/../train.py \
-    --batch_size=${batch_size} \
+
+    python3.7 $cur_path/../train.py \
     --rank_size=8 \
     --mode=train_and_evaluate \
     --max_epochs=150 \

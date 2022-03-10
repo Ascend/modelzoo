@@ -47,9 +47,9 @@ void InitYolov3Param(InitParam &initParam)
     initParam.classNum = 80;
     initParam.biasesNum = 18;
     initParam.biases = "10,13,16,30,33,23,30,61,62,45,59,119,116,90,156,198,373,326";
-    initParam.objectnessThresh = "0.001";
-    initParam.iouThresh = "0.5";
-    initParam.scoreThresh = "0.001";
+    initParam.objectnessThresh = "0.3";
+    initParam.iouThresh = "0.45";
+    initParam.scoreThresh = "0.3";
     initParam.yoloType = 3;
     initParam.modelType = 0;
     initParam.inputType = 0;

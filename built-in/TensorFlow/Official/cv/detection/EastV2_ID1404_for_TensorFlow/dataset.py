@@ -117,9 +117,9 @@ def get_datalist(train_data_path):
     return train_data_list
 
 
-def generator(train_data_path, input_size=512, batch_size=16, vis=False):
-    image_list = np.array(get_datalist(train_data_path))
-    print('{} training images in {}'.format(len(image_list), train_data_path))
+def generator(input_size=512, batch_size=16, image_list=None, vis=False):
+    #image_list = np.array(get_datalist(train_data_path))
+    #print('{} training images in {}'.format(len(image_list), train_data_path))
     index = np.arange(0, len(image_list))
     dataset = ImageDataset(image_list, input_size)
     while True:

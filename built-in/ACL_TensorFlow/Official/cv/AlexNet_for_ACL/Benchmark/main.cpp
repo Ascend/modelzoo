@@ -227,14 +227,19 @@ aclError Process()
             for (int j = 0; j < cfg.batchSize; j++) {
                 batchFileNames.push_back(fileNames[i*cfg.batchSize+j]);
             }
-            processedCnt++;
+            
 
             if(cfg.useDvpp){
                 ret = DvppInitInput(batchFileNames);
+                //modify
+                if( ret != 0)
+                    continue;
             }	
             else{
                 ret = InitInput(batchFileNames);
             }
+            //modify
+            processedCnt++;
             gettimeofday(&endTmp, NULL);
             dataProcTime += (endTmp.tv_sec-startTmp.tv_sec)*1000000+(endTmp.tv_usec-startTmp.tv_usec);
             CHECK_RET(ret);
@@ -256,14 +261,17 @@ aclError Process()
             }
             
             gettimeofday(&startTmp, NULL);
-            processedCnt++;
-
+            
             if(cfg.useDvpp){
                 ret = DvppInitInput(batchFileNames);
+                if( ret != 0)
+                    continue;
             }	
             else{
                 ret = InitInput(batchFileNames);
             }
+            //modify
+            processedCnt++;
             gettimeofday(&endTmp, NULL);
             dataProcTime += (endTmp.tv_sec-startTmp.tv_sec)*1000000+(endTmp.tv_usec-startTmp.tv_usec);
             CHECK_RET(ret);

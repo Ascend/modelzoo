@@ -52,6 +52,7 @@ from tqdm import tqdm
 
 from dataset.cifar import DATASET_GETTERS
 from utils import AverageMeter, accuracy
+import apex
 
 logger = logging.getLogger(__name__)
 best_acc = 0
@@ -285,7 +286,7 @@ def main():
         {'params': [p for n, p in model.named_parameters() if any(
             nd in n for nd in no_decay)], 'weight_decay': 0.0}
     ]
-    optimizer = optim.SGD(grouped_parameters, lr=args.lr,
+    optimizer = apex.optimizers.NpuFusedSGD(grouped_parameters, lr=args.lr,
                           momentum=0.9, nesterov=args.nesterov)
 
     args.epochs = math.ceil(args.total_steps / args.eval_step)

@@ -237,13 +237,13 @@ npu_device.global_options().precision_mode=FLAGS.precision_mode
        
         2. 1单卡训练指令（脚本位于BertLarge_TF2.x_for_Tensorflow/test/train_full_1p_16bs.sh）,请确保下面例子中的“--data_path”修改为用户的tfrecord的路径,这里选择将tfrecord文件夹放在home目录下。
         
-            bash test/train_full_1p_16bs.sh --data_path=/home/tfrecord 
+            bash test/train_full_1p_16bs.sh --data_path=/home/tfrecord --precision_mode='allow_mix_precision'
     
     3. 8卡训练
     
         3.1 8卡训练指令（脚本位于BertLarge_TF2.x_for_Tensorflow/test/train_full_8p_128bs.sh),请确保下面例子中的“--data_path”修改为用户的tfrecord的路径。
     
-            bash test/train_full_8p_128bs.sh --data_path=/home/tfrecord 
+            bash test/train_full_8p_128bs.sh --data_path=/home/tfrecord --precision_mode='allow_mix_precision'
 
 
 

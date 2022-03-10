@@ -34,13 +34,13 @@ import six
 
 from tensorflow.python.ops import math_ops
 from tensorflow.keras.metrics import Mean
-from tensorflow.python.keras import backend as K
+from keras import backend as K
 from tensorflow.python.framework import dtypes
-from tensorflow.python.keras.utils import losses_utils
-from tensorflow.python.keras.utils import metrics_utils
+from keras.utils import losses_utils
+from keras.utils import metrics_utils
 from tensorflow.python.autograph.core import ag_ctx
 from tensorflow.python.autograph.impl import api as autograph
-from tensorflow.python.keras.utils.tf_utils import is_tensor_or_variable
+from keras.utils.tf_utils import is_tensor_or_variable
 from tensorflow.keras.metrics import get
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops

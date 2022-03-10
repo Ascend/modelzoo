@@ -480,7 +480,9 @@ def main_worker(npu, npus_per_node, args):
             else:
                 loss.backward()
             if args.net == "vgg16":
-                clip_gradient(model, 10.)
+                clip_gradient(optimizer, 10.)
+            if args.net == "res01":
+                clip_gradient(optimizer, 4.)
             optimizer.step()
 
             torch.npu.synchronize()

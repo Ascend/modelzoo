@@ -21,7 +21,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.python.keras import keras_parameterized  # pylint: disable=g-direct-tensorflow-import
+from keras import keras_parameterized  # pylint: disable=g-direct-tensorflow-import
 from official.modeling import activations
 
 

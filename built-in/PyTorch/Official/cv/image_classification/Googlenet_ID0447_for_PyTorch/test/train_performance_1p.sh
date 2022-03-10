@@ -62,7 +62,8 @@ python3.7 train.py  \
     --loss_scale_value 1024 \
     --seed 1234 \
     --device_id=$ASCEND_DEVICE_ID \
-    --print-freq 1 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
+    --print-freq 1 \
+    --max_steps 100 > ${cur_path}/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log 2>&1 &
 
 wait
 

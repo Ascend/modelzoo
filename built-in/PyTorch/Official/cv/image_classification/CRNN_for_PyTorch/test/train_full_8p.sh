@@ -9,7 +9,7 @@ export RANK_SIZE=8
 data_path=""
 
 #网络名称,同目录名称,需要模型审视修改
-Network="CRNN_for_PyTorch"
+Network="CRNN_ID0103_for_PyTorch"
 
 #训练batch_size,,需要模型审视修改
 batch_size=20480

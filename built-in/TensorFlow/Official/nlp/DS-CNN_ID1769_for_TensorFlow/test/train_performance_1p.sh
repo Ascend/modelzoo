@@ -162,8 +162,8 @@ echo "------------------ Final result ------------------"
 #s_step_100=`grep ' Step #100:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $2}'|awk -F . '{print $1}'|awk -F : '{print $3}'`
 #step_sec=`awk 'BEGIN{printf "%.2f\n",('${h_step_100}'-'${h_step_2}')*3600+('${m_step_100}'-'${m_step_2}')*60+('${s_step_100}'-'${s_step_2}')}'`
 
-data_step_sec=`grep 'train duration:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $5}'`
-train_step_sec=`grep 'train duration:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|awk 'END {print $8}'`
+data_step_sec=`grep 'train duration:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v INFO|awk 'NR>1'|awk '{print $5}'|awk '{sum+=$1} END {print sum/NR}'`
+train_step_sec=`grep 'train duration:' $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log|grep -v INFO|awk 'NR>1'|awk '{print $8}'|awk '{sum+=$1} END {print sum/NR}'`
 step_sec=`awk 'BEGIN{printf "%.6f\n",'${data_step_sec}'+'${train_step_sec}'}'`
 step_per_s=`awk 'BEGIN{printf "%.4f\n",1/'${step_sec}'}'`
 FPS=`awk 'BEGIN{printf "%.2f\n",'${batch_size}'*'${step_per_s}'}'`

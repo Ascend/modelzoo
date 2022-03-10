@@ -21,6 +21,8 @@ Network="DenseNet161_ID0455_for_Pytorch"
 
 #训练batch_size,,需要模型审视修改
 batch_size=1024
+#训练steps
+train_steps=10
 
 #参数校验，不需要修改
 for para in $*
@@ -79,6 +81,7 @@ do
     python3 train.py  \
         --model densenet161 \
         --epochs ${epochs} \
+        --max_steps ${train_steps} \
         --data-path=$data_path \
         --distributed \
         --batch-size=$batch_size \

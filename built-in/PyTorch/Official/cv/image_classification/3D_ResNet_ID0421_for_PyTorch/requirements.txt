@@ -1,6 +1,4 @@
-torch==1.5.0
-apex
-torchvision
+torchvision==0.2.2.post2
 h5py
 FFmpeg
 FFprobe

@@ -29,8 +29,14 @@ do
         data_path=`echo ${para#*=}`
     elif [[ $para == --precision_mode* ]];then
         precision_mode=`echo ${para#*=}`
+    elif [[ $para == --ci_cp* ]];then
+        ci_cp=`echo ${para#*=}`
     fi
 done
+
+if [[ $ci_cp == "1" ]];then
+    cp -r $data_path ${data_path}_bak
+fi
 
 PREC=""
 if [[ $precision_mode == "amp" ]];then
@@ -165,3 +171,8 @@ echo "TrainAccuracy = ${train_accuracy}" >> ${test_path_dir}/output/$ASCEND_DEVI
 echo "TrainingTime = ${TrainingTime}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> ${test_path_dir}/output/$ASCEND_DEVICE_ID/${CaseName}.log
+
+if [[ $ci_cp == "1" ]];then
+    rm -rf $data_path
+    mv ${data_path}_bak $data_path
+fi

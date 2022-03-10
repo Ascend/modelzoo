@@ -1,0 +1,9 @@
+{
+  "black-list": { 
+     "to-add": ["ReduceSumD"]
+  },
+  "white-list": {                 
+     "to-remove": [],
+     "to-add": []
+  }
+}

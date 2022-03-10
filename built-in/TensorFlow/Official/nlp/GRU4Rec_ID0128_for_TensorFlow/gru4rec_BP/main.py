@@ -50,6 +50,7 @@ def npu_session_config_init(session_config=None):
         custom_op = session_config.graph_options.rewrite_options.custom_optimizers.add()
         custom_op.name = 'NpuOptimizer'
         session_config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+        custom_op.parameter_map["precision_mode"].s = tf.compat.as_bytes("allow_mix_precision")
         # modify for npu op overflow start
         if command_line.over_dump is True:
             custom_op.parameter_map["enable_dump_debug"].b = True
@@ -86,9 +87,23 @@ class Args():
     hidden_act = 'tanh'
     n_items = (- 1)
 
+
+def broadcast_global_variables(root_rank, index):
+    op_list = []
+    for var in tf.global_variables():
+        if "float" in var.dtype.name:
+            inputs = [var]
+            outputs = hccl_ops.broadcast(tensor=inputs, root_rank=root_rank)
+            if outputs is not None:
+                op_list.append(outputs[0].op)
+                op_list.append(tf.assign(var, outputs[0]))
+    return tf.group(op_list)
+
+
 def parseArgs():
     parser = argparse.ArgumentParser(description='GRU4Rec args')
     parser.add_argument('--layer', default=1, type=int)
+    parser.add_argument('--npu_nums', default=1, type=int)
     parser.add_argument('--size', default=100, type=int)
     parser.add_argument('--epoch', default=3, type=int)
     parser.add_argument('--lr', default=0.001, type=float)
@@ -123,6 +138,7 @@ if (__name__ == '__main__'):
     args.learning_rate = command_line.lr
     args.is_training = command_line.train
     args.test_model = command_line.test
+    args.npu_nums = command_line.npu_nums
     args.hidden_act = command_line.hidden_act
     args.final_act = command_line.final_act
     args.loss = command_line.loss
@@ -138,8 +154,12 @@ if (__name__ == '__main__'):
         gpu_config = tf.ConfigProto()
         gpu_config.graph_options.optimizer_options.global_jit_level = config_pb2.OptimizerOptions.OFF
     gpu_config.gpu_options.allow_growth = True
+    if args.npu_nums == 8:
+        bocast_op = broadcast_global_variables(0, 1)
     with tf.Session(config=npu_session_config_init(session_config=gpu_config)) as sess:
         gru = model.GRU4Rec(sess, args)
+        if args.npu_nums == 8:
+            sess.run(bocast_op)
         if args.is_training:
             gru.fit(data)
         else:

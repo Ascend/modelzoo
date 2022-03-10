@@ -14,7 +14,7 @@ data_path=""
 
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
-Network="LSTM_for_PyTorch"
+Network="LSTM_ID0468_for_PyTorch"
 #训练epoch
 train_epochs=0
 #训练batch_size

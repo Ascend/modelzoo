@@ -93,7 +93,8 @@ if [[ $data_path == "" ]];then
     exit 1
 fi
 
-cp -r $data_path/../coco_YoloV3_ID0076/data/* ${cur_path}/../data/
+cp -r $data_path/data/* ${cur_path}/../data/
+sed -i "s/total_epoches = 200/total_epoches = 1/g" ${cur_path}/../args_single.py
 
 #训练开始时间，不需要修改 
 start_time=$(date +%s)
@@ -131,8 +132,8 @@ do
     #执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path
     python3 train.py \
-        --mode multi \
-		--data_url $data_path \
+        --mode single \
+		--data_url $data_path/coco \
 		--train_url ${cur_path}/output/$ASCEND_DEVICE_ID/ckpt \
         --over_dump ${over_dump} \
         --over_dump_path ${over_dump_path} \
@@ -176,4 +177,3 @@ echo "ActualFPS = ${ActualFPS}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName
 echo "TrainingTime = ${TrainingTime}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "ActualLoss = ${ActualLoss}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
 echo "E2ETrainingTime = ${e2e_time}" >> $cur_path/output/$ASCEND_DEVICE_ID/${CaseName}.log
-sed -i -e '/ModuleNotFoundError/d' $cur_path/output/${ASCEND_DEVICE_ID}/train_${ASCEND_DEVICE_ID}.log

@@ -309,7 +309,9 @@ class Solver(object):
             d_loss_fake = torch.mean(out_src)
 
             # Compute loss for gradient penalty.
-            alpha = torch.rand(x_real.size(0), 1, 1, 1).to(self.device)
+            #alpha = torch.rand(x_real.size(0), 1, 1, 1).to(self.device)
+            alpha = torch.rand(x_real.size(0), 1, 1, 1).pin_memory()
+            alpha = alpha.to(self.device, non_blocking=True)
             x_hat = (alpha * x_real.data + (1 - alpha) * x_fake.data).requires_grad_(True)
             out_src, _ = self.D(x_hat)
             d_loss_gp = self.gradient_penalty(out_src, x_hat)

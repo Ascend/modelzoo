@@ -1,9 +1,9 @@
--   [基本信息](#基本信息.md)
--   [概述](#概述.md)
--   [训练环境准备](#训练环境准备.md)
--   [快速上手](#快速上手.md)
--   [迁移学习指导](#迁移学习指导.md)
--   [高级参考](#高级参考.md)
+- [基本信息](#基本信息.md)
+- [概述](#概述.md)
+- [训练环境准备](#训练环境准备.md)
+- [快速上手](#快速上手.md)
+- [迁移学习指导](#迁移学习指导.md)
+- [高级参考](#高级参考.md)
 <h2 id="基本信息.md">基本信息</h2>
 
 **发布者（Publisher）：Huawei**
@@ -32,21 +32,20 @@
 
 ## 简述
 
-BERT模型的全称是：BidirectionalEncoder **Representations** from Transformer。BERT模型的目标是利用大规模无标注语料训练、获得文本的包含丰富语义信息的Representation，即：文本的语义表示，然后将文本的语义表示在特定NLP任务中作微调，最终应用于该NLP任务。
+Inception结构的GoogLeNet可以很好的执行在内存和计算资源有限的机器上；GoogLeNet只有500w个参数，是具有6000w参数的AlexNet的1/12，更不用说VGG是AlexNet的3倍参数;
 
-- 论文路径
-
-  https://arxiv.org/abs/1512.00567 (https://blog.csdn.net/shankezh/article/details/89088085)
-
-- 开源代码路径
+- 参考论文：
+  https://arxiv.org/abs/1512.00567
+ 
+- 参考实现：
 
   https://github.com/shankezh/DL_HotNet_Tensorflow
-
--   适配昇腾 AI 处理器的实现：
+  
+- 适配昇腾 AI 处理器的实现：
     
     https://github.com/Ascend/modelzoo/tree/master/built-in/TensorFlow/Official/cv/image_classification/InceptionV3_ID0491_for_TensorFlow
 
--   通过Git获取对应commit\_id的代码方法如下：
+- 通过Git获取对应commit_id的代码方法如下:
     
         git clone {repository_url}    # 克隆仓库的代码
         cd {repository_name}    # 切换到模型的代码仓目录
@@ -141,10 +140,11 @@ echo "parameter explain:
 
 1、用户自行准备好数据集，包括训练数据集和验证数据集。使用的数据集是CIFAR10
 
-3、数据集的处理可以参考"简述->开源代码路径处理"
+2、数据集的处理可以参考"简述->开源代码路径处理"
 
 ## 模型训练<a name="section715881518135"></a>
-- 下载训练脚本。
+
+- 单击“立即下载”，并选择合适的下载方式下载源码包。
 - 开始训练。
 
     1. 启动训练之前，首先要配置程序运行相关环境变量。
@@ -161,14 +161,23 @@ echo "parameter explain:
             bash test/train_full_1p.sh --data_path=/home/tfrecord 
 
 
-<h2 id="迁移学习指导.md">高级参考</h2>
+<h2 id="高级参考.md">高级参考</h2>
 
-## 脚本和事例代码
+## 脚本和示例代码
 
 ```
-├-- README.md                            #说明文档
-├-- requirements.txt						 #依赖
-├-- test			#训练脚本目录	
+├-- README.md                           
+├-- requirements.txt	
+├-- Incetpion_V3.py	
+├-- net	
+    ├-- GoogLeNet
+        ├-- InceptionV3.py	
+├-- coms
+    ├-- coms.py
+    ├-- learning_rate.py
+    ├-- pre_process.py
+    ├-- tfrecords.py
+├-- test			
 ├     |--train_full_1p.sh
       |--train_performance_1p.sh
       |--......

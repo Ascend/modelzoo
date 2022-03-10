@@ -135,7 +135,7 @@ e2e_time=$(( $end_time - $start_time ))
 echo "------------------ Final result ------------------"
 #输出性能FPS，需要模型审视修改
 #单步平均时间
-TrainingTime=`grep "time: " $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log |awk -F "time: " '{print $2}' |tail -n +3| awk -F "] ETA" '{print $1}'|awk '{sum+=$1}END {print"",sum/NR}'`
+TrainingTime=`grep "time: " $cur_path/output/$ASCEND_DEVICE_ID/train_$ASCEND_DEVICE_ID.log |awk -F "time: " '{print $2}' |tail -n +4| awk -F "] ETA" '{print $1}'|awk '{sum+=$1}END {print"",sum/NR}'`
 #FPS
 FPS=`python3 -c "print(${batch_size}/${TrainingTime})"`
 #打印，不需要修改

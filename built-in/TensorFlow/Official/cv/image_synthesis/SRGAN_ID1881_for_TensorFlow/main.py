@@ -46,6 +46,20 @@ sys.path.append(project_path)
 from utils import *
 from config import config, log_config
 
+
+
+def broadcast_global_variables(root_rank, index):
+    op_list = []
+    for var in tf.global_variables():
+        if "float" in var.dtype.name:
+            inputs = [var]
+            outputs = hccl_ops.broadcast(tensor=inputs, root_rank=root_rank)
+            if outputs is not None:
+                op_list.append(outputs[0].op)
+                op_list.append(tf.assign(var, outputs[0]))
+    return tf.group(op_list)
+
+
 ###====================== HYPER-PARAMETERS ===========================###
 ## Adam
 batch_size = config.TRAIN.batch_size
@@ -131,10 +145,16 @@ def train():
     with tf.variable_scope('learning_rate'):
         lr_v = tf.Variable(lr_init, trainable=False)
     ## Pretrain
-    g_optim_init = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(mse_loss, var_list=g_vars)
+    if args.npu_nums == 1:
+        g_optim_init = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(mse_loss, var_list=g_vars)
     ## SRGAN
-    g_optim = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(g_loss, var_list=g_vars)
-    d_optim = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(d_loss, var_list=d_vars)
+        g_optim = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(g_loss, var_list=g_vars)
+        d_optim = npu_tf_optimizer(tf.train.AdamOptimizer(lr_v, beta1=beta1)).minimize(d_loss, var_list=d_vars)
+    if args.npu_nums == 8:
+        g_optim_init = npu_tf_optimizer(npu_distributed_optimizer_wrapper(tf.train.AdamOptimizer(lr_v, beta1=beta1))).minimize(mse_loss, var_list=g_vars)
+    ## SRGAN
+        g_optim = npu_tf_optimizer(npu_distributed_optimizer_wrapper(tf.train.AdamOptimizer(lr_v, beta1=beta1))).minimize(g_loss, var_list=g_vars)
+        d_optim = npu_tf_optimizer(npu_distributed_optimizer_wrapper(tf.train.AdamOptimizer(lr_v, beta1=beta1))).minimize(d_loss, var_list=d_vars)
 
     ###========================== RESTORE MODEL =============================###
     config_proto = tf.ConfigProto()
@@ -185,6 +205,7 @@ def train():
     ## fixed learning rate
     sess.run(tf.assign(lr_v, lr_init))
     print(" ** fixed learning rate: %f (for init G)" % lr_init)
+    broadcast_op = broadcast_global_variables(0, 1)
     for epoch in range(0, n_epoch_init + 1):
         epoch_time = time.time()
         total_mse_loss, n_iter = 0, 0
@@ -202,6 +223,8 @@ def train():
         ## If your machine have enough memory, please pre-load the whole train set.
         for idx in range(0, len(train_hr_imgs), batch_size):
             if idx + batch_size <= len(train_hr_imgs):
+                if args.npu_nums==8:
+                    sess.run(broadcast_op)
                 step_time = time.time()
                 b_imgs_384 = tl.prepro.threading_data(train_hr_imgs[idx:idx + batch_size], fn=crop_sub_imgs_fn, is_random=True)
                 b_imgs_96 = tl.prepro.threading_data(b_imgs_384, fn=downsample_fn)
@@ -352,6 +375,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--mode', type=str, default='srgan', help='srgan, evaluate')
+    parser.add_argument('--npu_nums', type=int, default=1, help='')
 
     args = parser.parse_args()
 

@@ -150,7 +150,7 @@ do
   	--scale_loss=False \
   	--steps_between_eval=10000 \
   	--steps_per_loop=${NPU_LOOP_SIZE} \
-  	--stop_steps=100000 \
+  	--stop_steps=300000 \
   	--train_batch_size=${batch_size} \
   	--verbosity=0 \
   	--warmup_steps=0 \

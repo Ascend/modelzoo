@@ -50,7 +50,8 @@ def save_infer_result(result_dir, result):
     load_dict = json.loads(result)
     if load_dict.get('MxpiObject') is None:
         with open(result_dir + '/result.txt', 'a+') as f_write:
-            f_write.write("")
+            object_list = 'Object detected num is 0\n'
+            f_write.writelines(object_list)
     else:
         res_vec = load_dict.get('MxpiObject')
         with open(result_dir + '/result.txt', 'a+') as f_write:
@@ -78,7 +79,7 @@ if __name__ == '__main__':
         exit()
 
     # create streams by pipeline config file
-    with open("../pipeline/yolov3_opencv.pipeline", 'rb') as f:
+    with open("./yolov3_opencv.pipeline", 'rb') as f:
         pipeline = f.read()
     ret = stream_manager.CreateMultipleStreams(pipeline)
     if ret != 0:
@@ -88,7 +89,7 @@ if __name__ == '__main__':
     # Construct the input of the stream
     data_input = MxDataInput()
 
-    infer_file = './infer.txt'
+    infer_file = '../data/config/infer.txt'
     file_list = read_file_list(infer_file)
     res_dir_name = 'result'
     if not os.path.exists(res_dir_name):

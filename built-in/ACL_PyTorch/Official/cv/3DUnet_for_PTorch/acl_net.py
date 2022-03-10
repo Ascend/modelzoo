@@ -20,7 +20,7 @@ import time
 # error code
 ACL_ERROR_NONE = 0
 
-# memory malloc code
+# memory malloc
 ACL_MEM_MALLOC_HUGE_FIRST = 0
 ACL_MEM_MALLOC_HUGE_ONLY = 1
 ACL_MEM_MALLOC_NORMAL_ONLY = 2

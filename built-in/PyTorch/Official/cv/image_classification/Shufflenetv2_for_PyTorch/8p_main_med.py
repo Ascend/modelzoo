@@ -125,6 +125,8 @@ parser.add_argument('--opt-level', default='O2', type=str,
                     help='loss scale using in amp, default -1 means dynamic')
 parser.add_argument('--num-classes', default=1000, type=int,
                     help='number of classes')
+parser.add_argument('--local_rank', default=0, type=int,
+                    help='local rank of the node')
 
 warnings.filterwarnings('ignore')
 best_acc1 = 0
@@ -178,8 +180,7 @@ def main():
         # The child process uses the environment variables of the parent process,
         # we have to set LOCAL_DEVICE_ID for every proc
         if args.device == 'npu':
-            # main_worker(args.gpu, ngpus_per_node, args)
-            mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+            main_worker(args.local_rank, ngpus_per_node, args)
         else:
             mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
     else:

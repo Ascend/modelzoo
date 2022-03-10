@@ -72,7 +72,8 @@ class TrainParam:
         self.nesterov = nesterov
                  
 class TrainClassifier:
-    num_workers = 1
+    # num_workers = 1
+    num_workers = 128
     pin_memory = False
     ckpt_filename = 'train.pt'
     def __init__(self,
@@ -244,7 +245,8 @@ class TrainClassifier:
         num_batch = len(self.trainloader)
         for batch_idx, (inputs, targets) in enumerate(self.trainloader,1):
             start_time = time.time()
-            inputs, targets = inputs.to(f'npu:{NPU_CALCULATE_DEVICE}'), targets.to(f'npu:{NPU_CALCULATE_DEVICE}')
+            # inputs, targets = inputs.to(f'npu:{NPU_CALCULATE_DEVICE}'), targets.to(f'npu:{NPU_CALCULATE_DEVICE}')
+            inputs, targets = inputs.to(f'npu:{NPU_CALCULATE_DEVICE}',non_blocking=True), targets.to(f'npu:{NPU_CALCULATE_DEVICE}',non_blocking=True)
             self.optimizer.zero_grad()
             outputs = self.net(inputs)
             loss = self.criterion(outputs, targets)
@@ -258,11 +260,11 @@ class TrainClassifier:
             self.optimizer.step()
 
             accumulated_train_loss += torch.sum(loss).item()
-            
+                        
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
-            
+                        
             train_loss = accumulated_train_loss/total
             train_acc = 100.*correct/total
             toc = time.time()

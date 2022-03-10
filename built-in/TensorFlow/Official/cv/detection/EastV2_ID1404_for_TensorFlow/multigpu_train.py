@@ -43,11 +43,22 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['CUDA_VISIBLE_DEVICES'] = cfg.gpu_list
 gpus = list(range(len(cfg.gpu_list.split(','))))
 
+flags = tf.flags
+FLAGS = flags.FLAGS
+flags.DEFINE_integer("mul_rank_size", 1, "number of npu device")
+flags.DEFINE_integer("mul_device_id", 0, "indicator of npu device")
+
+image_list = np.array(dataset.get_datalist(cfg.train_data_path))
+if FLAGS.mul_rank_size != 1:
+    sample_one_device = int(len(image_list) / FLAGS.mul_rank_size)
+    image_list = image_list[FLAGS.mul_device_id * sample_one_device:(FLAGS.mul_device_id+1)*sample_one_device]
+
+
 def queue_thread():
-    data_generator = dataset.get_batch(train_data_path=cfg.train_data_path,
-                                           num_workers=cfg.num_readers,
+    data_generator = dataset.get_batch(num_workers=cfg.num_readers,
                                            input_size=cfg.input_size,
-                                           batch_size=cfg.batch_size_per_gpu * len(gpus))
+                                           batch_size=cfg.batch_size_per_gpu * len(gpus),
+                                           image_list=image_list)
     for i in range(cfg.max_steps):
          data = next(data_generator)
          q.put(data)
@@ -98,6 +109,18 @@ def average_gradients(tower_grads):
     return average_grads
 
 
+def broadcast_global_variables(root_rank, index):
+    op_list = []
+    for var in tf.global_variables():
+        if "float" in var.dtype.name:
+            inputs = [var]
+            outputs = hccl_ops.broadcast(tensor=inputs, root_rank=root_rank)
+            if outputs is not None:
+                op_list.append(outputs[0].op)
+                op_list.append(tf.assign(var, outputs[0]))
+    return tf.group(op_list)
+
+
 def main(argv=None):
     if not tf.gfile.Exists(cfg.checkpoint_path):
         tf.gfile.MkDir(cfg.checkpoint_path)
@@ -105,13 +128,18 @@ def main(argv=None):
         if not cfg.restore:
             tf.gfile.DeleteRecursively(cfg.checkpoint_path)
             tf.gfile.MkDir(cfg.checkpoint_path)
-
+    if FLAGS.mul_rank_size != 1:
+        from hccl.split.api import set_split_strategy_by_size
+        set_split_strategy_by_size([90, 10])
     input_images = tf.placeholder(tf.float32, shape=[None, None, None, 3], name='input_images')
     input_label_maps = tf.placeholder(tf.float32, shape=[None, None, None, 6], name='input_label_maps')
     input_training_masks = tf.placeholder(tf.float32, shape=[None, None, None, 1], name='input_training_masks')
 
     global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
-    learning_rate = tf.train.exponential_decay(cfg.learning_rate, global_step, decay_steps=10000, decay_rate=0.94,
+    lr = cfg.learning_rate
+    if FLAGS.mul_rank_size != 1:
+        lr = lr * FLAGS.mul_rank_size
+    learning_rate = tf.train.exponential_decay(lr, global_step, decay_steps=10000, decay_rate=0.94,
                                                staircase=True)
     # add summary
     tf.summary.scalar('learning_rate', learning_rate)
@@ -119,7 +147,15 @@ def main(argv=None):
     opt = tf.train.AdamOptimizer(learning_rate)
     #opt = npu_tf_optimizer(tf.train.AdamOptimizer(learning_rate))
     loss_scale_manager = ExponentialUpdateLossScaleManager(init_loss_scale=2**32, incr_every_n_steps=100, decr_every_n_nan_or_inf=2, decr_ratio=0.5)
-    opt = NPULossScaleOptimizer(opt, loss_scale_manager)
+    
+    if FLAGS.mul_rank_size != 1:
+        opt = npu_distributed_optimizer_wrapper(opt)
+        opt = NPULossScaleOptimizer(opt, loss_scale_manager, is_distributed=True)
+    else:
+        opt = NPULossScaleOptimizer(opt, loss_scale_manager)
+    
+    
+    # opt = NPULossScaleOptimizer(opt, loss_scale_manager)
     #npu modify end
     # opt = tf.train.MomentumOptimizer(learning_rate, 0.9)
 
@@ -156,13 +192,24 @@ def main(argv=None):
     summary_writer = tf.summary.FileWriter(cfg.checkpoint_path, tf.get_default_graph())
 
     init = tf.global_variables_initializer()
-
+    bcast_op = broadcast_global_variables(0, 1)
     # if cfg.pretrained_model_path is not None:
     #     variable_restore_op = slim.assign_from_checkpoint_fn(cfg.pretrained_model_path,
     #                                                          slim.get_trainable_variables(), ignore_missing_vars=True)
     #npu modify begin
     #with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
-    with tf.Session(config=npu_config_proto(config_proto=tf.ConfigProto(allow_soft_placement=True))) as sess:
+    config = tf.ConfigProto()
+    custom_op = config.graph_options.rewrite_options.custom_optimizers.add()
+    custom_op.name = "NpuOptimizer"
+    if FLAGS.mul_rank_size != 1:
+        custom_op.parameter_map['hcom_parallel'].b = True
+    custom_op.parameter_map['precision_mode'].s = tf.compat.as_bytes("allow_mix_precision")
+    custom_op.parameter_map["modify_mixlist"].s = tf.compat.as_bytes("./ops_info.json")
+    config.graph_options.rewrite_options.remapping = RewriterConfig.OFF
+    config.graph_options.rewrite_options.memory_optimization = RewriterConfig.OFF
+    
+    #with tf.Session(config=npu_config_proto(config_proto=tf.ConfigProto(allow_soft_placement=True))) as sess:
+    with tf.Session(config=npu_config_proto(config_proto=config)) as sess:
     #npu modify end
         if cfg.restore:
             print('continue training from previous checkpoint')
@@ -170,6 +217,8 @@ def main(argv=None):
             saver.restore(sess, ckpt)
         else:
             sess.run(init)
+            if FLAGS.mul_rank_size != 1:
+                sess.run(bcast_op)
             if cfg.pretrained_model_path is not None:
                 variable_restore_op = slim.assign_from_checkpoint_fn(cfg.pretrained_model_path,
                                                                      slim.get_trainable_variables(),

@@ -145,7 +145,7 @@ class Trainer(object):
             starttime=time.time()
             image, target = sample['image'], sample['label']
             if self.args.npu:
-                image, target = image.npu(), target.npu()
+                image, target = image.npu(non_blocking=True), target.npu(non_blocking=True)
             self.scheduler(self.optimizer, i, epoch, self.best_pred)
             self.optimizer.zero_grad()
             output = self.model(image)

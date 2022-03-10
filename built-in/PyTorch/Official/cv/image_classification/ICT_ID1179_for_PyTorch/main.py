@@ -352,12 +352,12 @@ def main():
         ema_model.npu()
         cudnn.benchmark = True
 
-
-    optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
+    optimizer = torch.optim.SGD(model.parameters(), args.lr,
+    #optimizer = apex.optimizers.NpuFusedSGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay,
                                 nesterov=args.nesterov)
-    model, optimizer = amp.initialize(model, optimizer, opt_level='O2', loss_scale=128, combine_grad=True)
+    #model, optimizer = amp.initialize(model, optimizer, opt_level='O2', loss_scale=128, combine_grad=True)
 
     exp_name = experiment_name(sl = args.sl,
                     dataset= args.dataset,
@@ -561,9 +561,9 @@ def train_sl(trainloader, model, optimizer, epoch, filep):
         
         # compute gradient and do SGD step
         optimizer.zero_grad()
-        with amp.scale_loss(loss, optimizer) as scaled_loss:
-            scaled_loss.backward()
-        #loss.backward()
+        #with amp.scale_loss(loss, optimizer) as scaled_loss:
+        #    scaled_loss.backward()
+        loss.backward()
         optimizer.step()
         global_step += 1
         

@@ -3,7 +3,7 @@
 ################基础配置参数，需要模型审视修改##################
 # 必选字段(必须在此处定义的参数): Network batch_size RANK_SIZE
 # 网络名称，同目录名称
-Network="ResNet50_for_PyTorch"
+Network="ResNet50_ID0095_for_PyTorch"
 # 训练batch_size
 batch_size=4096
 # 训练使用的npu卡数
@@ -12,7 +12,7 @@ export RANK_SIZE=8
 data_path=""
 
 # 训练epoch 90
-train_epochs=1
+train_epochs=3
 # 加载数据进程数
 workers=128
 

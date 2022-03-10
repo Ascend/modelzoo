@@ -97,7 +97,7 @@ class IterationTimer(HookBase):
     placed at the beginning of the list of hooks to obtain accurate timing.
     """
 
-    def __init__(self, warmup_iter=3):
+    def __init__(self, batchsize, warmup_iter=3):
         """
         Args:
             warmup_iter (int): the number of iterations at the beginning to exclude
@@ -107,6 +107,7 @@ class IterationTimer(HookBase):
         self._step_timer = Timer()
         self._start_time = time.perf_counter()
         self._total_timer = Timer()
+        self._batchsize = batchsize
 
     def before_train(self):
         self._start_time = time.perf_counter()
@@ -131,6 +132,8 @@ class IterationTimer(HookBase):
                     total_time_minus_hooks / num_iter,
                 )
             )
+            fps = self._batchsize * num_iter / total_time_minus_hooks
+            print("FPS = {:.3f}".format(fps))
 
         logger.info(
             "Total training time: {} ({} on hooks)".format(

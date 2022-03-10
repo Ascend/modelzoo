@@ -298,6 +298,7 @@ class Runner(object):
             keep_checkpoint_max=5,
             keep_checkpoint_every_n_hours=1e6,  
             log_step_count_steps=1e9, 
+            iterations_per_loop=10,
         )
 
         if mode == 'train':
@@ -381,12 +382,13 @@ class Runner(object):
 
         training_hooks = []
 
-        
+        #because iterations_per_lopp is 10
+        train_log_every = self.run_hparams.log_every_n_steps / 10
         
         training_hooks.append(
             ProfilerHook(
                 global_batch_size=global_batch_size,
-                log_every=self.run_hparams.log_every_n_steps,
+                log_every=train_log_every,
                 warmup_steps=warmup_steps,
                 is_training=True,
                 sample_dir=self.run_hparams.sample_dir

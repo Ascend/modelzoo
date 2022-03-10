@@ -376,7 +376,10 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     uint32_t right = 0;
     uint32_t bottom = 0;
     acldvppRoiConfig *cropConfig;
-
+#ifdef ASCEND710_DVPP
+    right = width - 1;
+    bottom =  height - 1;
+#else
     if (width % 2 == 0)
     {
         right = width - 1;
@@ -394,6 +397,7 @@ acldvppRoiConfig *InitCropRoiConfig(uint32_t width, uint32_t height)
     {
         bottom = height;
     }
+#endif
     printf("InitCropRoiConfig right=%d, bottom=%d \n", right, bottom);
     cropConfig = acldvppCreateRoiConfig(0, right, 0, bottom);
     if (cropConfig == nullptr)
@@ -472,9 +476,21 @@ aclError DvppInitInput(std::vector<std::string> files)
 
         uint32_t W = imgSizes[files[i]].first;
         uint32_t H = imgSizes[files[i]].second;
+    #ifdef ASCEND710_DVPP
+        uint32_t W_Aligned = (W + 63) / 64 * 64;
+        uint32_t H_Aligned = (H + 15) / 16 * 16;
+        
+        //modify for 1951
+        if(W_Aligned > 4096 || H_Aligned > 4096)
+        {
+            return -1; 
+        }   
+    #else
         uint32_t W_Aligned = (W + 127) / 128 * 128;
         uint32_t H_Aligned = (H + 15) / 16 * 16;
         uint32_t outputBuffSize = W_Aligned * H_Aligned * 3 / 2;
+    #endif
+
         std::string fileLocation = cfg.dataDir + "/" + files[i];
 
         FILE *pFile = fopen(fileLocation.c_str(), "r");
@@ -517,7 +533,43 @@ aclError DvppInitInput(std::vector<std::string> files)
             LOG("copy host to device failed[%d]\n", ret);
             return ret;
         }
-
+    #ifdef ASCEND710_DVPP
+        uint32_t outputBuffSize=0;
+        int32_t components = 0;
+        acldvppJpegFormat realformat;
+        int aclformat;
+        acldvppJpegGetImageInfoV2(buff, fileSize, &W, &H, &components,&realformat);
+        switch (realformat){
+            case 0:
+                aclformat = 6;
+                outputBuffSize = W_Aligned * H_Aligned * 3;
+                break;
+            case 1:
+                aclformat = 4;
+                outputBuffSize = W_Aligned * H_Aligned * 2;
+                break;
+            case 2:
+                aclformat = 2;
+                outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+                break;
+            case 4:
+                aclformat = 1001;
+                outputBuffSize = W_Aligned * H_Aligned  * 2;
+                break;
+            case 3:
+                aclformat = 0;
+                outputBuffSize = W_Aligned * H_Aligned;
+                break;    
+            default:
+                aclformat = 1;
+                outputBuffSize = W_Aligned * H_Aligned  * 3/2;
+                break;
+        }
+        if (aclformat == 0) {
+            aclformat = 1;
+            outputBuffSize = outputBuffSize * 3/2;
+        }
+    #endif
         aclrtFreeHost(buff);
         // 分配device图片解码内存
         void *jpeg_dev_mem_out_ptr = nullptr;
@@ -533,8 +585,16 @@ aclError DvppInitInput(std::vector<std::string> files)
 
         funcName = "DvppPicDescCreate_output";
         gettimeofday(&func_start, NULL);
-
+    #ifdef ASCEND710_DVPP
+        jpeg_output_desc = createDvppPicDesc(jpeg_dev_mem_out_ptr, acldvppPixelFormat(aclformat), W, H, W_Aligned, H_Aligned, outputBuffSize);
+        LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
+                files[i].c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, aclformat);
+    #else
         jpeg_output_desc = createDvppPicDesc(jpeg_dev_mem_out_ptr, PIXEL_FORMAT_YUV_SEMIPLANAR_420, W, H, W_Aligned, H_Aligned, outputBuffSize);
+        LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
+                files[i].c_str(),W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
+    #endif
+        
         if (jpeg_output_desc == nullptr)
         {
             ret = ACL_ERROR_OTHERS;
@@ -542,12 +602,7 @@ aclError DvppInitInput(std::vector<std::string> files)
             return ret;
         }
         gettimeofday(&func_end, NULL);
-
-        LOG("file[%s] jpeg picDesc info: W=%d, H=%d, W_Aligned=%d, H_Aligned=%d, outBufSize=%d, format=%d\n", \ 
-                files[i]
-                                                                                                                  .c_str(),
-            W, H, W_Aligned, H_Aligned, outputBuffSize, PIXEL_FORMAT_YUV_SEMIPLANAR_420);
-
+        
         costTime = (func_end.tv_sec - func_start.tv_sec) * 1000000 + (func_end.tv_usec - func_start.tv_usec);
 
         dvppTime[funcName] += costTime;
@@ -572,9 +627,26 @@ aclError DvppInitInput(std::vector<std::string> files)
         dvppTime[funcName] += costTime;
 
         //Crop original image and Resize [256, 256]
-        aclrtSynchronizeStream(stream);
+        ret = aclrtSynchronizeStream(stream);
+        if (ret != ACL_ERROR_NONE) {
+            printf(" aclrtSynchronizeStream failed\n");
+            return ret;
+        }
+        ret = acldvppGetPicDescRetCode(jpeg_output_desc);
+        if (ret != ACL_ERROR_NONE) {
+            printf(" acldvppGetPicDescRetCode failed\n");
+            return ret;
+        }
         acldvppRoiConfig *cropConfig = nullptr;
         acldvppPicDesc *cropOutputDesc = nullptr;       // resize output desc
+    #ifdef ASCEND710_DVPP
+        uint32_t w_new = acldvppGetPicDescWidth(jpeg_output_desc);
+        uint32_t h_new = acldvppGetPicDescHeight(jpeg_output_desc);
+        uint32_t format = acldvppGetPicDescFormat(jpeg_output_desc);
+        W = w_new;
+        H = h_new;
+        printf("w_new=%d, h_new=%d, format=%u\n", w_new, h_new, format);     
+    #endif
         cropConfig = InitCropRoiConfig(W, H);
         void *cropOutBufferDev = nullptr;
         uint32_t cropOutBufferSize = 256 * 256 * 3 / 2;

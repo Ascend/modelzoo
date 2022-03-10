@@ -19,7 +19,7 @@ data_path=""
 #基础参数，需要模型审视修改
 #网络名称，同目录名称
 Network="ResNext50_ID0070_for_TensorFlow"
-batch_size=32
+batch_size=256
 #训练epoch
 train_epochs=1
 #训练步数
@@ -88,8 +88,8 @@ fi
 
 cd $cur_path/../code/resnext50_train/mains/
 #修改参数
-sed -i "s|'num_epochs': 120|'num_epochs': None|g" $cur_path/../code/resnext50_train/configs/res50_32bs_8p_host.py
-sed -i "s|file:///data/imagenet_TF|file://$data_path|g"  $cur_path/../code/resnext50_train/configs/res50_32bs_8p_host.py
+sed -i "s|'num_epochs': 120|'num_epochs': None|g" $cur_path/../code/resnext50_train/configs/res50_256bs_8p_host.py
+sed -i "s|file:///data/imagenet_TF|file://$data_path|g"  $cur_path/../code/resnext50_train/configs/res50_256bs_8p_host.py
 wait
 #训练开始时间，不需要修改
 start_time=$(date +%s)
@@ -116,7 +116,7 @@ do
 
 	#执行训练脚本，以下传参不需要修改，其他需要模型审视修改
     #--data_dir, --model_dir, --precision_mode, --over_dump, --over_dump_path，--data_dump_flag，--data_dump_step，--data_dump_path，--profiling，--profiling_dump_path，--autotune
-    nohup python3 res50.py --config_file=res50_32bs_8p_host \
+    nohup python3 res50.py --config_file=res50_256bs_8p_host \
         --max_train_steps=$train_steps \
         --iterations_per_loop=100 \
         --debug=True \
@@ -130,8 +130,8 @@ wait
 end_time=$(date +%s)
 e2e_time=$(( $end_time - $start_time ))
 #参数改回
-sed -i "s|'num_epochs': None|'num_epochs': 120|g" $cur_path/../code/resnext50_train/configs/res50_32bs_8p_host.py
-sed -i "s|file://$data_path|file:///data/imagenet_TF|g"  $cur_path/../code/resnext50_train/configs/res50_32bs_8p_host.py
+sed -i "s|'num_epochs': None|'num_epochs': 120|g" $cur_path/../code/resnext50_train/configs/res50_256bs_8p_host.py
+sed -i "s|file://$data_path|file:///data/imagenet_TF|g"  $cur_path/../code/resnext50_train/configs/res50_256bs_8p_host.py
 wait
 
 #结果打印，不需要修改

@@ -19,6 +19,8 @@ Network="Googlenet_ID0447_for_PyTorch"
 
 #训练batch_size,,需要模型审视修改
 batch_size=4096
+#训练steps
+train_steps=30
 
 #参数校验，不需要修改
 for para in $*
@@ -65,6 +67,7 @@ do
     python3.7 train.py  \
         --model googlenet \
         --epochs 1 \
+        --max_steps ${train_steps} \
         --distributed \
         --apex \
         --apex-opt-level O1 \
