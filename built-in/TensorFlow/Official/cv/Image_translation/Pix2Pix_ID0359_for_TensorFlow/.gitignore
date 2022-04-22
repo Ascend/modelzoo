@@ -1,6 +1,0 @@
-sample/*
-logs/*
-datasets/*
-checkpoint/*
-val/*
-*.pyc

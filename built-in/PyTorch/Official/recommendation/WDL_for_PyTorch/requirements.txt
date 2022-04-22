@@ -1,4 +1,0 @@
-sklearn
-pandas==1.3.3
-tqdm
-numpy

@@ -1,3 +1,0 @@
-Keras==2.3.1
-pydotplus==2.0.2
-graphviz==0.17

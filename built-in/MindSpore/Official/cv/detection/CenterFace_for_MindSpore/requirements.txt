@@ -1,3 +1,0 @@
-numpy=1.17.5
-opencv-python=4.4.0.46
-pycocotools

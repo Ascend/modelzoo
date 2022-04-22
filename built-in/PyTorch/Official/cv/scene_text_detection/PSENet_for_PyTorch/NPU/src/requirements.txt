@@ -1,3 +1,0 @@
-pyclipper
-Polygon3
-opencv-python

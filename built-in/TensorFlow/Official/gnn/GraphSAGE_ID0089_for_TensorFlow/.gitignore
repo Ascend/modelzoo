@@ -1,8 +1,0 @@
-.idea
-output
-data/ppi
-data/reddit
-exp_list.sh
-*/__pycache__
-*/*.swp
-D*

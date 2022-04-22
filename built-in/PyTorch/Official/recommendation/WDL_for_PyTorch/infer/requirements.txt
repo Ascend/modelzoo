@@ -1,4 +1,0 @@
-sklearn
-pandas
-tqdm
-numpy

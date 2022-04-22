@@ -1,1 +1,0 @@
-atc --input_format=NCHW --model=ctpn.air --framework=1 --output=ctpn --soc_version=Ascend310 --disable_reuse_memory=0 --insert_op_conf=ctpn_ms_cv_norm.aippconfig --op_select_implmode=high_precision

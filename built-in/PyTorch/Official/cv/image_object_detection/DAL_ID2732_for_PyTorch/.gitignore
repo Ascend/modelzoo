@@ -1,8 +1,0 @@
-*.so
-*.o
-*.pyc
-*.pkl
-*.pth
-*.DS_Store
-.idea
-*/__pycache__

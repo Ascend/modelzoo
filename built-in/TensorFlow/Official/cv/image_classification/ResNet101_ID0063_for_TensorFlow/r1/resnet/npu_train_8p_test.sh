@@ -1,1 +1,0 @@
-nohup bash npu_train_test.sh 8 &

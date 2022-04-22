@@ -1,4 +1,0 @@
-Python 3.7.5
-TensorFlow
-numpy >= 1.12.1
-Pandas

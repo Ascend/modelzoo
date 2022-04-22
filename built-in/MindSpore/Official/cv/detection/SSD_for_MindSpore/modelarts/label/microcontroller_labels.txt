@@ -1,5 +1,0 @@
-background
-Arduino Nano
-ESP8266
-Raspberry Pi 3
-Heltec ESP32 Lora

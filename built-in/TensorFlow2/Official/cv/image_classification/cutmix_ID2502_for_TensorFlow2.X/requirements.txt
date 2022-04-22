@@ -1,4 +1,0 @@
-os
-numpy
-pandas
-tensorflow

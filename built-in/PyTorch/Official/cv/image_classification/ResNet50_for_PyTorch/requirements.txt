@@ -1,3 +1,0 @@
-apex
-torchvision
-opencv-python
